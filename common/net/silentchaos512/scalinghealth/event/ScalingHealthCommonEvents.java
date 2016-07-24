@@ -82,14 +82,8 @@ public class ScalingHealthCommonEvents {
   public void onLivingUpdateEvent(LivingUpdateEvent event) {
 
     EntityLivingBase entityLiving = event.getEntityLiving();
-    if (!entityLiving.worldObj.isRemote && entityLiving instanceof EntityPlayer
-        && ConfigScalingHealth.ENABLE_BONUS_HEALTH_REGEN) {
-      EntityPlayer player = (EntityPlayer) entityLiving;
-      int food = player.getFoodStats().getFoodLevel();
-      if (player.worldObj.getTotalWorldTime() % 240 == 0 && food >= 10) {
-        player.heal(1);
-      }
-    }
+
+    // See PlayerBonusRegenHandler for new player health regen.
 
     if (!entityLiving.worldObj.isRemote && entityLiving instanceof EntityPlayer
         && entityLiving.ticksExisted % 20 == 0) {
@@ -99,6 +93,7 @@ public class ScalingHealthCommonEvents {
               p.posY + 0.5D, p.posZ + 0.5D).expand(16, 8, 16));
       for (EntityPlayer pl : players) {
         NBTTagCompound tag = ScalingHealthSaveStorage.playerData.get(p.getName());
+        // What is this?
         // if (tag.hasKey("username")) {
         // // ...
         // } else {

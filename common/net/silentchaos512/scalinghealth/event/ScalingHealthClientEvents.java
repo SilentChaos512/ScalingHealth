@@ -45,7 +45,9 @@ public class ScalingHealthClientEvents {
     String ret = "";
 
     ret += "Difficulty = " + ScalingHealthSaveStorage.getDifficulty(world) + "\n";
-    ret += "Player Health = " + player.getHealth() + " / " + player.getMaxHealth();
+    ret += "Player Health = " + player.getHealth() + " / " + player.getMaxHealth() + "\n";
+    int regenTimer = PlayerBonusRegenHandler.INSTANCE.getTimerForPlayer(player);
+    ret += String.format("Regen Timer = %d (%ds)", regenTimer, regenTimer / 20);
 
     return ret;
   }
