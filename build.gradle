@@ -1,0 +1,91 @@
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+    }
+}
+apply plugin: 'net.minecraftforge.gradle.forge'
+
+//plugins {
+//    id "net.minecraftforge.gradle.forge" version "2.0.2"
+//}
+
+version = "0.1.0"
+group = "net.silentchaos512.scalinghealth"
+archivesBaseName = "ScalingHealth-1.9.4"
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+minecraft {
+    version = "1.9.4-12.17.0.1976"
+    runDir = "eclipse"
+
+    replace "@VERSION@", project.version
+    replaceIn "ScalingHealth.java"
+
+    mappings = "snapshot_20160518"
+    useDepAts = true
+}
+
+repositories {
+    //mavenCentral()
+    maven {
+        name = "JEI"
+        url "http://dvs1.progwml6.com/files/maven"
+    }
+    maven {
+        name = "Guide-API"
+        url = "http://tehnut.info/maven/"
+    }
+}
+
+jar {
+    //classifier = "alpha"
+}
+task deobfJar(type: Jar) {
+    from(sourceSets.main.output) {
+        classifier = "deobf"
+    }
+}
+artifacts {
+    archives deobfJar
+}
+
+dependencies {
+    deobfCompile "mezz.jei:jei_1.9.4:3.6.7.216"
+    //deobfCompile "info.amerifrance.guideapi:Guide-API:1.9.4-2.0.0-37"
+}
+
+sourceSets {
+    main {
+        java { srcDirs = ["$projectDir/common"] }
+        resources { srcDirs = ["$projectDir/resources"] }
+    }
+}
+
+processResources
+{
+    // this will ensure that this task is redone when the versions change.
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    // replace stuff in mcmod.info, nothing else
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+                
+        // replace version and mcversion
+        expand 'version':project.version, 'mcversion':project.minecraft.version
+    }
+        
+    // copy everything else, thats not the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}

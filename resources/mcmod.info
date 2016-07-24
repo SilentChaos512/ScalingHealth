@@ -1,0 +1,12 @@
+[
+{
+  "modid": "ScalingHealth",
+  "name": "Scaling Health",
+  "description": "Extra health for players and/or mobs!",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "TODO",
+  "authors": [ "SilentChaos512" ],
+  "credits": ""
+}
+]
