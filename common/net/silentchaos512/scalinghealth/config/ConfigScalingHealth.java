@@ -42,6 +42,8 @@ public class ConfigScalingHealth {
   public static double DIFFICULTY_DEFAULT = 0;
   public static int HOURS_TO_MAX_DIFFICULTY = 48; // Not actually loaded, just to make calc below clear.
   // Difficult Life's DIFFICULTY_PER_TICK... is actually per second -.- Mine is per tick.
+  // Default from Difficult Life is 0.00165562913907284768211920529801, which works out to about 42 hours
+  // to max difficulty. Feels faster than that, but maybe I'm wrong...
   public static double DIFFICULTY_PER_TICK = DIFFICULTY_MAX / (HOURS_TO_MAX_DIFFICULTY * 72000);
 
   // Blights

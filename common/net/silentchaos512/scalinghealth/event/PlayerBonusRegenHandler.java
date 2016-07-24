@@ -25,7 +25,7 @@ public class PlayerBonusRegenHandler {
   @SubscribeEvent
   public void onPlayerTick(PlayerTickEvent event) {
 
-    if (event.side == Side.CLIENT)
+    if (event.side == Side.CLIENT || !ConfigScalingHealth.ENABLE_BONUS_HEALTH_REGEN)
       return;
 
     EntityPlayer player = event.player;

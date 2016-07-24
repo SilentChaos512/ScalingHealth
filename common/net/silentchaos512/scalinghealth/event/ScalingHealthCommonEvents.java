@@ -46,6 +46,7 @@ public class ScalingHealthCommonEvents {
   @SubscribeEvent
   public void onLivingDrops(LivingDropsEvent event) {
 
+    // Handle heart drops.
     EntityLivingBase entityLiving = event.getEntityLiving();
     if (!entityLiving.worldObj.isRemote) {
       Random rand = ScalingHealth.random;
@@ -68,6 +69,7 @@ public class ScalingHealthCommonEvents {
   @SubscribeEvent
   public void onLivingSpawnEvent(LivingEvent.LivingUpdateEvent event) {
 
+    // Increase mob health and make blights?
     EntityLivingBase entityLiving = event.getEntityLiving();
     if (!entityLiving.worldObj.isRemote && !(entityLiving instanceof EntityPlayer)) {
       if (!entityBlacklistedFromHealthIncrease(entityLiving)) {
@@ -85,15 +87,17 @@ public class ScalingHealthCommonEvents {
 
     // See PlayerBonusRegenHandler for new player health regen.
 
+    // Seems to be used to send update packets?
     if (!entityLiving.worldObj.isRemote && entityLiving instanceof EntityPlayer
         && entityLiving.ticksExisted % 20 == 0) {
       EntityPlayer p = (EntityPlayer) entityLiving;
+      // Gets all players in a one chunk radius?
       List<EntityPlayer> players = p.worldObj.getEntitiesWithinAABB(EntityPlayer.class,
           new AxisAlignedBB(p.posX - 0.5D, p.posY - 0.5D, p.posZ - 0.5D, p.posX + 0.5D,
               p.posY + 0.5D, p.posZ + 0.5D).expand(16, 8, 16));
       for (EntityPlayer pl : players) {
         NBTTagCompound tag = ScalingHealthSaveStorage.playerData.get(p.getName());
-        // What is this?
+        // What is this? Why is it here?
         // if (tag.hasKey("username")) {
         // // ...
         // } else {
@@ -107,6 +111,7 @@ public class ScalingHealthCommonEvents {
   @SubscribeEvent
   public void onWorldTick(TickEvent.WorldTickEvent event) {
 
+    // Handle difficulty ticks. Unlike Difficult Life, this is actually done each tick.
     World world = event.world;
     if (event.side == Side.SERVER && world != null && world.provider != null
         && world.provider.getDimension() == 0 && event.phase == Phase.START) {
@@ -118,24 +123,26 @@ public class ScalingHealthCommonEvents {
   public void onPlayerRespawn(
       net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent event) {
 
+    // Set player health correctly after respawn.
     if (event.player instanceof EntityPlayerMP) {
       EntityPlayerMP player = (EntityPlayerMP) event.player;
 
+      // Lose health on death?
       if (ConfigScalingHealth.LOSE_HEALTH_ON_DEATH) {
         ScalingHealthSaveStorage.resetPlayerHealth(player);
       }
 
+      // Calculate modifier value.
       int health = ScalingHealthSaveStorage.getPlayerHealth(player);
       int maxHealth = (int) player.getMaxHealth();
       float difference = health - maxHealth;
-      ScalingHealth.logHelper.debug(health, maxHealth);
 
       AttributeModifier mod = player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
           .getModifier(ScalingHealthSaveStorage.MODIFIER_ID);
       if (mod == null) {
         player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
             .applyModifier(new AttributeModifier(ScalingHealthSaveStorage.MODIFIER_ID,
-                ScalingHealth.MOD_ID + ".PlayerHealthDifference", difference, 0));
+                ScalingHealth.MOD_ID + ".PlayerHealthDifference", difference, 0)); // TODO: Constant key!
       }
 
       ScalingHealthSaveStorage.setPlayerHealth(player, health);
@@ -147,6 +154,7 @@ public class ScalingHealthCommonEvents {
   @SubscribeEvent
   public void onPlayerJoinedServerEvent(PlayerLoggedInEvent event) {
 
+    // Sync player data and set health.
     if (event.player instanceof EntityPlayerMP) {
       DataSyncManager.requestServerToClientMessage("worldData", (EntityPlayerMP) event.player,
           ScalingHealthSaveStorage.commonTag, true);
@@ -162,7 +170,7 @@ public class ScalingHealthCommonEvents {
       if (mod == null) {
         player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
             .applyModifier(new AttributeModifier(ScalingHealthSaveStorage.MODIFIER_ID,
-                ScalingHealth.MOD_ID + ".PlayerHealthDifference", difference, 0));
+                ScalingHealth.MOD_ID + ".PlayerHealthDifference", difference, 0)); // TODO: Constant key!
       }
       maxHealth = player.getMaxHealth();
       if (player.getHealth() > maxHealth) {
