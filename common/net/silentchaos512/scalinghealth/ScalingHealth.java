@@ -20,6 +20,7 @@ import net.silentchaos512.lib.SilentLib;
 import net.silentchaos512.lib.registry.SRegistry;
 import net.silentchaos512.lib.util.LocalizationHelper;
 import net.silentchaos512.lib.util.LogHelper;
+import net.silentchaos512.scalinghealth.command.CommandScalingHealth;
 import net.silentchaos512.scalinghealth.init.ModItems;
 import net.silentchaos512.scalinghealth.network.PacketScalingHealth;
 import net.silentchaos512.scalinghealth.proxy.ScalingHealthCommonProxy;

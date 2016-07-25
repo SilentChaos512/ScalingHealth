@@ -1,4 +1,4 @@
-package net.silentchaos512.scalinghealth;
+package net.silentchaos512.scalinghealth.command;
 
 import java.util.List;
 
@@ -11,6 +11,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
+import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.utils.ScalingHealthSaveStorage;
 
