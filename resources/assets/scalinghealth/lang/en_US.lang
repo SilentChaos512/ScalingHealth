@@ -1,0 +1,24 @@
+##########
+# Blocks #
+##########
+
+# No one's home!
+
+
+
+#########
+# Items #
+#########
+
+item.scalinghealth:HeartContainer.name=Heart Container
+
+
+
+############
+# Commands #
+############
+
+command.outOfBounds=Value must be between %s and %s.
+command.showDifficulty=Difficulty: %s / %s
+command.setDifficulty=Set world difficulty to %s.
+command.setHealth=Set health of player %s to %d.

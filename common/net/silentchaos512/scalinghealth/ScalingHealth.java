@@ -38,6 +38,8 @@ public class ScalingHealth {
   public static final String DEPENDENCIES = "required-after:Forge@[12.17.0.1976,);required-after:SilentLib;";
   public static final String RESOURCE_PREFIX = MOD_ID.toLowerCase() + ":";
 
+  public static boolean DEBUG_MODE = "@VERSION@".equals(VERSION);
+
   public static SimpleNetworkWrapper networkManager;
 
   public static Random random = new Random();

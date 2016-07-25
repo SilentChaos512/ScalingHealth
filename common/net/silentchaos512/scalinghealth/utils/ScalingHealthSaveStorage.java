@@ -75,6 +75,10 @@ public class ScalingHealthSaveStorage {
       // -(player.getMaxHealth() - value), 0));
     }
 
+    if (player.getHealth() > player.getMaxHealth()) {
+      player.setHealth(player.getMaxHealth());
+    }
+
     sendUpdatePacketToPlayer((EntityPlayerMP) player);
   }
 
