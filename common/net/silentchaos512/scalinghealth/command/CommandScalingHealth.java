@@ -102,6 +102,10 @@ public class CommandScalingHealth implements ICommand {
         if (args.length > 2) {
           String name = args[2];
           player = server.getPlayerList().getPlayerByUsername(name);
+          if (player == null) {
+            tell(sender, "playerNotFound", true, name);
+            return;
+          }
         }
 
         // Change it!
