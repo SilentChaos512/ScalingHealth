@@ -21,6 +21,7 @@ import net.silentchaos512.lib.registry.SRegistry;
 import net.silentchaos512.lib.util.LocalizationHelper;
 import net.silentchaos512.lib.util.LogHelper;
 import net.silentchaos512.scalinghealth.command.CommandScalingHealth;
+import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.init.ModItems;
 import net.silentchaos512.scalinghealth.network.PacketScalingHealth;
 import net.silentchaos512.scalinghealth.proxy.ScalingHealthCommonProxy;
@@ -29,7 +30,8 @@ import net.silentchaos512.scalinghealth.proxy.ScalingHealthCommonProxy;
 @Mod(modid = ScalingHealth.MOD_ID,
   name = ScalingHealth.MOD_NAME,
   version = ScalingHealth.VERSION,
-  dependencies = ScalingHealth.DEPENDENCIES)
+  dependencies = ScalingHealth.DEPENDENCIES,
+  guiFactory = "net.silentchaos512.scalinghealth.gui.GuiFactoryScalingHealth")
 //@formatter:on
 public class ScalingHealth {
 
@@ -74,7 +76,7 @@ public class ScalingHealth {
     networkManager.registerMessage(PacketScalingHealth.Handler.class, PacketScalingHealth.class, 0,
         Side.CLIENT);
 
-    // TODO: Config
+    ConfigScalingHealth.init(event.getSuggestedConfigurationFile());
 
     ModItems.init(registry);
 

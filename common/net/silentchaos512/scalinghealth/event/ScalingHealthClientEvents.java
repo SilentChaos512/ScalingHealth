@@ -10,6 +10,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.utils.ScalingHealthSaveStorage;
 
 public class ScalingHealthClientEvents {
@@ -18,6 +19,9 @@ public class ScalingHealthClientEvents {
   public void renderTick(RenderGameOverlayEvent.Post event) {
 
     if (Minecraft.getMinecraft().theWorld == null || event.getType() != ElementType.ALL)
+      return;
+
+    if (!ConfigScalingHealth.DEBUG_MODE)
       return;
 
     ScaledResolution res = event.getResolution();

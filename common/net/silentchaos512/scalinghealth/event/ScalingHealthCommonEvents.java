@@ -30,6 +30,7 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -390,5 +391,14 @@ public class ScalingHealthCommonEvents {
   public void onWorldSaveEvent(WorldEvent.Save event) {
 
     ScalingHealthSaveStorage.saveServerWorldFile(event);
+  }
+
+  @SubscribeEvent
+  public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
+
+    if (event.getModID().equals(ScalingHealth.MOD_ID)) {
+      ConfigScalingHealth.load();
+      ConfigScalingHealth.save();
+    }
   }
 }
