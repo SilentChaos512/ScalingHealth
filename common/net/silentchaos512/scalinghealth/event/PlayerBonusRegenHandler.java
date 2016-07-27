@@ -19,6 +19,8 @@ public class PlayerBonusRegenHandler {
 
   public int getTimerForPlayer(EntityPlayer player) {
 
+    if (player == null || !timers.containsKey(player.getName()))
+      return -1;
     return timers.get(player.getName());
   }
 

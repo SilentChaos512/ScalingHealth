@@ -1,6 +1,7 @@
 package net.silentchaos512.scalinghealth.network;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -59,7 +60,8 @@ public class PacketScalingHealth implements IMessage {
       }
       if (message.id.equalsIgnoreCase("playerData")) {
         String tagName = message.tag.getString("username");
-        String username = ScalingHealth.proxy.getClientPlayer().getName();
+        EntityPlayer clientPlayer = ScalingHealth.proxy.getClientPlayer();
+        String username = clientPlayer == null ? "" : clientPlayer.getName();
         if (username.equalsIgnoreCase(tagName))
           ScalingHealthSaveStorage.clientPlayerData = message.tag;
         else

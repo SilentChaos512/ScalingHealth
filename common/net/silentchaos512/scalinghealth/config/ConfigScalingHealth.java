@@ -11,7 +11,7 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 
 public class ConfigScalingHealth {
 
-  public static boolean DEBUG_MODE = ScalingHealth.VERSION.equals("@VERSION@");
+  public static boolean DEBUG_MODE = false;
 
   // Client
   public static boolean CHANGE_HEART_RENDERING = true;  // TODO: Change?
