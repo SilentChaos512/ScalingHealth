@@ -17,39 +17,36 @@ public class ModifierHandler {
   public static final String MODIFIER_NAME_HEALTH = ScalingHealth.MOD_ID + ".HealthModifier";
   public static final String MODIFIER_NAME_DAMAGE = ScalingHealth.MOD_ID + ".DamageModifier";
 
+  private static void setModifier(IAttributeInstance attr, UUID id, String name, float amount) {
+
+    if (attr == null)
+      return;
+
+    // Calculate the difference for the modifier.
+    float normalValue = (float) attr.getBaseValue();
+    float difference = amount - normalValue;
+
+    // Get current and new modifier.
+    AttributeModifier mod = attr.getModifier(id);
+    AttributeModifier newMod = new AttributeModifier(id, name, difference, 0);
+
+    // Remove the old, apply the new.
+    if (mod != null)
+      attr.removeModifier(mod);
+    attr.applyModifier(newMod);
+  }
+
   public static void setMaxHealth(EntityLivingBase entity, float amount) {
 
+    float originalHealth = entity.getHealth();
     IAttributeInstance attr = entity.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
-    if (attr != null) {
-      float normalMax = (float) attr.getBaseValue();
-      float difference = amount - normalMax;
-
-      AttributeModifier mod = attr.getModifier(MODIFIER_ID_HEALTH);
-      AttributeModifier newMod = new AttributeModifier(MODIFIER_ID_HEALTH, MODIFIER_NAME_HEALTH,
-          difference, 0);
-
-      // ScalingHealth.logHelper.debug(amount, normalMax, difference, mod == null);
-
-      if (mod != null)
-        attr.removeModifier(mod);
-      attr.applyModifier(newMod);
-    }
+    setModifier(attr, MODIFIER_ID_HEALTH, MODIFIER_NAME_HEALTH, amount);
+    entity.setHealth(originalHealth);
   }
 
   public static void setAttackDamage(EntityLivingBase entity, float amount) {
 
     IAttributeInstance attr = entity.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
-    if (attr != null) {
-      float normalMax = (float) attr.getBaseValue();
-      float difference = amount - normalMax;
-
-      AttributeModifier mod = attr.getModifier(MODIFIER_ID_DAMAGE);
-      AttributeModifier newMod = new AttributeModifier(MODIFIER_ID_DAMAGE, MODIFIER_NAME_DAMAGE,
-          difference, 0);
-
-      if (mod != null)
-        attr.removeModifier(mod);
-      attr.applyModifier(newMod);
-    }
+    setModifier(attr, MODIFIER_ID_DAMAGE, MODIFIER_NAME_DAMAGE, amount);
   }
 }
