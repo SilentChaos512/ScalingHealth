@@ -8,7 +8,6 @@ import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityMob;
@@ -36,10 +35,12 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.relauncher.Side;
+import net.silentchaos512.lib.util.LogHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.init.ModItems;
 import net.silentchaos512.scalinghealth.network.DataSyncManager;
+import net.silentchaos512.scalinghealth.utils.ModifierHandler;
 import net.silentchaos512.scalinghealth.utils.ScalingHealthSaveStorage;
 
 public class ScalingHealthCommonEvents {
@@ -133,22 +134,11 @@ public class ScalingHealthCommonEvents {
         ScalingHealthSaveStorage.resetPlayerHealth(player);
       }
 
-      // Calculate modifier value.
-      int health = ScalingHealthSaveStorage.getPlayerHealth(player);
-      int maxHealth = (int) player.getMaxHealth();
-      float difference = health - maxHealth;
-
-      AttributeModifier mod = player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
-          .getModifier(ScalingHealthSaveStorage.MODIFIER_ID);
-      if (mod == null) {
-        player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
-            .applyModifier(new AttributeModifier(ScalingHealthSaveStorage.MODIFIER_ID,
-                ScalingHealth.MOD_ID + ".PlayerHealthDifference", difference, 0)); // TODO: Constant key!
-      }
-
-      ScalingHealthSaveStorage.setPlayerHealth(player, health);
-      if (player.getHealth() != health)
-        player.setHealth(health);
+      // Apply health modifier
+      int maxHealth = ScalingHealthSaveStorage.getPlayerHealth(player);
+      ModifierHandler.setMaxHealth(player, maxHealth);
+      if (player.getHealth() != maxHealth)
+        player.setHealth(maxHealth);
     }
   }
 
@@ -161,22 +151,14 @@ public class ScalingHealthCommonEvents {
           ScalingHealthSaveStorage.commonTag, true);
       DataSyncManager.requestServerToClientMessage("playerData", (EntityPlayerMP) event.player,
           ScalingHealthSaveStorage.playerData.get(event.player.getName()), true);
-      EntityPlayerMP player = (EntityPlayerMP) event.player;
-      float maxHealth = player.getMaxHealth();
-      float shouldHave = ScalingHealthSaveStorage.getPlayerHealth(player);
-      float difference = shouldHave - maxHealth;
 
-      AttributeModifier mod = player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
-          .getModifier(ScalingHealthSaveStorage.MODIFIER_ID);
-      if (mod == null) {
-        player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
-            .applyModifier(new AttributeModifier(ScalingHealthSaveStorage.MODIFIER_ID,
-                ScalingHealth.MOD_ID + ".PlayerHealthDifference", difference, 0)); // TODO: Constant key!
-      }
-      maxHealth = player.getMaxHealth();
-      if (player.getHealth() > maxHealth) {
+      EntityPlayerMP player = (EntityPlayerMP) event.player;
+
+      // Apply health modifier
+      float maxHealth = ScalingHealthSaveStorage.getPlayerHealth(player);
+      ModifierHandler.setMaxHealth(player, maxHealth);
+      if (player.getHealth() > maxHealth)
         player.setHealth(maxHealth);
-      }
     }
   }
 
@@ -196,6 +178,7 @@ public class ScalingHealthCommonEvents {
     }
 
     float genAddedHealth = difficulty;
+    float genAddedDamage = 0;
 
     if (entityLiving instanceof IMob)
       genAddedHealth *= ConfigScalingHealth.DIFFICULTY_GENERIC_HEALTH_MULTIPLIER;
@@ -210,32 +193,26 @@ public class ScalingHealthCommonEvents {
       genAddedHealth += diffIncrease;
     }
 
-    IAttributeInstance attrDamage = entityLiving
-        .getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
-    if (attrDamage != null) {
-      if (difficulty > 0) {
-        float diffIncrease = difficulty * rand.nextFloat();
-        difficulty -= diffIncrease;
-        if (attrDamage.getModifier(ScalingHealthSaveStorage.MODIFIER_ID) == null) {
-          attrDamage.applyModifier(new AttributeModifier(ScalingHealthSaveStorage.MODIFIER_ID,
-              "ScalingHealth.DamageModifier", diffIncrease / 10, 0));
-        }
-      }
+    // Increase attack damage.
+    if (difficulty > 0) {
+      float diffIncrease = difficulty * rand.nextFloat();
+      difficulty -= diffIncrease;
+      genAddedDamage = diffIncrease / 10f;
+      ModifierHandler.setAttackDamage(entityLiving, genAddedDamage);
     }
 
     if (difficulty > 0) {
       // TODO: Random potion effects? (DLEventHandler:217)
     }
 
-    IAttributeInstance attrHealth = entityLiving
-        .getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
-    if (attrHealth.getModifier(ScalingHealthSaveStorage.MODIFIER_ID) == null) {
-      attrHealth.applyModifier(new AttributeModifier(ScalingHealthSaveStorage.MODIFIER_ID,
-          "ScalingHealth.HealthModifier", genAddedHealth, 0));
-    }
+    // Apply extra health.
+    ModifierHandler.setMaxHealth(entityLiving, genAddedHealth + entityLiving.getMaxHealth());
     entityLiving.setHealth(entityLiving.getMaxHealth());
 
-    // ScalingHealth.logHelper.debug(entityLiving.getName(), genAddedHealth, difficulty);
+    // TODO: Config!
+//    LogHelper log = ScalingHealth.logHelper;
+//    log.info(
+//        entityLiving.getName() + ": Health +" + genAddedHealth + ", Damage +" + genAddedDamage);
   }
 
   private void makeEntityBlight(EntityLivingBase entityLiving, Random rand) {
@@ -283,7 +260,7 @@ public class ScalingHealthCommonEvents {
     if (entityLiving instanceof EntityCreeper) {
       ((EntityCreeper) entityLiving)
           .onStruckByLightning(new EntityLightningBolt(entityLiving.worldObj,
-              entityLiving.posX, entityLiving.posY, entityLiving.posZ, true)); // TODO: true or false?
+              entityLiving.posX, entityLiving.posY, entityLiving.posZ, true));
     }
     // @formatter:on
   }
@@ -360,7 +337,7 @@ public class ScalingHealthCommonEvents {
 
     return entityLiving.getAttributeMap() != null
         && entityLiving.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
-            .getModifier(ScalingHealthSaveStorage.MODIFIER_ID) == null;
+            .getModifier(ModifierHandler.MODIFIER_ID_HEALTH) == null;
   }
 
   private boolean entityBlacklistedFromBecomingBlight(EntityLivingBase entityLiving) {

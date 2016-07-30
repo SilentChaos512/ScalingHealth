@@ -109,7 +109,13 @@ public class CommandScalingHealth implements ICommand {
         }
 
         // Change it!
+        float currentHealth = player.getHealth();
+        float toHeal = value - currentHealth;
+
         ScalingHealthSaveStorage.setPlayerHealth(player, value);
+        if (toHeal > 0)
+          player.heal(toHeal);
+
         tell(sender, "setHealth", true, player.getName(), value);
       } catch (NumberFormatException ex) {
         tell(sender, getCommandUsage(sender), false);

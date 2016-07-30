@@ -25,8 +25,6 @@ import net.silentchaos512.scalinghealth.network.DataSyncManager;
 
 public class ScalingHealthSaveStorage {
 
-  public static final UUID MODIFIER_ID = UUID.fromString("af286358-cd54-11e4-afdc-1681e6b88ec1");
-
   public static final String NBT_WORLD_DIFFICULTY = "difficulty";
   public static final String NBT_PLAYER_HEALTH = "health";
 
@@ -56,28 +54,16 @@ public class ScalingHealthSaveStorage {
 
   public static int getPlayerHealth(EntityPlayer player) {
 
-    return getPlayerTag(player).getInteger(NBT_PLAYER_HEALTH);
+    int val = getPlayerTag(player).getInteger(NBT_PLAYER_HEALTH);
+    return val <= 0 ? 20 : val;
   }
 
   public static void setPlayerHealth(EntityPlayer player, int value) {
 
     getPlayerTag(player).setInteger(NBT_PLAYER_HEALTH, value);
-
-    AttributeModifier modifier = player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
-        .getModifier(MODIFIER_ID);
-    if (modifier != null) {
-      AttributeModifier copy = new AttributeModifier(modifier.getID(), modifier.getName(),
-          value - 20, modifier.getOperation());
-      player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).removeModifier(modifier);
-      player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).applyModifier(copy);
-      // player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
-      // .applyModifier(new AttributeModifier(MODIFIER_ID, "ScalingHealth.PlayerHealthDfifference",
-      // -(player.getMaxHealth() - value), 0));
-    }
-
-    if (player.getHealth() > player.getMaxHealth()) {
-      player.setHealth(player.getMaxHealth());
-    }
+    ModifierHandler.setMaxHealth(player, value);
+    if (player.getHealth() > value)
+      player.setHealth(value);
 
     sendUpdatePacketToPlayer((EntityPlayerMP) player);
   }
@@ -95,8 +81,6 @@ public class ScalingHealthSaveStorage {
       setPlayerHealth(player, currentHealth + 2);
       player.heal(2.0f);
     }
-
-    ScalingHealth.logHelper.debug(getPlayerHealth(player));
   }
 
   public static void resetPlayerHealth(EntityPlayer player) {
