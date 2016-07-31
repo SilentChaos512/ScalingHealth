@@ -1,0 +1,8 @@
+0.1.2
+Added: Custom health rendering now implemented.
+
+0.1.1
+Changed the way attribute modifiers are applied.
+
+0.1.0
+Initial alpha release.
