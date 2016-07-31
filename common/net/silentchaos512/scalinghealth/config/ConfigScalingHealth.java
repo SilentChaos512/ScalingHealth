@@ -72,7 +72,8 @@ public class ConfigScalingHealth {
 
   public static void init(File file) {
 
-    c = new Configuration(file);
+    String path = file.getPath().replaceFirst("\\.cfg$", "/main.cfg");
+    c = new Configuration(new File(path));
     load();
   }
 

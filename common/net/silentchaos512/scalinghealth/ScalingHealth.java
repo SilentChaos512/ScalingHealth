@@ -36,7 +36,7 @@ import net.silentchaos512.scalinghealth.proxy.ScalingHealthCommonProxy;
 public class ScalingHealth {
 
   public static final String MOD_ID = "ScalingHealth";
-  public static final String MOD_ID_LOWER = "scalinghealth";
+  //public static final String MOD_ID_LOWER = "scalinghealth";
   public static final String MOD_NAME = "Scaling Health";
   public static final String VERSION = "@VERSION@";
   public static final String DEPENDENCIES = "required-after:Forge@[12.17.0.1976,);required-after:SilentLib;";
@@ -59,7 +59,7 @@ public class ScalingHealth {
 //    }
 //  };
 
-  @Instance(MOD_ID_LOWER)
+  @Instance(MOD_ID)
   public static ScalingHealth instance;
 
   @SidedProxy(clientSide = "net.silentchaos512.scalinghealth.proxy.ScalingHealthClientProxy", serverSide = "net.silentchaos512.scalinghealth.proxy.ScalingHealthCommonProxy")
@@ -78,6 +78,7 @@ public class ScalingHealth {
         Side.CLIENT);
 
     ConfigScalingHealth.init(event.getSuggestedConfigurationFile());
+    ConfigScalingHealth.save();
 
     ModItems.init(registry);
 

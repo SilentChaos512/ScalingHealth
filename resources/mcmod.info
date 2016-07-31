@@ -1,6 +1,6 @@
 [
 {
-  "modid": "scalinghealth",
+  "modid": "ScalingHealth",
   "name": "Scaling Health",
   "description": "Extra health for players and/or mobs!",
   "version": "${version}",
