@@ -15,6 +15,21 @@ public class ScalingHealthClientProxy extends ScalingHealthCommonProxy {
     super.preInit(registry);
     MinecraftForge.EVENT_BUS.register(new ScalingHealthClientEvents());
     MinecraftForge.EVENT_BUS.register(new HeartDisplayHandler());
+    registry.clientPreInit();
+  }
+
+  @Override
+  public void init(SRegistry registry) {
+
+    super.init(registry);
+    registry.clientInit();
+  }
+
+  @Override
+  public void postInit(SRegistry registry) {
+
+    super.postInit(registry);
+    registry.clientPostInit();
   }
 
   @Override

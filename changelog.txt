@@ -1,5 +1,7 @@
 0.1.2
 Added: Custom health rendering now implemented.
+Fixed: Some mobs not having current health set correctly on spawn.
+Fixed: Heart Container model not loading.
 
 0.1.1
 Changed the way attribute modifiers are applied.

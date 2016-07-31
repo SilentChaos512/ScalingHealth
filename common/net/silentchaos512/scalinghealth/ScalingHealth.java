@@ -50,14 +50,14 @@ public class ScalingHealth {
 
   public static SRegistry registry = new SRegistry(MOD_ID);
 
-  public static CreativeTabs creativeTab = new CreativeTabs("tab" + MOD_ID) {
-
-    @Override
-    public Item getTabIconItem() {
-
-      return Items.ACACIA_BOAT;
-    }
-  };
+//  public static CreativeTabs creativeTab = new CreativeTabs("tab" + MOD_ID) {
+//
+//    @Override
+//    public Item getTabIconItem() {
+//
+//      return Items.ACACIA_BOAT;
+//    }
+//  };
 
   @Instance(MOD_ID_LOWER)
   public static ScalingHealth instance;
