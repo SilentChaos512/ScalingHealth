@@ -7,7 +7,6 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityMob;
@@ -24,8 +23,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
+import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
-import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -35,7 +34,6 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.relauncher.Side;
-import net.silentchaos512.lib.util.LogHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.init.ModItems;
@@ -69,10 +67,13 @@ public class ScalingHealthCommonEvents {
   }
 
   @SubscribeEvent
-  public void onLivingSpawnEvent(LivingEvent.LivingUpdateEvent event) {
+  public void onLivingSpawnEvent(EntityJoinWorldEvent event) {
 
     // Increase mob health and make blights?
-    EntityLivingBase entityLiving = event.getEntityLiving();
+    if (!(event.getEntity() instanceof EntityLivingBase))
+      return;
+
+    EntityLivingBase entityLiving = (EntityLivingBase) event.getEntity();
     if (!entityLiving.worldObj.isRemote && !(entityLiving instanceof EntityPlayer)) {
       if (!entityBlacklistedFromHealthIncrease(entityLiving)) {
         if (canIncreaseEntityHealth(entityLiving)) {
