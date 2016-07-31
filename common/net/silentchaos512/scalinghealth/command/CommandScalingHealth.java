@@ -29,7 +29,7 @@ public class CommandScalingHealth implements ICommand {
   @Override
   public String getCommandName() {
 
-    return ScalingHealth.MOD_ID.toLowerCase();
+    return ScalingHealth.MOD_ID_LOWER;
   }
 
   @Override

@@ -14,8 +14,8 @@ public class ModifierHandler {
       .fromString("c0bef565-35f6-4dc5-bb4c-3644c382e6ce");
   public static final UUID MODIFIER_ID_DAMAGE = UUID
       .fromString("d3560b15-c459-451c-86a8-0247015ae899");
-  public static final String MODIFIER_NAME_HEALTH = ScalingHealth.MOD_ID + ".HealthModifier";
-  public static final String MODIFIER_NAME_DAMAGE = ScalingHealth.MOD_ID + ".DamageModifier";
+  public static final String MODIFIER_NAME_HEALTH = ScalingHealth.MOD_ID_OLD + ".HealthModifier";
+  public static final String MODIFIER_NAME_DAMAGE = ScalingHealth.MOD_ID_OLD + ".DamageModifier";
 
   private static void setModifier(IAttributeInstance attr, UUID id, String name, float amount) {
 

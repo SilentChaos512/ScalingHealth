@@ -27,7 +27,7 @@ import net.silentchaos512.scalinghealth.network.PacketScalingHealth;
 import net.silentchaos512.scalinghealth.proxy.ScalingHealthCommonProxy;
 
 //@formatter:off
-@Mod(modid = ScalingHealth.MOD_ID,
+@Mod(modid = ScalingHealth.MOD_ID_LOWER,
   name = ScalingHealth.MOD_NAME,
   version = ScalingHealth.VERSION,
   dependencies = ScalingHealth.DEPENDENCIES,
@@ -35,12 +35,12 @@ import net.silentchaos512.scalinghealth.proxy.ScalingHealthCommonProxy;
 //@formatter:on
 public class ScalingHealth {
 
-  public static final String MOD_ID = "ScalingHealth";
-  //public static final String MOD_ID_LOWER = "scalinghealth";
+  public static final String MOD_ID_OLD = "ScalingHealth";
+  public static final String MOD_ID_LOWER = "scalinghealth";
   public static final String MOD_NAME = "Scaling Health";
   public static final String VERSION = "@VERSION@";
   public static final String DEPENDENCIES = "required-after:Forge@[12.17.0.1976,);required-after:SilentLib;";
-  public static final String RESOURCE_PREFIX = MOD_ID.toLowerCase() + ":";
+  public static final String RESOURCE_PREFIX = MOD_ID_LOWER + ":";
 
   public static SimpleNetworkWrapper networkManager;
 
@@ -48,7 +48,7 @@ public class ScalingHealth {
   public static LogHelper logHelper = new LogHelper(MOD_NAME);
   public static LocalizationHelper localizationHelper;
 
-  public static SRegistry registry = new SRegistry(MOD_ID);
+  public static SRegistry registry = new SRegistry(MOD_ID_OLD);
 
 //  public static CreativeTabs creativeTab = new CreativeTabs("tab" + MOD_ID) {
 //
@@ -59,7 +59,7 @@ public class ScalingHealth {
 //    }
 //  };
 
-  @Instance(MOD_ID)
+  @Instance(MOD_ID_LOWER)
   public static ScalingHealth instance;
 
   @SidedProxy(clientSide = "net.silentchaos512.scalinghealth.proxy.ScalingHealthClientProxy", serverSide = "net.silentchaos512.scalinghealth.proxy.ScalingHealthCommonProxy")
@@ -68,10 +68,10 @@ public class ScalingHealth {
   @EventHandler
   public void preInit(FMLPreInitializationEvent event) {
 
-    localizationHelper = new LocalizationHelper(MOD_ID).setReplaceAmpersand(true);
-    SilentLib.instance.registerLocalizationHelperForMod(MOD_ID, localizationHelper);
+    localizationHelper = new LocalizationHelper(MOD_ID_LOWER).setReplaceAmpersand(true);
+    SilentLib.instance.registerLocalizationHelperForMod(MOD_ID_LOWER, localizationHelper);
 
-    networkManager = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_ID);
+    networkManager = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_ID_LOWER);
     networkManager.registerMessage(PacketScalingHealth.Handler.class, PacketScalingHealth.class, 0,
         Side.SERVER);
     networkManager.registerMessage(PacketScalingHealth.Handler.class, PacketScalingHealth.class, 0,

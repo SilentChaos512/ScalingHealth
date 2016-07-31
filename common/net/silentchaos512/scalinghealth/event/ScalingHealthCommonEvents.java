@@ -7,6 +7,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityMob;
@@ -199,7 +200,6 @@ public class ScalingHealthCommonEvents {
       float diffIncrease = difficulty * rand.nextFloat();
       difficulty -= diffIncrease;
       genAddedDamage = diffIncrease / 10f;
-      ModifierHandler.setAttackDamage(entityLiving, genAddedDamage);
     }
 
     if (difficulty > 0) {
@@ -208,11 +208,11 @@ public class ScalingHealthCommonEvents {
 
     // Apply extra health.
     ModifierHandler.setMaxHealth(entityLiving, genAddedHealth + entityLiving.getMaxHealth());
+    ModifierHandler.setAttackDamage(entityLiving, genAddedDamage); // FIXME
     entityLiving.setHealth(entityLiving.getMaxHealth());
 
     // TODO: Config!
-//    LogHelper log = ScalingHealth.logHelper;
-//    log.info(
+//    ScalingHealth.logHelper.info(
 //        entityLiving.getName() + ": Health +" + genAddedHealth + ", Damage +" + genAddedDamage);
   }
 
@@ -374,7 +374,7 @@ public class ScalingHealthCommonEvents {
   @SubscribeEvent
   public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
 
-    if (event.getModID().equals(ScalingHealth.MOD_ID)) {
+    if (event.getModID().equals(ScalingHealth.MOD_ID_LOWER)) {
       ConfigScalingHealth.load();
       ConfigScalingHealth.save();
     }

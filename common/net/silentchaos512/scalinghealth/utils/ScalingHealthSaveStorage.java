@@ -139,7 +139,7 @@ public class ScalingHealthSaveStorage {
         if (f != null) {
           String fPath = f.getAbsolutePath();
           File worldSaveFile = new File(
-              fPath + "/" + ScalingHealth.MOD_ID + "Data_" + player.getName() + ".dat");
+              fPath + "/" + ScalingHealth.MOD_ID_OLD + "Data_" + player.getName() + ".dat");
           if (!worldSaveFile.exists()) {
             log.info("Player file not found. Creating it now.");
             worldSaveFile.createNewFile();
@@ -177,7 +177,7 @@ public class ScalingHealthSaveStorage {
         if (f != null) {
           String fPath = f.getAbsolutePath();
           File worldSaveFile = new File(
-              fPath + "/" + ScalingHealth.MOD_ID + "Data_" + player.getName() + ".dat");
+              fPath + "/" + ScalingHealth.MOD_ID_OLD + "Data_" + player.getName() + ".dat");
           if (!worldSaveFile.exists()) {
             worldSaveFile.createNewFile();
           }

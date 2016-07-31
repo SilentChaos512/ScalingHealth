@@ -20,7 +20,7 @@ import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 
 public class HeartDisplayHandler extends Gui {
 
-  public static final ResourceLocation TEXTURE = new ResourceLocation(ScalingHealth.MOD_ID,
+  public static final ResourceLocation TEXTURE = new ResourceLocation(ScalingHealth.MOD_ID_LOWER,
       "textures/gui/hud.png");
   public static final int[] colors = new int[] { 0xE60000, 0xE64F12, 0xFF571D, 0xE6B000, 0xC8E600,
       0x4BB300, 0x2AD92D, 0x09D96B, 0x0EE6E2, 0x00ACE6, 0x1880E6, 0x184CE6, 0x6289FF, 0x7676FF,

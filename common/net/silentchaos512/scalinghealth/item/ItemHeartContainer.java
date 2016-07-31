@@ -15,7 +15,7 @@ public class ItemHeartContainer extends ItemSL {
 
   public ItemHeartContainer() {
 
-    super(1, ScalingHealth.MOD_ID, "HeartContainer");
+    super(1, ScalingHealth.MOD_ID_LOWER, "HeartContainer");
     setCreativeTab(CreativeTabs.MISC);
   }
 

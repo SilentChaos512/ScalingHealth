@@ -1,5 +1,9 @@
 0.1.2
 Added: Custom health rendering now implemented.
+Added: Some attribute modifier debug info. Displayed through WIT (not a dependency)
+Added: A way to change the hard-coded max health limit (uses ASM, I don't think there's any other way)
+Added: An ASM config file that has an option to change the max health cap (in config/scalinghealth)
+Changed: Main config file moved to its own folder (config/scalinghealth).
 Fixed: Some mobs not having current health set correctly on spawn.
 Fixed: Heart Container model not loading.
 
