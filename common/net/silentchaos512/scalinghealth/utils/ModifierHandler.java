@@ -17,14 +17,14 @@ public class ModifierHandler {
   public static final String MODIFIER_NAME_HEALTH = ScalingHealth.MOD_ID_OLD + ".HealthModifier";
   public static final String MODIFIER_NAME_DAMAGE = ScalingHealth.MOD_ID_OLD + ".DamageModifier";
 
-  private static void setModifier(IAttributeInstance attr, UUID id, String name, float amount) {
+  private static void setModifier(IAttributeInstance attr, UUID id, String name, double amount) {
 
     if (attr == null)
       return;
 
     // Calculate the difference for the modifier.
-    float normalValue = (float) attr.getBaseValue();
-    float difference = amount - normalValue;
+    double normalValue = attr.getBaseValue();
+    double difference = amount - normalValue;
 
     // Get current and new modifier.
     AttributeModifier mod = attr.getModifier(id);
@@ -36,7 +36,7 @@ public class ModifierHandler {
     attr.applyModifier(newMod);
   }
 
-  public static void setMaxHealth(EntityLivingBase entity, float amount) {
+  public static void setMaxHealth(EntityLivingBase entity, double amount) {
 
     float originalHealth = entity.getHealth();
     IAttributeInstance attr = entity.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
@@ -44,9 +44,10 @@ public class ModifierHandler {
     entity.setHealth(originalHealth);
   }
 
-  public static void setAttackDamage(EntityLivingBase entity, float amount) {
+  public static void setAttackDamage(EntityLivingBase entity, double amount) {
 
     IAttributeInstance attr = entity.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
-    setModifier(attr, MODIFIER_ID_DAMAGE, MODIFIER_NAME_DAMAGE, amount);
+    if (attr != null)
+      setModifier(attr, MODIFIER_ID_DAMAGE, MODIFIER_NAME_DAMAGE, amount + attr.getBaseValue());
   }
 }
