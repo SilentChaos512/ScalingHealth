@@ -133,7 +133,7 @@ public class ScalingHealthSaveStorage {
 
     try {
       EntityPlayer player = event.getEntityPlayer();
-      if (player != null && !player.worldObj.isRemote && playerData.get(player.getName()) != null) {
+      if (player != null && !player.worldObj.isRemote) {
         log.info("Begin loading file for player " + player.getName() + ".");
         File f = event.getPlayerDirectory();
         if (f != null) {

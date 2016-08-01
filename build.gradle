@@ -49,14 +49,6 @@ repositories {
 jar {
     //classifier = "alpha"
 }
-task deobfJar(type: Jar) {
-    from(sourceSets.main.output) {
-        classifier = "deobf"
-    }
-}
-artifacts {
-    archives deobfJar
-}
 
 dependencies {
     deobfCompile "mezz.jei:jei_1.9.4:3.6.7.216"
