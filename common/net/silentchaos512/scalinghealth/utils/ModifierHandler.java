@@ -17,7 +17,8 @@ public class ModifierHandler {
   public static final String MODIFIER_NAME_HEALTH = ScalingHealth.MOD_ID_OLD + ".HealthModifier";
   public static final String MODIFIER_NAME_DAMAGE = ScalingHealth.MOD_ID_OLD + ".DamageModifier";
 
-  private static void setModifier(IAttributeInstance attr, UUID id, String name, double amount) {
+  private static void setModifier(IAttributeInstance attr, UUID id, String name, double amount,
+      int op) {
 
     if (attr == null)
       return;
@@ -28,7 +29,7 @@ public class ModifierHandler {
 
     // Get current and new modifier.
     AttributeModifier mod = attr.getModifier(id);
-    AttributeModifier newMod = new AttributeModifier(id, name, difference, 0);
+    AttributeModifier newMod = new AttributeModifier(id, name, difference, op);
 
     // Remove the old, apply the new.
     if (mod != null)
@@ -36,18 +37,22 @@ public class ModifierHandler {
     attr.applyModifier(newMod);
   }
 
-  public static void setMaxHealth(EntityLivingBase entity, double amount) {
+  public static void setMaxHealth(EntityLivingBase entity, double amount, int op) {
 
     float originalHealth = entity.getHealth();
     IAttributeInstance attr = entity.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
-    setModifier(attr, MODIFIER_ID_HEALTH, MODIFIER_NAME_HEALTH, amount);
-    entity.setHealth(originalHealth);
+    if (attr != null) {
+      setModifier(attr, MODIFIER_ID_HEALTH, MODIFIER_NAME_HEALTH, amount, op);
+      entity.setHealth(originalHealth);
+    }
   }
 
-  public static void setAttackDamage(EntityLivingBase entity, double amount) {
+  public static void addAttackDamage(EntityLivingBase entity, double amount, int op) {
 
     IAttributeInstance attr = entity.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
-    if (attr != null)
-      setModifier(attr, MODIFIER_ID_DAMAGE, MODIFIER_NAME_DAMAGE, amount + attr.getBaseValue());
+    if (attr != null) {
+      amount += attr.getBaseValue();
+      setModifier(attr, MODIFIER_ID_DAMAGE, MODIFIER_NAME_DAMAGE, amount, op);
+    }
   }
 }

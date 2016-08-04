@@ -109,14 +109,35 @@ public class DifficultyHandler {
       // TODO: Random potion effects? (DLEventHandler:217)
     }
 
-    // Apply extra health.
-    ModifierHandler.setMaxHealth(entityLiving, genAddedHealth + entityLiving.getMaxHealth());
-    ModifierHandler.setAttackDamage(entityLiving, genAddedDamage); // FIXME
+    // Apply extra health and damage.
+    float healthMulti = 1f;
+    switch (ConfigScalingHealth.MOB_HEALTH_SCALING_MODE) {
+      case ADD:
+        ModifierHandler.setMaxHealth(entityLiving, genAddedHealth + entityLiving.getMaxHealth(), 0);
+        break;
+      case MULTI:
+        healthMulti = genAddedHealth / 20f;
+        ModifierHandler.setMaxHealth(entityLiving, healthMulti + entityLiving.getMaxHealth(), 1);
+        break;
+      case MULTI_HALF:
+        healthMulti = genAddedHealth / (20f + (entityLiving.getMaxHealth() - 20f) * 0.5f);
+        ModifierHandler.setMaxHealth(entityLiving, healthMulti + entityLiving.getMaxHealth(), 1);
+        break;
+      case MULTI_QUARTER:
+        healthMulti = genAddedHealth / (20f + (entityLiving.getMaxHealth() - 20f) * 0.75f);
+        ModifierHandler.setMaxHealth(entityLiving, healthMulti + entityLiving.getMaxHealth(), 1);
+        break;
+      default:
+        ScalingHealth.logHelper.severe("Unknown mob health scaling mode: "
+            + ConfigScalingHealth.MOB_HEALTH_SCALING_MODE.name());
+        break;
+    }
+    ModifierHandler.addAttackDamage(entityLiving, genAddedDamage, 0);
     entityLiving.setHealth(entityLiving.getMaxHealth());
 
     // TODO: Config!
-    // ScalingHealth.logHelper.info(
-    // entityLiving.getName() + ": Health +" + genAddedHealth + ", Damage +" + genAddedDamage);
+    ScalingHealth.logHelper.info(
+        entityLiving.getName() + ": Health +" + genAddedHealth + ", Damage +" + genAddedDamage);
 
     return makeBlight;
   }

@@ -110,7 +110,7 @@ public class ScalingHealthCommonEvents {
 
       // Apply health modifier
       int maxHealth = ScalingHealthSaveStorage.getPlayerHealth(player);
-      ModifierHandler.setMaxHealth(player, maxHealth);
+      ModifierHandler.setMaxHealth(player, maxHealth, 0);
       if (player.getHealth() != maxHealth)
         player.setHealth(maxHealth);
     }
@@ -130,7 +130,7 @@ public class ScalingHealthCommonEvents {
 
       // Apply health modifier
       float maxHealth = ScalingHealthSaveStorage.getPlayerHealth(player);
-      ModifierHandler.setMaxHealth(player, maxHealth);
+      ModifierHandler.setMaxHealth(player, maxHealth, 0);
       if (player.getHealth() > maxHealth)
         player.setHealth(maxHealth);
     }

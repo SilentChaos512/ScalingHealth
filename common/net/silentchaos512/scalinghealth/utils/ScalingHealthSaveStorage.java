@@ -61,7 +61,7 @@ public class ScalingHealthSaveStorage {
   public static void setPlayerHealth(EntityPlayer player, int value) {
 
     getPlayerTag(player).setInteger(NBT_PLAYER_HEALTH, value);
-    ModifierHandler.setMaxHealth(player, value);
+    ModifierHandler.setMaxHealth(player, value, 0);
     if (player.getHealth() > value)
       player.setHealth(value);
 

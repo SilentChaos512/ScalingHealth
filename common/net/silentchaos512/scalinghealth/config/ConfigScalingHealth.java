@@ -8,6 +8,7 @@ import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.config.IConfigElement;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.lib.EnumHealthModMode;
 
 public class ConfigScalingHealth {
 
@@ -33,6 +34,7 @@ public class ConfigScalingHealth {
   public static boolean ALLOW_HOSTILE_EXTRA_HEALTH = true;
   public static float DIFFICULTY_GENERIC_HEALTH_MULTIPLIER = 0.5F;
   public static float DIFFICULTY_PEACEFUL_HEALTH_MULTIPLIER = 0.25F;
+  public static EnumHealthModMode MOB_HEALTH_SCALING_MODE = EnumHealthModMode.MULTI_HALF;
   // Blights
   public static float BLIGHT_CHANCE_MULTIPLIER = 0.0625F;
   public static int BLIGHT_AMP_SPEED = 8;
@@ -135,6 +137,7 @@ public class ConfigScalingHealth {
           DIFFICULTY_PEACEFUL_HEALTH_MULTIPLIER, 0f, Float.MAX_VALUE,
           "The minimum extra health a peaceful will have per point of difficulty. Same as "
               + "\"Base Health Modifier\", but for peaceful mobs!");
+      MOB_HEALTH_SCALING_MODE = EnumHealthModMode.loadFromConfig(c, MOB_HEALTH_SCALING_MODE);
       // Blights
       BLIGHT_CHANCE_MULTIPLIER = c.getFloat("Blight Chance Multiplier", CAT_MOB_BLIGHT,
           BLIGHT_CHANCE_MULTIPLIER, 0f, Float.MAX_VALUE,

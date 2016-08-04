@@ -22,19 +22,13 @@ public class WitEventHandler {
     if (entity != null && entity.getAttributeMap() != null) {
       TextFormatting tf = TextFormatting.GRAY;
 
-      IAttributeInstance attr = entity.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
-      if (attr != null)
-        for (AttributeModifier mod : attr.getModifiers())
-          if (mod != null)
-            event.lines.add(tf + String.format("%s: %.1f (op %d)", mod.getName(),
-                (float) mod.getAmount(), mod.getOperation()));
-
-      attr = entity.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
-      if (attr != null)
-        for (AttributeModifier mod : attr.getModifiers())
-          if (mod != null)
-            event.lines.add(tf + String.format("%s: %.1f (op %d)", mod.getName(),
-                (float) mod.getAmount(), mod.getOperation()));
+      for (IAttributeInstance attr : entity.getAttributeMap().getAllAttributes()) {
+        if (attr != null)
+          for (AttributeModifier mod : attr.getModifiers())
+            if (mod != null)
+              event.lines.add(tf + String.format("%s: %.3f (op %d)", mod.getName(),
+                  (float) mod.getAmount(), mod.getOperation()));
+      }
     }
   }
 }
