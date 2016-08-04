@@ -20,7 +20,7 @@ public class SHAsmConfig {
 
   public static void init() {
 
-    map.put(MAX_HEALTH_MAX, 1024D);
+    map.put(MAX_HEALTH_MAX, 2048D);
   }
 
   public static void load() {

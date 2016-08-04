@@ -1,4 +1,9 @@
 0.1.3
+Added: Multiple health scaling modes. Defaults to MULTI_HALF.
+        - ADD: The old method, adds a flat value based on difficulty.
+        - MULTI: Applies a multiplier to health instead, so health increases are proportional to base max health.
+        - MULTI_HALF: Same as MULTI, but the multiplier for higher health mobs is lower.
+        - MULTI_QUARTER: Same as MULTI_HALF, but the multiplier reduction is even greater (max health is lower than MULTI_HALF and MULTI)
 Added: A way to change the hard-coded max health limit (uses ASM, I don't think there's any other way)
 Added: An ASM config file that has an option to change the max health cap (in config/scalinghealth)
 

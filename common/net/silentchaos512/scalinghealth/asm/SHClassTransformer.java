@@ -1,22 +1,17 @@
 package net.silentchaos512.scalinghealth.asm;
 
 import java.util.Arrays;
-import java.util.Map;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldNode;
-import org.objectweb.asm.tree.IntInsnNode;
-import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 import net.minecraft.launchwrapper.IClassTransformer;
-import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.minecraftforge.fml.common.FMLLog;
 
 public class SHClassTransformer implements IClassTransformer {
 
@@ -32,7 +27,7 @@ public class SHClassTransformer implements IClassTransformer {
 
   private byte[] transform(int index, byte[] basicClass, boolean isObf) {
 
-    ScalingHealth.logHelper.info("Transforming class " + classesToTransform[index]);
+    FMLLog.info("[Scaling Health] Transforming class " + classesToTransform[index]);
 
     try {
       ClassNode node = new ClassNode();
@@ -76,7 +71,7 @@ public class SHClassTransformer implements IClassTransformer {
             }
             method.instructions.insertBefore(a, new LdcInsnNode(SHAsmConfig.getValue(SHAsmConfig.MAX_HEALTH_MAX)));
             method.instructions.remove(a);
-            ScalingHealth.logHelper.info("  Successfully changed max health maximum!");
+            FMLLog.info("[Scaling Health]   Successfully changed max health maximum!");
             break;
           }
         }

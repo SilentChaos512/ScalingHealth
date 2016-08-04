@@ -33,7 +33,6 @@ public class SHLoadingPlugin implements IFMLLoadingPlugin {
   @Override
   public void injectData(Map<String, Object> data) {
 
-    ScalingHealth.logHelper.info("Loading ScalingHealth ASM plugin...");
     isObf = (Boolean) data.get("runtimeDeobfuscationEnabled");
     SHAsmConfig.init();
     SHAsmConfig.load();
