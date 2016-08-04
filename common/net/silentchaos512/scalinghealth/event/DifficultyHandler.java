@@ -120,10 +120,12 @@ public class DifficultyHandler {
         ModifierHandler.setMaxHealth(entityLiving, healthMulti + entityLiving.getMaxHealth(), 1);
         break;
       case MULTI_HALF:
+        // TODO: Is this bad for mobs with less than 20 health?
         healthMulti = genAddedHealth / (20f + (entityLiving.getMaxHealth() - 20f) * 0.5f);
         ModifierHandler.setMaxHealth(entityLiving, healthMulti + entityLiving.getMaxHealth(), 1);
         break;
       case MULTI_QUARTER:
+        // TODO: Is this bad for mobs with less than 20 health?
         healthMulti = genAddedHealth / (20f + (entityLiving.getMaxHealth() - 20f) * 0.75f);
         ModifierHandler.setMaxHealth(entityLiving, healthMulti + entityLiving.getMaxHealth(), 1);
         break;
@@ -135,9 +137,8 @@ public class DifficultyHandler {
     ModifierHandler.addAttackDamage(entityLiving, genAddedDamage, 0);
     entityLiving.setHealth(entityLiving.getMaxHealth());
 
-    // TODO: Config!
-    ScalingHealth.logHelper.info(
-        entityLiving.getName() + ": Health +" + genAddedHealth + ", Damage +" + genAddedDamage);
+    // ScalingHealth.logHelper.info(
+    // entityLiving.getName() + ": Health +" + genAddedHealth + ", Damage +" + genAddedDamage);
 
     return makeBlight;
   }
