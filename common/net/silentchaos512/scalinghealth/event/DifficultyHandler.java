@@ -6,6 +6,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityMob;
@@ -20,6 +21,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
@@ -45,7 +47,7 @@ public class DifficultyHandler {
   }
 
   @SubscribeEvent
-  public void onMobSpawn(EntityJoinWorldEvent event) {
+  public void onMobSpawn(LivingUpdateEvent event) {
 
     // Increase mob health and make blights?
     if (!(event.getEntity() instanceof EntityLivingBase))
@@ -135,6 +137,8 @@ public class DifficultyHandler {
         break;
     }
     ModifierHandler.addAttackDamage(entityLiving, genAddedDamage, 0);
+
+    // Heal.
     entityLiving.setHealth(entityLiving.getMaxHealth());
 
     // ScalingHealth.logHelper.info(
@@ -206,7 +210,7 @@ public class DifficultyHandler {
 
   private boolean canIncreaseEntityHealth(EntityLivingBase entityLiving) {
 
-    return entityLiving.getAttributeMap() != null
+    return entityLiving.getAttributeMap() != null && entityLiving.ticksExisted > 1
         && entityLiving.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
             .getModifier(ModifierHandler.MODIFIER_ID_HEALTH) == null;
   }
