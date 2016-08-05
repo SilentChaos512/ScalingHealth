@@ -5,7 +5,10 @@ Added: Multiple health scaling modes. Defaults to MULTI_HALF.
         - MULTI_HALF: Same as MULTI, but the multiplier for higher health mobs is lower.
         - MULTI_QUARTER: Same as MULTI_HALF, but the multiplier reduction is even greater (max health is lower than MULTI_HALF and MULTI)
 Added: A way to change the hard-coded max health limit (uses ASM, I don't think there's any other way)
-Added: An ASM config file that has an option to change the max health cap (in config/scalinghealth)
+Added: An ASM config file that has an option to change the max health cap (config/scalinghealth/asm.cfg). Defaults to 2048, twice the vanilla cap.
+Added: A ding sound plays when using a heart container.
+Fixed: Some mobs not being healed to the correct health. For real this time!
+Fixed: The health modifier for mobs being calculated wrong if other modifiers are present.
 
 0.1.2
 Added: Custom health rendering now implemented.

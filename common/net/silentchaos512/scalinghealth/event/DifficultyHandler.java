@@ -86,6 +86,8 @@ public class DifficultyHandler {
 
     float genAddedHealth = difficulty;
     float genAddedDamage = 0;
+    float baseMaxHealth = (float) entityLiving
+        .getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue();
 
     if (entityLiving instanceof IMob)
       genAddedHealth *= ConfigScalingHealth.DIFFICULTY_GENERIC_HEALTH_MULTIPLIER;
@@ -115,21 +117,21 @@ public class DifficultyHandler {
     float healthMulti = 1f;
     switch (ConfigScalingHealth.MOB_HEALTH_SCALING_MODE) {
       case ADD:
-        ModifierHandler.setMaxHealth(entityLiving, genAddedHealth + entityLiving.getMaxHealth(), 0);
+        ModifierHandler.setMaxHealth(entityLiving, genAddedHealth + baseMaxHealth, 0);
         break;
       case MULTI:
         healthMulti = genAddedHealth / 20f;
-        ModifierHandler.setMaxHealth(entityLiving, healthMulti + entityLiving.getMaxHealth(), 1);
+        ModifierHandler.setMaxHealth(entityLiving, healthMulti + baseMaxHealth, 1);
         break;
       case MULTI_HALF:
         // TODO: Is this bad for mobs with less than 20 health?
         healthMulti = genAddedHealth / (20f + (entityLiving.getMaxHealth() - 20f) * 0.5f);
-        ModifierHandler.setMaxHealth(entityLiving, healthMulti + entityLiving.getMaxHealth(), 1);
+        ModifierHandler.setMaxHealth(entityLiving, healthMulti + baseMaxHealth, 1);
         break;
       case MULTI_QUARTER:
         // TODO: Is this bad for mobs with less than 20 health?
         healthMulti = genAddedHealth / (20f + (entityLiving.getMaxHealth() - 20f) * 0.75f);
-        ModifierHandler.setMaxHealth(entityLiving, healthMulti + entityLiving.getMaxHealth(), 1);
+        ModifierHandler.setMaxHealth(entityLiving, healthMulti + baseMaxHealth, 1);
         break;
       default:
         ScalingHealth.logHelper.severe("Unknown mob health scaling mode: "
