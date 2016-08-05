@@ -2,10 +2,12 @@ package net.silentchaos512.scalinghealth.item;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
 import net.silentchaos512.lib.item.ItemSL;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -26,6 +28,8 @@ public class ItemHeartContainer extends ItemSL {
     if (!world.isRemote) {
       ScalingHealthSaveStorage.incrementPlayerHealth(player);
       --stack.stackSize;
+      world.playSound(null, player.getPosition(), SoundEvents.ENTITY_EXPERIENCE_ORB_TOUCH,
+          SoundCategory.PLAYERS, 1.0f, 0.7f + 0.1f * (float) ScalingHealth.random.nextGaussian());
     }
     return new ActionResult(EnumActionResult.SUCCESS, stack);
   }
