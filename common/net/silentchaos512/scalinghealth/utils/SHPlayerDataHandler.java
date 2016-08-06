@@ -176,8 +176,11 @@ public class SHPlayerDataHandler {
           return;
 
         // Increase player difficulty.
-        if (player.worldObj.getTotalWorldTime() % 20 == 0)
-          incrementDifficulty(ConfigScalingHealth.DIFFICULTY_PER_SECOND);
+        if (player.worldObj.getTotalWorldTime() % 20 == 0) {
+          float amount = ConfigScalingHealth.DIFFICULTY_PER_SECOND;
+          // TODO: Multiplier for other dimensions?
+          incrementDifficulty(amount);
+        }
         // Sync with client?
         if (player.worldObj.getTotalWorldTime() % ConfigScalingHealth.PACKET_DELAY == 0) {
           save();

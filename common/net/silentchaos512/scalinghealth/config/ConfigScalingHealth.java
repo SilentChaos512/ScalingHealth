@@ -49,10 +49,8 @@ public class ConfigScalingHealth {
   public static float DIFFICULTY_MAX = 250;
   public static float DIFFICULTY_DEFAULT = 0;
   public static int HOURS_TO_MAX_DIFFICULTY = 60; // Not actually loaded, just to make calc below clear.
-  // Difficult Life's DIFFICULTY_PER_TICK... is actually per second -.- Mine is per tick.
-  // Default from Difficult Life is 0.00165562913907284768211920529801, which works out to about 42 hours
-  // to max difficulty. Feels faster than that, but maybe I'm wrong...
   public static float DIFFICULTY_PER_SECOND = DIFFICULTY_MAX / (HOURS_TO_MAX_DIFFICULTY * 3600);
+  public static int DIFFICULTY_SEARCH_RADIUS = 160;
 
   // Network
   public static int PACKET_DELAY = 20;
@@ -174,6 +172,10 @@ public class ConfigScalingHealth {
           DIFFICULTY_PER_SECOND, 0f, Float.MAX_VALUE,
           "The amount of difficulty added each second. In Difficult Life, the option was named per tick, "
           + "but was actually applied each second.");
+      DIFFICULTY_SEARCH_RADIUS = c.getInt("Search Radius", CAT_DIFFICULTY,
+          DIFFICULTY_SEARCH_RADIUS, 0, Integer.MAX_VALUE,
+          "The distance from a newly spawned mob to search for players to determine its difficulty "
+          + "level. Set to 0 for unlimited range.");
 
       // Network
       PACKET_DELAY = c.getInt("Packet Delay", CAT_NETWORK,

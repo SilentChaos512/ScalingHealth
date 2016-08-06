@@ -1,12 +1,12 @@
 package net.silentchaos512.scalinghealth.event;
 
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityMob;
@@ -19,38 +19,54 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-import net.minecraftforge.fml.relauncher.Side;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.utils.ModifierHandler;
-import net.silentchaos512.scalinghealth.utils.ScalingHealthSaveStorage;
+import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
+import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
 public class DifficultyHandler {
 
   public static DifficultyHandler INSTANCE = new DifficultyHandler();
 
-  @SubscribeEvent
-  public void onWorldTick(TickEvent.WorldTickEvent event) {
+  public double getAreaDifficulty(World world, BlockPos pos) {
 
-    // Handle difficulty ticks.
-    World world = event.world; //@formatter:off
-    if (event.side == Side.CLIENT || event.phase != Phase.START
-        || world == null || world.provider == null
-        || world.provider.getDimension() != 0
-        || world.getTotalWorldTime() % 20 != 0)
-      return; //@formatter:on
+    long radius = ConfigScalingHealth.DIFFICULTY_SEARCH_RADIUS;
+    long radiusSquared = radius <= 0 ? Long.MAX_VALUE : radius * radius;
 
-    for (EntityPlayer player : event.world.playerEntities) {
+    // TODO: Multiple calculation modes!
+    double totalDifficulty = 0;
+    List<EntityPlayer> players = world.getPlayers(EntityPlayer.class,
+        p -> p.getDistanceSq(pos) < radiusSquared);
+    for (EntityPlayer player : players) {
+      PlayerData data = SHPlayerDataHandler.get(player);
+      if (data != null)
+        totalDifficulty += data.getDifficulty();
     }
 
-    //ScalingHealthSaveStorage.incrementDifficulty(world, ConfigScalingHealth.DIFFICULTY_PER_SECOND);
+    return totalDifficulty / players.size();
   }
+
+  // @SubscribeEvent
+  // public void onWorldTick(TickEvent.WorldTickEvent event) {
+  //
+  // // Handle difficulty ticks.
+//    World world = event.world; //@formatter:off
+//    if (event.side == Side.CLIENT || event.phase != Phase.START
+//        || world == null || world.provider == null
+//        || world.provider.getDimension() != 0
+//        || world.getTotalWorldTime() % 20 != 0)
+//      return; //@formatter:on
+  //
+  // for (EntityPlayer player : event.world.playerEntities) {
+  // }
+  //
+  // //ScalingHealthSaveStorage.incrementDifficulty(world, ConfigScalingHealth.DIFFICULTY_PER_SECOND);
+  // }
 
   @SubscribeEvent
   public void onMobSpawn(LivingUpdateEvent event) {
@@ -76,7 +92,7 @@ public class DifficultyHandler {
 
   private boolean increaseEntityHealth(EntityLivingBase entityLiving) {
 
-    float difficulty = (float) ScalingHealthSaveStorage.getDifficulty(entityLiving.worldObj);
+    float difficulty = (float) getAreaDifficulty(entityLiving.worldObj, entityLiving.getPosition());
     Random rand = ScalingHealth.random;
     boolean makeBlight = false;
 
