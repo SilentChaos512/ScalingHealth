@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.utils.ScalingHealthSaveStorage;
 
+@Deprecated
 public class PacketScalingHealth implements IMessage {
 
   public String id = null;

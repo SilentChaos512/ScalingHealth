@@ -11,7 +11,8 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
-import net.silentchaos512.scalinghealth.utils.ScalingHealthSaveStorage;
+import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
+import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
 public class ScalingHealthClientEvents {
 
@@ -46,9 +47,13 @@ public class ScalingHealthClientEvents {
 
     World world = Minecraft.getMinecraft().theWorld;
     EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+    PlayerData data = SHPlayerDataHandler.get(player);
+    if (data == null)
+      return "Player data is null!";
+
     String ret = "";
 
-    ret += "Difficulty = " + ScalingHealthSaveStorage.getDifficulty(world) + "\n";
+    ret += "Difficulty = " + data.getDifficulty() + "\n";
     ret += "Player Health = " + player.getHealth() + " / " + player.getMaxHealth() + "\n";
     int regenTimer = PlayerBonusRegenHandler.INSTANCE.getTimerForPlayer(player);
     ret += String.format("Regen Timer = %d (%ds)", regenTimer, regenTimer / 20);

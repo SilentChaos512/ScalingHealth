@@ -38,12 +38,18 @@ public class DifficultyHandler {
   @SubscribeEvent
   public void onWorldTick(TickEvent.WorldTickEvent event) {
 
-    // Handle difficulty ticks. Unlike Difficult Life, this is actually done each tick.
-    World world = event.world;
-    if (event.side == Side.SERVER && world != null && world.provider != null
-        && world.provider.getDimension() == 0 && event.phase == Phase.START) {
-      ScalingHealthSaveStorage.incrementDifficulty(world, ConfigScalingHealth.DIFFICULTY_PER_TICK);
+    // Handle difficulty ticks.
+    World world = event.world; //@formatter:off
+    if (event.side == Side.CLIENT || event.phase != Phase.START
+        || world == null || world.provider == null
+        || world.provider.getDimension() != 0
+        || world.getTotalWorldTime() % 20 != 0)
+      return; //@formatter:on
+
+    for (EntityPlayer player : event.world.playerEntities) {
     }
+
+    //ScalingHealthSaveStorage.incrementDifficulty(world, ConfigScalingHealth.DIFFICULTY_PER_SECOND);
   }
 
   @SubscribeEvent

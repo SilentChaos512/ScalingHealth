@@ -2,9 +2,6 @@ package net.silentchaos512.scalinghealth;
 
 import java.util.Random;
 
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.init.Items;
-import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -13,9 +10,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import net.minecraftforge.fml.relauncher.Side;
 import net.silentchaos512.lib.SilentLib;
 import net.silentchaos512.lib.registry.SRegistry;
 import net.silentchaos512.lib.util.LocalizationHelper;
@@ -23,7 +18,6 @@ import net.silentchaos512.lib.util.LogHelper;
 import net.silentchaos512.scalinghealth.command.CommandScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.init.ModItems;
-import net.silentchaos512.scalinghealth.network.PacketScalingHealth;
 import net.silentchaos512.scalinghealth.proxy.ScalingHealthCommonProxy;
 
 //@formatter:off
@@ -71,11 +65,11 @@ public class ScalingHealth {
     localizationHelper = new LocalizationHelper(MOD_ID_LOWER).setReplaceAmpersand(true);
     SilentLib.instance.registerLocalizationHelperForMod(MOD_ID_LOWER, localizationHelper);
 
-    networkManager = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_ID_LOWER);
-    networkManager.registerMessage(PacketScalingHealth.Handler.class, PacketScalingHealth.class, 0,
-        Side.SERVER);
-    networkManager.registerMessage(PacketScalingHealth.Handler.class, PacketScalingHealth.class, 0,
-        Side.CLIENT);
+//    networkManager = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_ID_LOWER);
+//    networkManager.registerMessage(PacketScalingHealth.Handler.class, PacketScalingHealth.class, 0,
+//        Side.SERVER);
+//    networkManager.registerMessage(PacketScalingHealth.Handler.class, PacketScalingHealth.class, 0,
+//        Side.CLIENT);
 
     ConfigScalingHealth.init(event.getSuggestedConfigurationFile());
     ConfigScalingHealth.save();

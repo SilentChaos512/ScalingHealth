@@ -48,11 +48,11 @@ public class ConfigScalingHealth {
   // Difficulty
   public static float DIFFICULTY_MAX = 250;
   public static float DIFFICULTY_DEFAULT = 0;
-  public static int HOURS_TO_MAX_DIFFICULTY = 48; // Not actually loaded, just to make calc below clear.
+  public static int HOURS_TO_MAX_DIFFICULTY = 60; // Not actually loaded, just to make calc below clear.
   // Difficult Life's DIFFICULTY_PER_TICK... is actually per second -.- Mine is per tick.
   // Default from Difficult Life is 0.00165562913907284768211920529801, which works out to about 42 hours
   // to max difficulty. Feels faster than that, but maybe I'm wrong...
-  public static float DIFFICULTY_PER_TICK = DIFFICULTY_MAX / (HOURS_TO_MAX_DIFFICULTY * 72000);
+  public static float DIFFICULTY_PER_SECOND = DIFFICULTY_MAX / (HOURS_TO_MAX_DIFFICULTY * 3600);
 
   // Network
   public static int PACKET_DELAY = 20;
@@ -170,10 +170,10 @@ public class ConfigScalingHealth {
       DIFFICULTY_DEFAULT = c.getFloat("Starting Value", CAT_DIFFICULTY,
           DIFFICULTY_DEFAULT, 0f, Float.MAX_VALUE,
           "The starting difficulty level for new worlds.");
-      DIFFICULTY_PER_TICK = c.getFloat("Increase Per Tick", CAT_DIFFICULTY,
-          DIFFICULTY_PER_TICK, 0f, Float.MAX_VALUE,
-          "The amount of difficulty added each tick. Unlike Difficult Life, this is actually added "
-              + "per tick, not per second, so expect a much smaller number to be entered here.");
+      DIFFICULTY_PER_SECOND = c.getFloat("Increase Per Second", CAT_DIFFICULTY,
+          DIFFICULTY_PER_SECOND, 0f, Float.MAX_VALUE,
+          "The amount of difficulty added each second. In Difficult Life, the option was named per tick, "
+          + "but was actually applied each second.");
 
       // Network
       PACKET_DELAY = c.getInt("Packet Delay", CAT_NETWORK,

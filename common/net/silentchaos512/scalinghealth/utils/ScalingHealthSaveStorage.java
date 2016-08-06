@@ -23,6 +23,7 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.network.DataSyncManager;
 
+@Deprecated
 public class ScalingHealthSaveStorage {
 
   public static final String NBT_WORLD_DIFFICULTY = "difficulty";

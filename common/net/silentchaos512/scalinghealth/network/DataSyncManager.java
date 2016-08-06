@@ -11,6 +11,7 @@ import net.minecraftforge.fml.common.FMLLog;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 
+@Deprecated
 public class DataSyncManager {
 
   public static final Hashtable<String, Integer> packetSyncManager = new Hashtable<String, Integer>();
