@@ -25,8 +25,7 @@ public class ItemHeartContainer extends ItemSL {
   public ActionResult<ItemStack> onItemRightClick(ItemStack stack, World world, EntityPlayer player,
       EnumHand hand) {
 
-    if (!world.isRemote) {
-      ScalingHealthSaveStorage.incrementPlayerHealth(player);
+    if (!world.isRemote && ScalingHealthSaveStorage.incrementPlayerHealth(player)) {
       --stack.stackSize;
       world.playSound(null, player.getPosition(), SoundEvents.ENTITY_EXPERIENCE_ORB_TOUCH,
           SoundCategory.PLAYERS, 1.0f, 0.7f + 0.1f * (float) ScalingHealth.random.nextGaussian());

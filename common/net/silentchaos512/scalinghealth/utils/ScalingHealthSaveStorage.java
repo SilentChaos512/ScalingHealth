@@ -68,7 +68,7 @@ public class ScalingHealthSaveStorage {
     sendUpdatePacketToPlayer((EntityPlayerMP) player);
   }
 
-  public static void incrementPlayerHealth(EntityPlayer player) {
+  public static boolean incrementPlayerHealth(EntityPlayer player) {
 
     if (player instanceof EntityPlayerMP) {
       int currentHealth = getPlayerHealth(player);
@@ -76,11 +76,13 @@ public class ScalingHealthSaveStorage {
       // Don't increase beyond maximum, if a limit has been set (non-positive max means unlimited)
       if (ConfigScalingHealth.PLAYER_HEALTH_MAX > 0
           && currentHealth + 2 > ConfigScalingHealth.PLAYER_HEALTH_MAX)
-        return;
+        return false;
 
       setPlayerHealth(player, currentHealth + 2);
       player.heal(2.0f);
+      return true;
     }
+    return false;
   }
 
   public static void resetPlayerHealth(EntityPlayer player) {
