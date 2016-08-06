@@ -9,6 +9,7 @@ import java.util.Map;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
@@ -135,7 +136,7 @@ public class SHPlayerDataHandler {
 
     public void setDifficulty(double value) {
 
-      difficulty = value;
+      difficulty = MathHelper.clamp_double(value, 0, ConfigScalingHealth.DIFFICULTY_MAX);
     }
 
     public void incrementDifficulty(double amount) {
@@ -152,7 +153,7 @@ public class SHPlayerDataHandler {
 
     public void setMaxHealth(float value) {
 
-      maxHealth = value;
+      maxHealth = MathHelper.clamp_float(value, 2, ConfigScalingHealth.PLAYER_HEALTH_MAX);
 
       EntityPlayer player = playerWR.get();
       if (player != null)
