@@ -153,12 +153,15 @@ public class SHPlayerDataHandler {
 
     public void setMaxHealth(float value) {
 
-      maxHealth = MathHelper.clamp_float(value, 2, ConfigScalingHealth.PLAYER_HEALTH_MAX);
+      int configMax = ConfigScalingHealth.PLAYER_HEALTH_MAX;
+      configMax = configMax <= 0 ? Integer.MAX_VALUE : configMax;
+
+      maxHealth = MathHelper.clamp_float(value, 2, configMax);
+      ScalingHealth.logHelper.debug(value, maxHealth);
 
       EntityPlayer player = playerWR.get();
       if (player != null)
         ModifierHandler.setMaxHealth(playerWR.get(), maxHealth, 0);
-      player.heal(2);
 
       save();
       sendUpdateMessage();
@@ -167,6 +170,10 @@ public class SHPlayerDataHandler {
     public void incrementMaxHealth(float amount) {
 
       setMaxHealth(maxHealth + amount);
+
+      EntityPlayer player = playerWR.get();
+      if (player != null)
+        player.heal(amount);
     }
 
     private void tick() {
