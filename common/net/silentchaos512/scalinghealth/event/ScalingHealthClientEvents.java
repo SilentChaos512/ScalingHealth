@@ -11,6 +11,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
+import net.silentchaos512.scalinghealth.lib.EnumAreaDifficultyMode;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
@@ -36,7 +37,13 @@ public class ScalingHealthClientEvents {
     String text = getDebugText();
     int y = 3;
     for (String line : text.split("\n")) {
-      fontRender.drawStringWithShadow(line, 3, y, 0xFFFFFF);
+      String[] array = line.split("=");
+      if (array.length == 2) {
+        fontRender.drawString(array[0].trim(), 3, y, 0xFFFFFF);
+        fontRender.drawString(array[1].trim(), 90, y, 0xFFFFFF);
+      } else {
+        fontRender.drawStringWithShadow(line, 3, y, 0xFFFFFF);
+      }
       y += 10;
     }
 
@@ -48,14 +55,15 @@ public class ScalingHealthClientEvents {
     World world = Minecraft.getMinecraft().theWorld;
     EntityPlayer player = Minecraft.getMinecraft().thePlayer;
     PlayerData data = SHPlayerDataHandler.get(player);
+    EnumAreaDifficultyMode areaMode = ConfigScalingHealth.AREA_DIFFICULTY_MODE;
     if (data == null)
       return "Player data is null!";
 
     String ret = "";
 
-    ret += "Area Difficulty = "
-        + DifficultyHandler.INSTANCE.getAreaDifficulty(world, player.getPosition()) + "\n";
-    ret += "Player Difficulty = " + data.getDifficulty() + "\n";
+    ret += String.format("Area Difficulty = %.4f (%s)\n",
+        areaMode.getAreaDifficulty(world, player.getPosition()), areaMode.name());
+    ret += String.format("Player Difficulty = %.4f\n", data.getDifficulty());
     ret += "Player Health = " + player.getHealth() + " / " + player.getMaxHealth() + "\n";
     int regenTimer = PlayerBonusRegenHandler.INSTANCE.getTimerForPlayer(player);
     ret += String.format("Regen Timer = %d (%ds)", regenTimer, regenTimer / 20);

@@ -9,6 +9,7 @@ import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -159,7 +160,8 @@ public class CommandScalingHealth implements ICommand {
   @Override
   public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
 
-    return (server.isSinglePlayer() && server.worldServers[0].getWorldInfo().areCommandsAllowed())
+    return ((server.isDedicatedServer() && !(sender instanceof EntityPlayer))
+        || server.isSinglePlayer() && server.worldServers[0].getWorldInfo().areCommandsAllowed())
         || server.getPlayerList().getOppedPlayers()
             .getGameProfileFromName(sender.getName()) != null;
   }

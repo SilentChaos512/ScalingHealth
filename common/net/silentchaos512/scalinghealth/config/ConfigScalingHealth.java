@@ -8,6 +8,7 @@ import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.config.IConfigElement;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.lib.EnumAreaDifficultyMode;
 import net.silentchaos512.scalinghealth.lib.EnumHealthModMode;
 
 public class ConfigScalingHealth {
@@ -50,7 +51,9 @@ public class ConfigScalingHealth {
   public static float DIFFICULTY_DEFAULT = 0;
   public static int HOURS_TO_MAX_DIFFICULTY = 60; // Not actually loaded, just to make calc below clear.
   public static float DIFFICULTY_PER_SECOND = DIFFICULTY_MAX / (HOURS_TO_MAX_DIFFICULTY * 3600);
+  public static float DIFFICULTY_PER_BLOCK = DIFFICULTY_MAX / 100000;
   public static int DIFFICULTY_SEARCH_RADIUS = 160;
+  public static EnumAreaDifficultyMode AREA_DIFFICULTY_MODE = EnumAreaDifficultyMode.WEIGHTED_AVERAGE;
 
   // Network
   public static int PACKET_DELAY = 20;
@@ -172,10 +175,15 @@ public class ConfigScalingHealth {
           DIFFICULTY_PER_SECOND, 0f, Float.MAX_VALUE,
           "The amount of difficulty added each second. In Difficult Life, the option was named per tick, "
           + "but was actually applied each second.");
+      DIFFICULTY_PER_BLOCK = c.getFloat("Difficulty Per Block", CAT_DIFFICULTY,
+          DIFFICULTY_PER_BLOCK, 0, Float.MAX_VALUE,
+          "The amount of difficulty added per unit distance from the origin/spanw, assuming \"Area Mode\" "
+          + "is set to a distance-based option.");
       DIFFICULTY_SEARCH_RADIUS = c.getInt("Search Radius", CAT_DIFFICULTY,
-          DIFFICULTY_SEARCH_RADIUS, 0, Integer.MAX_VALUE,
+          DIFFICULTY_SEARCH_RADIUS, 0, Short.MAX_VALUE,
           "The distance from a newly spawned mob to search for players to determine its difficulty "
           + "level. Set to 0 for unlimited range.");
+      AREA_DIFFICULTY_MODE = EnumAreaDifficultyMode.loadFromConfig(c, AREA_DIFFICULTY_MODE);
 
       // Network
       PACKET_DELAY = c.getInt("Packet Delay", CAT_NETWORK,

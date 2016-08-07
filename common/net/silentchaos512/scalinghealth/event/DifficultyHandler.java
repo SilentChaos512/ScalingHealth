@@ -33,24 +33,6 @@ public class DifficultyHandler {
 
   public static DifficultyHandler INSTANCE = new DifficultyHandler();
 
-  public double getAreaDifficulty(World world, BlockPos pos) {
-
-    long radius = ConfigScalingHealth.DIFFICULTY_SEARCH_RADIUS;
-    long radiusSquared = radius <= 0 ? Long.MAX_VALUE : radius * radius;
-
-    // TODO: Multiple calculation modes!
-    double totalDifficulty = 0;
-    List<EntityPlayer> players = world.getPlayers(EntityPlayer.class,
-        p -> p.getDistanceSq(pos) < radiusSquared);
-    for (EntityPlayer player : players) {
-      PlayerData data = SHPlayerDataHandler.get(player);
-      if (data != null)
-        totalDifficulty += data.getDifficulty();
-    }
-
-    return totalDifficulty / players.size();
-  }
-
   // @SubscribeEvent
   // public void onWorldTick(TickEvent.WorldTickEvent event) {
   //
@@ -92,7 +74,8 @@ public class DifficultyHandler {
 
   private boolean increaseEntityHealth(EntityLivingBase entityLiving) {
 
-    float difficulty = (float) getAreaDifficulty(entityLiving.worldObj, entityLiving.getPosition());
+    float difficulty = (float) ConfigScalingHealth.AREA_DIFFICULTY_MODE
+        .getAreaDifficulty(entityLiving.worldObj, entityLiving.getPosition());
     Random rand = ScalingHealth.random;
     boolean makeBlight = false;
 

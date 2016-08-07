@@ -97,6 +97,18 @@ public class SHPlayerDataHandler {
       if (event.getEntityLiving() instanceof EntityPlayer) {
         EntityPlayer player = (EntityPlayer) event.getEntityLiving();
         SHPlayerDataHandler.get(player).tick();
+
+        // Get data from nearby players.
+        if (!player.worldObj.isRemote
+            && player.worldObj.getTotalWorldTime() % 5 * ConfigScalingHealth.PACKET_DELAY == 0) {
+          int radius = ConfigScalingHealth.DIFFICULTY_SEARCH_RADIUS;
+          int radiusSquared = radius <= 0 ? Integer.MAX_VALUE : radius * radius;
+          for (EntityPlayer p : player.worldObj.getPlayers(EntityPlayer.class,
+              p -> !p.equals(player) && p.getDistanceSq(player.getPosition()) < radiusSquared)) {
+            MessageDataSync message = new MessageDataSync(get(p), p.getName());
+            NetworkHandler.INSTANCE.sendTo(message, (EntityPlayerMP) player);
+          }
+        }
       }
     }
 
@@ -104,7 +116,7 @@ public class SHPlayerDataHandler {
     public void onPlayerLogin(PlayerLoggedInEvent event) {
 
       if (event.player instanceof EntityPlayerMP) {
-        MessageDataSync message = new MessageDataSync(get(event.player));
+        MessageDataSync message = new MessageDataSync(get(event.player), event.player.getName());
         NetworkHandler.INSTANCE.sendTo(message, (EntityPlayerMP) event.player);
       }
     }
@@ -201,7 +213,7 @@ public class SHPlayerDataHandler {
 
       if (!client) {
         EntityPlayer player = playerWR.get();
-        MessageDataSync message = new MessageDataSync(get(player));
+        MessageDataSync message = new MessageDataSync(get(player), player.getName());
         NetworkHandler.INSTANCE.sendTo(message, (EntityPlayerMP) player);
       }
     }
