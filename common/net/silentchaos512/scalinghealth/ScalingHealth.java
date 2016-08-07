@@ -65,12 +65,6 @@ public class ScalingHealth {
     localizationHelper = new LocalizationHelper(MOD_ID_LOWER).setReplaceAmpersand(true);
     SilentLib.instance.registerLocalizationHelperForMod(MOD_ID_LOWER, localizationHelper);
 
-//    networkManager = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_ID_LOWER);
-//    networkManager.registerMessage(PacketScalingHealth.Handler.class, PacketScalingHealth.class, 0,
-//        Side.SERVER);
-//    networkManager.registerMessage(PacketScalingHealth.Handler.class, PacketScalingHealth.class, 0,
-//        Side.CLIENT);
-
     ConfigScalingHealth.init(event.getSuggestedConfigurationFile());
     ConfigScalingHealth.save();
 
@@ -85,8 +79,6 @@ public class ScalingHealth {
 
   @EventHandler
   public void init(FMLInitializationEvent event) {
-
-    // TODO: Save config?
 
     proxy.init(registry);
   }

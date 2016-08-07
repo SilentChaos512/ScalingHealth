@@ -33,23 +33,6 @@ public class DifficultyHandler {
 
   public static DifficultyHandler INSTANCE = new DifficultyHandler();
 
-  // @SubscribeEvent
-  // public void onWorldTick(TickEvent.WorldTickEvent event) {
-  //
-  // // Handle difficulty ticks.
-//    World world = event.world; //@formatter:off
-//    if (event.side == Side.CLIENT || event.phase != Phase.START
-//        || world == null || world.provider == null
-//        || world.provider.getDimension() != 0
-//        || world.getTotalWorldTime() % 20 != 0)
-//      return; //@formatter:on
-  //
-  // for (EntityPlayer player : event.world.playerEntities) {
-  // }
-  //
-  // //ScalingHealthSaveStorage.incrementDifficulty(world, ConfigScalingHealth.DIFFICULTY_PER_SECOND);
-  // }
-
   @SubscribeEvent
   public void onMobSpawn(LivingUpdateEvent event) {
 

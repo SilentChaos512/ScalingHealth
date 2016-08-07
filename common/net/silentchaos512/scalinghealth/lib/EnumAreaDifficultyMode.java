@@ -15,8 +15,6 @@ public enum EnumAreaDifficultyMode {
 
   WEIGHTED_AVERAGE, AVERAGE, MIN_LEVEL, MAX_LEVEL, DISTANCE_FROM_SPAWN, DISTANCE_FROM_ORIGIN;
 
-  private boolean unknownModeReported = false;
-
   public static EnumAreaDifficultyMode loadFromConfig(Configuration c,
       EnumAreaDifficultyMode defaultValue) {
 

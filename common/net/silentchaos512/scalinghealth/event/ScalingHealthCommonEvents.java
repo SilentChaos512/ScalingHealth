@@ -45,34 +45,6 @@ public class ScalingHealthCommonEvents {
   }
 
   @SubscribeEvent
-  public void onLivingUpdateEvent(LivingUpdateEvent event) {
-
-    EntityLivingBase entityLiving = event.getEntityLiving();
-
-    // See PlayerBonusRegenHandler for new player health regen.
-
-    // Seems to be used to send update packets?
-    if (!entityLiving.worldObj.isRemote && entityLiving instanceof EntityPlayer
-        && entityLiving.ticksExisted % 20 == 0) {
-      EntityPlayer p = (EntityPlayer) entityLiving;
-      // Gets all players in a one chunk radius?
-      List<EntityPlayer> players = p.worldObj.getEntitiesWithinAABB(EntityPlayer.class,
-          new AxisAlignedBB(p.posX - 0.5D, p.posY - 0.5D, p.posZ - 0.5D, p.posX + 0.5D,
-              p.posY + 0.5D, p.posZ + 0.5D).expand(16, 8, 16));
-//      for (EntityPlayer pl : players) {
-//        NBTTagCompound tag = ScalingHealthSaveStorage.playerData.get(p.getName());
-//        // What is this? Why is it here?
-//        // if (tag.hasKey("username")) {
-//        // // ...
-//        // } else {
-//        // tag.setString("username", p.getName());
-//        // }
-//        DataSyncManager.requestServerToClientMessage("playerData", (EntityPlayerMP) pl, tag, true);
-//      }
-    }
-  }
-
-  @SubscribeEvent
   public void onPlayerRespawn(
       net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent event) {
 
@@ -84,11 +56,9 @@ public class ScalingHealthCommonEvents {
       // Lose health on death?
       if (ConfigScalingHealth.LOSE_HEALTH_ON_DEATH) {
         data.setMaxHealth(ConfigScalingHealth.PLAYER_STARTING_HEALTH);
-//        ScalingHealthSaveStorage.resetPlayerHealth(player);
       }
 
       // Apply health modifier
-//      int maxHealth = ScalingHealthSaveStorage.getPlayerHealth(player);
       float maxHealth = data.getMaxHealth();
       ModifierHandler.setMaxHealth(player, maxHealth, 0);
       if (player.getHealth() != maxHealth)
@@ -101,46 +71,16 @@ public class ScalingHealthCommonEvents {
 
     // Sync player data and set health.
     if (event.player instanceof EntityPlayerMP) {
-//      DataSyncManager.requestServerToClientMessage("worldData", (EntityPlayerMP) event.player,
-//          ScalingHealthSaveStorage.commonTag, true);
-//      DataSyncManager.requestServerToClientMessage("playerData", (EntityPlayerMP) event.player,
-//          ScalingHealthSaveStorage.playerData.get(event.player.getName()), true);
-
       EntityPlayerMP player = (EntityPlayerMP) event.player;
       PlayerData data = SHPlayerDataHandler.get(player);
 
       // Apply health modifier
-//      float maxHealth = ScalingHealthSaveStorage.getPlayerHealth(player);
       float maxHealth = data.getMaxHealth();
       ModifierHandler.setMaxHealth(player, maxHealth, 0);
       if (player.getHealth() > maxHealth)
         player.setHealth(maxHealth);
     }
   }
-
-//  @SubscribeEvent
-//  public void onPlayerLoadFromFile(PlayerEvent.LoadFromFile event) {
-//
-//    ScalingHealthSaveStorage.loadPlayerFile(event);
-//  }
-//
-//  @SubscribeEvent
-//  public void onPlayerSaveToFile(PlayerEvent.SaveToFile event) {
-//
-//    ScalingHealthSaveStorage.savePlayerFile(event);
-//  }
-//
-//  @SubscribeEvent
-//  public void onWorldLoadEvent(WorldEvent.Load event) {
-//
-//    ScalingHealthSaveStorage.loadServerWorldFile(event);
-//  }
-//
-//  @SubscribeEvent
-//  public void onWorldSaveEvent(WorldEvent.Save event) {
-//
-//    ScalingHealthSaveStorage.saveServerWorldFile(event);
-//  }
 
   @SubscribeEvent
   public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
