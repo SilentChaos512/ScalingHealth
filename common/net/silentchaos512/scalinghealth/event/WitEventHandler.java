@@ -26,7 +26,7 @@ public class WitEventHandler {
       if (entity instanceof EntityPlayer) {
         PlayerData data = SHPlayerDataHandler.get((EntityPlayer) entity);
         if (data != null)
-          event.lines.add(String.format("Difficulty: %.4f", data.getDifficulty()));
+          event.lines.add(tf + String.format("Difficulty: %.4f", data.getDifficulty()));
       }
 
       for (IAttributeInstance attr : entity.getAttributeMap().getAllAttributes()) {
