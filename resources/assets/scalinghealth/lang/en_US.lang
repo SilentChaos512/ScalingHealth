@@ -19,6 +19,7 @@ item.scalinghealth:HeartContainer.name=Heart Container
 ############
 
 command.outOfBounds=Value must be between %s and %s.
-command.showDifficulty=Difficulty: %s / %s
-command.setDifficulty=Set world difficulty to %s.
+command.showDifficulty=Difficulty of %s: %s / %s
+command.setDifficulty=Set difficulty of player %s to %s.
+command.showHealth=Health of %s: %s / %s
 command.setHealth=Set health of player %s to %d.

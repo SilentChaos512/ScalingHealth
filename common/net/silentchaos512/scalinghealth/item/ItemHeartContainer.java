@@ -11,7 +11,9 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
 import net.silentchaos512.lib.item.ItemSL;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.utils.ScalingHealthSaveStorage;
+import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
+import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
+import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
 public class ItemHeartContainer extends ItemSL {
 
@@ -25,7 +27,15 @@ public class ItemHeartContainer extends ItemSL {
   public ActionResult<ItemStack> onItemRightClick(ItemStack stack, World world, EntityPlayer player,
       EnumHand hand) {
 
-    if (!world.isRemote && ScalingHealthSaveStorage.incrementPlayerHealth(player)) {
+    if (!world.isRemote) {
+      PlayerData data = SHPlayerDataHandler.get(player);
+
+      if (data == null || (data.getMaxHealth() >= ConfigScalingHealth.PLAYER_HEALTH_MAX
+          && ConfigScalingHealth.PLAYER_HEALTH_MAX > 0)) {
+        return new ActionResult<ItemStack>(EnumActionResult.PASS, stack);
+      }
+
+      data.incrementMaxHealth(2);
       --stack.stackSize;
       world.playSound(null, player.getPosition(), SoundEvents.ENTITY_EXPERIENCE_ORB_TOUCH,
           SoundCategory.PLAYERS, 1.0f, 0.7f + 0.1f * (float) ScalingHealth.random.nextGaussian());

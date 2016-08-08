@@ -5,6 +5,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
 import net.silentchaos512.lib.registry.SRegistry;
+import net.silentchaos512.scalinghealth.client.ClientTickHandler;
 import net.silentchaos512.scalinghealth.client.HeartDisplayHandler;
 import net.silentchaos512.scalinghealth.event.ScalingHealthClientEvents;
 import net.silentchaos512.scalinghealth.event.WitEventHandler;
@@ -16,6 +17,7 @@ public class ScalingHealthClientProxy extends ScalingHealthCommonProxy {
 
     super.preInit(registry);
     MinecraftForge.EVENT_BUS.register(new ScalingHealthClientEvents());
+    MinecraftForge.EVENT_BUS.register(new ClientTickHandler());
     MinecraftForge.EVENT_BUS.register(new HeartDisplayHandler());
     if (Loader.isModLoaded("wit") || Loader.isModLoaded("WIT"))
       MinecraftForge.EVENT_BUS.register(new WitEventHandler());

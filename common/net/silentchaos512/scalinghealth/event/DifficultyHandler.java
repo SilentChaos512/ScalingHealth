@@ -1,12 +1,12 @@
 package net.silentchaos512.scalinghealth.event;
 
+import java.util.List;
 import java.util.Random;
 
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityMob;
@@ -19,32 +19,19 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
-import net.minecraftforge.fml.relauncher.Side;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.utils.ModifierHandler;
-import net.silentchaos512.scalinghealth.utils.ScalingHealthSaveStorage;
+import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
+import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
 public class DifficultyHandler {
 
   public static DifficultyHandler INSTANCE = new DifficultyHandler();
-
-  @SubscribeEvent
-  public void onWorldTick(TickEvent.WorldTickEvent event) {
-
-    // Handle difficulty ticks. Unlike Difficult Life, this is actually done each tick.
-    World world = event.world;
-    if (event.side == Side.SERVER && world != null && world.provider != null
-        && world.provider.getDimension() == 0 && event.phase == Phase.START) {
-      ScalingHealthSaveStorage.incrementDifficulty(world, ConfigScalingHealth.DIFFICULTY_PER_TICK);
-    }
-  }
 
   @SubscribeEvent
   public void onMobSpawn(LivingUpdateEvent event) {
@@ -70,7 +57,8 @@ public class DifficultyHandler {
 
   private boolean increaseEntityHealth(EntityLivingBase entityLiving) {
 
-    float difficulty = (float) ScalingHealthSaveStorage.getDifficulty(entityLiving.worldObj);
+    float difficulty = (float) ConfigScalingHealth.AREA_DIFFICULTY_MODE
+        .getAreaDifficulty(entityLiving.worldObj, entityLiving.getPosition());
     Random rand = ScalingHealth.random;
     boolean makeBlight = false;
 

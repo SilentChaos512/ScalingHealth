@@ -1,5 +1,10 @@
-0.1.4
+0.2.0
+WARNING: A new save system has been implemented! It should be much more reliable, but your current health and difficulty will reset to default values. Use the "/scalinghealth" command to correct that. Deleting your current main.cfg config file is not required, but recommended.
+Added: A player-based difficulty system. Each player will track a difficulty level. Should be good for servers.
+Added: Area difficulty modes. When a mob spawns, an "area difficulty" value is calculated. This has several configurable modes, most of which will consider all nearby players to determine the difficulty. There are also options to use distance from the world spawn or origin. By default, a weighted average is used, with the weights being based on the distance of each player from the mob. In other words, the difficulty of closer players has a bigger impact.
+Changed: Difficulty per tick changed to per second. Should make the values easier for some people to understand (no e-notation in the default value), and help with rounding errors. To get the value you want, try 'max_difficulty / (hours_to_max_difficulty * 3600)'.
 Fixed: Heart containers being consumed at max health.
+Possibly Fixed: Some problems with health getting reset. Not tested, but some or all of these issues may have been fixed by the new save system.
 
 0.1.3
 Added: Multiple health scaling modes. Defaults to MULTI_HALF.

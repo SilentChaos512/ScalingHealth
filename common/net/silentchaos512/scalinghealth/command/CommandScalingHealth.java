@@ -7,13 +7,15 @@ import com.google.common.collect.Lists;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
-import net.silentchaos512.scalinghealth.utils.ScalingHealthSaveStorage;
+import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
+import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
 public class CommandScalingHealth implements ICommand {
 
@@ -53,80 +55,113 @@ public class CommandScalingHealth implements ICommand {
       return;
     }
 
+    // Get arguments.
     String command = args[0];
+    double value = -1D;
+    EntityPlayer targetPlayer = null;
+
+    if (args.length > 1) {
+      try {
+        value = Double.parseDouble(args[1]);
+      } catch (Exception ex) {
+        tell(sender, getCommandUsage(sender), false);
+        return;
+      }
+    }
+    if (args.length > 2) {
+      String name = args[2];
+      targetPlayer = server.getPlayerList().getPlayerByUsername(name);
+      if (targetPlayer == null) {
+        tell(sender, "playerNotFound", true, name);
+        return;
+      }
+    }
+
     if (command.equals("difficulty")) {
-      double current = ScalingHealthSaveStorage.getDifficulty(sender.getEntityWorld());
-      if (args.length == 1) {
-        // Display difficulty.
-        String strCurrent = String.format(NUMFORMAT, current);
-        String strMax = String.format(NUMFORMAT, ConfigScalingHealth.DIFFICULTY_MAX);
-        tell(sender, "showDifficulty", true, strCurrent, strMax);
-        return;
-      }
-
-      try {
-        // Try set difficulty.
-        double value = Double.parseDouble(args[1]);
-        // Bounds check.
-        if (value < 0 || value > ConfigScalingHealth.DIFFICULTY_MAX) {
-          tell(sender, "outOfBounds", true, String.format(NUMFORMAT, 0.0f),
-              String.format("%.2f", ConfigScalingHealth.DIFFICULTY_MAX));
-          return;
-        }
-
-        // Change it!
-        ScalingHealthSaveStorage.incrementDifficulty(sender.getEntityWorld(), value - current);
-        tell(sender, "setDifficulty", true, String.format(NUMFORMAT, value));
-      } catch (NumberFormatException ex) {
-        tell(sender, getCommandUsage(sender), false);
-      }
+      executeDifficulty(server, sender, value, targetPlayer);
     } else if (command.equals("health")) {
-      if (args.length < 2) {
-        tell(sender, getCommandUsage(sender), false);
+      executeHealth(server, sender, value, targetPlayer);
+    }
+  }
+
+  private void executeDifficulty(MinecraftServer server, ICommandSender sender, double value,
+      EntityPlayer targetPlayer) {
+
+    if (targetPlayer == null)
+      targetPlayer = (EntityPlayer) sender;
+    PlayerData data = SHPlayerDataHandler.get(targetPlayer);
+
+    if (data == null) {
+      tell(sender, "Player data is null!", false);
+      return;
+    }
+
+    if (value < 0) {
+      // Report difficulty.
+      double current = data.getDifficulty();
+      String strCurrent = String.format(NUMFORMAT, current);
+      String strMax = String.format(NUMFORMAT, ConfigScalingHealth.DIFFICULTY_MAX);
+      tell(sender, "showDifficulty", true, targetPlayer.getName(), strCurrent, strMax);
+    } else {
+      // Try set difficulty.
+      // Bounds check.
+      if (value < 0 || value > ConfigScalingHealth.DIFFICULTY_MAX) {
+        tell(sender, "outOfBounds", true, String.format(NUMFORMAT, 0.0f),
+            String.format("%.2f", ConfigScalingHealth.DIFFICULTY_MAX));
         return;
       }
-      try {
-        // Try set player health.
-        int value = Integer.parseInt(args[1]);
-        EntityPlayerMP player = (EntityPlayerMP) sender;
 
-        // Bounds check.
-        int max = ConfigScalingHealth.PLAYER_HEALTH_MAX;
-        max = max <= 0 ? Integer.MAX_VALUE : max;
-        if (value < 2 || (value > max)) {
-          tell(sender, "outOfBounds", true, 2, max);
-          return;
-        }
+      // Change it!
+      data.setDifficulty(value);
+      tell(sender, "setDifficulty", true, targetPlayer.getName(), String.format(NUMFORMAT, value));
+    }
+  }
 
-        // Specific player, or the user?
-        if (args.length > 2) {
-          String name = args[2];
-          player = server.getPlayerList().getPlayerByUsername(name);
-          if (player == null) {
-            tell(sender, "playerNotFound", true, name);
-            return;
-          }
-        }
+  private void executeHealth(MinecraftServer server, ICommandSender sender, double value,
+      EntityPlayer targetPlayer) {
 
-        // Change it!
-        float currentHealth = player.getHealth();
-        float toHeal = value - currentHealth;
+    if (targetPlayer == null)
+      targetPlayer = (EntityPlayer) sender;
+    PlayerData data = SHPlayerDataHandler.get(targetPlayer);
 
-        ScalingHealthSaveStorage.setPlayerHealth(player, value);
-        if (toHeal > 0)
-          player.heal(toHeal);
+    if (data == null) {
+      tell(sender, "Player data is null!", false);
+      return;
+    }
 
-        tell(sender, "setHealth", true, player.getName(), value);
-      } catch (NumberFormatException ex) {
-        tell(sender, getCommandUsage(sender), false);
+    if (value < 0) {
+      // Report health.
+      float current = targetPlayer.getHealth();
+      float max = targetPlayer.getMaxHealth();
+      String strCurrent = String.format(NUMFORMAT, current);
+      String strMax = String.format(NUMFORMAT, max);
+      tell(sender, "showHealth", true, targetPlayer.getName(), strCurrent, strMax);
+    } else {
+      // Bounds check.
+      int max = ConfigScalingHealth.PLAYER_HEALTH_MAX;
+      max = max <= 0 ? Integer.MAX_VALUE : max;
+      if (value < 2 || value > max) {
+        tell(sender, "outOfBounds", true, 2, max);
+        return;
       }
+
+      // Change it!
+      float currentHealth = targetPlayer.getHealth();
+      float toHeal = (float) (value - currentHealth);
+      data.setMaxHealth((float) value);
+
+      if (toHeal > 0)
+        targetPlayer.heal(toHeal);
+
+      tell(sender, "setHealth", true, targetPlayer.getName(), value);
     }
   }
 
   @Override
   public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
 
-    return (server.isSinglePlayer() && server.worldServers[0].getWorldInfo().areCommandsAllowed())
+    return ((server.isDedicatedServer() && !(sender instanceof EntityPlayer))
+        || server.isSinglePlayer() && server.worldServers[0].getWorldInfo().areCommandsAllowed())
         || server.getPlayerList().getOppedPlayers()
             .getGameProfileFromName(sender.getName()) != null;
   }
