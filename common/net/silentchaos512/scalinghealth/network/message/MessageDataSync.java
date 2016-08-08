@@ -9,6 +9,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.client.ClientTickHandler;
 import net.silentchaos512.scalinghealth.network.Message;
+import net.silentchaos512.scalinghealth.utils.ModifierHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
@@ -21,11 +22,11 @@ public class MessageDataSync extends Message {
 
   }
 
-  public MessageDataSync(PlayerData data, String playerName) {
+  public MessageDataSync(PlayerData data, EntityPlayer player) {
 
     tags = new NBTTagCompound();
     data.writeToNBT(tags);
-    this.playerName = playerName;
+    this.playerName = player.getName();
   }
 
   @Override
@@ -38,6 +39,9 @@ public class MessageDataSync extends Message {
       if (player != null) {
         PlayerData data = SHPlayerDataHandler.get(player);
         data.readFromNBT(tags);
+        // Set players health and max health.
+        ModifierHandler.setMaxHealth(player, data.getMaxHealth(), 0);
+        player.setHealth(data.getHealth());
       }
     });
 

@@ -105,7 +105,7 @@ public class SHPlayerDataHandler {
           int radiusSquared = radius <= 0 ? Integer.MAX_VALUE : radius * radius;
           for (EntityPlayer p : player.worldObj.getPlayers(EntityPlayer.class,
               p -> !p.equals(player) && p.getDistanceSq(player.getPosition()) < radiusSquared)) {
-            MessageDataSync message = new MessageDataSync(get(p), p.getName());
+            MessageDataSync message = new MessageDataSync(get(p), p);
             NetworkHandler.INSTANCE.sendTo(message, (EntityPlayerMP) player);
           }
         }
@@ -116,7 +116,7 @@ public class SHPlayerDataHandler {
     public void onPlayerLogin(PlayerLoggedInEvent event) {
 
       if (event.player instanceof EntityPlayerMP) {
-        MessageDataSync message = new MessageDataSync(get(event.player), event.player.getName());
+        MessageDataSync message = new MessageDataSync(get(event.player), event.player);
         NetworkHandler.INSTANCE.sendTo(message, (EntityPlayerMP) event.player);
       }
     }
@@ -125,9 +125,11 @@ public class SHPlayerDataHandler {
   public static class PlayerData {
 
     public static final String NBT_DIFFICULTY = "difficulty";
+    public static final String NBT_HEALTH = "health";
     public static final String NBT_MAX_HEALTH = "max_health";
 
     double difficulty = 0.0D;
+    float health = 20;
     float maxHealth = ConfigScalingHealth.PLAYER_STARTING_HEALTH;
 
     public WeakReference<EntityPlayer> playerWR;
@@ -154,6 +156,11 @@ public class SHPlayerDataHandler {
     public void incrementDifficulty(double amount) {
 
       setDifficulty(difficulty + amount);
+    }
+
+    public float getHealth() {
+
+      return health;
     }
 
     public float getMaxHealth() {
@@ -203,6 +210,7 @@ public class SHPlayerDataHandler {
         }
         // Sync with client?
         if (player.worldObj.getTotalWorldTime() % ConfigScalingHealth.PACKET_DELAY == 0) {
+          health = player.getHealth();
           save();
           sendUpdateMessage();
         }
@@ -213,7 +221,7 @@ public class SHPlayerDataHandler {
 
       if (!client) {
         EntityPlayer player = playerWR.get();
-        MessageDataSync message = new MessageDataSync(get(player), player.getName());
+        MessageDataSync message = new MessageDataSync(get(player), player);
         NetworkHandler.INSTANCE.sendTo(message, (EntityPlayerMP) player);
       }
     }
@@ -232,6 +240,7 @@ public class SHPlayerDataHandler {
     public void writeToNBT(NBTTagCompound tags) {
 
       tags.setDouble(NBT_DIFFICULTY, difficulty);
+      tags.setFloat(NBT_HEALTH, health);
       tags.setFloat(NBT_MAX_HEALTH, maxHealth);
     }
 
@@ -249,6 +258,7 @@ public class SHPlayerDataHandler {
     public void readFromNBT(NBTTagCompound tags) {
 
       difficulty = tags.getDouble(NBT_DIFFICULTY);
+      health = tags.getFloat(NBT_HEALTH);
       maxHealth = tags.getFloat(NBT_MAX_HEALTH);
     }
   }

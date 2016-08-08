@@ -1,3 +1,6 @@
+0.2.1
+Fixed: Player's health displaying incorrectly after traveling between dimensions.
+
 0.2.0
 WARNING: A new save system has been implemented! It should be much more reliable, but your current health and difficulty will reset to default values. Use the "/scalinghealth" command to correct that. Deleting your current main.cfg config file is not required, but recommended.
 Added: A player-based difficulty system. Each player will track a difficulty level. Should be good for servers.
