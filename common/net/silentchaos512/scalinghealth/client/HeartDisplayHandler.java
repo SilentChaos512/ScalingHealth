@@ -49,9 +49,8 @@ public class HeartDisplayHandler extends Gui {
     GlStateManager.enableBlend();
 
     int health = MathHelper.ceiling_float_int(player.getHealth());
-//    boolean highlight = healthUpdateCounter > updateCounter
-//        && (healthUpdateCounter - updateCounter) / 3 % 2 == 1;
     boolean highlight = player.hurtResistantTime / 3 % 2 == 1;
+    updateCounter = ClientTickHandler.ticksInGame;
 
     if (health < playerHealth && player.hurtResistantTime > 0) {
       lastSystemTime = Minecraft.getSystemTime();
@@ -78,7 +77,7 @@ public class HeartDisplayHandler extends Gui {
     int healthRows = MathHelper.ceiling_float_int((healthMax + absorb) / 2f / 10f);
     int rowHeight = Math.max(10 - (healthRows - 2), 3); // TODO: Remove?
 
-    rand.setSeed((long) (updateCounter * 312871));
+    rand.setSeed(updateCounter * 312871);
 
     int left = width / 2 - 91;
     int top = height - GuiIngameForge.left_height;
