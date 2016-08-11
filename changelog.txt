@@ -1,5 +1,8 @@
 0.2.1
+Added: Heart Crystal Ore. Drops shards that can be used to craft heart containers...
 Fixed: Player's health displaying incorrectly after traveling between dimensions.
+Fixed: Hearts not shaking on low health.
+Fixed: Mobs with low health getting a larger boost on "MULTI" health scaling modes.
 
 0.2.0
 WARNING: A new save system has been implemented! It should be much more reliable, but your current health and difficulty will reset to default values. Use the "/scalinghealth" command to correct that. Deleting your current main.cfg config file is not required, but recommended.

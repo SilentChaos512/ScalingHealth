@@ -2,7 +2,7 @@
 # Blocks #
 ##########
 
-# No one's home!
+tile.scalinghealth:CrystalOre.name=Heart Crystal Ore
 
 
 
@@ -10,6 +10,7 @@
 # Items #
 #########
 
+item.scalinghealth:CrystalShard.name=Heart Crystal Shard
 item.scalinghealth:HeartContainer.name=Heart Container
 
 

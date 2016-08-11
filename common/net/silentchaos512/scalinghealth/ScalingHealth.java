@@ -11,14 +11,17 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.silentchaos512.lib.SilentLib;
 import net.silentchaos512.lib.registry.SRegistry;
 import net.silentchaos512.lib.util.LocalizationHelper;
 import net.silentchaos512.lib.util.LogHelper;
 import net.silentchaos512.scalinghealth.command.CommandScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
+import net.silentchaos512.scalinghealth.init.ModBlocks;
 import net.silentchaos512.scalinghealth.init.ModItems;
 import net.silentchaos512.scalinghealth.proxy.ScalingHealthCommonProxy;
+import net.silentchaos512.scalinghealth.world.SHWorldGenerator;
 
 //@formatter:off
 @Mod(modid = ScalingHealth.MOD_ID_LOWER,
@@ -68,11 +71,12 @@ public class ScalingHealth {
     ConfigScalingHealth.init(event.getSuggestedConfigurationFile());
     ConfigScalingHealth.save();
 
+    ModBlocks.init(registry);
     ModItems.init(registry);
 
     // TODO: Achievements?
 
-    // TODO: World generator?
+    GameRegistry.registerWorldGenerator(new SHWorldGenerator(), 0);
 
     proxy.preInit(registry);
   }
