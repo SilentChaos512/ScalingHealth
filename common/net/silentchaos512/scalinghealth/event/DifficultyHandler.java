@@ -103,6 +103,7 @@ public class DifficultyHandler {
 
     // Apply extra health and damage.
     float healthMulti = 1f;
+    float healthScaleDiff = Math.max(0, entityLiving.getMaxHealth() - 20f);
     switch (ConfigScalingHealth.MOB_HEALTH_SCALING_MODE) {
       case ADD:
         ModifierHandler.setMaxHealth(entityLiving, genAddedHealth + baseMaxHealth, 0);
@@ -113,12 +114,12 @@ public class DifficultyHandler {
         break;
       case MULTI_HALF:
         // TODO: Is this bad for mobs with less than 20 health?
-        healthMulti = genAddedHealth / (20f + (entityLiving.getMaxHealth() - 20f) * 0.5f);
+        healthMulti = genAddedHealth / (20f + healthScaleDiff * 0.5f);
         ModifierHandler.setMaxHealth(entityLiving, healthMulti + baseMaxHealth, 1);
         break;
       case MULTI_QUARTER:
         // TODO: Is this bad for mobs with less than 20 health?
-        healthMulti = genAddedHealth / (20f + (entityLiving.getMaxHealth() - 20f) * 0.75f);
+        healthMulti = genAddedHealth / (20f + healthScaleDiff * 0.75f);
         ModifierHandler.setMaxHealth(entityLiving, healthMulti + baseMaxHealth, 1);
         break;
       default:
