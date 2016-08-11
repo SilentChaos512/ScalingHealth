@@ -1,14 +1,10 @@
 package net.silentchaos512.scalinghealth.event;
 
-import java.util.List;
 import java.util.Random;
 
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
-import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
@@ -59,15 +55,16 @@ public class ScalingHealthCommonEvents {
       }
 
       // Apply health modifier
+      float health = player.getHealth();
       float maxHealth = data.getMaxHealth();
       ModifierHandler.setMaxHealth(player, maxHealth, 0);
-      if (player.getHealth() != maxHealth)
+      if (health != maxHealth && maxHealth > 0)
         player.setHealth(maxHealth);
     }
   }
 
   @SubscribeEvent
-  public void onPlayerJoinedServerEvent(PlayerLoggedInEvent event) {
+  public void onPlayerJoinedServer(PlayerLoggedInEvent event) {
 
     // Sync player data and set health.
     if (event.player instanceof EntityPlayerMP) {
@@ -75,9 +72,10 @@ public class ScalingHealthCommonEvents {
       PlayerData data = SHPlayerDataHandler.get(player);
 
       // Apply health modifier
+      float health = player.getHealth();
       float maxHealth = data.getMaxHealth();
       ModifierHandler.setMaxHealth(player, maxHealth, 0);
-      if (player.getHealth() > maxHealth)
+      if (health > maxHealth && maxHealth > 0)
         player.setHealth(maxHealth);
     }
   }

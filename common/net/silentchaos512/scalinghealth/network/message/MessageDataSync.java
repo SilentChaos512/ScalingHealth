@@ -41,7 +41,8 @@ public class MessageDataSync extends Message {
         data.readFromNBT(tags);
         // Set players health and max health.
         ModifierHandler.setMaxHealth(player, data.getMaxHealth(), 0);
-        player.setHealth(data.getHealth());
+        if (data.getHealth() > 0f)
+          player.setHealth(data.getHealth());
       }
     });
 

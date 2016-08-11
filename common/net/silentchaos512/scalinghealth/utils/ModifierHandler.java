@@ -6,6 +6,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.player.EntityPlayer;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 
 public class ModifierHandler {
@@ -38,6 +39,11 @@ public class ModifierHandler {
   }
 
   public static void setMaxHealth(EntityLivingBase entity, double amount, int op) {
+
+    if (amount <= 0) {
+      ScalingHealth.logHelper.warning("ModifierHandler.setMaxHealth: amount <= 0!");
+      return;
+    }
 
     float originalHealth = entity.getHealth();
     IAttributeInstance attr = entity.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
