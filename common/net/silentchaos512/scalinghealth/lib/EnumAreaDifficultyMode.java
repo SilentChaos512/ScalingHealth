@@ -54,6 +54,7 @@ public enum EnumAreaDifficultyMode {
       return 0;
 
     double total = 0;
+    double ret = 0;
     BlockPos origin = BlockPos.ORIGIN;
 
     switch (this) {
@@ -69,7 +70,8 @@ public enum EnumAreaDifficultyMode {
             totalWeight += weight;
           }
         }
-        return totalWeight <= 0 ? 0 : total / totalWeight;
+        ret = totalWeight <= 0 ? 0 : total / totalWeight;
+        break;
 
       case AVERAGE:
         for (EntityPlayer player : players) {
@@ -77,7 +79,8 @@ public enum EnumAreaDifficultyMode {
           if (data != null)
             total += data.getDifficulty();
         }
-        return total / players.size();
+        ret = total / players.size();
+        break;
 
       case MAX_LEVEL:
         double max = 0;
@@ -88,7 +91,8 @@ public enum EnumAreaDifficultyMode {
             max = Math.max(d, max);
           }
         }
-        return max;
+        ret = max;
+        break;
 
       case MIN_LEVEL:
         double min = ConfigScalingHealth.DIFFICULTY_MAX;
@@ -99,7 +103,8 @@ public enum EnumAreaDifficultyMode {
             min = Math.min(d, min);
           }
         }
-        return min;
+        ret = min;
+        break;
 
       case DISTANCE_FROM_SPAWN:
         origin = world.getSpawnPoint();
@@ -107,9 +112,13 @@ public enum EnumAreaDifficultyMode {
         int dx = pos.getX() - origin.getX();
         int dz = pos.getZ() - origin.getZ();
         double distance = Math.sqrt(dx * dx + dz * dz);
-        return distance * ConfigScalingHealth.DIFFICULTY_PER_BLOCK;
+        ret = distance * ConfigScalingHealth.DIFFICULTY_PER_BLOCK;
+        break;
     }
 
-    return 0;
+    // Group bonus?
+    ret *= 1 + ConfigScalingHealth.DIFFICULTY_GROUP_AREA_BONUS * (players.size() - 1);
+
+    return ret;
   }
 }

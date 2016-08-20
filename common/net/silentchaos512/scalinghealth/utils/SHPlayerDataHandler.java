@@ -9,6 +9,7 @@ import java.util.Map;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -134,6 +135,9 @@ public class SHPlayerDataHandler {
 
     public WeakReference<EntityPlayer> playerWR;
     private final boolean client;
+    private int lastPosX = 0;
+    private int lastPosY = 0;
+    private int lastPosZ = 0;
 
     public PlayerData(EntityPlayer player) {
 
@@ -205,8 +209,19 @@ public class SHPlayerDataHandler {
         // Increase player difficulty.
         if (player.worldObj.getTotalWorldTime() % 20 == 0) {
           float amount = ConfigScalingHealth.DIFFICULTY_PER_SECOND;
+
+          // Idle multiplier
+          if (lastPosX == (int) player.posX && lastPosZ == (int) player.posZ)
+            amount *= ConfigScalingHealth.DIFFICULTY_IDLE_MULTI;
+          ScalingHealth.logHelper.debug(amount);
+
           // TODO: Multiplier for other dimensions?
+
           incrementDifficulty(amount);
+
+          lastPosX = (int) player.posX;
+          lastPosY = (int) player.posY;
+          lastPosZ = (int) player.posZ;
         }
         // Sync with client?
         if (player.worldObj.getTotalWorldTime() % ConfigScalingHealth.PACKET_DELAY == 0) {

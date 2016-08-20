@@ -52,6 +52,8 @@ public class ConfigScalingHealth {
   public static int HOURS_TO_MAX_DIFFICULTY = 60; // Not actually loaded, just to make calc below clear.
   public static float DIFFICULTY_PER_SECOND = DIFFICULTY_MAX / (HOURS_TO_MAX_DIFFICULTY * 3600);
   public static float DIFFICULTY_PER_BLOCK = DIFFICULTY_MAX / 100000;
+  public static float DIFFICULTY_IDLE_MULTI = 0.7f;
+  public static float DIFFICULTY_GROUP_AREA_BONUS = 0.05f;
   public static int DIFFICULTY_SEARCH_RADIUS = 160;
   public static EnumAreaDifficultyMode AREA_DIFFICULTY_MODE = EnumAreaDifficultyMode.WEIGHTED_AVERAGE;
 
@@ -179,6 +181,13 @@ public class ConfigScalingHealth {
           DIFFICULTY_PER_BLOCK, 0, Float.MAX_VALUE,
           "The amount of difficulty added per unit distance from the origin/spanw, assuming \"Area Mode\" "
           + "is set to a distance-based option.");
+      DIFFICULTY_IDLE_MULTI = c.getFloat("Idle Multiplier", CAT_DIFFICULTY,
+          DIFFICULTY_IDLE_MULTI, 0f, Float.MAX_VALUE,
+          "Difficulty added per second is multiplied by this if the player is not moving.");
+      DIFFICULTY_GROUP_AREA_BONUS = c.getFloat("Group Area Bonus", CAT_DIFFICULTY,
+          DIFFICULTY_GROUP_AREA_BONUS, 0f, Float.MAX_VALUE,
+          "Adds this much extra difficulty per additional player in the area. So, area difficulty will\n"
+          + "be multiplied by: 1 + group_bonus * (players_in_area - 1)");
       DIFFICULTY_SEARCH_RADIUS = c.getInt("Search Radius", CAT_DIFFICULTY,
           DIFFICULTY_SEARCH_RADIUS, 0, Short.MAX_VALUE,
           "The distance from a newly spawned mob to search for players to determine its difficulty "
