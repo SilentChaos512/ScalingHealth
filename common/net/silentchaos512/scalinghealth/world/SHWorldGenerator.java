@@ -11,6 +11,7 @@ import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.minecraftforge.fml.common.IWorldGenerator;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.init.ModBlocks;
 
 public class SHWorldGenerator implements IWorldGenerator {
@@ -28,7 +29,7 @@ public class SHWorldGenerator implements IWorldGenerator {
 
   private void generateSurface(World world, Random random, int posX, int posZ) {
 
-    int i, x, y, z, meta, veinCount, veinSize;
+    int i, x, y, z, meta, veinCount, veinSize, minHeight, maxHeight;
     BlockPos pos;
     Block block;
     IBlockState state;
@@ -36,15 +37,20 @@ public class SHWorldGenerator implements IWorldGenerator {
     // Crystal Shard Ore
     block = ModBlocks.crystalOre;
     state = block.getDefaultState();
-    // TODO: Configs!
-    veinCount = random.nextFloat() < (2f / 7f) ? 1 : 0;
-    veinSize = 6;
+
+    veinCount = (int) ConfigScalingHealth.HEART_CRYSTAL_ORE_VEIN_COUNT;
+    if (random.nextFloat() < ConfigScalingHealth.HEART_CRYSTAL_ORE_VEIN_COUNT - veinCount)
+      ++veinCount;
+    veinSize = ConfigScalingHealth.HEART_CRYSTAL_ORE_VEIN_SIZE;
+    minHeight = ConfigScalingHealth.HEART_CRYSTAL_ORE_MIN_HEIGHT;
+    maxHeight = ConfigScalingHealth.HEART_CRYSTAL_ORE_MAX_HEIGHT;
+
     for (i = 0; i < veinCount; ++i) {
-       x = posX + random.nextInt(16);
-       y = random.nextInt(30 - 10) + 10;
-       z = posZ + random.nextInt(16);
-       pos = new BlockPos(x, y, z);
-       new WorldGenMinable(state, veinSize).generate(world, random, pos);
+      x = posX + random.nextInt(16);
+      y = random.nextInt(maxHeight - minHeight) + minHeight;
+      z = posZ + random.nextInt(16);
+      pos = new BlockPos(x, y, z);
+      new WorldGenMinable(state, veinSize).generate(world, random, pos);
     }
   }
 }

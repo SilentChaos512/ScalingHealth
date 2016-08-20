@@ -60,6 +60,12 @@ public class ConfigScalingHealth {
   // Network
   public static int PACKET_DELAY = 20;
 
+  // World
+  public static float HEART_CRYSTAL_ORE_VEIN_COUNT = 3f / 7f;
+  public static int HEART_CRYSTAL_ORE_VEIN_SIZE = 6;
+  public static int HEART_CRYSTAL_ORE_MIN_HEIGHT = 10;
+  public static int HEART_CRYSTAL_ORE_MAX_HEIGHT = 35;
+
   static final String split = Configuration.CATEGORY_SPLITTER;
   public static final String CAT_MAIN = "main";
   public static final String CAT_CLIENT = CAT_MAIN + split + "client";
@@ -72,6 +78,7 @@ public class ConfigScalingHealth {
   public static final String CAT_ITEMS = CAT_MAIN + split + "items";
   public static final String CAT_DIFFICULTY = CAT_MAIN + split + "difficulty";
   public static final String CAT_NETWORK = CAT_MAIN + split + "network";
+  public static final String CAT_WORLD = CAT_MAIN + split + "world";
 
   private static Configuration c;
 
@@ -199,6 +206,25 @@ public class ConfigScalingHealth {
           PACKET_DELAY, 1, 1200,
           "The number of ticks between update packets. Smaller numbers mean more packets (and more "
           + "bandwidth and processing power used), but also less client-server desync.");
+
+      // World
+      String cat = CAT_WORLD + split + "heart_crystal_ore";
+      HEART_CRYSTAL_ORE_VEIN_COUNT = c.getFloat("Veins Per Chunk", cat,
+          HEART_CRYSTAL_ORE_VEIN_COUNT, 0, 10000,
+          "The number of veins per chunk. The fractional part is a probability of an extra vein in each chunk.");
+      HEART_CRYSTAL_ORE_VEIN_SIZE = c.getInt("Vein Size", cat,
+          HEART_CRYSTAL_ORE_VEIN_SIZE, 0, 10000,
+          "The size of each vein.");
+      HEART_CRYSTAL_ORE_MIN_HEIGHT = c.getInt("Min Height", cat,
+          HEART_CRYSTAL_ORE_MIN_HEIGHT, 0, 255,
+          "The lowest y-level the ore can be found at. Must be less than Max Height");
+      HEART_CRYSTAL_ORE_MAX_HEIGHT = c.getInt("Max Height", cat,
+          HEART_CRYSTAL_ORE_MAX_HEIGHT, 0, 255,
+          "The highest y-level the ore can be found at. Must be greater than Min Height");
+      if (HEART_CRYSTAL_ORE_MAX_HEIGHT <= HEART_CRYSTAL_ORE_MIN_HEIGHT) {
+        HEART_CRYSTAL_ORE_MAX_HEIGHT = 35;
+        HEART_CRYSTAL_ORE_MIN_HEIGHT = 10;
+      }
 
       //@formatter:on
     } catch (Exception ex) {

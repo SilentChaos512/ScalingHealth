@@ -213,7 +213,6 @@ public class SHPlayerDataHandler {
           // Idle multiplier
           if (lastPosX == (int) player.posX && lastPosZ == (int) player.posZ)
             amount *= ConfigScalingHealth.DIFFICULTY_IDLE_MULTI;
-          ScalingHealth.logHelper.debug(amount);
 
           // TODO: Multiplier for other dimensions?
 
