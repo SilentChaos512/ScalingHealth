@@ -1,5 +1,10 @@
+0.2.2
+
+
 0.2.1
 Added: Heart Crystal Ore. Drops shards that can be used to craft heart containers...
+Added: Group difficulty bonus. The area difficulty increases a bit more for each additional player in the area (configurable)
+Added: Idle difficulty increase multiplier. By default, difficulty increase per second is slower when the player is not moving. Set it to a number greater than one is you want faster increase when idle.
 Fixed: Player's health displaying incorrectly after traveling between dimensions.
 Fixed: Hearts not shaking on low health.
 Fixed: Mobs with low health getting a larger boost on "MULTI" health scaling modes.
