@@ -193,8 +193,8 @@ public class ConfigScalingHealth {
           "Difficulty added per second is multiplied by this if the player is not moving.");
       DIFFICULTY_GROUP_AREA_BONUS = c.getFloat("Group Area Bonus", CAT_DIFFICULTY,
           DIFFICULTY_GROUP_AREA_BONUS, 0f, Float.MAX_VALUE,
-          "Adds this much extra difficulty per additional player in the area. So, area difficulty will\n"
-          + "be multiplied by: 1 + group_bonus * (players_in_area - 1)");
+          "Adds this much extra difficulty per additional player in the area. So, area difficulty will"
+          + " be multiplied by: 1 + group_bonus * (players_in_area - 1)");
       DIFFICULTY_SEARCH_RADIUS = c.getInt("Search Radius", CAT_DIFFICULTY,
           DIFFICULTY_SEARCH_RADIUS, 0, Short.MAX_VALUE,
           "The distance from a newly spawned mob to search for players to determine its difficulty "

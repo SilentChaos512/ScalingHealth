@@ -1,5 +1,6 @@
 0.2.2
-
+Added: A difficulty bar. Displays for a short time occasionally. Feedback appreciated.
+Fixed: Health modifiers being wrong when other modifiers are already applied.
 
 0.2.1
 Added: Heart Crystal Ore. Drops shards that can be used to craft heart containers...
