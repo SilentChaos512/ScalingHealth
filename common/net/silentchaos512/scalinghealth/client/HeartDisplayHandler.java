@@ -148,7 +148,7 @@ public class HeartDisplayHandler extends Gui {
       int rowColor = getColorForRow(i);
 
       for (int j = 0; j < renderHearts; ++j) {
-        int y = 0 + (i == regen ? -2 : 0);
+        int y = 0 + (j == regen ? -2 : 0);
         drawTexturedModalRect(left + 8 * j, top + y, 0, potionOffset, 9, 9, rowColor);
       }
 
