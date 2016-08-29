@@ -27,7 +27,7 @@ public class DifficultyDisplayHandler extends Gui {
   public void onRenderOverlay(RenderGameOverlayEvent.Pre event) {
 
     // TODO: Configs?
-    if (event.getType() != ElementType.TEXT)
+    if (event.getType() != ElementType.TEXT || ConfigScalingHealth.DIFFICULTY_MAX <= 0)
       return;
 
     Minecraft mc = Minecraft.getMinecraft();
