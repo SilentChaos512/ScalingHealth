@@ -139,6 +139,8 @@ public class DifficultyHandler {
   private void makeEntityBlight(EntityLivingBase entityLiving, Random rand) {
 
     //@formatter:off
+    BlightHandler.markBlight(entityLiving);
+
     entityLiving.addPotionEffect(new PotionEffect(
         MobEffects.INVISIBILITY, Integer.MAX_VALUE, 0, true, false));
     entityLiving.addPotionEffect(new PotionEffect(

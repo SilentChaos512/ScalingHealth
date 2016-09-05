@@ -5,6 +5,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.silentchaos512.lib.proxy.CommonProxy;
 import net.silentchaos512.lib.registry.SRegistry;
+import net.silentchaos512.scalinghealth.event.BlightHandler;
 import net.silentchaos512.scalinghealth.event.DifficultyHandler;
 import net.silentchaos512.scalinghealth.event.PlayerBonusRegenHandler;
 import net.silentchaos512.scalinghealth.event.ScalingHealthCommonEvents;
@@ -24,6 +25,7 @@ public class ScalingHealthCommonProxy extends CommonProxy {
     MinecraftForge.EVENT_BUS.register(new SHPlayerDataHandler.EventHandler());
     MinecraftForge.EVENT_BUS.register(PlayerBonusRegenHandler.INSTANCE);
     MinecraftForge.EVENT_BUS.register(DifficultyHandler.INSTANCE);
+    MinecraftForge.EVENT_BUS.register(BlightHandler.INSTANCE);
   }
 
   public EntityPlayer getClientPlayer() {

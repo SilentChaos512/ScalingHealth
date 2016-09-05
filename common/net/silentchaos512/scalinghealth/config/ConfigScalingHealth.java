@@ -45,6 +45,8 @@ public class ConfigScalingHealth {
   public static float HEART_DROP_CHANCE = 0.01F;
   public static int HEARTS_DROPPED_BY_BOSS_MIN = 3;
   public static int HEARTS_DROPPED_BY_BOSS_MAX = 6;
+  public static int HEARTS_DROPPED_BY_BLIGHT_MIN = 1;
+  public static int HEARTS_DROPPED_BY_BLIGHT_MAX = 2;
 
   // Difficulty
   public static float DIFFICULTY_MAX = 250;
@@ -164,6 +166,7 @@ public class ConfigScalingHealth {
       HEART_DROP_CHANCE = c.getFloat("Heart Drop Chance", CAT_ITEMS,
           HEART_DROP_CHANCE, 0f, 1f,
           "The chance of any mob dropping a heart canister when killed.");
+
       HEARTS_DROPPED_BY_BOSS_MIN = c.getInt("Hearts Dropped by Boss Min", CAT_ITEMS,
           HEARTS_DROPPED_BY_BOSS_MIN, 0, 64,
           "The minimum number of heart canisters that a boss will drop when killed.");
@@ -172,6 +175,15 @@ public class ConfigScalingHealth {
           "The maximum number of heart canisters that a boss will drop when killed.");
       if (HEARTS_DROPPED_BY_BOSS_MAX < HEARTS_DROPPED_BY_BOSS_MIN)
         HEARTS_DROPPED_BY_BOSS_MAX = HEARTS_DROPPED_BY_BOSS_MIN;
+
+      HEARTS_DROPPED_BY_BLIGHT_MIN = c.getInt("Hearts Dropped by Blight Min", CAT_ITEMS,
+          HEARTS_DROPPED_BY_BLIGHT_MIN, 0, 64,
+          "The minimum number of heart canisters that a blight will drop when killed.");
+      HEARTS_DROPPED_BY_BLIGHT_MAX = c.getInt("Hearts Dropped by Blight Max", CAT_ITEMS,
+          HEARTS_DROPPED_BY_BLIGHT_MAX, 0, 64,
+          "The maximum number of heart canisters that a blight will drop when killed.");
+      if (HEARTS_DROPPED_BY_BLIGHT_MAX < HEARTS_DROPPED_BY_BLIGHT_MIN)
+        HEARTS_DROPPED_BY_BLIGHT_MAX = HEARTS_DROPPED_BY_BLIGHT_MIN;
 
       // Difficulty
       DIFFICULTY_MAX = c.getFloat("Max Value", CAT_DIFFICULTY,
