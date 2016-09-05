@@ -19,8 +19,9 @@ public class DifficultyDisplayHandler extends Gui {
   public static final ResourceLocation TEXTURE = new ResourceLocation(ScalingHealth.MOD_ID_LOWER,
       "textures/gui/hud.png");
 
-  int lastDifficultyDisplayed = -1;
-  int LastUpdateTime = 0;
+  int lastDifficultyDisplayed = -100;
+  int lastAreaDifficultyDisplayed = -100;
+  int lastUpdateTime = 0;
   int currentTime = 0;
 
   @SubscribeEvent
@@ -41,13 +42,21 @@ public class DifficultyDisplayHandler extends Gui {
       return;
 
     int difficulty = (int) data.getDifficulty();
+    int areaDifficulty = (int) ConfigScalingHealth.AREA_DIFFICULTY_MODE
+        .getAreaDifficulty(player.worldObj, player.getPosition());
+
     if (difficulty != lastDifficultyDisplayed) {
       lastDifficultyDisplayed = difficulty;
-      LastUpdateTime = ClientTickHandler.ticksInGame;
+      lastUpdateTime = ClientTickHandler.ticksInGame;
+    }
+    if (areaDifficulty < lastAreaDifficultyDisplayed - 10
+        || areaDifficulty > lastAreaDifficultyDisplayed + 10) {
+      lastAreaDifficultyDisplayed = areaDifficulty;
+      lastUpdateTime = ClientTickHandler.ticksInGame;
     }
 
     currentTime = ClientTickHandler.ticksInGame;
-    if (currentTime - LastUpdateTime < 120) { // TODO: Config?
+    if (currentTime - lastUpdateTime < 160) { // TODO: Config?
       GlStateManager.enableBlend();
 
       mc.renderEngine.bindTexture(TEXTURE);
@@ -57,9 +66,14 @@ public class DifficultyDisplayHandler extends Gui {
 
       int posX = width / 2 - 32;
       int posY = height - GuiIngameForge.left_height - 14;
+      // Frame
       drawTexturedModalRect(posX, posY, 192, 0, 64, 12, 0xFFFFFF);
-      int barLength = (int) (60 * difficulty / ConfigScalingHealth.DIFFICULTY_MAX);
-      drawTexturedModalRect(posX + 2, posY + 2, 194, 14, barLength, 8, 0xFFFFFF);
+      // Area Difficulty
+      int barLength = (int) (60 * areaDifficulty / ConfigScalingHealth.DIFFICULTY_MAX);
+      drawTexturedModalRect(posX + 2, posY + 2, 194, 14, barLength, 6, 0xFFFFFF);
+      // Difficulty
+      barLength = (int) (60 * difficulty / ConfigScalingHealth.DIFFICULTY_MAX);
+      drawTexturedModalRect(posX + 2, posY + 8, 194, 20, barLength, 2, 0xFFFFFF);
 
       GlStateManager.popMatrix();
       GlStateManager.disableBlend();
