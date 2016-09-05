@@ -16,8 +16,8 @@ public class ConfigScalingHealth {
   public static boolean DEBUG_MODE = false;
 
   // Client
-  public static boolean CHANGE_HEART_RENDERING = true;  // TODO: Change?
-  public static boolean RENDER_DIFFICULTY_METER = true; // TODO: Change?
+  public static boolean CHANGE_HEART_RENDERING = true;
+  public static boolean RENDER_DIFFICULTY_METER = true;
 
   // Player Health
   public static int PLAYER_STARTING_HEALTH = 20;
