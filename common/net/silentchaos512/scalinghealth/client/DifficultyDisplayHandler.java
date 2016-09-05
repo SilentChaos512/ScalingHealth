@@ -5,6 +5,7 @@ import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
@@ -21,7 +22,7 @@ public class DifficultyDisplayHandler extends Gui {
 
   int lastDifficultyDisplayed = -100;
   int lastAreaDifficultyDisplayed = -100;
-  int lastUpdateTime = 0;
+  int lastUpdateTime = Integer.MIN_VALUE;
   int currentTime = 0;
 
   @SubscribeEvent
@@ -43,15 +44,17 @@ public class DifficultyDisplayHandler extends Gui {
       return;
 
     int difficulty = (int) data.getDifficulty();
-    int areaDifficulty = (int) ConfigScalingHealth.AREA_DIFFICULTY_MODE
-        .getAreaDifficulty(player.worldObj, player.getPosition());
+    int areaDifficulty = MathHelper.clamp_int((int) ConfigScalingHealth.AREA_DIFFICULTY_MODE
+        .getAreaDifficulty(player.worldObj, player.getPosition()), 0,
+        (int) ConfigScalingHealth.DIFFICULTY_MAX);
+    int timeSinceLastUpdate = ClientTickHandler.ticksInGame - lastUpdateTime;
 
     if (difficulty != lastDifficultyDisplayed) {
       lastDifficultyDisplayed = difficulty;
       lastUpdateTime = ClientTickHandler.ticksInGame;
     }
     if (areaDifficulty < lastAreaDifficultyDisplayed - 10
-        || areaDifficulty > lastAreaDifficultyDisplayed + 10) {
+        || areaDifficulty > lastAreaDifficultyDisplayed + 10 && timeSinceLastUpdate > 1200) {
       lastAreaDifficultyDisplayed = areaDifficulty;
       lastUpdateTime = ClientTickHandler.ticksInGame;
     }
