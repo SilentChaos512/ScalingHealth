@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -195,8 +196,8 @@ public class DifficultyHandler {
     if (!ConfigScalingHealth.ALLOW_PEACEFUL_EXTRA_HEALTH && entityLiving instanceof EntityAnimal)
       return false;
 
-    // TODO
-    return false;
+    return ConfigScalingHealth.MOB_HEALTH_BLACKLIST
+        .contains(EntityList.getEntityString(entityLiving));
   }
 
   private boolean canIncreaseEntityHealth(EntityLivingBase entityLiving) {
@@ -208,8 +209,7 @@ public class DifficultyHandler {
 
   private boolean entityBlacklistedFromBecomingBlight(EntityLivingBase entityLiving) {
 
-    // TODO
-    return false;
+    return ConfigScalingHealth.BLIGHT_BLACKLIST.contains(EntityList.getEntityString(entityLiving));
   }
 
   private ItemStack selectArmorForSlot(int slot, int tier) {

@@ -1,7 +1,10 @@
 package net.silentchaos512.scalinghealth.config;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.ConfigElement;
@@ -36,10 +39,14 @@ public class ConfigScalingHealth {
   public static float DIFFICULTY_GENERIC_HEALTH_MULTIPLIER = 0.5F;
   public static float DIFFICULTY_PEACEFUL_HEALTH_MULTIPLIER = 0.25F;
   public static EnumHealthModMode MOB_HEALTH_SCALING_MODE = EnumHealthModMode.MULTI_HALF;
+  public static List<String> MOB_HEALTH_BLACKLIST;
+  private static String[] MOB_HEALTH_BLACKLIST_DEFAULTS = new String[] {};
   // Blights
   public static float BLIGHT_CHANCE_MULTIPLIER = 0.0625F;
   public static int BLIGHT_AMP_SPEED = 8;
   public static int BLIGHT_AMP_STRENGTH = 2;
+  public static List<String> BLIGHT_BLACKLIST;
+  private static String[] BLIGHT_BLACKLIST_DEFAULTS = new String[] { "WitherBoss" };
 
   // Items
   public static float HEART_DROP_CHANCE = 0.01F;
@@ -150,6 +157,11 @@ public class ConfigScalingHealth {
           "The minimum extra health a peaceful will have per point of difficulty. Same as "
               + "\"Base Health Modifier\", but for peaceful mobs!");
       MOB_HEALTH_SCALING_MODE = EnumHealthModMode.loadFromConfig(c, MOB_HEALTH_SCALING_MODE);
+      MOB_HEALTH_BLACKLIST = Arrays.asList(c.getStringList("Blacklist", CAT_MOB_HEALTH,
+          MOB_HEALTH_BLACKLIST_DEFAULTS,
+          "Mobs listed here will never receive extra health, and will not become blights. There is"
+          + " also a separate blacklist for blights, if you still want the mob in question to have"
+          + " extra health."));
       // Blights
       BLIGHT_CHANCE_MULTIPLIER = c.getFloat("Blight Chance Multiplier", CAT_MOB_BLIGHT,
           BLIGHT_CHANCE_MULTIPLIER, 0f, Float.MAX_VALUE,
@@ -161,6 +173,10 @@ public class ConfigScalingHealth {
       BLIGHT_AMP_STRENGTH = c.getInt("Amplifier Strength", CAT_MOB_BLIGHT,
           BLIGHT_AMP_STRENGTH, 0, 99,
           "The amplifier level on the strength potion effect applied to blights.");
+      BLIGHT_BLACKLIST = Arrays.asList(c.getStringList("Blacklist", CAT_MOB_BLIGHT,
+          BLIGHT_BLACKLIST_DEFAULTS,
+          "Mobs listed here will never become blights, but can still receive extra health. There is"
+          + " also a blacklist for extra health."));
 
       // Items
       HEART_DROP_CHANCE = c.getFloat("Heart Drop Chance", CAT_ITEMS,

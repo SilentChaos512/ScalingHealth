@@ -1,5 +1,13 @@
+0.2.4
+Added: A blacklist for extra health and a blacklist for blights. Note that if a mob is blacklisted for extra health, it cannot become a blight.
+
 0.2.3
+Added: All players are now alerted when a blight is killed.
+Added: Blights now drop heart canisters when killed (1-2 by default)
+Changed: Blights while now reignite after a few seconds if their fire goes out.
+Changed: Difficulty bar now displays both area and player difficulty (the lower quarter of the bar is player difficulty)
 Fixed: A probable crash with the difficulty bar, if max difficulty is zero.
+Fixed: Config option to render the difficulty bar being ignored.
 
 0.2.2
 Added: A difficulty bar. Displays for a short time occasionally. Feedback appreciated.

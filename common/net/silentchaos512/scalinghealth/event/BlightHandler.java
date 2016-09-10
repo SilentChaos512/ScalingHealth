@@ -4,6 +4,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.silentchaos512.lib.util.PlayerHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -36,7 +37,7 @@ public class BlightHandler {
   // * Events *
   // **********
 
-  @SubscribeEvent
+  @SubscribeEvent(priority = EventPriority.LOWEST)
   public void onBlightKilled(LivingDeathEvent event) {
 
     if (event.getSource() == null || !isBlight(event.getEntityLiving()))
