@@ -6,6 +6,7 @@ import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.silentchaos512.lib.util.LocalizationHelper;
 import net.silentchaos512.lib.util.PlayerHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
@@ -43,13 +44,16 @@ public class BlightHandler {
     if (event.getSource() == null || !isBlight(event.getEntityLiving()))
       return;
 
+    LocalizationHelper loc = ScalingHealth.localizationHelper;
+
     if (event.getSource().getEntity() instanceof EntityPlayer) {
+      // Killed by a player.
       EntityLivingBase blight = event.getEntityLiving();
       EntityPlayer player = (EntityPlayer) event.getSource().getEntity();
 
       // Tell all players that the blight was killed.
-      String message = ScalingHealth.localizationHelper.getLocalizedString("blight",
-          "killedByPlayer", blight.getName(), player.getName());
+      String message = loc.getLocalizedString("blight", "killedByPlayer", blight.getName(),
+          player.getName());
       ScalingHealth.logHelper.info(message);
       for (EntityPlayer p : player.worldObj.getPlayers(EntityPlayer.class, e -> true))
         PlayerHelper.addChatMessage(p, message);
@@ -60,6 +64,17 @@ public class BlightHandler {
           + ConfigScalingHealth.HEARTS_DROPPED_BY_BLIGHT_MIN;
       if (heartCount > 0)
         event.getEntityLiving().dropItem(ModItems.heart, heartCount);
+    } else {
+      // Killed by something else.
+      EntityLivingBase blight = event.getEntityLiving();
+
+      // Tell all players that the blight died.
+      String message = event.getSource().getDeathMessage(blight).getFormattedText();
+      String blightName = loc.getLocalizedString("blight", "name", blight.getName());
+      message = message.replaceFirst(blight.getName(), blightName);
+      ScalingHealth.logHelper.info(message);
+      for (EntityPlayer p : blight.worldObj.getPlayers(EntityPlayer.class, e -> true))
+        PlayerHelper.addChatMessage(p, message);
     }
   }
 

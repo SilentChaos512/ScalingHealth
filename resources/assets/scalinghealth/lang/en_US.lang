@@ -19,6 +19,7 @@ item.scalinghealth:HeartContainer.name=Heart Container
 # Blights #
 ###########
 
+blight.scalinghealth:name=Blight %s
 blight.scalinghealth:killedByPlayer=Blight %s was killed by %s!
 
 
