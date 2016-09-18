@@ -192,9 +192,9 @@ public class DifficultyHandler {
   private boolean entityBlacklistedFromHealthIncrease(EntityLivingBase entityLiving) {
 
     if (!ConfigScalingHealth.ALLOW_HOSTILE_EXTRA_HEALTH && entityLiving instanceof EntityMob)
-      return false;
+      return true;
     if (!ConfigScalingHealth.ALLOW_PEACEFUL_EXTRA_HEALTH && entityLiving instanceof EntityAnimal)
-      return false;
+      return true;
 
     return ConfigScalingHealth.MOB_HEALTH_BLACKLIST
         .contains(EntityList.getEntityString(entityLiving));
