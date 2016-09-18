@@ -11,6 +11,7 @@ import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.config.IConfigElement;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.client.HeartDisplayHandler;
 import net.silentchaos512.scalinghealth.lib.EnumAreaDifficultyMode;
 import net.silentchaos512.scalinghealth.lib.EnumHealthModMode;
 
@@ -111,6 +112,7 @@ public class ConfigScalingHealth {
       CHANGE_HEART_RENDERING = c.getBoolean("Custom Heart Rendering", CAT_CLIENT,
           CHANGE_HEART_RENDERING,
           "Replace vanilla heart rendering.");
+      HeartDisplayHandler.loadColorsFromConfig(c);
 
       // Players
       // Health
