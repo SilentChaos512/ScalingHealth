@@ -14,7 +14,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
-import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
@@ -23,25 +22,6 @@ public class HeartDisplayHandler extends Gui {
 
   public static final ResourceLocation TEXTURE = new ResourceLocation(ScalingHealth.MOD_ID_LOWER,
       "textures/gui/hud.png");
-  // public static final int[] colors = new int[] { 0xE60000, 0xE64F12, 0xFF571D, 0xE6B000, 0xC8E600,
-  // 0x4BB300, 0x2AD92D, 0x09D96B, 0x0EE6E2, 0x00ACE6, 0x1880E6, 0x184CE6, 0x6289FF, 0x7676FF,
-  // 0x8363E6, 0xA563E6, 0xCE38FF, 0xFF38FF, 0xFF4BA6, 0xFF4BA6 };
-  public static final int[] COLORS_DEFAULT = { 0xBF0000, // 0 red
-      0xE66000, // 25 orange-red
-      0xE69900, // 40 orange
-      0xE6D300, // 55 yellow
-      0x99E600, // 80 lime
-      0x4CE600, // 100 green
-      0x00E699, // 160 teal
-      0x00E6E6, // 180 aqua
-      0x0099E6, // 200 sky blue
-      0x0000E6, // 240 blue
-      0x9900E6, // 280 dark purple
-      0xD580FF, // 280 light purple
-      0x8C8C8C, // 0 gray
-      0xE6E6E6  // 0 white
-  };
-  private static int[] colors;
 
   long lastSystemTime = 0;
   long healthUpdateCounter = 0;
@@ -190,30 +170,6 @@ public class HeartDisplayHandler extends Gui {
 
   protected int getColorForRow(int row) {
 
-    return colors[row % colors.length];
-  }
-
-  public static void loadColorsFromConfig(Configuration c) {
-
-    // Get hex strings for default colors.
-    String[] defaults = new String[COLORS_DEFAULT.length];
-    for (int i = 0; i < defaults.length; ++i)
-      defaults[i] = String.format("%06x", COLORS_DEFAULT[i]);
-
-    // Load the string list from config.
-    String[] list = c.getStringList("Heart Colors", ConfigScalingHealth.CAT_CLIENT, defaults,
-        "The colors for each additional row of hearts. The colors will loop back around to the beginning if necessary. Use hexadecimal to specify colors (like HTML color codes).");
-
-    // Convert hex strings to ints.
-    try {
-      colors = new int[list.length];
-      for (int i = 0; i < colors.length; ++i)
-        colors[i] = Integer.decode("0x" + list[i]);
-    } catch (NumberFormatException ex) {
-      ScalingHealth.logHelper.warning(
-          "Failed to load heart colors because a value could not be parsed. Make sure all values are valid hexadecimal integers. Try using an online HTML color picker if you are having problems.");
-      ex.printStackTrace();
-      colors = COLORS_DEFAULT;
-    }
+    return ConfigScalingHealth.HEART_COLORS[row % ConfigScalingHealth.HEART_COLORS.length];
   }
 }

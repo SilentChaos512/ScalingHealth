@@ -4,14 +4,11 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.client.config.IConfigElement;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.client.HeartDisplayHandler;
 import net.silentchaos512.scalinghealth.lib.EnumAreaDifficultyMode;
 import net.silentchaos512.scalinghealth.lib.EnumHealthModMode;
 
@@ -22,6 +19,22 @@ public class ConfigScalingHealth {
   // Client
   public static boolean CHANGE_HEART_RENDERING = true;
   public static boolean RENDER_DIFFICULTY_METER = true;
+  public static final int[] HEART_COLORS = {//
+      0xBF0000, // 0 red
+      0xE66000, // 25 orange-red
+      0xE69900, // 40 orange
+      0xE6D300, // 55 yellow
+      0x99E600, // 80 lime
+      0x4CE600, // 100 green
+      0x00E699, // 160 teal
+      0x00E6E6, // 180 aqua
+      0x0099E6, // 200 sky blue
+      0x0000E6, // 240 blue
+      0x9900E6, // 280 dark purple
+      0xD580FF, // 280 light purple
+      0x8C8C8C, // 0 gray
+      0xE6E6E6  // 0 white
+  };
 
   // Player Health
   public static int PLAYER_STARTING_HEALTH = 20;
@@ -112,7 +125,7 @@ public class ConfigScalingHealth {
       CHANGE_HEART_RENDERING = c.getBoolean("Custom Heart Rendering", CAT_CLIENT,
           CHANGE_HEART_RENDERING,
           "Replace vanilla heart rendering.");
-      HeartDisplayHandler.loadColorsFromConfig(c);
+      loadHeartColors(c);
 
       // Players
       // Health
@@ -259,6 +272,28 @@ public class ConfigScalingHealth {
       //@formatter:on
     } catch (Exception ex) {
       ScalingHealth.logHelper.severe("Could not load configuration file!");
+    }
+  }
+  
+  private static void loadHeartColors(Configuration c) {
+
+    // Get hex strings for default colors.
+    String[] defaults = new String[HEART_COLORS.length];
+    for (int i = 0; i < defaults.length; ++i)
+      defaults[i] = String.format("%06x", HEART_COLORS[i]);
+
+    // Load the string list from config.
+    String[] list = c.getStringList("Heart Colors", ConfigScalingHealth.CAT_CLIENT, defaults,
+        "The colors for each additional row of hearts. The colors will loop back around to the beginning if necessary. Use hexadecimal to specify colors (like HTML color codes).");
+
+    // Convert hex strings to ints.
+    try {
+      for (int i = 0; i < HEART_COLORS.length; ++i)
+        HEART_COLORS[i] = Integer.decode("0x" + list[i]);
+    } catch (NumberFormatException ex) {
+      ScalingHealth.logHelper.warning(
+          "Failed to load heart colors because a value could not be parsed. Make sure all values are valid hexadecimal integers. Try using an online HTML color picker if you are having problems.");
+      ex.printStackTrace();
     }
   }
 
