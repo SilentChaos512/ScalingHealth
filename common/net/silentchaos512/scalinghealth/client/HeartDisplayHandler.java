@@ -198,7 +198,7 @@ public class HeartDisplayHandler extends Gui {
     // Get hex strings for default colors.
     String[] defaults = new String[COLORS_DEFAULT.length];
     for (int i = 0; i < defaults.length; ++i)
-      defaults[i] = Integer.toHexString(COLORS_DEFAULT[i]);
+      defaults[i] = String.format("%06x", COLORS_DEFAULT[i]);
 
     // Load the string list from config.
     String[] list = c.getStringList("Heart Colors", ConfigScalingHealth.CAT_CLIENT, defaults,

@@ -1,7 +1,11 @@
+0.2.5
+Fixed: Heart color configs not being padded with 0's. This had no effect on the behavior of the configs, but could be confusing to users.
+
 0.2.4
 Added: A blacklist for extra health and a blacklist for blights. Note that if a mob is blacklisted for extra health, it cannot become a blight.
 Added: Config to specify extra heart colors.
 Added: Death message when blights are killed by something other than a player.
+Fixed: 'Allow Hostile Extra Health' and 'Allow Peaceful Extra Health' configs not working.
 
 0.2.3
 Added: All players are now alerted when a blight is killed.
