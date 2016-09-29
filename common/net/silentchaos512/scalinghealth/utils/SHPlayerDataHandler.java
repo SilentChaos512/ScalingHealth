@@ -180,11 +180,10 @@ public class SHPlayerDataHandler {
       configMax = configMax <= 0 ? Integer.MAX_VALUE : configMax;
 
       maxHealth = MathHelper.clamp_float(value, 2, configMax);
-      ScalingHealth.logHelper.debug(value, maxHealth);
 
       EntityPlayer player = playerWR.get();
       if (player != null)
-        ModifierHandler.setMaxHealth(playerWR.get(), maxHealth, 0);
+        ModifierHandler.setMaxHealth(player, maxHealth, 0);
 
       save();
       sendUpdateMessage();

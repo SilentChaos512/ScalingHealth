@@ -37,6 +37,7 @@ public class ConfigScalingHealth {
   };
 
   // Player Health
+  public static boolean ALLOW_PLAYER_MODIFIED_HEALTH = true;
   public static int PLAYER_STARTING_HEALTH = 20;
   public static int PLAYER_HEALTH_MAX = 0;
   public static boolean LOSE_HEALTH_ON_DEATH = false;
@@ -129,6 +130,12 @@ public class ConfigScalingHealth {
 
       // Players
       // Health
+      ALLOW_PLAYER_MODIFIED_HEALTH = c.getBoolean("Allow Modified Health", CAT_PLAYER_HEALTH,
+          ALLOW_PLAYER_MODIFIED_HEALTH,
+          "Allow Scaling Health to modify the player's health. Set to false if you have another mod that"
+          + " modifies player health, and you would like that mod to handle health modifications instead."
+          + " With this option set to false, heart containers will not work, nor will the '/scalinghealth"
+          + " health' command.");
       PLAYER_STARTING_HEALTH = c.getInt("Starting Health", CAT_PLAYER_HEALTH,
           PLAYER_STARTING_HEALTH, 2, Integer.MAX_VALUE,
           "The amount of health (in half hearts) the player starts with.");

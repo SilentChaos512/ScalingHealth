@@ -8,6 +8,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.client.ClientTickHandler;
+import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.network.Message;
 import net.silentchaos512.scalinghealth.utils.ModifierHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
@@ -39,8 +40,10 @@ public class MessageDataSync extends Message {
       if (player != null) {
         PlayerData data = SHPlayerDataHandler.get(player);
         data.readFromNBT(tags);
+
         // Set players health and max health.
-        ModifierHandler.setMaxHealth(player, data.getMaxHealth(), 0);
+        if (ConfigScalingHealth.ALLOW_PLAYER_MODIFIED_HEALTH)
+          ModifierHandler.setMaxHealth(player, data.getMaxHealth(), 0);
         if (data.getHealth() > 0f)
           player.setHealth(data.getHealth());
       }

@@ -8,6 +8,7 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 
 public class ModifierHandler {
 
@@ -42,6 +43,15 @@ public class ModifierHandler {
 
     if (amount <= 0) {
       ScalingHealth.logHelper.warning("ModifierHandler.setMaxHealth: amount <= 0!");
+      return;
+    }
+
+    if (entity instanceof EntityPlayer && !ConfigScalingHealth.ALLOW_PLAYER_MODIFIED_HEALTH) {
+      // It's a player, but the user has disallowed Scaling Health from modifying the player's health.
+      ScalingHealth.logHelper.info(String.format(
+          "Would have set player %s's health to %.1f, but modified player health has been disabled"
+              + " in the config!",
+          entity.getName(), amount));
       return;
     }
 
