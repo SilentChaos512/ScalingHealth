@@ -3,6 +3,7 @@ package net.silentchaos512.scalinghealth.event;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -63,7 +64,7 @@ public class BlightHandler {
           - ConfigScalingHealth.HEARTS_DROPPED_BY_BLIGHT_MIN + 1)
           + ConfigScalingHealth.HEARTS_DROPPED_BY_BLIGHT_MIN;
       if (heartCount > 0)
-        event.getEntityLiving().dropItem(ModItems.heart, heartCount);
+        blight.dropItem(ModItems.heart, heartCount);
     } else {
       // Killed by something else.
       EntityLivingBase blight = event.getEntityLiving();
@@ -76,6 +77,17 @@ public class BlightHandler {
       for (EntityPlayer p : blight.worldObj.getPlayers(EntityPlayer.class, e -> true))
         PlayerHelper.addChatMessage(p, message);
     }
+  }
+
+  @SubscribeEvent(priority = EventPriority.HIGHEST)
+  public void onXPDropped(LivingExperienceDropEvent event) {
+
+    if (!isBlight(event.getEntityLiving()))
+      return;
+
+    int amount = event.getDroppedExperience();
+    amount *= ConfigScalingHealth.BLIGHT_XP_MULTIPLIER;
+    event.setDroppedExperience(amount);
   }
 
   @SubscribeEvent

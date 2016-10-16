@@ -62,6 +62,7 @@ public class ConfigScalingHealth {
   public static float BLIGHT_CHANCE_MULTIPLIER = 0.0625F;
   public static int BLIGHT_AMP_SPEED = 8;
   public static int BLIGHT_AMP_STRENGTH = 2;
+  public static float BLIGHT_XP_MULTIPLIER = 10f;
   public static List<String> BLIGHT_BLACKLIST;
   private static String[] BLIGHT_BLACKLIST_DEFAULTS = new String[] { "WitherBoss" };
 
@@ -199,6 +200,9 @@ public class ConfigScalingHealth {
       BLIGHT_AMP_STRENGTH = c.getInt("Amplifier Strength", CAT_MOB_BLIGHT,
           BLIGHT_AMP_STRENGTH, 0, 99,
           "The amplifier level on the strength potion effect applied to blights.");
+      BLIGHT_XP_MULTIPLIER = c.getFloat("XP Multiplier", CAT_MOB_BLIGHT,
+          BLIGHT_XP_MULTIPLIER, 0f, 1000.0f,
+          "The multiplier applied to the amount of XP dropped when a blight is killed.");
       BLIGHT_BLACKLIST = Arrays.asList(c.getStringList("Blacklist", CAT_MOB_BLIGHT,
           BLIGHT_BLACKLIST_DEFAULTS,
           "Mobs listed here will never become blights, but can still receive extra health. There is"
