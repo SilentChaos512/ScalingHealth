@@ -191,13 +191,15 @@ public class DifficultyHandler {
 
   private boolean entityBlacklistedFromHealthIncrease(EntityLivingBase entityLiving) {
 
+    if (entityLiving == null) return true;
     if (!ConfigScalingHealth.ALLOW_HOSTILE_EXTRA_HEALTH && entityLiving instanceof EntityMob)
       return true;
     if (!ConfigScalingHealth.ALLOW_PEACEFUL_EXTRA_HEALTH && entityLiving instanceof EntityAnimal)
       return true;
 
-    return ConfigScalingHealth.MOB_HEALTH_BLACKLIST
-        .contains(EntityList.getEntityString(entityLiving));
+    String entityId = EntityList.getEntityString(entityLiving);
+    if (entityId == null) return false;
+    return ConfigScalingHealth.MOB_HEALTH_BLACKLIST.contains(entityId);
   }
 
   private boolean canIncreaseEntityHealth(EntityLivingBase entityLiving) {
