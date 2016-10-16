@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.common.collect.Lists;
+
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
@@ -67,8 +69,8 @@ public class ConfigScalingHealth {
   public static float HEART_DROP_CHANCE = 0.01F;
   public static int HEARTS_DROPPED_BY_BOSS_MIN = 3;
   public static int HEARTS_DROPPED_BY_BOSS_MAX = 6;
-  public static int HEARTS_DROPPED_BY_BLIGHT_MIN = 1;
-  public static int HEARTS_DROPPED_BY_BLIGHT_MAX = 2;
+  public static int HEARTS_DROPPED_BY_BLIGHT_MIN = 0;
+  public static int HEARTS_DROPPED_BY_BLIGHT_MAX = 1;
 
   // Difficulty
   public static float DIFFICULTY_MAX = 250;
@@ -184,6 +186,8 @@ public class ConfigScalingHealth {
           "Mobs listed here will never receive extra health, and will not become blights. There is"
           + " also a separate blacklist for blights, if you still want the mob in question to have"
           + " extra health."));
+      if (MOB_HEALTH_BLACKLIST == null)
+        MOB_HEALTH_BLACKLIST = Lists.newArrayList(MOB_HEALTH_BLACKLIST_DEFAULTS);
       // Blights
       BLIGHT_CHANCE_MULTIPLIER = c.getFloat("Blight Chance Multiplier", CAT_MOB_BLIGHT,
           BLIGHT_CHANCE_MULTIPLIER, 0f, Float.MAX_VALUE,
