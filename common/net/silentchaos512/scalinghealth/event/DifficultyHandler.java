@@ -1,6 +1,5 @@
 package net.silentchaos512.scalinghealth.event;
 
-import java.util.List;
 import java.util.Random;
 
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -20,15 +19,12 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.silentchaos512.lib.util.LogHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.utils.ModifierHandler;
-import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
-import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
 public class DifficultyHandler {
 
@@ -191,15 +187,33 @@ public class DifficultyHandler {
 
   private boolean entityBlacklistedFromHealthIncrease(EntityLivingBase entityLiving) {
 
-    if (entityLiving == null) return true;
-    if (!ConfigScalingHealth.ALLOW_HOSTILE_EXTRA_HEALTH && entityLiving instanceof EntityMob)
-      return true;
-    if (!ConfigScalingHealth.ALLOW_PEACEFUL_EXTRA_HEALTH && entityLiving instanceof EntityAnimal)
-      return true;
+    String entityId = "null";
 
-    String entityId = EntityList.getEntityString(entityLiving);
-    if (entityId == null) return false;
-    return ConfigScalingHealth.MOB_HEALTH_BLACKLIST.contains(entityId);
+    try { // Trying to understand issue #9...
+      if (entityLiving == null) return true;
+      if (!ConfigScalingHealth.ALLOW_HOSTILE_EXTRA_HEALTH && entityLiving instanceof EntityMob)
+        return true;
+      if (!ConfigScalingHealth.ALLOW_PEACEFUL_EXTRA_HEALTH && entityLiving instanceof EntityAnimal)
+        return true;
+  
+      entityId = EntityList.getEntityString(entityLiving);
+      if (entityId == null) return false;
+      return ConfigScalingHealth.MOB_HEALTH_BLACKLIST.contains(entityId); // FIXME: NPE occurs here?
+    } catch (Exception ex) {
+      // Log everything I can think of... what in the world is coming up null?
+      LogHelper log = ScalingHealth.logHelper;
+      log.severe("An error occurred while trying to check if entity is blacklisted from health increases...");
+      log.severe("    entityLiving                = " + entityLiving);
+      log.severe("    entityId                    = " + entityId);
+      log.severe("    MOB_HEALTH_BLACKLIST        = " + ConfigScalingHealth.MOB_HEALTH_BLACKLIST);
+      if (ConfigScalingHealth.MOB_HEALTH_BLACKLIST != null)
+        for (String str : ConfigScalingHealth.MOB_HEALTH_BLACKLIST)
+          log.severe("      | " + str);
+      log.severe("    ALLOW_HOSTILE_EXTRA_HEALTH  = " + ConfigScalingHealth.ALLOW_HOSTILE_EXTRA_HEALTH);
+      log.severe("    ALLOW_PEACEFUL_EXTRA_HEALTH = " + ConfigScalingHealth.ALLOW_PEACEFUL_EXTRA_HEALTH);
+
+      return false;
+    }
   }
 
   private boolean canIncreaseEntityHealth(EntityLivingBase entityLiving) {
