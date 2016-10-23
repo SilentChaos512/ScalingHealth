@@ -56,14 +56,14 @@ public class ConfigScalingHealth {
   public static float DIFFICULTY_GENERIC_HEALTH_MULTIPLIER = 0.5F;
   public static float DIFFICULTY_PEACEFUL_HEALTH_MULTIPLIER = 0.25F;
   public static EnumHealthModMode MOB_HEALTH_SCALING_MODE = EnumHealthModMode.MULTI_HALF;
-  public static List<String> MOB_HEALTH_BLACKLIST;
+  private static List<String> MOB_HEALTH_BLACKLIST;
   private static String[] MOB_HEALTH_BLACKLIST_DEFAULTS = new String[] {};
   // Blights
   public static float BLIGHT_CHANCE_MULTIPLIER = 0.0625F;
   public static int BLIGHT_AMP_SPEED = 8;
   public static int BLIGHT_AMP_STRENGTH = 2;
   public static float BLIGHT_XP_MULTIPLIER = 10f;
-  public static List<String> BLIGHT_BLACKLIST;
+  private static List<String> BLIGHT_BLACKLIST;
   private static String[] BLIGHT_BLACKLIST_DEFAULTS = new String[] { "WitherBoss" };
 
   // Items
@@ -288,6 +288,20 @@ public class ConfigScalingHealth {
     } catch (Exception ex) {
       ScalingHealth.logHelper.severe("Could not load configuration file!");
     }
+  }
+
+  public static List<String> getMobHealthBlacklist() {
+
+    if (MOB_HEALTH_BLACKLIST == null)
+      MOB_HEALTH_BLACKLIST = Lists.newArrayList();
+    return MOB_HEALTH_BLACKLIST;
+  }
+
+  public static List<String> getMobBlightBlacklist() {
+
+    if (BLIGHT_BLACKLIST == null)
+      BLIGHT_BLACKLIST = Lists.newArrayList();
+    return BLIGHT_BLACKLIST;
   }
   
   private static void loadHeartColors(Configuration c) {
