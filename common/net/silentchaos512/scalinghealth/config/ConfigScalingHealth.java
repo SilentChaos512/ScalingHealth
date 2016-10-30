@@ -72,6 +72,7 @@ public class ConfigScalingHealth {
   public static int HEARTS_DROPPED_BY_BOSS_MAX = 6;
   public static int HEARTS_DROPPED_BY_BLIGHT_MIN = 0;
   public static int HEARTS_DROPPED_BY_BLIGHT_MAX = 1;
+  public static int HEARTS_DROPPED_BY_BLIGHT_MAX = 2;
 
   // Difficulty
   public static float DIFFICULTY_MAX = 250;
