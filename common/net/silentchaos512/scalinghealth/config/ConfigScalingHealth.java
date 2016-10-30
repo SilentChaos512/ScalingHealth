@@ -62,7 +62,11 @@ public class ConfigScalingHealth {
   public static float BLIGHT_CHANCE_MULTIPLIER = 0.0625F;
   public static int BLIGHT_AMP_SPEED = 8;
   public static int BLIGHT_AMP_STRENGTH = 2;
+  public static boolean BLIGHT_INVISIBLE = false;
+  public static boolean BLIGHT_FIRE_RESIST = true;
   public static float BLIGHT_XP_MULTIPLIER = 10f;
+  public static boolean BLIGHT_USE_FIRE_EFFECT = false;
+  public static boolean BLIGHT_SUPERCHARGE_CREEPERS = true;
   private static List<String> BLIGHT_BLACKLIST;
   private static String[] BLIGHT_BLACKLIST_DEFAULTS = new String[] { "WitherBoss" };
 
@@ -71,7 +75,6 @@ public class ConfigScalingHealth {
   public static int HEARTS_DROPPED_BY_BOSS_MIN = 3;
   public static int HEARTS_DROPPED_BY_BOSS_MAX = 6;
   public static int HEARTS_DROPPED_BY_BLIGHT_MIN = 0;
-  public static int HEARTS_DROPPED_BY_BLIGHT_MAX = 1;
   public static int HEARTS_DROPPED_BY_BLIGHT_MAX = 2;
 
   // Difficulty
@@ -201,9 +204,23 @@ public class ConfigScalingHealth {
       BLIGHT_AMP_STRENGTH = c.getInt("Amplifier Strength", CAT_MOB_BLIGHT,
           BLIGHT_AMP_STRENGTH, 0, 99,
           "The amplifier level on the strength potion effect applied to blights.");
+      BLIGHT_INVISIBLE = c.getBoolean("Invisibility", CAT_MOB_BLIGHT,
+          BLIGHT_INVISIBLE,
+          "Should blights have the invisibility potion effect?");
+      BLIGHT_FIRE_RESIST = c.getBoolean("Fire Resist", CAT_MOB_BLIGHT,
+          BLIGHT_FIRE_RESIST,
+          "Should blights have the fire resistance potion effect?");
       BLIGHT_XP_MULTIPLIER = c.getFloat("XP Multiplier", CAT_MOB_BLIGHT,
           BLIGHT_XP_MULTIPLIER, 0f, 1000.0f,
           "The multiplier applied to the amount of XP dropped when a blight is killed.");
+      BLIGHT_USE_FIRE_EFFECT = c.getBoolean("Use Old Fire Effect", CAT_MOB_BLIGHT,
+          BLIGHT_USE_FIRE_EFFECT,
+          "Use the old Difficult Life-style fire effect, where the blight is literally set on fire.\n"
+          + "Not recommended, as it does not work with mobs immune to fire. Make sure \"Fire Resist\""
+          + " is enabled if using this.");
+      BLIGHT_SUPERCHARGE_CREEPERS = c.getBoolean("Supercharge Creepers", CAT_MOB_BLIGHT,
+          BLIGHT_SUPERCHARGE_CREEPERS,
+          "Blight creepers will also be supercharged (like when they are struck by lightning).");
       BLIGHT_BLACKLIST = Arrays.asList(c.getStringList("Blacklist", CAT_MOB_BLIGHT,
           BLIGHT_BLACKLIST_DEFAULTS,
           "Mobs listed here will never become blights, but can still receive extra health. There is"
@@ -304,7 +321,7 @@ public class ConfigScalingHealth {
       BLIGHT_BLACKLIST = Lists.newArrayList();
     return BLIGHT_BLACKLIST;
   }
-  
+
   private static void loadHeartColors(Configuration c) {
 
     // Get hex strings for default colors.

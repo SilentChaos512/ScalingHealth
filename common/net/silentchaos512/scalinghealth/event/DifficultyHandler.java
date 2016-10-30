@@ -138,14 +138,30 @@ public class DifficultyHandler {
     //@formatter:off
     BlightHandler.markBlight(entityLiving);
 
-    entityLiving.addPotionEffect(new PotionEffect(
-        MobEffects.INVISIBILITY, Integer.MAX_VALUE, 0, true, false));
-    entityLiving.addPotionEffect(new PotionEffect(
-        MobEffects.FIRE_RESISTANCE, Integer.MAX_VALUE, 0, true, false));
-    entityLiving.addPotionEffect(new PotionEffect(
-        MobEffects.SPEED, Integer.MAX_VALUE, ConfigScalingHealth.BLIGHT_AMP_SPEED, true, false));
-    entityLiving.addPotionEffect(new PotionEffect(
-        MobEffects.STRENGTH, Integer.MAX_VALUE, ConfigScalingHealth.BLIGHT_AMP_STRENGTH, true, false));
+    // ===============
+    // Potions Effects
+    // ===============
+
+    // Invisibility
+    if (ConfigScalingHealth.BLIGHT_INVISIBLE)
+      entityLiving.addPotionEffect(new PotionEffect(
+          MobEffects.INVISIBILITY, Integer.MAX_VALUE, 0, true, false));
+    // Fire Resistance
+    if (ConfigScalingHealth.BLIGHT_FIRE_RESIST)
+      entityLiving.addPotionEffect(new PotionEffect(
+          MobEffects.FIRE_RESISTANCE, Integer.MAX_VALUE, 0, true, false));
+    // Speed
+    if (ConfigScalingHealth.BLIGHT_AMP_SPEED > 0)
+      entityLiving.addPotionEffect(new PotionEffect(
+          MobEffects.SPEED, Integer.MAX_VALUE, ConfigScalingHealth.BLIGHT_AMP_SPEED, true, false));
+    // Strength
+    if (ConfigScalingHealth.BLIGHT_AMP_STRENGTH > 0)
+      entityLiving.addPotionEffect(new PotionEffect(
+          MobEffects.STRENGTH, Integer.MAX_VALUE, ConfigScalingHealth.BLIGHT_AMP_STRENGTH, true, false));
+
+    // ================
+    // Random Equipment
+    // ================
 
     if (entityLiving instanceof EntityLiving) {
       EntityLiving entity = (EntityLiving) entityLiving;
@@ -176,8 +192,14 @@ public class DifficultyHandler {
         EnchantmentHelper.addRandomEnchantment(rand, stack, 30, false);
     }
 
-    entityLiving.setFire(Integer.MAX_VALUE / 20);
-    if (entityLiving instanceof EntityCreeper) {
+    // ===============
+    // Special Effects
+    // ===============
+
+    if (ConfigScalingHealth.BLIGHT_USE_FIRE_EFFECT)
+      entityLiving.setFire(Integer.MAX_VALUE / 20);
+
+    if (ConfigScalingHealth.BLIGHT_SUPERCHARGE_CREEPERS && entityLiving instanceof EntityCreeper) {
       ((EntityCreeper) entityLiving)
           .onStruckByLightning(new EntityLightningBolt(entityLiving.worldObj,
               entityLiving.posX, entityLiving.posY, entityLiving.posZ, true));
@@ -187,6 +209,7 @@ public class DifficultyHandler {
 
   private boolean entityBlacklistedFromHealthIncrease(EntityLivingBase entityLiving) {
 
+    //@formatter:off
     if (entityLiving == null) return true;
     if (!ConfigScalingHealth.ALLOW_HOSTILE_EXTRA_HEALTH && entityLiving instanceof EntityMob)
       return true;
@@ -199,6 +222,7 @@ public class DifficultyHandler {
     if (entityId == null || blacklist == null) return false;
 
     return blacklist.contains(entityId);
+    //@formatter:on
   }
 
   private boolean canIncreaseEntityHealth(EntityLivingBase entityLiving) {
@@ -210,6 +234,7 @@ public class DifficultyHandler {
 
   private boolean entityBlacklistedFromBecomingBlight(EntityLivingBase entityLiving) {
 
+    // @formatter:off
     if (entityLiving == null) return true;
 
     String entityId = EntityList.getEntityString(entityLiving);
@@ -218,6 +243,7 @@ public class DifficultyHandler {
     if (entityId == null || blacklist == null) return false;
 
     return blacklist.contains(entityId);
+    //@formatter:on
   }
 
   private ItemStack selectArmorForSlot(int slot, int tier) {
