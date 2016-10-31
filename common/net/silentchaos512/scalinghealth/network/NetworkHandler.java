@@ -5,6 +5,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.relauncher.Side;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.network.message.MessageDataSync;
+import net.silentchaos512.scalinghealth.network.message.MessageMarkBlight;
 
 public class NetworkHandler {
 
@@ -16,6 +17,7 @@ public class NetworkHandler {
   public static void init() {
 
     register(MessageDataSync.class, Side.CLIENT);
+    register(MessageMarkBlight.class, Side.CLIENT);
   }
 
   private static void register(Class clazz, Side handlerSide) {

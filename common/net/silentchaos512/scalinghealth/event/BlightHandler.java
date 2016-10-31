@@ -1,17 +1,23 @@
 package net.silentchaos512.scalinghealth.event;
 
+import java.util.Random;
+
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.silentchaos512.lib.util.LocalizationHelper;
 import net.silentchaos512.lib.util.PlayerHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.init.ModItems;
+import net.silentchaos512.scalinghealth.network.NetworkHandler;
+import net.silentchaos512.scalinghealth.network.message.MessageMarkBlight;
 
 public class BlightHandler {
 
@@ -25,7 +31,7 @@ public class BlightHandler {
   public static boolean isBlight(EntityLivingBase entityLiving) {
 
     return entityLiving != null && entityLiving.getEntityData() != null
-        && entityLiving.getEntityData().getBoolean(NBT_BLIGHT);
+        && (entityLiving.getEntityData().getBoolean(NBT_BLIGHT));
   }
 
   public static void markBlight(EntityLivingBase entityLiving) {
@@ -95,9 +101,38 @@ public class BlightHandler {
 
     if (event.getEntityLiving() != null) {
       EntityLivingBase entityLiving = event.getEntityLiving();
-      if ((entityLiving.worldObj.getTotalWorldTime() + UPDATE_DELAY_SALT) % UPDATE_DELAY == 0
-          && isBlight(entityLiving)) {
+
+      // Blights only!
+      if (!isBlight(entityLiving))
+        return;
+
+      boolean updateTime = (entityLiving.worldObj.getTotalWorldTime() + UPDATE_DELAY_SALT)
+          % UPDATE_DELAY == 0;
+
+      // Update packets to make sure clients know this entity is a blight.
+      if (updateTime) {
+        MessageMarkBlight message = new MessageMarkBlight(entityLiving);
+        NetworkHandler.INSTANCE.sendToAllAround(message, new TargetPoint(entityLiving.dimension,
+            entityLiving.posX, entityLiving.posY, entityLiving.posZ, 128));
+      }
+
+      // Effects
+      // Old DL-style fire (buggy)
+      if (ConfigScalingHealth.BLIGHT_USE_FIRE_EFFECT && updateTime) {
         entityLiving.setFire(Integer.MAX_VALUE / 20);
+      }
+      // New particle effects
+      else if (!ConfigScalingHealth.BLIGHT_USE_FIRE_EFFECT) {
+        Random rand = ScalingHealth.random;
+        double width = entityLiving.width * 1.8;
+        double height = entityLiving.height * 1.2;
+        for (int i = 0; i < 2; ++i) {
+          double posX = entityLiving.posX - width / 2 + rand.nextDouble() * width;
+          double posY = entityLiving.posY + rand.nextDouble() * height;
+          double posZ = entityLiving.posZ - width / 2 + rand.nextDouble() * width;
+          entityLiving.worldObj.spawnParticle(EnumParticleTypes.DRAGON_BREATH, posX, posY, posZ, 0,
+              0, 0);
+        }
       }
     }
   }

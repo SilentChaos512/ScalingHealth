@@ -20,6 +20,13 @@ public class WitEventHandler {
       return;
 
     EntityLivingBase entity = event.entityLiving;
+    if (entity != null) {
+      if (entity.getEntityData() == null)
+        event.lines.add("Entity Data is null!?");
+      else
+        event.lines.add("Blight: " + BlightHandler.isBlight(entity));
+    }
+
     if (entity != null && entity.getAttributeMap() != null) {
       TextFormatting tf = TextFormatting.GRAY;
 

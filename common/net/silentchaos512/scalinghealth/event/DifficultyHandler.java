@@ -22,8 +22,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
+import net.silentchaos512.scalinghealth.network.NetworkHandler;
+import net.silentchaos512.scalinghealth.network.message.MessageMarkBlight;
 import net.silentchaos512.scalinghealth.utils.ModifierHandler;
 
 public class DifficultyHandler {
@@ -204,6 +207,12 @@ public class DifficultyHandler {
           .onStruckByLightning(new EntityLightningBolt(entityLiving.worldObj,
               entityLiving.posX, entityLiving.posY, entityLiving.posZ, true));
     }
+
+    // Notify clients
+    MessageMarkBlight message = new MessageMarkBlight(entityLiving);
+    NetworkHandler.INSTANCE.sendToAllAround(message, new TargetPoint(entityLiving.dimension,
+        entityLiving.posX, entityLiving.posY, entityLiving.posZ, 128));
+
     // @formatter:on
   }
 
