@@ -48,7 +48,8 @@ public class BlightHandler {
   @SubscribeEvent(priority = EventPriority.LOWEST)
   public void onBlightKilled(LivingDeathEvent event) {
 
-    if (event.getSource() == null || !isBlight(event.getEntityLiving()))
+    if (event.getSource() == null || !isBlight(event.getEntityLiving())
+        || event.getEntity().worldObj.isRemote)
       return;
 
     LocalizationHelper loc = ScalingHealth.localizationHelper;
@@ -126,12 +127,17 @@ public class BlightHandler {
         Random rand = ScalingHealth.random;
         double width = entityLiving.width * 1.8;
         double height = entityLiving.height * 1.2;
-        for (int i = 0; i < 2; ++i) {
+        int particleCount = 3 - ScalingHealth.proxy.getParticleSettings();
+
+        for (int i = 0; i < particleCount; ++i) {
           double posX = entityLiving.posX - width / 2 + rand.nextDouble() * width;
           double posY = entityLiving.posY + rand.nextDouble() * height;
           double posZ = entityLiving.posZ - width / 2 + rand.nextDouble() * width;
-          entityLiving.worldObj.spawnParticle(EnumParticleTypes.DRAGON_BREATH, posX, posY, posZ, 0,
-              0, 0);
+          double motionX = rand.nextGaussian() * 0.02;
+          double motionY = rand.nextGaussian() * 0.02 + 0.01;
+          double motionZ = rand.nextGaussian() * 0.02;
+          entityLiving.worldObj.spawnParticle(EnumParticleTypes.DRAGON_BREATH, posX, posY, posZ,
+              motionX, motionY, motionZ);
         }
       }
     }

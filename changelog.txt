@@ -1,3 +1,8 @@
+0.2.7
+Added: Config option to replace blights being on fire with a particle effect (enabled by default). This is more reliable, as it works on fire-proof mobs. Current effect likely needs work...
+Added: Additional configs for blights (fire resistance, invisibility, supercharged creepers).
+Changed: Default hearts dropped by blights to 0-2 (up from 0-1, update your configs if desired)
+
 0.2.6
 Still attempting to solve a weird crash (see issue #9). Additional info should be dumped to the log.
 Added: Blights drop extra XP now (configurable, default 10x).

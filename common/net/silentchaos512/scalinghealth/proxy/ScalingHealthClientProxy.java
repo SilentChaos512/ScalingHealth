@@ -45,4 +45,10 @@ public class ScalingHealthClientProxy extends ScalingHealthCommonProxy {
 
     return Minecraft.getMinecraft().thePlayer;
   }
+
+  @Override
+  public int getParticleSettings() {
+
+    return Minecraft.getMinecraft().gameSettings.particleSetting;
+  }
 }

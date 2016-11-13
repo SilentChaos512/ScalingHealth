@@ -32,4 +32,9 @@ public class ScalingHealthCommonProxy extends CommonProxy {
 
     return null;
   }
+
+  public int getParticleSettings() {
+
+    return 0;
+  }
 }
