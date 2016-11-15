@@ -68,7 +68,7 @@ public class ConfigScalingHealth {
   public static boolean BLIGHT_USE_FIRE_EFFECT = false;
   public static boolean BLIGHT_SUPERCHARGE_CREEPERS = true;
   private static List<String> BLIGHT_BLACKLIST;
-  private static String[] BLIGHT_BLACKLIST_DEFAULTS = new String[] { "WitherBoss" };
+  private static String[] BLIGHT_BLACKLIST_DEFAULTS = new String[] { "WitherBoss", "Villager" };
 
   // Items
   public static float HEART_DROP_CHANCE = 0.01F;
