@@ -140,6 +140,7 @@ public class DifficultyHandler {
 
     //@formatter:off
     BlightHandler.markBlight(entityLiving);
+    BlightHandler.spawnBlightFire(entityLiving);
 
     // ===============
     // Potions Effects
@@ -198,9 +199,6 @@ public class DifficultyHandler {
     // ===============
     // Special Effects
     // ===============
-
-    if (ConfigScalingHealth.BLIGHT_USE_FIRE_EFFECT)
-      entityLiving.setFire(Integer.MAX_VALUE / 20);
 
     if (ConfigScalingHealth.BLIGHT_SUPERCHARGE_CREEPERS && entityLiving instanceof EntityCreeper) {
       ((EntityCreeper) entityLiving)

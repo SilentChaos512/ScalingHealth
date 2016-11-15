@@ -33,8 +33,6 @@ public class BlightHandler {
 
   public static BlightHandler INSTANCE = new BlightHandler();
 
-  //public List<EntityBlightFire> blightFireList = Lists.newArrayList();
-
   // ******************
   // * Blight marking *
   // ******************
@@ -50,6 +48,30 @@ public class BlightHandler {
     if (entityLiving == null || entityLiving.getEntityData() == null)
       return;
     entityLiving.getEntityData().setBoolean(NBT_BLIGHT, true);
+  }
+
+  public static void spawnBlightFire(EntityLivingBase blight) {
+
+    if (blight.worldObj.isRemote)
+      return;
+
+    EntityBlightFire fire = new EntityBlightFire(blight);
+    fire.setPosition(blight.posX, blight.posY, blight.posZ);
+    blight.worldObj.spawnEntityInWorld(fire);
+    if (ConfigScalingHealth.BLIGHT_FIRE_RIDES_BLIGHT)
+      fire.startRiding(blight);
+  }
+
+  public static EntityBlightFire getBlightFire(EntityLivingBase blight) {
+
+    World world = blight.worldObj;
+    List<EntityBlightFire> fireList = world.getEntities(EntityBlightFire.class, e -> true);
+
+    for (EntityBlightFire fire : fireList)
+      if (fire.getParent() != null && fire.getParent().equals(blight))
+        return fire;
+
+    return null;
   }
 
   // **********
@@ -122,55 +144,17 @@ public class BlightHandler {
       boolean updateTime = (world.getTotalWorldTime() + UPDATE_DELAY_SALT) % UPDATE_DELAY == 0;
 
       // Update packets to make sure clients know this entity is a blight.
-      if (updateTime) {
+      if (updateTime && !world.isRemote) {
+        // Send message to clients to make sure they know the entity is a blight.
         MessageMarkBlight message = new MessageMarkBlight(entityLiving);
         NetworkHandler.INSTANCE.sendToAllAround(message, new TargetPoint(entityLiving.dimension,
             entityLiving.posX, entityLiving.posY, entityLiving.posZ, 128));
+
+        // Effects
+        // Assign a blight fire if necessary.
+        if (getBlightFire(entityLiving) == null)
+          spawnBlightFire(entityLiving);
       }
-
-      // Effects
-      if (updateTime && !world.isRemote) {
-        // Try to find a fire already assigned to this blight.
-        List<EntityBlightFire> fireList = world.getEntities(EntityBlightFire.class, e -> true);
-        ScalingHealth.logHelper.debug(fireList.size());
-        for (EntityBlightFire fire : fireList) {
-          // ScalingHealth.logHelper.info(fire + "\n " + fire.getParent());
-          if (fire.getParent() != null && !fire.getParent().isDead)
-            if (fire.getParent().equals(entityLiving))
-              return; // Found the blight's fire.
-         }
-
-        ScalingHealth.logHelper.debug("Blight update time!");
-
-        // Blight fire not found. Create one!
-        EntityBlightFire fire = new EntityBlightFire(entityLiving);
-        fire.setPosition(entityLiving.posX, entityLiving.posY, entityLiving.posZ);
-        if (!entityLiving.worldObj.spawnEntityInWorld(fire))
-          ScalingHealth.logHelper.warning("Failed to spawn a blight fire?");
-      }
-
-      // // Old DL-style fire (buggy)
-      // if (ConfigScalingHealth.BLIGHT_USE_FIRE_EFFECT && updateTime) {
-      // // entityLiving.setFire(Integer.MAX_VALUE / 20);
-      // }
-      // // New particle effects
-      // else if (!ConfigScalingHealth.BLIGHT_USE_FIRE_EFFECT) {
-      // Random rand = ScalingHealth.random;
-      // double width = entityLiving.width * 1.8;
-      // double height = entityLiving.height * 1.2;
-      // int particleCount = 3 - ScalingHealth.proxy.getParticleSettings();
-      //
-      // for (int i = 0; i < particleCount; ++i) {
-      // double posX = entityLiving.posX - width / 2 + rand.nextDouble() * width;
-      // double posY = entityLiving.posY + rand.nextDouble() * height;
-      // double posZ = entityLiving.posZ - width / 2 + rand.nextDouble() * width;
-      // double motionX = rand.nextGaussian() * 0.02;
-      // double motionY = rand.nextGaussian() * 0.02 + 0.01;
-      // double motionZ = rand.nextGaussian() * 0.02;
-      // entityLiving.worldObj.spawnParticle(EnumParticleTypes.DRAGON_BREATH, posX, posY, posZ,
-      // motionX, motionY, motionZ);
-      // }
-      // }
     }
   }
 }

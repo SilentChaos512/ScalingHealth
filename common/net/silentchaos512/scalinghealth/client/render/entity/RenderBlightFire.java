@@ -2,6 +2,7 @@ package net.silentchaos512.scalinghealth.client.render.entity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.culling.ICamera;
@@ -20,23 +21,23 @@ import net.silentchaos512.scalinghealth.entity.EntityBlightFire;
 
 public class RenderBlightFire extends Render<EntityBlightFire> {
 
+  protected final ResourceLocation TEXTURE = new ResourceLocation(ScalingHealth.MOD_ID_LOWER,
+      "textures/entity/BlightFire.png");
+
   public RenderBlightFire(RenderManager renderManager) {
 
     super(renderManager);
-    ScalingHealth.logHelper.derp();
   }
 
   @Override
   protected ResourceLocation getEntityTexture(EntityBlightFire entity) {
 
-    // TODO Auto-generated method stub
-    return null;
+    return TEXTURE;
   }
 
   public boolean shouldRender(EntityBlightFire fire, ICamera camera, double camX, double camY,
       double camZ) {
 
-    // ScalingHealth.logHelper.debug("shouldRender");
     EntityLivingBase parent = fire.getParent();
     if (parent == null)
       return false;
@@ -56,51 +57,42 @@ public class RenderBlightFire extends Render<EntityBlightFire> {
   public void doRender(EntityBlightFire fire, double x, double y, double z, float entityYaw,
       float partialTicks) {
 
-    // ScalingHealth.logHelper.debug("doRender", x, y, z, "@", fire.posX, fire.posY, fire.posZ);
     EntityLivingBase parent = fire.getParent();
     if (parent == null)
       return;
 
     GlStateManager.disableLighting();
-    TextureMap texturemap = Minecraft.getMinecraft().getTextureMapBlocks();
-    TextureAtlasSprite sprite, sprite1;
-    boolean vanilla = false;
-    if (vanilla) {
-      sprite = texturemap.getAtlasSprite("minecraft:blocks/fire_layer_0");
-      sprite1 = texturemap.getAtlasSprite("minecraft:blocks/fire_layer_1");
-    } else {
-      sprite = texturemap.getAtlasSprite("ScalingHealth:entity/BlightFire0");
-      sprite1 = texturemap.getAtlasSprite("ScalingHealth:entity/BlightFire1");
-    }
     GlStateManager.pushMatrix();
     GlStateManager.translate(x, y - parent.height + 0.5, z);
     float f = parent.width * 1.6F;
     GlStateManager.scale(f, f, f);
     Tessellator tessellator = Tessellator.getInstance();
     VertexBuffer vertexbuffer = tessellator.getBuffer();
+
     float f1 = 0.5F;
     float f2 = 0.0F;
     float f3 = parent.height / f;
     float f4 = (float) (parent.posY - parent.getEntityBoundingBox().minY);
+
     GlStateManager.rotate(-this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-    GlStateManager.translate(0.0F, 0.0F, -0.3F + (float) ((int) f3) * 0.02F);
+    GlStateManager.translate(0.0F, 0.0F, (float) ((int) f3) * 0.02F);
     GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+
     float f5 = 0.0F;
     int i = 0;
+
     vertexbuffer.begin(7, DefaultVertexFormats.POSITION_TEX);
+    this.bindTexture(TEXTURE);
 
     while (f3 > 0.0F) {
-      TextureAtlasSprite sprite2 = i % 2 == 0 ? sprite : sprite1;
-      this.bindTexture(new ResourceLocation(ScalingHealth.MOD_ID_LOWER,
-          i % 2 == 0 ? "textures/entity/BlightFire0.png" : "textures/entity/BlightFire1.png"));
+      boolean flag = i % 2 == 0;
       int frame = ClientTickHandler.ticksInGame % 32;
-      float minU = 0;// sprite2.getMinU();
-      float minV = frame / 32f;// sprite2.getMinV();
-      float maxU = 1;// sprite2.getMaxU();
-      float maxV = (frame + 1) / 32f;// sprite2.getMaxV();
-      // ScalingHealth.logHelper.debug(minU, minV, maxU, maxV);
+      float minU = flag ? 0.5f : 0.0f;
+      float minV = frame / 32f;
+      float maxU = flag ? 1.0f : 0.5f;
+      float maxV = (frame + 1) / 32f;
 
-      if (i / 2 % 2 == 0) {
+      if (flag) {
         float f10 = maxU;
         maxU = minU;
         minU = f10;
@@ -133,7 +125,6 @@ public class RenderBlightFire extends Render<EntityBlightFire> {
     @Override
     public Render createRenderFor(RenderManager manager) {
 
-      ScalingHealth.logHelper.derp();
       return new RenderBlightFire(manager);
     }
   }

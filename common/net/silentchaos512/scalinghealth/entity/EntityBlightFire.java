@@ -11,6 +11,8 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 
 public class EntityBlightFire extends Entity implements IEntityAdditionalSpawnData {
 
+  public static final String NBT_PARENT = "ParentBlight";
+
   private EntityLivingBase parent;
 
   public EntityBlightFire(World worldIn) {
@@ -22,46 +24,47 @@ public class EntityBlightFire extends Entity implements IEntityAdditionalSpawnDa
 
     super(parent.worldObj);
     this.parent = parent;
-    this.startRiding(parent, true);
   }
 
   @Override
   public void onUpdate() {
 
+    // Server side only, blight fire must have a parent.
     if (!worldObj.isRemote && (parent == null || parent.isDead)) {
       setDead();
-      ScalingHealth.logHelper.debug("dead fire", FMLCommonHandler.instance().getEffectiveSide());
       return;
     }
 
+    // Update position manually in case fire is not riding the blight.
     if (parent != null) {
       this.posX = parent.posX;
-      this.posY = parent.posY + parent.height;
+      this.posY = parent.posY + parent.height / 1.5;
       this.posZ = parent.posZ;
     }
-
-    // ScalingHealth.logHelper.debug(posX, posY, posZ);
   }
 
   @Override
   protected void entityInit() {
-
-    // TODO Auto-generated method stub
 
   }
 
   @Override
   protected void readEntityFromNBT(NBTTagCompound compound) {
 
-    // TODO Auto-generated method stub
-
+    if (compound.hasKey(NBT_PARENT)) {
+      int id = compound.getInteger(NBT_PARENT);
+      Entity entity = worldObj.getEntityByID(id);
+      if (entity instanceof EntityLivingBase)
+        parent = (EntityLivingBase) entity;
+    }
   }
 
   @Override
   protected void writeEntityToNBT(NBTTagCompound compound) {
 
-    // TODO Auto-generated method stub
-
+    if (parent != null) {
+      compound.setInteger(NBT_PARENT, parent.getEntityId());
+    }
   }
 
   public EntityLivingBase getParent() {
