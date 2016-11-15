@@ -10,6 +10,7 @@ import net.silentchaos512.scalinghealth.client.DifficultyDisplayHandler;
 import net.silentchaos512.scalinghealth.client.HeartDisplayHandler;
 import net.silentchaos512.scalinghealth.event.ScalingHealthClientEvents;
 import net.silentchaos512.scalinghealth.event.WitEventHandler;
+import net.silentchaos512.scalinghealth.init.ModEntities;
 
 public class ScalingHealthClientProxy extends ScalingHealthCommonProxy {
 
@@ -24,6 +25,8 @@ public class ScalingHealthClientProxy extends ScalingHealthCommonProxy {
     if (Loader.isModLoaded("wit") || Loader.isModLoaded("WIT"))
       MinecraftForge.EVENT_BUS.register(new WitEventHandler());
     registry.clientPreInit();
+
+    ModEntities.registerRenderers(registry);
   }
 
   @Override

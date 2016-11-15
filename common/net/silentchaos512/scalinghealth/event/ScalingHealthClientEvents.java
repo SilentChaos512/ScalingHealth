@@ -5,12 +5,15 @@ import org.lwjgl.opengl.GL11;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
+import net.silentchaos512.scalinghealth.entity.EntityBlightFire;
 import net.silentchaos512.scalinghealth.lib.EnumAreaDifficultyMode;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
@@ -33,6 +36,8 @@ public class ScalingHealthClientEvents {
     FontRenderer fontRender = Minecraft.getMinecraft().fontRendererObj;
 
     GL11.glPushMatrix();
+    float scale = 0.6f;
+    GlStateManager.scale(scale, scale, 1.0f);
 
     String text = getDebugText();
     int y = 3;
@@ -42,7 +47,7 @@ public class ScalingHealthClientEvents {
         fontRender.drawString(array[0].trim(), 3, y, 0xFFFFFF);
         fontRender.drawString(array[1].trim(), 90, y, 0xFFFFFF);
       } else {
-        fontRender.drawStringWithShadow(line, 3, y, 0xFFFFFF);
+        fontRender.drawString(line, 3, y, 0xFFFFFF);
       }
       y += 10;
     }
@@ -66,7 +71,13 @@ public class ScalingHealthClientEvents {
     ret += String.format("Player Difficulty = %.4f\n", data.getDifficulty());
     ret += "Player Health = " + player.getHealth() + " / " + player.getMaxHealth() + "\n";
     int regenTimer = PlayerBonusRegenHandler.INSTANCE.getTimerForPlayer(player);
-    ret += String.format("Regen Timer = %d (%ds)", regenTimer, regenTimer / 20);
+    ret += String.format("Regen Timer = %d (%ds)", regenTimer, regenTimer / 20) + "\n";
+
+    // Blight count
+    int blightCount = world.getEntities(EntityLivingBase.class, e -> BlightHandler.isBlight(e))
+        .size();
+    int blightFires = world.getEntities(EntityBlightFire.class, e -> true).size();
+    ret += String.format("Blights (Fires) = %d (%d)", blightCount, blightFires);
 
     return ret;
   }

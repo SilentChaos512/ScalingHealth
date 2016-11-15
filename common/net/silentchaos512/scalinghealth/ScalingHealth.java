@@ -45,7 +45,7 @@ public class ScalingHealth {
   public static LogHelper logHelper = new LogHelper(MOD_NAME);
   public static LocalizationHelper localizationHelper;
 
-  public static SRegistry registry = new SRegistry(MOD_ID_OLD);
+  public static SRegistry registry = new SRegistry(MOD_ID_LOWER, logHelper);
 
 //  public static CreativeTabs creativeTab = new CreativeTabs("tab" + MOD_ID) {
 //

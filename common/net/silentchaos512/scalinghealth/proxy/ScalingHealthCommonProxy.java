@@ -9,6 +9,7 @@ import net.silentchaos512.scalinghealth.event.BlightHandler;
 import net.silentchaos512.scalinghealth.event.DifficultyHandler;
 import net.silentchaos512.scalinghealth.event.PlayerBonusRegenHandler;
 import net.silentchaos512.scalinghealth.event.ScalingHealthCommonEvents;
+import net.silentchaos512.scalinghealth.init.ModEntities;
 import net.silentchaos512.scalinghealth.network.NetworkHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 
@@ -18,6 +19,8 @@ public class ScalingHealthCommonProxy extends CommonProxy {
   public void preInit(SRegistry registry) {
 
     super.preInit(registry);
+
+    ModEntities.init(registry);
 
     NetworkHandler.init();
 
