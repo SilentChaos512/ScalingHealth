@@ -60,7 +60,8 @@ public class DifficultyDisplayHandler extends Gui {
     }
 
     currentTime = ClientTickHandler.ticksInGame;
-    if (currentTime - lastUpdateTime < 160) { // TODO: Config?
+    boolean showAlways = true;
+    if (showAlways || currentTime - lastUpdateTime < 160) { // TODO: Config?
       GlStateManager.enableBlend();
 
       mc.renderEngine.bindTexture(TEXTURE);
@@ -68,16 +69,27 @@ public class DifficultyDisplayHandler extends Gui {
       GlStateManager.pushMatrix();
       // GlStateManager.scale(1f, 0.5f, 1f);
 
-      int posX = width / 2 - 32;
-      int posY = height - GuiIngameForge.left_height - 14;
+      int posX = 5; // width / 2 - 32;
+      int posY = height - 30; // height - GuiIngameForge.left_height - 14;
+
       // Frame
       drawTexturedModalRect(posX, posY, 192, 0, 64, 12, 0xFFFFFF);
+
       // Area Difficulty
       int barLength = (int) (60 * areaDifficulty / ConfigScalingHealth.DIFFICULTY_MAX);
       drawTexturedModalRect(posX + 2, posY + 2, 194, 14, barLength, 6, 0xFFFFFF);
+
       // Difficulty
       barLength = (int) (60 * difficulty / ConfigScalingHealth.DIFFICULTY_MAX);
       drawTexturedModalRect(posX + 2, posY + 8, 194, 20, barLength, 2, 0xFFFFFF);
+
+      // Text
+      float textScale = 0.6f;
+      GlStateManager.pushMatrix();
+      GlStateManager.scale(textScale, textScale, 1.0f);
+      mc.fontRendererObj.drawStringWithShadow("DIFFICULTY", posX / textScale + 4,
+          posY / textScale - 9, 0xFFFFFF);
+      GlStateManager.popMatrix();
 
       GlStateManager.popMatrix();
       GlStateManager.disableBlend();
