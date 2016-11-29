@@ -21,7 +21,7 @@ public class ConfigScalingHealth {
   // Client
   public static boolean CHANGE_HEART_RENDERING = true;
   public static boolean RENDER_DIFFICULTY_METER = true;
-  public static final int[] HEART_COLORS = {//
+  public static int[] HEART_COLORS = {//
       0xBF0000, // 0 red
       0xE66000, // 25 orange-red
       0xE69900, // 40 orange
@@ -305,7 +305,7 @@ public class ConfigScalingHealth {
       //@formatter:on
     } catch (Exception ex) {
       ScalingHealth.logHelper.severe("Could not load configuration file!");
-      ScalingHealth.logHelper.severe(ex);
+      ex.printStackTrace();
     }
   }
 
@@ -336,6 +336,7 @@ public class ConfigScalingHealth {
 
     // Convert hex strings to ints.
     try {
+      HEART_COLORS = new int[list.length];
       for (int i = 0; i < HEART_COLORS.length; ++i)
         HEART_COLORS[i] = Integer.decode("0x" + list[i]);
     } catch (NumberFormatException ex) {
