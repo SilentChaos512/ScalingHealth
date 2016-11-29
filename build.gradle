@@ -16,7 +16,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 //    id "net.minecraftforge.gradle.forge" version "2.0.2"
 //}
 
-version = "0.2.7"
+version = "0.2.8"
 group = "net.silentchaos512.scalinghealth"
 archivesBaseName = "ScalingHealth-1.10.2"
 
@@ -30,6 +30,7 @@ minecraft {
     coreMod = "net.silentchaos512.scalinghealth.asm.SHLoadingPlugin"
 
     replace "@VERSION@", project.version
+    replace "DEV_ENV = true", "DEV_ENV = false"
     replaceIn "ScalingHealth.java"
 
     mappings = "snapshot_20161111"

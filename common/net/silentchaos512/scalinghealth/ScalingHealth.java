@@ -32,11 +32,13 @@ import net.silentchaos512.scalinghealth.world.SHWorldGenerator;
 //@formatter:on
 public class ScalingHealth {
 
+  public static final boolean DEV_ENV = true;
   public static final String MOD_ID_OLD = "ScalingHealth";
   public static final String MOD_ID_LOWER = "scalinghealth";
   public static final String MOD_NAME = "Scaling Health";
   public static final String VERSION = "@VERSION@";
-  public static final String DEPENDENCIES = "required-after:Forge@[12.17.0.1976,);required-after:SilentLib;";
+  public static final String DEPENDENCIES = "required-after:Forge@[12.18.2.2125,);required-after:SilentLib"
+      + (DEV_ENV ? ";" : "@[1.1.0,);");
   public static final String RESOURCE_PREFIX = MOD_ID_LOWER + ":";
 
   public static SimpleNetworkWrapper networkManager;
