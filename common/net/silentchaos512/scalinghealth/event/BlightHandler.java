@@ -93,11 +93,13 @@ public class BlightHandler {
       EntityPlayer player = (EntityPlayer) event.getSource().getEntity();
 
       // Tell all players that the blight was killed.
-      String message = loc.getLocalizedString("blight", "killedByPlayer", blight.getName(),
-          player.getName());
-      ScalingHealth.logHelper.info(message);
-      for (EntityPlayer p : player.worldObj.getPlayers(EntityPlayer.class, e -> true))
-        PlayerHelper.addChatMessage(p, message);
+      if (ConfigScalingHealth.BLIGHT_NOTIFY_PLAYERS_ON_DEATH) {
+        String message = loc.getLocalizedString("blight", "killedByPlayer", blight.getName(),
+            player.getName());
+        ScalingHealth.logHelper.info(message);
+        for (EntityPlayer p : player.worldObj.getPlayers(EntityPlayer.class, e -> true))
+          PlayerHelper.addChatMessage(p, message);
+      }
 
       // Drop hearts!
       int heartCount = ScalingHealth.random.nextInt(ConfigScalingHealth.HEARTS_DROPPED_BY_BLIGHT_MAX
@@ -110,12 +112,14 @@ public class BlightHandler {
       EntityLivingBase blight = event.getEntityLiving();
 
       // Tell all players that the blight died.
-      String message = event.getSource().getDeathMessage(blight).getFormattedText();
-      String blightName = loc.getLocalizedString("blight", "name", blight.getName());
-      message = message.replaceFirst(blight.getName(), blightName);
-      ScalingHealth.logHelper.info(message);
-      for (EntityPlayer p : blight.worldObj.getPlayers(EntityPlayer.class, e -> true))
-        PlayerHelper.addChatMessage(p, message);
+      if (ConfigScalingHealth.BLIGHT_NOTIFY_PLAYERS_ON_DEATH) {
+        String message = event.getSource().getDeathMessage(blight).getFormattedText();
+        String blightName = loc.getLocalizedString("blight", "name", blight.getName());
+        message = message.replaceFirst(blight.getName(), blightName);
+        ScalingHealth.logHelper.info(message);
+        for (EntityPlayer p : blight.worldObj.getPlayers(EntityPlayer.class, e -> true))
+          PlayerHelper.addChatMessage(p, message);
+      }
     }
   }
 

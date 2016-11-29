@@ -67,6 +67,7 @@ public class ConfigScalingHealth {
   public static boolean BLIGHT_FIRE_RESIST = true;
   public static float BLIGHT_XP_MULTIPLIER = 10f;
   public static boolean BLIGHT_SUPERCHARGE_CREEPERS = true;
+  public static boolean BLIGHT_NOTIFY_PLAYERS_ON_DEATH = true;
   private static List<String> BLIGHT_BLACKLIST;
   private static String[] BLIGHT_BLACKLIST_DEFAULTS = new String[] { "WitherBoss", "Villager" };
 
@@ -304,6 +305,7 @@ public class ConfigScalingHealth {
       //@formatter:on
     } catch (Exception ex) {
       ScalingHealth.logHelper.severe("Could not load configuration file!");
+      ScalingHealth.logHelper.severe(ex);
     }
   }
 
