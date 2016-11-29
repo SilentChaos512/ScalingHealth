@@ -153,6 +153,10 @@ public class HeartDisplayHandler extends Gui {
         drawTexturedModalRect(left + 8 * renderHearts, top, 9, potionOffset, 9, 9, rowColor);
     }
 
+    for (int i = 0; i < 10 && i < health / 2; ++i) {
+      drawTexturedModalRect(left + 8 * i, top, 17, potionOffset, 9, 9, 0xFFFFFF);
+    }
+
     GlStateManager.disableBlend();
     mc.renderEngine.bindTexture(Gui.ICONS);
   }
