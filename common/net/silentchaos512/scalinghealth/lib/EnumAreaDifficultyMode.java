@@ -6,14 +6,13 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
-import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
 public enum EnumAreaDifficultyMode {
 
-  WEIGHTED_AVERAGE, AVERAGE, MIN_LEVEL, MAX_LEVEL, DISTANCE_FROM_SPAWN, DISTANCE_FROM_ORIGIN;
+  WEIGHTED_AVERAGE, AVERAGE, MIN_LEVEL, MAX_LEVEL, DISTANCE_FROM_SPAWN, DISTANCE_FROM_ORIGIN, DISTANCE_AND_TIME;
 
   public static EnumAreaDifficultyMode loadFromConfig(Configuration c,
       EnumAreaDifficultyMode defaultValue) {
@@ -31,7 +30,8 @@ public enum EnumAreaDifficultyMode {
         + "  MIN_LEVEL - The lowest difficulty level of all nearby players.\n"
         + "  MAX_LEVEL - The highest difficulty level of all nearby players.\n"
         + "  DISTANCE_FROM_SPAWN - Based on the mob's distance from spawn.\n"
-        + "  DISTANCE_FROM_ORIGIN - Based on the mob's distance from the origin.",
+        + "  DISTANCE_FROM_ORIGIN - Based on the mob's distance from the origin.\n"
+        + "  DISTANCE_AND_TIME - Mix of DISTANCE_FROM_SPAWN and WEIGHTED_AVERAGE.",
         validValues);
     //@formatter:on
 
@@ -42,6 +42,11 @@ public enum EnumAreaDifficultyMode {
   }
 
   public double getAreaDifficulty(World world, BlockPos pos) {
+
+    return getAreaDifficulty(world, pos, true);
+  }
+
+  public double getAreaDifficulty(World world, BlockPos pos, boolean addGroupBonus) {
 
     // Get players in range. TODO: Only get player list for types that need it?
     int radius = ConfigScalingHealth.DIFFICULTY_SEARCH_RADIUS;
@@ -114,10 +119,20 @@ public enum EnumAreaDifficultyMode {
         double distance = Math.sqrt(dx * dx + dz * dz);
         ret = distance * ConfigScalingHealth.DIFFICULTY_PER_BLOCK;
         break;
+
+      case DISTANCE_AND_TIME:
+        double difficultyFromPlayers = WEIGHTED_AVERAGE.getAreaDifficulty(world, pos, false);
+        double difficultyFromDistance = DISTANCE_FROM_SPAWN.getAreaDifficulty(world, pos, false);
+        ret = difficultyFromPlayers + difficultyFromDistance;
+        break;
     }
 
+    // Clamp to difficulty range (intentionally done before group bonus)
+    ret = ret < 0 ? 0 : ret > ConfigScalingHealth.DIFFICULTY_MAX ? ConfigScalingHealth.DIFFICULTY_MAX : ret;
+
     // Group bonus?
-    ret *= 1 + ConfigScalingHealth.DIFFICULTY_GROUP_AREA_BONUS * (players.size() - 1);
+    if (addGroupBonus)
+      ret *= 1 + ConfigScalingHealth.DIFFICULTY_GROUP_AREA_BONUS * (players.size() - 1);
 
     return ret;
   }
