@@ -46,6 +46,7 @@ public class PlayerBonusRegenHandler {
       int timer = timers.get(name);
       if (--timer <= 0) {
         player.heal(1f);
+        player.addExhaustion(0.025f);
         timer = ConfigScalingHealth.BONUS_HEALTH_REGEN_DELAY;
       }
       timers.put(name, timer);

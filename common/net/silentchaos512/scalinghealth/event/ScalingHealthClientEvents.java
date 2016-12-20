@@ -72,6 +72,7 @@ public class ScalingHealthClientEvents {
     ret += "Player Health = " + player.getHealth() + " / " + player.getMaxHealth() + "\n";
     int regenTimer = PlayerBonusRegenHandler.INSTANCE.getTimerForPlayer(player);
     ret += String.format("Regen Timer = %d (%ds)", regenTimer, regenTimer / 20) + "\n";
+    ret += String.format("Food = %d (%.2f)", player.getFoodStats().getFoodLevel(), player.getFoodStats().getSaturationLevel()) + "\n";
 
     // Blight count
     int blightCount = world.getEntities(EntityLivingBase.class, e -> BlightHandler.isBlight(e))
