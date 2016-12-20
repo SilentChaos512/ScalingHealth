@@ -60,8 +60,8 @@ public class DifficultyDisplayHandler extends Gui {
     }
 
     currentTime = ClientTickHandler.ticksInGame;
-    boolean showAlways = true;
-    if (showAlways || currentTime - lastUpdateTime < 160) { // TODO: Config?
+    if (ConfigScalingHealth.RENDER_DIFFICULTY_METER_ALWAYS
+        || currentTime - lastUpdateTime < ConfigScalingHealth.DIFFICULTY_METER_DISPLAY_TIME) {
       GlStateManager.enableBlend();
 
       mc.renderEngine.bindTexture(TEXTURE);
