@@ -38,14 +38,14 @@ public class HeartDisplayHandler extends Gui {
     event.setCanceled(true);
 
     Minecraft mc = Minecraft.getMinecraft();
-    EntityPlayer player = mc.thePlayer;
-    final boolean hardcoreMode = mc.theWorld.getWorldInfo().isHardcoreModeEnabled();
+    EntityPlayer player = mc.player;
+    final boolean hardcoreMode = mc.world.getWorldInfo().isHardcoreModeEnabled();
 
     int width = event.getResolution().getScaledWidth();
     int height = event.getResolution().getScaledHeight();
     GlStateManager.enableBlend();
 
-    int health = MathHelper.ceiling_float_int(player.getHealth());
+    int health = MathHelper.ceil(player.getHealth());
     boolean highlight = player.hurtResistantTime / 3 % 2 == 1;
     updateCounter = ClientTickHandler.ticksInGame;
 
@@ -69,9 +69,9 @@ public class HeartDisplayHandler extends Gui {
     IAttributeInstance attrMaxHealth = player
         .getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
     float healthMax = Math.min((float) attrMaxHealth.getAttributeValue(), 20);
-    float absorb = MathHelper.ceiling_float_int(player.getAbsorptionAmount());
+    float absorb = MathHelper.ceil(player.getAbsorptionAmount());
 
-    int healthRows = MathHelper.ceiling_float_int((healthMax + absorb) / 2f / 10f);
+    int healthRows = MathHelper.ceil((healthMax + absorb) / 2f / 10f);
     int rowHeight = Math.max(10 - (healthRows - 2), 3); // TODO: Remove?
 
     rand.setSeed(updateCounter * 312871);
@@ -96,8 +96,8 @@ public class HeartDisplayHandler extends Gui {
     float absorbRemaining = absorb;
 
     // Draw vanilla hearts
-    for (int i = MathHelper.ceiling_float_int((healthMax + absorb) / 2f) - 1; i >= 0; --i) {
-      int row = MathHelper.ceiling_float_int((i + 1) / 10f) - 1;
+    for (int i = MathHelper.ceil((healthMax + absorb) / 2f) - 1; i >= 0; --i) {
+      int row = MathHelper.ceil((i + 1) / 10f) - 1;
       int x = left + i % 10 * 8;
       int y = top - row * rowHeight;
 
@@ -139,7 +139,7 @@ public class HeartDisplayHandler extends Gui {
 
     mc.renderEngine.bindTexture(TEXTURE);
 
-    health = MathHelper.ceiling_float_int(player.getHealth());
+    health = MathHelper.ceil(player.getHealth());
     for (int i = 0; i < health / 20; ++i) {
       int renderHearts = Math.min((health - 20 * (i + 1)) / 2, 10);
       int rowColor = getColorForRow(i);

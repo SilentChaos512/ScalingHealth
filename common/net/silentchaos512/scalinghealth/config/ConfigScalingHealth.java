@@ -21,6 +21,8 @@ public class ConfigScalingHealth {
   // Client
   public static boolean CHANGE_HEART_RENDERING = true;
   public static boolean RENDER_DIFFICULTY_METER = true;
+  public static boolean RENDER_DIFFICULTY_METER_ALWAYS = false;
+  public static int DIFFICULTY_METER_DISPLAY_TIME = 160;
   public static int[] HEART_COLORS = {//
       0xBF0000, // 0 red
       0xE66000, // 25 orange-red
@@ -131,6 +133,15 @@ public class ConfigScalingHealth {
           "Draws random stuffs on the screen! And maybe does some other things.");
 
       // Client
+      RENDER_DIFFICULTY_METER = c.getBoolean("Render Difficulty Meter", CAT_CLIENT,
+          RENDER_DIFFICULTY_METER,
+          "Show the difficulty meter. Usually, it is displayed for a few seconds occasionally.");
+      RENDER_DIFFICULTY_METER_ALWAYS = c.getBoolean("Render Difficulty Meter Always", CAT_CLIENT,
+          RENDER_DIFFICULTY_METER_ALWAYS,
+          "Render the difficulty meter at all times.");
+      DIFFICULTY_METER_DISPLAY_TIME = c.getInt("Difficulty Meter Display Time", CAT_CLIENT,
+          DIFFICULTY_METER_DISPLAY_TIME, 0, Integer.MAX_VALUE,
+          "The time (in ticks) to show the difficulty meter whenever it pops up.");
       CHANGE_HEART_RENDERING = c.getBoolean("Custom Heart Rendering", CAT_CLIENT,
           CHANGE_HEART_RENDERING,
           "Replace vanilla heart rendering.");

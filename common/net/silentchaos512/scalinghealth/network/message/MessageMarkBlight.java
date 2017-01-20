@@ -31,7 +31,7 @@ public class MessageMarkBlight extends Message {
   public IMessage handleMessage(MessageContext context) {
 
     ClientTickHandler.scheduledActions.add(() -> {
-      Entity entity = Minecraft.getMinecraft().theWorld.getEntityByID(entityId);
+      Entity entity = Minecraft.getMinecraft().world.getEntityByID(entityId);
       //ScalingHealth.logHelper.debug("Attempt mark blight... Entity " + entityId + " " + entity);
       if (entity instanceof EntityLivingBase)
         BlightHandler.markBlight((EntityLivingBase) entity);

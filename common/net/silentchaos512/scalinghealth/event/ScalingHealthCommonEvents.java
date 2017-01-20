@@ -4,6 +4,7 @@ import java.util.Random;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -22,7 +23,7 @@ public class ScalingHealthCommonEvents {
 
     // Handle heart drops.
     EntityLivingBase entityLiving = event.getEntityLiving();
-    if (!entityLiving.worldObj.isRemote) {
+    if (!entityLiving.world.isRemote) {
       Random rand = ScalingHealth.random;
       int stackSize = 0;
       if (event.isRecentlyHit() && rand.nextFloat() <= ConfigScalingHealth.HEART_DROP_CHANCE) {

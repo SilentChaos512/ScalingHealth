@@ -37,8 +37,8 @@ public class ScalingHealth {
   public static final String MOD_ID_LOWER = "scalinghealth";
   public static final String MOD_NAME = "Scaling Health";
   public static final String VERSION = "@VERSION@";
-  public static final String DEPENDENCIES = "required-after:Forge@[12.18.2.2125,);required-after:SilentLib"
-      + (DEV_ENV ? ";" : "@[1.1.0,);");
+  public static final String DEPENDENCIES = "required-after:forge@[13.19.1.2188,);required-after:silentlib"
+      + (DEV_ENV ? ";" : "@[1.1.3,);");
   public static final String RESOURCE_PREFIX = MOD_ID_LOWER + ":";
 
   public static SimpleNetworkWrapper networkManager;

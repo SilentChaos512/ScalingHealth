@@ -33,9 +33,9 @@ public class ClientTickHandler {
 
     if (event.phase == Phase.END) {
       Minecraft mc = Minecraft.getMinecraft();
-      if (mc.theWorld == null) {
+      if (mc.world == null) {
         SHPlayerDataHandler.cleanup();
-      } else if (mc.thePlayer != null) {
+      } else if (mc.player != null) {
         while (!scheduledActions.isEmpty()) {
           scheduledActions.poll().run();
         }

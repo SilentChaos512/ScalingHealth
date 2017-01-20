@@ -35,7 +35,7 @@ public class MessageDataSync extends Message {
   public IMessage handleMessage(MessageContext context) {
 
     ClientTickHandler.scheduledActions.add(() -> {
-      EntityPlayer player = ScalingHealth.proxy.getClientPlayer().worldObj
+      EntityPlayer player = ScalingHealth.proxy.getClientPlayer().world
           .getPlayerEntityByName(playerName);
       if (player != null) {
         PlayerData data = SHPlayerDataHandler.get(player);

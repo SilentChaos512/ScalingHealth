@@ -29,19 +29,19 @@ public class CommandScalingHealth implements ICommand {
   }
 
   @Override
-  public String getCommandName() {
+  public String getName() {
 
     return ScalingHealth.MOD_ID_LOWER;
   }
 
   @Override
-  public String getCommandUsage(ICommandSender sender) {
+  public String getUsage(ICommandSender sender) {
 
-    return "Usage: /" + getCommandName() + " <difficulty|health> <value> [player]";
+    return "Usage: /" + getName() + " <difficulty|health> <value> [player]";
   }
 
   @Override
-  public List<String> getCommandAliases() {
+  public List<String> getAliases() {
 
     return Lists.newArrayList();
   }
@@ -51,7 +51,7 @@ public class CommandScalingHealth implements ICommand {
       throws CommandException {
 
     if (args.length < 1) {
-      tell(sender, getCommandUsage(sender), false);
+      tell(sender, getUsage(sender), false);
       return;
     }
 
@@ -64,7 +64,7 @@ public class CommandScalingHealth implements ICommand {
       try {
         value = Double.parseDouble(args[1]);
       } catch (Exception ex) {
-        tell(sender, getCommandUsage(sender), false);
+        tell(sender, getUsage(sender), false);
         return;
       }
     }
@@ -161,13 +161,13 @@ public class CommandScalingHealth implements ICommand {
   public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
 
     return ((server.isDedicatedServer() && !(sender instanceof EntityPlayer))
-        || server.isSinglePlayer() && server.worldServers[0].getWorldInfo().areCommandsAllowed())
+        || server.isSinglePlayer() && server.worlds[0].getWorldInfo().areCommandsAllowed())
         || server.getPlayerList().getOppedPlayers()
             .getGameProfileFromName(sender.getName()) != null;
   }
 
   @Override
-  public List<String> getTabCompletionOptions(MinecraftServer server, ICommandSender sender,
+  public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender,
       String[] args, BlockPos pos) {
 
     return Lists.newArrayList("difficulty", "health");
@@ -185,6 +185,6 @@ public class CommandScalingHealth implements ICommand {
 
     String value = fromLocalizationFile
         ? ScalingHealth.localizationHelper.getLocalizedString("command." + key, args) : key;
-    sender.addChatMessage(new TextComponentString(value));
+    sender.sendMessage(new TextComponentString(value));
   }
 }

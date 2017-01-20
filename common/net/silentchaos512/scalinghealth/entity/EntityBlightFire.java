@@ -22,7 +22,7 @@ public class EntityBlightFire extends Entity implements IEntityAdditionalSpawnDa
 
   public EntityBlightFire(EntityLivingBase parent) {
 
-    super(parent.worldObj);
+    super(parent.world);
     this.parent = parent;
   }
 
@@ -30,7 +30,7 @@ public class EntityBlightFire extends Entity implements IEntityAdditionalSpawnDa
   public void onUpdate() {
 
     // Server side only, blight fire must have a parent.
-    if (!worldObj.isRemote && (parent == null || parent.isDead)) {
+    if (!world.isRemote && (parent == null || parent.isDead)) {
       setDead();
       return;
     }
@@ -53,7 +53,7 @@ public class EntityBlightFire extends Entity implements IEntityAdditionalSpawnDa
 
     if (compound.hasKey(NBT_PARENT)) {
       int id = compound.getInteger(NBT_PARENT);
-      Entity entity = worldObj.getEntityByID(id);
+      Entity entity = world.getEntityByID(id);
       if (entity instanceof EntityLivingBase)
         parent = (EntityLivingBase) entity;
     }
@@ -83,7 +83,7 @@ public class EntityBlightFire extends Entity implements IEntityAdditionalSpawnDa
 
     int id = additionalData.readInt();
     if (id != -1) {
-      Entity entity = worldObj.getEntityByID(id);
+      Entity entity = world.getEntityByID(id);
       if (entity instanceof EntityLivingBase)
         parent = (EntityLivingBase) entity;
     }

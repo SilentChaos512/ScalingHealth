@@ -46,7 +46,7 @@ public class ScalingHealthClientProxy extends ScalingHealthCommonProxy {
   @Override
   public EntityPlayer getClientPlayer() {
 
-    return Minecraft.getMinecraft().thePlayer;
+    return Minecraft.getMinecraft().player;
   }
 
   @Override

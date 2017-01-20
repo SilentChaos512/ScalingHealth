@@ -64,7 +64,7 @@ public class SHPlayerDataHandler {
 
   private static int getKey(EntityPlayer player) {
 
-    return player.hashCode() << 1 + (player.worldObj.isRemote ? 1 : 0);
+    return player.hashCode() << 1 + (player.world.isRemote ? 1 : 0);
   }
 
   public static NBTTagCompound getDataCompoundForPlayer(EntityPlayer player) {
@@ -100,11 +100,11 @@ public class SHPlayerDataHandler {
         SHPlayerDataHandler.get(player).tick();
 
         // Get data from nearby players.
-        if (!player.worldObj.isRemote
-            && player.worldObj.getTotalWorldTime() % 5 * ConfigScalingHealth.PACKET_DELAY == 0) {
+        if (!player.world.isRemote
+            && player.world.getTotalWorldTime() % 5 * ConfigScalingHealth.PACKET_DELAY == 0) {
           int radius = ConfigScalingHealth.DIFFICULTY_SEARCH_RADIUS;
           int radiusSquared = radius <= 0 ? Integer.MAX_VALUE : radius * radius;
-          for (EntityPlayer p : player.worldObj.getPlayers(EntityPlayer.class,
+          for (EntityPlayer p : player.world.getPlayers(EntityPlayer.class,
               p -> !p.equals(player) && p.getDistanceSq(player.getPosition()) < radiusSquared)) {
             MessageDataSync message = new MessageDataSync(get(p), p);
             NetworkHandler.INSTANCE.sendTo(message, (EntityPlayerMP) player);
@@ -142,7 +142,7 @@ public class SHPlayerDataHandler {
     public PlayerData(EntityPlayer player) {
 
       playerWR = new WeakReference<EntityPlayer>(player);
-      client = player.worldObj.isRemote;
+      client = player.world.isRemote;
 
       load();
     }
@@ -154,7 +154,7 @@ public class SHPlayerDataHandler {
 
     public void setDifficulty(double value) {
 
-      difficulty = MathHelper.clamp_double(value, 0, ConfigScalingHealth.DIFFICULTY_MAX);
+      difficulty = MathHelper.clamp(value, 0, ConfigScalingHealth.DIFFICULTY_MAX);
     }
 
     public void incrementDifficulty(double amount) {
@@ -179,7 +179,7 @@ public class SHPlayerDataHandler {
       int configMax = ConfigScalingHealth.PLAYER_HEALTH_MAX;
       configMax = configMax <= 0 ? Integer.MAX_VALUE : configMax;
 
-      maxHealth = MathHelper.clamp_float(value, 2, configMax);
+      maxHealth = MathHelper.clamp(value, 2, configMax);
 
       EntityPlayer player = playerWR.get();
       if (player != null)
@@ -206,7 +206,7 @@ public class SHPlayerDataHandler {
           return;
 
         // Increase player difficulty.
-        if (player.worldObj.getTotalWorldTime() % 20 == 0) {
+        if (player.world.getTotalWorldTime() % 20 == 0) {
           float amount = ConfigScalingHealth.DIFFICULTY_PER_SECOND;
 
           // Idle multiplier
@@ -222,7 +222,7 @@ public class SHPlayerDataHandler {
           lastPosZ = (int) player.posZ;
         }
         // Sync with client?
-        if (player.worldObj.getTotalWorldTime() % ConfigScalingHealth.PACKET_DELAY == 0) {
+        if (player.world.getTotalWorldTime() % ConfigScalingHealth.PACKET_DELAY == 0) {
           health = player.getHealth();
           save();
           sendUpdateMessage();

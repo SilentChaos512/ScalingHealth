@@ -34,7 +34,7 @@ public class DifficultyDisplayHandler extends Gui {
       return;
 
     Minecraft mc = Minecraft.getMinecraft();
-    EntityPlayer player = mc.thePlayer;
+    EntityPlayer player = mc.player;
 
     int width = event.getResolution().getScaledWidth();
     int height = event.getResolution().getScaledHeight();
@@ -44,8 +44,8 @@ public class DifficultyDisplayHandler extends Gui {
       return;
 
     int difficulty = (int) data.getDifficulty();
-    int areaDifficulty = MathHelper.clamp_int((int) ConfigScalingHealth.AREA_DIFFICULTY_MODE
-        .getAreaDifficulty(player.worldObj, player.getPosition()), 0,
+    int areaDifficulty = MathHelper.clamp((int) ConfigScalingHealth.AREA_DIFFICULTY_MODE
+        .getAreaDifficulty(player.world, player.getPosition()), 0,
         (int) ConfigScalingHealth.DIFFICULTY_MAX);
     int timeSinceLastUpdate = ClientTickHandler.ticksInGame - lastUpdateTime;
 
@@ -60,8 +60,8 @@ public class DifficultyDisplayHandler extends Gui {
     }
 
     currentTime = ClientTickHandler.ticksInGame;
-    boolean showAlways = true;
-    if (showAlways || currentTime - lastUpdateTime < 160) { // TODO: Config?
+    if (ConfigScalingHealth.RENDER_DIFFICULTY_METER_ALWAYS
+        || currentTime - lastUpdateTime < ConfigScalingHealth.DIFFICULTY_METER_DISPLAY_TIME) {
       GlStateManager.enableBlend();
 
       mc.renderEngine.bindTexture(TEXTURE);

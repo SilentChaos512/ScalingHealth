@@ -23,7 +23,7 @@ public class ScalingHealthClientEvents {
   @SubscribeEvent
   public void renderTick(RenderGameOverlayEvent.Post event) {
 
-    if (Minecraft.getMinecraft().theWorld == null || event.getType() != ElementType.ALL)
+    if (Minecraft.getMinecraft().world == null || event.getType() != ElementType.ALL)
       return;
 
     if (!ConfigScalingHealth.DEBUG_MODE)
@@ -57,8 +57,8 @@ public class ScalingHealthClientEvents {
 
   private String getDebugText() {
 
-    World world = Minecraft.getMinecraft().theWorld;
-    EntityPlayer player = Minecraft.getMinecraft().thePlayer;
+    World world = Minecraft.getMinecraft().world;
+    EntityPlayer player = Minecraft.getMinecraft().player;
     PlayerData data = SHPlayerDataHandler.get(player);
     EnumAreaDifficultyMode areaMode = ConfigScalingHealth.AREA_DIFFICULTY_MODE;
     if (data == null)
@@ -72,6 +72,7 @@ public class ScalingHealthClientEvents {
     ret += "Player Health = " + player.getHealth() + " / " + player.getMaxHealth() + "\n";
     int regenTimer = PlayerBonusRegenHandler.INSTANCE.getTimerForPlayer(player);
     ret += String.format("Regen Timer = %d (%ds)", regenTimer, regenTimer / 20) + "\n";
+    ret += String.format("Food = %d (%.2f)", player.getFoodStats().getFoodLevel(), player.getFoodStats().getSaturationLevel()) + "\n";
 
     // Blight count
     int blightCount = world.getEntities(EntityLivingBase.class, e -> BlightHandler.isBlight(e))

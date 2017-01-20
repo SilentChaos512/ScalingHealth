@@ -43,7 +43,7 @@ public class DifficultyHandler {
     EntityLivingBase entityLiving = (EntityLivingBase) event.getEntity();
 
     //@formatter:off
-    if (entityLiving.worldObj.isRemote
+    if (entityLiving.world.isRemote
         || entityLiving instanceof EntityPlayer
         || entityBlacklistedFromHealthIncrease(entityLiving)
         || !canIncreaseEntityHealth(entityLiving))
@@ -58,7 +58,7 @@ public class DifficultyHandler {
   private boolean increaseEntityHealth(EntityLivingBase entityLiving) {
 
     float difficulty = (float) ConfigScalingHealth.AREA_DIFFICULTY_MODE
-        .getAreaDifficulty(entityLiving.worldObj, entityLiving.getPosition());
+        .getAreaDifficulty(entityLiving.world, entityLiving.getPosition());
     Random rand = ScalingHealth.random;
     boolean makeBlight = false;
 
@@ -202,7 +202,7 @@ public class DifficultyHandler {
 
     if (ConfigScalingHealth.BLIGHT_SUPERCHARGE_CREEPERS && entityLiving instanceof EntityCreeper) {
       ((EntityCreeper) entityLiving)
-          .onStruckByLightning(new EntityLightningBolt(entityLiving.worldObj,
+          .onStruckByLightning(new EntityLightningBolt(entityLiving.world,
               entityLiving.posX, entityLiving.posY, entityLiving.posZ, true));
     }
 

@@ -25,6 +25,8 @@ public class SHAsmConfig {
 
   public static void load() {
 
+    System.out.println("Scaling Health: Loading ASM config...");
+
     Path path = FileSystems.getDefault().getPath(PATH);
     File file = new File(PATH);
 

@@ -52,19 +52,19 @@ public class BlightHandler {
 
   public static void spawnBlightFire(EntityLivingBase blight) {
 
-    if (blight.worldObj.isRemote)
+    if (blight.world.isRemote)
       return;
 
     EntityBlightFire fire = new EntityBlightFire(blight);
     fire.setPosition(blight.posX, blight.posY, blight.posZ);
-    blight.worldObj.spawnEntityInWorld(fire);
+    blight.world.spawnEntity(fire);
     if (ConfigScalingHealth.BLIGHT_FIRE_RIDES_BLIGHT)
       fire.startRiding(blight);
   }
 
   public static EntityBlightFire getBlightFire(EntityLivingBase blight) {
 
-    World world = blight.worldObj;
+    World world = blight.world;
     List<EntityBlightFire> fireList = world.getEntities(EntityBlightFire.class, e -> true);
 
     for (EntityBlightFire fire : fireList)
@@ -82,7 +82,7 @@ public class BlightHandler {
   public void onBlightKilled(LivingDeathEvent event) {
 
     if (event.getSource() == null || !isBlight(event.getEntityLiving())
-        || event.getEntity().worldObj.isRemote)
+        || event.getEntity().world.isRemote)
       return;
 
     LocalizationHelper loc = ScalingHealth.localizationHelper;
@@ -97,7 +97,7 @@ public class BlightHandler {
         String message = loc.getLocalizedString("blight", "killedByPlayer", blight.getName(),
             player.getName());
         ScalingHealth.logHelper.info(message);
-        for (EntityPlayer p : player.worldObj.getPlayers(EntityPlayer.class, e -> true))
+        for (EntityPlayer p : player.world.getPlayers(EntityPlayer.class, e -> true))
           PlayerHelper.addChatMessage(p, message);
       }
 
@@ -116,8 +116,12 @@ public class BlightHandler {
         String message = event.getSource().getDeathMessage(blight).getFormattedText();
         String blightName = loc.getLocalizedString("blight", "name", blight.getName());
         message = message.replaceFirst(blight.getName(), blightName);
+
+        if (message.startsWith("Blight Squid") && message.contains("drowned"))
+          message += "... again";
+
         ScalingHealth.logHelper.info(message);
-        for (EntityPlayer p : blight.worldObj.getPlayers(EntityPlayer.class, e -> true))
+        for (EntityPlayer p : blight.world.getPlayers(EntityPlayer.class, e -> true))
           PlayerHelper.addChatMessage(p, message);
       }
     }
@@ -139,7 +143,7 @@ public class BlightHandler {
 
     if (event.getEntityLiving() != null) {
       EntityLivingBase entityLiving = event.getEntityLiving();
-      World world = entityLiving.worldObj;
+      World world = entityLiving.world;
 
       // Blights only!
       if (!isBlight(entityLiving))

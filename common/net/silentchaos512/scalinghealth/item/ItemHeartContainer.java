@@ -24,8 +24,9 @@ public class ItemHeartContainer extends ItemSL {
   }
 
   @Override
-  public ActionResult<ItemStack> onItemRightClick(ItemStack stack, World world, EntityPlayer player,
-      EnumHand hand) {
+  public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+
+    ItemStack stack = player.getHeldItem(hand);
 
     if (!world.isRemote) {
       PlayerData data = SHPlayerDataHandler.get(player);
@@ -36,8 +37,8 @@ public class ItemHeartContainer extends ItemSL {
       }
 
       data.incrementMaxHealth(2);
-      --stack.stackSize;
-      world.playSound(null, player.getPosition(), SoundEvents.ENTITY_EXPERIENCE_ORB_TOUCH,
+      stack.shrink(1);
+      world.playSound(null, player.getPosition(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP,
           SoundCategory.PLAYERS, 1.0f, 0.7f + 0.1f * (float) ScalingHealth.random.nextGaussian());
     }
     return new ActionResult(EnumActionResult.SUCCESS, stack);

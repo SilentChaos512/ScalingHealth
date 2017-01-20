@@ -46,6 +46,7 @@ public class PlayerBonusRegenHandler {
       int timer = timers.get(name);
       if (--timer <= 0) {
         player.heal(1f);
+        player.addExhaustion(0.025f);
         timer = ConfigScalingHealth.BONUS_HEALTH_REGEN_DELAY;
       }
       timers.put(name, timer);
@@ -56,7 +57,7 @@ public class PlayerBonusRegenHandler {
   public void onPlayerHurt(LivingHurtEvent event) {
 
     EntityLivingBase entityLiving = event.getEntityLiving();
-    if (entityLiving.worldObj.isRemote || !(entityLiving instanceof EntityPlayer))
+    if (entityLiving.world.isRemote || !(entityLiving instanceof EntityPlayer))
       return;
     timers.put(entityLiving.getName(), ConfigScalingHealth.BONUS_HEALTH_REGEN_INITIAL_DELAY);
   }
