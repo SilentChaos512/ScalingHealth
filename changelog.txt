@@ -1,3 +1,16 @@
+1.0.2
+Added: "Distance and Time" difficulty mode: adds together the "Weighted Average" and "Distance from Spawn" modes. You may need to adjust some other values in the config to make the increases manageable.
+Fixed (1.11 only): Textures not loading.
+
+1.0.1
+Added: Configs for difficulty meter (under the client category)
+Fixed: Difficulty meter displaying at all times... did that for debugging and forgot to remove it.
+
+1.0.0
+Added: A config option to disable blight death messages... What, you don't like seeing "Blight Squid drowned" for the 50th time?
+Changed: Improved heart rendering a bit
+Fixed: A bug where the config file would fail to load if the length of the heart colors list was changed.
+
 0.2.7
 Added: Config option to replace blights being on fire with a particle effect (enabled by default). This is more reliable, as it works on fire-proof mobs. Current effect likely needs work...
 Added: Additional configs for blights (fire resistance, invisibility, supercharged creepers).
