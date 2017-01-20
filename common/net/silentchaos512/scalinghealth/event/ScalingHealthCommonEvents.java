@@ -50,8 +50,10 @@ public class ScalingHealthCommonEvents {
       PlayerData data = SHPlayerDataHandler.get(player);
 
       // Lose health on death?
-      if (ConfigScalingHealth.LOSE_HEALTH_ON_DEATH) {
-        data.setMaxHealth(ConfigScalingHealth.PLAYER_STARTING_HEALTH);
+      if (ConfigScalingHealth.PLAYER_HEALTH_LOST_ON_DEATH > 0) {
+        float newHealth = data.getMaxHealth() - ConfigScalingHealth.PLAYER_HEALTH_LOST_ON_DEATH;
+        float startHealth = ConfigScalingHealth.PLAYER_STARTING_HEALTH;
+        data.setMaxHealth(newHealth < startHealth ? startHealth : newHealth);
       }
 
       // Apply health modifier

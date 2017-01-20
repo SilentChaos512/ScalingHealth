@@ -42,7 +42,7 @@ public class ConfigScalingHealth {
   public static boolean ALLOW_PLAYER_MODIFIED_HEALTH = true;
   public static int PLAYER_STARTING_HEALTH = 20;
   public static int PLAYER_HEALTH_MAX = 0;
-  public static boolean LOSE_HEALTH_ON_DEATH = false;
+  public static int PLAYER_HEALTH_LOST_ON_DEATH = 0;
   // Regen
   public static boolean ENABLE_BONUS_HEALTH_REGEN = true;
   public static int BONUS_HEALTH_REGEN_MIN_FOOD = 10;
@@ -150,9 +150,12 @@ public class ConfigScalingHealth {
       PLAYER_HEALTH_MAX = c.getInt("Max Health", CAT_PLAYER_HEALTH,
           PLAYER_HEALTH_MAX, 0, Integer.MAX_VALUE,
           "The maximum amount of health (in half hearts) the player can reach. Zero means unlimited.");
-      LOSE_HEALTH_ON_DEATH = c.getBoolean("Lose Health On Death", CAT_PLAYER_HEALTH,
-          LOSE_HEALTH_ON_DEATH,
-          "If true, the player's health will be reset to the default starting health on death.");
+//      LOSE_HEALTH_ON_DEATH = c.getBoolean("Lose Health On Death", CAT_PLAYER_HEALTH,
+//          LOSE_HEALTH_ON_DEATH,
+//          "If true, the player's health will be reset to the default starting health on death.");
+      PLAYER_HEALTH_LOST_ON_DEATH = c.getInt("Health Lost on Death", CAT_PLAYER_HEALTH,
+          PLAYER_HEALTH_LOST_ON_DEATH, 0, Integer.MAX_VALUE,
+          "The amount of health (in half hearts) the player will lose each time they die.");
       // Regen
       ENABLE_BONUS_HEALTH_REGEN = c.getBoolean("Enable Bonus Regen", CAT_PLAYER_REGEN,
           ENABLE_BONUS_HEALTH_REGEN,
