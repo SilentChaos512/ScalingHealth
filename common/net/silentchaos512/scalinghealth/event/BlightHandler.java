@@ -2,8 +2,6 @@ package net.silentchaos512.scalinghealth.event;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
-
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
@@ -12,9 +10,8 @@ import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
+import net.silentchaos512.lib.util.ChatHelper;
 import net.silentchaos512.lib.util.LocalizationHelper;
 import net.silentchaos512.lib.util.PlayerHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -98,7 +95,7 @@ public class BlightHandler {
             player.getName());
         ScalingHealth.logHelper.info(message);
         for (EntityPlayer p : player.world.getPlayers(EntityPlayer.class, e -> true))
-          PlayerHelper.addChatMessage(p, message);
+          ChatHelper.sendMessage(p, message);
       }
 
       // Drop hearts!
@@ -119,10 +116,12 @@ public class BlightHandler {
 
         if (message.startsWith("Blight Squid") && message.contains("drowned"))
           message += "... again";
+        if (message.endsWith("suffocated in a wall"))
+          message += " *slow clap*";
 
         ScalingHealth.logHelper.info(message);
         for (EntityPlayer p : blight.world.getPlayers(EntityPlayer.class, e -> true))
-          PlayerHelper.addChatMessage(p, message);
+          ChatHelper.sendMessage(p, message);
       }
     }
   }

@@ -23,6 +23,7 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
+import net.silentchaos512.lib.util.StackHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.network.NetworkHandler;
@@ -307,6 +308,6 @@ public class DifficultyHandler {
         break;
     }
 
-    return item == null ? null : new ItemStack(item);
+    return item == null ? StackHelper.empty() : new ItemStack(item);
   }
 }

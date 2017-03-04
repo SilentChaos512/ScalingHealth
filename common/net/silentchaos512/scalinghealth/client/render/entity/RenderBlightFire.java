@@ -22,7 +22,7 @@ import net.silentchaos512.scalinghealth.entity.EntityBlightFire;
 public class RenderBlightFire extends Render<EntityBlightFire> {
 
   protected final ResourceLocation TEXTURE = new ResourceLocation(ScalingHealth.MOD_ID_LOWER,
-      "textures/entity/BlightFire.png");
+      "textures/entity/blightfire.png");
 
   public RenderBlightFire(RenderManager renderManager) {
 

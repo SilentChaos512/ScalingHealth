@@ -1,3 +1,6 @@
+1.0.3
+Added: A config to specify the amount of health lost when a player dies (defaults to 0). The old "Lose Health on Death" config is no longer used.
+
 1.0.2
 Added: "Distance and Time" difficulty mode: adds together the "Weighted Average" and "Distance from Spawn" modes. You may need to adjust some other values in the config to make the increases manageable.
 Fixed (1.11 only): Textures not loading.

@@ -1,5 +1,5 @@
 {
-  "parent": "ScalingHealth:block/CrystalOre",
+  "parent": "scalinghealth:block/crystalore",
   "display": {
     "thirdperson": {
       "rotation": [ 10, -45, 170 ],
