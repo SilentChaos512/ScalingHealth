@@ -24,7 +24,7 @@ public class ItemHeartContainer extends ItemSL {
   }
 
   @Override
-  public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+  protected ActionResult<ItemStack> clOnItemRightClick(World world, EntityPlayer player, EnumHand hand) {
 
     ItemStack stack = player.getHeldItem(hand);
 
