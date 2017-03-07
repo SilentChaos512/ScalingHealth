@@ -10,6 +10,7 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
 import net.silentchaos512.lib.item.ItemSL;
+import net.silentchaos512.lib.util.StackHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
@@ -37,7 +38,7 @@ public class ItemHeartContainer extends ItemSL {
       }
 
       data.incrementMaxHealth(2);
-      stack.shrink(1);
+      StackHelper.shrink(stack, 1);
       world.playSound(null, player.getPosition(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP,
           SoundCategory.PLAYERS, 1.0f, 0.7f + 0.1f * (float) ScalingHealth.random.nextGaussian());
     }
