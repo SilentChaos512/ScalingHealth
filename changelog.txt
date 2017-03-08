@@ -1,3 +1,13 @@
+1.0.4-44
+Fixed: Heart containers not being consumed when used on 1.10.2.
+
+1.0.4-42
+Fixed: Heart containers not functioning on 1.10.2.
+
+1.0.4-41
+First XCompat build released
+Added: Some special blight death messages for comedic effect.
+
 1.0.3
 Added: A config to specify the amount of health lost when a player dies (defaults to 0). The old "Lose Health on Death" config is no longer used.
 

@@ -7,12 +7,14 @@ import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLMissingMappingsEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.silentchaos512.lib.SilentLib;
+import net.silentchaos512.lib.registry.MC10IdRemapper;
 import net.silentchaos512.lib.registry.SRegistry;
 import net.silentchaos512.lib.util.LocalizationHelper;
 import net.silentchaos512.lib.util.LogHelper;
@@ -39,7 +41,7 @@ public class ScalingHealth {
   public static final String MOD_NAME = "Scaling Health";
   public static final String VERSION = "@VERSION@";
   public static final String DEPENDENCIES = "" //"required-after:forge@[12.18.2.2125,);" // 13.19.1.2188
-      + "required-after:silentlib" + (DEV_ENV ? ";" : "@[2.0.0,);");
+      + "required-after:silentlib" + (DEV_ENV ? ";" : "@[2.0.1,);");
   public static final String ACCEPTED_MC_VERSIONS = "[1.10.2,1.11.2]";
   public static final String RESOURCE_PREFIX = MOD_ID_LOWER + ":";
 
@@ -101,5 +103,13 @@ public class ScalingHealth {
   public void onServerLoad(FMLServerStartingEvent event) {
 
     event.registerServerCommand(new CommandScalingHealth());
+  }
+
+  @EventHandler
+  public void onMissingMapping(FMLMissingMappingsEvent event) {
+
+    for (FMLMissingMappingsEvent.MissingMapping mismap : event.get()) {
+      MC10IdRemapper.remap(mismap);
+    }
   }
 }
