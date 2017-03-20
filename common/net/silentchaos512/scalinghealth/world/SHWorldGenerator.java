@@ -38,9 +38,22 @@ public class SHWorldGenerator implements IWorldGenerator {
     block = ModBlocks.crystalOre;
     state = block.getDefaultState();
 
-    veinCount = (int) ConfigScalingHealth.HEART_CRYSTAL_ORE_VEIN_COUNT;
+    // Vein count. Also consider bonus veins determined by distance from spawn.
+    float trueVeinCount = ConfigScalingHealth.HEART_CRYSTAL_ORE_VEIN_COUNT;
+    int spawnX = world.getSpawnPoint().getX() / 16;
+    int spawnZ = world.getSpawnPoint().getZ() / 16;
+    int chunkX = posX / 16;
+    int chunkZ = posZ / 16;
+    int deltaX = chunkX - spawnX;
+    int deltaZ = chunkZ - spawnZ;
+    float distance = (float) Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
+    trueVeinCount += Math.min(distance * ConfigScalingHealth.HEART_CRYSTAL_ORE_EXTRA_VEIN_RATE,
+        ConfigScalingHealth.HEART_CRYSTAL_ORE_EXTRA_VEIN_CAP);
+
+    veinCount = (int) trueVeinCount;
     if (random.nextFloat() < ConfigScalingHealth.HEART_CRYSTAL_ORE_VEIN_COUNT - veinCount)
       ++veinCount;
+
     veinSize = ConfigScalingHealth.HEART_CRYSTAL_ORE_VEIN_SIZE;
     minHeight = ConfigScalingHealth.HEART_CRYSTAL_ORE_MIN_HEIGHT;
     maxHeight = ConfigScalingHealth.HEART_CRYSTAL_ORE_MAX_HEIGHT;

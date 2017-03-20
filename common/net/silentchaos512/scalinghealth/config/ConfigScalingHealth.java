@@ -101,6 +101,8 @@ public class ConfigScalingHealth {
   public static int HEART_CRYSTAL_ORE_VEIN_SIZE = 6;
   public static int HEART_CRYSTAL_ORE_MIN_HEIGHT = 10;
   public static int HEART_CRYSTAL_ORE_MAX_HEIGHT = 35;
+  public static float HEART_CRYSTAL_ORE_EXTRA_VEIN_CAP = 3f;
+  public static float HEART_CRYSTAL_ORE_EXTRA_VEIN_RATE = HEART_CRYSTAL_ORE_EXTRA_VEIN_CAP / 3125;
 
   static final String split = Configuration.CATEGORY_SPLITTER;
   public static final String CAT_MAIN = "main";
@@ -320,6 +322,12 @@ public class ConfigScalingHealth {
         HEART_CRYSTAL_ORE_MAX_HEIGHT = 35;
         HEART_CRYSTAL_ORE_MIN_HEIGHT = 10;
       }
+      HEART_CRYSTAL_ORE_EXTRA_VEIN_RATE = c.getFloat("Extra Vein Rate", cat,
+          HEART_CRYSTAL_ORE_EXTRA_VEIN_RATE, 0f, 1f,
+          "The number of extra possible veins per chunk away from spawn. The default value will reach the cap at 50,000 blocks from spawn.");
+      HEART_CRYSTAL_ORE_EXTRA_VEIN_CAP = c.getFloat("Extra Vein Cap", cat,
+          HEART_CRYSTAL_ORE_EXTRA_VEIN_CAP, 0f, 1000f,
+          "The maximum number of extra veins created by distance from spawn.");
 
       //@formatter:on
     } catch (Exception ex) {
