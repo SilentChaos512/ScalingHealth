@@ -95,7 +95,7 @@ public class DifficultyHandler {
     if (difficulty > 0) {
       float diffIncrease = difficulty * rand.nextFloat();
       difficulty -= diffIncrease;
-      genAddedDamage = diffIncrease / 10f;
+      genAddedDamage = diffIncrease * ConfigScalingHealth.DIFFICULTY_DAMAGE_MULTIPLIER;
     }
 
     if (difficulty > 0) {

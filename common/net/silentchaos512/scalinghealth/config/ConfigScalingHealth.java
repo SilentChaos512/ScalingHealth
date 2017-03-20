@@ -52,6 +52,8 @@ public class ConfigScalingHealth {
   public static int BONUS_HEALTH_REGEN_INITIAL_DELAY = 400;
   public static int BONUS_HEALTH_REGEN_DELAY = 100;
 
+  // Mobs
+  public static float DIFFICULTY_DAMAGE_MULTIPLIER = 0.15f;
   // Mob Health
   public static boolean ALLOW_PEACEFUL_EXTRA_HEALTH = true;
   public static boolean ALLOW_HOSTILE_EXTRA_HEALTH = true;
@@ -185,6 +187,9 @@ public class ConfigScalingHealth {
           "The number of ticks between each bonus regen tick (a half heart being healed).");
 
       // Mobs
+      DIFFICULTY_DAMAGE_MULTIPLIER = c.getFloat("Damage Modifier", CAT_MOB,
+          DIFFICULTY_DAMAGE_MULTIPLIER, 0f, Float.MAX_VALUE,
+          "A multiplier for extra attack strength all mobs will receive. Set to 0 to disable extra attack strength.");
       // Health
       ALLOW_PEACEFUL_EXTRA_HEALTH = c.getBoolean("Allow Peaceful Extra Health", CAT_MOB_HEALTH,
           ALLOW_PEACEFUL_EXTRA_HEALTH,
