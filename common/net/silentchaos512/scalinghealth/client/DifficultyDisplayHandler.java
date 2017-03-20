@@ -77,8 +77,12 @@ public class DifficultyDisplayHandler extends Gui {
       GlStateManager.pushMatrix();
       // GlStateManager.scale(1f, 0.5f, 1f);
 
-      int posX = 5; // width / 2 - 32;
-      int posY = height - 30; // height - GuiIngameForge.left_height - 14;
+      int posX = ConfigScalingHealth.DIFFICULTY_METER_POS_X; //5;
+      if (posX < 0)
+        posX = posX + width - 64;
+      int posY = ConfigScalingHealth.DIFFICULTY_METER_POS_Y; //height - 30;
+      if (posY < 0)
+        posY = posY + height - 12;
 
       // Frame
       drawTexturedModalRect(posX, posY, 192, 0, 64, 12, 0xFFFFFF);

@@ -1,3 +1,9 @@
+1.0.5
+Added: Config option for damage scaling on mobs (#20)
+Added: Config options for position of difficulty meter. Negative numbers will place it some distance from the right/bottom edge of the screen. (#19)
+Added: Config options to add extra heart crystal ore veins based on distance from spawn (#16)
+Added: Keybindings to show/hide difficulty meter (#15)
+
 1.0.4-44
 Fixed: Heart containers not being consumed when used on 1.10.2.
 

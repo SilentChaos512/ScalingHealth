@@ -23,6 +23,8 @@ public class ConfigScalingHealth {
   public static boolean RENDER_DIFFICULTY_METER = true;
   public static boolean RENDER_DIFFICULTY_METER_ALWAYS = false;
   public static int DIFFICULTY_METER_DISPLAY_TIME = 160;
+  public static int DIFFICULTY_METER_POS_X = 5;
+  public static int DIFFICULTY_METER_POS_Y = -30;
   public static int[] HEART_COLORS = {//
       0xBF0000, // 0 red
       0xE66000, // 25 orange-red
@@ -53,7 +55,7 @@ public class ConfigScalingHealth {
   public static int BONUS_HEALTH_REGEN_DELAY = 100;
 
   // Mobs
-  public static float DIFFICULTY_DAMAGE_MULTIPLIER = 0.15f;
+  public static float DIFFICULTY_DAMAGE_MULTIPLIER = 0.1f;
   // Mob Health
   public static boolean ALLOW_PEACEFUL_EXTRA_HEALTH = true;
   public static boolean ALLOW_HOSTILE_EXTRA_HEALTH = true;
@@ -146,6 +148,12 @@ public class ConfigScalingHealth {
       DIFFICULTY_METER_DISPLAY_TIME = c.getInt("Difficulty Meter Display Time", CAT_CLIENT,
           DIFFICULTY_METER_DISPLAY_TIME, 0, Integer.MAX_VALUE,
           "The time (in ticks) to show the difficulty meter whenever it pops up.");
+      DIFFICULTY_METER_POS_X = c.getInt("Position X", CAT_CLIENT,
+          DIFFICULTY_METER_POS_X, Integer.MIN_VALUE, Integer.MAX_VALUE,
+          "Sets position of the difficulty meter. Negative numbers anchor it to the right side of the screen.");
+      DIFFICULTY_METER_POS_Y = c.getInt("Position Y", CAT_CLIENT,
+          DIFFICULTY_METER_POS_Y, Integer.MIN_VALUE, Integer.MAX_VALUE,
+          "Sets position of the difficulty meter. Negative numbers anchor it to the bottom of the screen.");
       CHANGE_HEART_RENDERING = c.getBoolean("Custom Heart Rendering", CAT_CLIENT,
           CHANGE_HEART_RENDERING,
           "Replace vanilla heart rendering.");
