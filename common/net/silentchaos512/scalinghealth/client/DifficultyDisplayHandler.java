@@ -17,6 +17,8 @@ import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
 public class DifficultyDisplayHandler extends Gui {
 
+  public static final DifficultyDisplayHandler INSTANCE = new DifficultyDisplayHandler();
+
   public static final ResourceLocation TEXTURE = new ResourceLocation(ScalingHealth.MOD_ID_LOWER,
       "textures/gui/hud.png");
 
@@ -24,6 +26,12 @@ public class DifficultyDisplayHandler extends Gui {
   int lastAreaDifficultyDisplayed = -100;
   int lastUpdateTime = Integer.MIN_VALUE;
   int currentTime = 0;
+
+  public void showBar() {
+
+    this.lastUpdateTime = Integer.MIN_VALUE;
+    this.lastDifficultyDisplayed = -100;
+  }
 
   @SubscribeEvent
   public void onRenderOverlay(RenderGameOverlayEvent.Pre event) {
