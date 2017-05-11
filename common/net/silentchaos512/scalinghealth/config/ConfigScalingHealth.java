@@ -91,6 +91,7 @@ public class ConfigScalingHealth {
   public static float DIFFICULTY_PER_SECOND = DIFFICULTY_MAX / (HOURS_TO_MAX_DIFFICULTY * 3600);
   public static float DIFFICULTY_PER_BLOCK = DIFFICULTY_MAX / 100000;
   public static float DIFFICULTY_IDLE_MULTI = 0.7f;
+  public static int DIFFICULTY_LOST_ON_DEATH = 0;
   public static float DIFFICULTY_GROUP_AREA_BONUS = 0.05f;
   public static int DIFFICULTY_SEARCH_RADIUS = 160;
   public static EnumAreaDifficultyMode AREA_DIFFICULTY_MODE = EnumAreaDifficultyMode.WEIGHTED_AVERAGE;
@@ -296,6 +297,9 @@ public class ConfigScalingHealth {
       DIFFICULTY_IDLE_MULTI = c.getFloat("Idle Multiplier", CAT_DIFFICULTY,
           DIFFICULTY_IDLE_MULTI, 0f, Float.MAX_VALUE,
           "Difficulty added per second is multiplied by this if the player is not moving.");
+      DIFFICULTY_LOST_ON_DEATH = c.getInt("Lost On Death", CAT_DIFFICULTY,
+          DIFFICULTY_LOST_ON_DEATH, -1000, 1000,
+          "The difficulty a player loses on death. Entering a negative number will cause the player to GAIN difficulty instead!");
       DIFFICULTY_GROUP_AREA_BONUS = c.getFloat("Group Area Bonus", CAT_DIFFICULTY,
           DIFFICULTY_GROUP_AREA_BONUS, 0f, Float.MAX_VALUE,
           "Adds this much extra difficulty per additional player in the area. So, area difficulty will"

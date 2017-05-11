@@ -57,6 +57,13 @@ public class ScalingHealthCommonEvents {
         data.setMaxHealth(newHealth < startHealth ? startHealth : newHealth);
       }
 
+      // Lose difficulty on death?
+      double currentDifficulty = data.getDifficulty();
+      double newDifficulty = MathHelper.clamp(
+          currentDifficulty - ConfigScalingHealth.DIFFICULTY_LOST_ON_DEATH, 0,
+          ConfigScalingHealth.DIFFICULTY_MAX);
+      data.setDifficulty(newDifficulty);
+
       // Apply health modifier
       float health = player.getHealth();
       float maxHealth = data.getMaxHealth();
