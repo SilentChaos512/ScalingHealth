@@ -3,6 +3,7 @@ package net.silentchaos512.scalinghealth.event;
 import java.util.Random;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
@@ -26,7 +27,11 @@ public class ScalingHealthCommonEvents {
     if (!entityLiving.world.isRemote) {
       Random rand = ScalingHealth.random;
       int stackSize = 0;
-      if (event.isRecentlyHit() && rand.nextFloat() <= ConfigScalingHealth.HEART_DROP_CHANCE) {
+
+      float dropRate = entityLiving instanceof IMob ? ConfigScalingHealth.HEART_DROP_CHANCE_HOSTILE
+          : ConfigScalingHealth.HEART_DROP_CHANCE_PASSIVE;
+
+      if (event.isRecentlyHit() && rand.nextFloat() <= dropRate) {
         stackSize += 1;
       }
 

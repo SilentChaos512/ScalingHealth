@@ -78,7 +78,8 @@ public class ConfigScalingHealth {
   private static String[] BLIGHT_BLACKLIST_DEFAULTS = new String[] { "WitherBoss", "Villager" };
 
   // Items
-  public static float HEART_DROP_CHANCE = 0.01F;
+  public static float HEART_DROP_CHANCE_HOSTILE = 0.01F;
+  public static float HEART_DROP_CHANCE_PASSIVE = 0.001f;
   public static int HEARTS_DROPPED_BY_BOSS_MIN = 3;
   public static int HEARTS_DROPPED_BY_BOSS_MAX = 6;
   public static int HEARTS_DROPPED_BY_BLIGHT_MIN = 0;
@@ -257,9 +258,12 @@ public class ConfigScalingHealth {
           + " also a blacklist for extra health."));
 
       // Items
-      HEART_DROP_CHANCE = c.getFloat("Heart Drop Chance", CAT_ITEMS,
-          HEART_DROP_CHANCE, 0f, 1f,
-          "The chance of any mob dropping a heart canister when killed.");
+      HEART_DROP_CHANCE_HOSTILE = c.getFloat("Heart Drop Chance", CAT_ITEMS,
+          HEART_DROP_CHANCE_HOSTILE, 0f, 1f,
+          "The chance of a hostile mob dropping a heart canister when killed.");
+      HEART_DROP_CHANCE_PASSIVE = c.getFloat("Heart Drop Chance (Passive)", CAT_ITEMS,
+          HEART_DROP_CHANCE_PASSIVE, 0f, 1f,
+          "The chance of a passive mob (animals) dropping a heart canister when killed.");
 
       HEARTS_DROPPED_BY_BOSS_MIN = c.getInt("Hearts Dropped by Boss Min", CAT_ITEMS,
           HEARTS_DROPPED_BY_BOSS_MIN, 0, 64,
