@@ -1,3 +1,6 @@
+1.0.7
+Changed: Many difficulty configs can now be set to negative values, allowing far greater control over the difficulty system!
+
 1.0.6
 Added: Config to lose difficulty on death. Set to a negative number if you want to GAIN difficulty on death. Defaults to 0.
 Added: Separate config for hearts dropped by passive mobs (defaults to 0.1%, hostile rate is 1%).

@@ -93,7 +93,7 @@ public class ConfigScalingHealth {
   public static float DIFFICULTY_PER_BLOCK = DIFFICULTY_MAX / 100000;
   public static float DIFFICULTY_PER_KILL = 0;
   public static float DIFFICULTY_IDLE_MULTI = 0.7f;
-  public static int DIFFICULTY_LOST_ON_DEATH = 0;
+  public static float DIFFICULTY_LOST_ON_DEATH = 0f;
   public static float DIFFICULTY_GROUP_AREA_BONUS = 0.05f;
   public static int DIFFICULTY_SEARCH_RADIUS = 160;
   public static EnumAreaDifficultyMode AREA_DIFFICULTY_MODE = EnumAreaDifficultyMode.WEIGHTED_AVERAGE;
@@ -287,29 +287,32 @@ public class ConfigScalingHealth {
       // Difficulty
       DIFFICULTY_MAX = c.getFloat("Max Value", CAT_DIFFICULTY,
           DIFFICULTY_MAX, 0f, Float.MAX_VALUE,
-          "The maximum difficult level that can be reached.");
+          "The maximum difficult level that can be reached. Note that values beyond 250 are not"
+          + " tested, and extremely high values may produce strange results.");
       DIFFICULTY_DEFAULT = c.getFloat("Starting Value", CAT_DIFFICULTY,
           DIFFICULTY_DEFAULT, 0f, Float.MAX_VALUE,
           "The starting difficulty level for new worlds.");
       DIFFICULTY_PER_SECOND = c.getFloat("Increase Per Second", CAT_DIFFICULTY,
-          DIFFICULTY_PER_SECOND, 0f, Float.MAX_VALUE,
+          DIFFICULTY_PER_SECOND, -1000f, 1000f,
           "The amount of difficulty added each second. In Difficult Life, the option was named per tick, "
-          + "but was actually applied each second.");
+          + "but was actually applied each second. Negative numbers will decrease difficulty over time.");
       DIFFICULTY_PER_BLOCK = c.getFloat("Difficulty Per Block", CAT_DIFFICULTY,
-          DIFFICULTY_PER_BLOCK, 0, Float.MAX_VALUE,
+          DIFFICULTY_PER_BLOCK, -1000f, 1000f,
           "The amount of difficulty added per unit distance from the origin/spanw, assuming \"Area Mode\" "
-          + "is set to a distance-based option.");
+          + "is set to a distance-based option. Negative numbers will decrease difficulty over distance.");
       DIFFICULTY_PER_KILL = c.getFloat("Difficulty Per Kill", CAT_DIFFICULTY,
-          DIFFICULTY_PER_KILL, 0, 1000,
-          "The difficulty gained for each hostile mob killed. Set to 0 to disable.");
+          DIFFICULTY_PER_KILL, -1000f, 1000f,
+          "The difficulty gained for each hostile mob killed. Set to 0 to disable. Negative numbers"
+          + " cause difficulty to decrease with each kill.");
       DIFFICULTY_IDLE_MULTI = c.getFloat("Idle Multiplier", CAT_DIFFICULTY,
-          DIFFICULTY_IDLE_MULTI, 0f, Float.MAX_VALUE,
+          DIFFICULTY_IDLE_MULTI, 0f, 100f,
           "Difficulty added per second is multiplied by this if the player is not moving.");
-      DIFFICULTY_LOST_ON_DEATH = c.getInt("Lost On Death", CAT_DIFFICULTY,
-          DIFFICULTY_LOST_ON_DEATH, -1000, 1000,
-          "The difficulty a player loses on death. Entering a negative number will cause the player to GAIN difficulty instead!");
+      DIFFICULTY_LOST_ON_DEATH = c.getFloat("Lost On Death", CAT_DIFFICULTY,
+          DIFFICULTY_LOST_ON_DEATH, -1000f, 1000f,
+          "The difficulty a player loses on death. Entering a negative number will cause the player"
+          + " to gain difficulty instead!");
       DIFFICULTY_GROUP_AREA_BONUS = c.getFloat("Group Area Bonus", CAT_DIFFICULTY,
-          DIFFICULTY_GROUP_AREA_BONUS, 0f, Float.MAX_VALUE,
+          DIFFICULTY_GROUP_AREA_BONUS, -10f, 10f,
           "Adds this much extra difficulty per additional player in the area. So, area difficulty will"
           + " be multiplied by: 1 + group_bonus * (players_in_area - 1)");
       DIFFICULTY_SEARCH_RADIUS = c.getInt("Search Radius", CAT_DIFFICULTY,
