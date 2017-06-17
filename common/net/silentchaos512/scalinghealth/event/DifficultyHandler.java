@@ -20,6 +20,8 @@ import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.DamageSource;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
@@ -29,6 +31,8 @@ import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.network.NetworkHandler;
 import net.silentchaos512.scalinghealth.network.message.MessageMarkBlight;
 import net.silentchaos512.scalinghealth.utils.ModifierHandler;
+import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
+import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
 public class DifficultyHandler {
 
@@ -54,6 +58,21 @@ public class DifficultyHandler {
     boolean makeBlight = increaseEntityHealth(entityLiving);
     if (makeBlight)
       makeEntityBlight(entityLiving, ScalingHealth.random);
+  }
+
+  @SubscribeEvent
+  public void onMobDeath(LivingDeathEvent event) {
+
+    EntityLivingBase entity = event.getEntityLiving();
+    DamageSource source = event.getSource();
+
+    if (source.getSourceOfDamage() instanceof EntityPlayer) {
+      if (entity instanceof IMob) {
+        EntityPlayer player = (EntityPlayer) source.getSourceOfDamage();
+        PlayerData data = SHPlayerDataHandler.get(player);
+        data.incrementDifficulty(ConfigScalingHealth.DIFFICULTY_PER_KILL);
+      }
+    }
   }
 
   private boolean increaseEntityHealth(EntityLivingBase entityLiving) {

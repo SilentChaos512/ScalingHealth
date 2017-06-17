@@ -91,6 +91,7 @@ public class ConfigScalingHealth {
   public static int HOURS_TO_MAX_DIFFICULTY = 60; // Not actually loaded, just to make calc below clear.
   public static float DIFFICULTY_PER_SECOND = DIFFICULTY_MAX / (HOURS_TO_MAX_DIFFICULTY * 3600);
   public static float DIFFICULTY_PER_BLOCK = DIFFICULTY_MAX / 100000;
+  public static float DIFFICULTY_PER_KILL = 0;
   public static float DIFFICULTY_IDLE_MULTI = 0.7f;
   public static int DIFFICULTY_LOST_ON_DEATH = 0;
   public static float DIFFICULTY_GROUP_AREA_BONUS = 0.05f;
@@ -298,6 +299,9 @@ public class ConfigScalingHealth {
           DIFFICULTY_PER_BLOCK, 0, Float.MAX_VALUE,
           "The amount of difficulty added per unit distance from the origin/spanw, assuming \"Area Mode\" "
           + "is set to a distance-based option.");
+      DIFFICULTY_PER_KILL = c.getFloat("Difficulty Per Kill", CAT_DIFFICULTY,
+          DIFFICULTY_PER_KILL, 0, 1000,
+          "The difficulty gained for each hostile mob killed. Set to 0 to disable.");
       DIFFICULTY_IDLE_MULTI = c.getFloat("Idle Multiplier", CAT_DIFFICULTY,
           DIFFICULTY_IDLE_MULTI, 0f, Float.MAX_VALUE,
           "Difficulty added per second is multiplied by this if the player is not moving.");
