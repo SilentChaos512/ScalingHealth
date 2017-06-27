@@ -7,9 +7,11 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IBlockAccess;
 import net.silentchaos512.lib.block.BlockSL;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.init.ModItems;
 
 public class BlockCrystalOre extends BlockSL {
@@ -46,14 +48,22 @@ public class BlockCrystalOre extends BlockSL {
   @Override
   public int quantityDroppedWithBonus(int fortune, Random rand) {
 
+    float ret;
     if (fortune > 0) {
-      int j = rand.nextInt(fortune) - 1;
-      if (j < 0)
-        j = 0;
-      return quantityDropped(rand) * (j + 1);
+      float f = (fortune - 1) * rand.nextFloat() - 1f;
+      if (f < 0f)
+        f = 0f;
+      ret = quantityDropped(rand) * (f + 1);
     } else {
-      return quantityDropped(rand);
+      ret = quantityDropped(rand);
     }
+    return MathHelper.clamp((int) ret, 1, 64);
+  }
+
+  @Override
+  public int quantityDropped(Random random) {
+
+    return ConfigScalingHealth.HEART_CRYSTAL_ORE_QUANTITY_DROPPED;
   }
 
   @Override

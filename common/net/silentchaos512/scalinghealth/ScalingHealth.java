@@ -35,12 +35,13 @@ import net.silentchaos512.scalinghealth.world.SHWorldGenerator;
 //@formatter:on
 public class ScalingHealth {
 
-  public static final boolean DEV_ENV = true;
   public static final String MOD_ID_OLD = "ScalingHealth";
   public static final String MOD_ID_LOWER = "scalinghealth";
   public static final String MOD_NAME = "Scaling Health";
   public static final String VERSION = "@VERSION@";
-  public static final String DEPENDENCIES = "required-after:silentlib" + (DEV_ENV ? ";" : "@[2.0.5,);");
+  public static final String VERSION_SILENTLIB = "SL_VERSION";
+  public static final int BUILD_NUM = 0;
+  public static final String DEPENDENCIES = "required-after:silentlib@[" + VERSION_SILENTLIB + ",);";
   public static final String ACCEPTED_MC_VERSIONS = "[1.10.2,1.11.2]";
   public static final String RESOURCE_PREFIX = MOD_ID_LOWER + ":";
 
@@ -51,15 +52,6 @@ public class ScalingHealth {
   public static LocalizationHelper localizationHelper;
 
   public static SRegistry registry = new SRegistry(MOD_ID_LOWER, logHelper);
-
-//  public static CreativeTabs creativeTab = new CreativeTabs("tab" + MOD_ID) {
-//
-//    @Override
-//    public Item getTabIconItem() {
-//
-//      return Items.ACACIA_BOAT;
-//    }
-//  };
 
   @Instance(MOD_ID_LOWER)
   public static ScalingHealth instance;
@@ -73,8 +65,8 @@ public class ScalingHealth {
     localizationHelper = new LocalizationHelper(MOD_ID_LOWER).setReplaceAmpersand(true);
     SilentLib.instance.registerLocalizationHelperForMod(MOD_ID_LOWER, localizationHelper);
 
-    ConfigScalingHealth.init(event.getSuggestedConfigurationFile());
-    ConfigScalingHealth.save();
+    ConfigScalingHealth.INSTANCE.init(event.getSuggestedConfigurationFile());
+    ConfigScalingHealth.INSTANCE.save();
 
     ModBlocks.init(registry);
     ModItems.init(registry);

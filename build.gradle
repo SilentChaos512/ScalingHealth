@@ -16,24 +16,38 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 //    id "net.minecraftforge.gradle.forge" version "2.0.2"
 //}
 
-version = "1.0.6"
+version = "1.0.8"
+def silentlib_version = "2.1.4"
+def buildNum = 0;
 group = "net.silentchaos512.scalinghealth"
-archivesBaseName = "ScalingHealth-1.11.x"
+archivesBaseName = "ScalingHealth-1.11.2"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 minecraft {
-    version = "1.11-13.19.1.2189"
+    version = "1.11.2-13.20.0.2282"
     runDir = "eclipse"
 
     coreMod = "net.silentchaos512.scalinghealth.asm.SHLoadingPlugin"
+    
+    def versionFile = file('version.properties')
+    if (versionFile.canRead()) {
+        def Properties versionProps = new Properties()
+        
+        versionProps.load(new FileInputStream(versionFile))
+        
+        buildNum = versionProps['BUILD_NUM'].toInteger() + 1
+        
+        versionProps['BUILD_NUM'] = buildNum.toString()
+        versionProps.store(versionFile.newWriter(), null)
+    }
 
     replace "@VERSION@", project.version
-    replace "DEV_ENV = true", "DEV_ENV = false"
-    replaceIn "ScalingHealth.java"
+    replace "SL_VERSION", silentlib_version
+    replace "BUILD_NUM = 0", "BUILD_NUM = " + buildNum
 
-    mappings = "snapshot_20161122"
+    mappings = "snapshot_20161220"
     useDepAts = true
 }
 
@@ -46,14 +60,19 @@ repositories {
 }
 
 jar {
+    classifier = buildNum
     manifest {
         attributes("FMLCorePluginContainsFMLMod": "true", "FMLCorePlugin": "net.silentchaos512.scalinghealth.asm.SHLoadingPlugin")
     }
 }
 
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = buildNum + '-sources'
+    from sourceSets.main.allSource
+}
+
 dependencies {
-    deobfCompile "mezz.jei:jei_1.9.4:3.6.7.216"
-    //deobfCompile "info.amerifrance.guideapi:Guide-API:1.9.4-2.0.0-37"
+    //deobfCompile "mezz.jei:jei_1.9.4:3.6.7.216"
 }
 
 sourceSets {
