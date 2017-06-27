@@ -2,19 +2,19 @@ package net.silentchaos512.scalinghealth;
 
 import java.util.Random;
 
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLMissingMappingsEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.silentchaos512.lib.SilentLib;
-import net.silentchaos512.lib.registry.MC10IdRemapper;
 import net.silentchaos512.lib.registry.SRegistry;
 import net.silentchaos512.lib.util.LocalizationHelper;
 import net.silentchaos512.lib.util.LogHelper;
@@ -35,13 +35,14 @@ import net.silentchaos512.scalinghealth.world.SHWorldGenerator;
 //@formatter:on
 public class ScalingHealth {
 
-  public static final boolean DEV_ENV = true;
   public static final String MOD_ID_OLD = "ScalingHealth";
   public static final String MOD_ID_LOWER = "scalinghealth";
   public static final String MOD_NAME = "Scaling Health";
   public static final String VERSION = "@VERSION@";
-  public static final String DEPENDENCIES = "required-after:silentlib" + (DEV_ENV ? ";" : "@[2.0.5,);");
-  public static final String ACCEPTED_MC_VERSIONS = "[1.10.2,1.11.2]";
+  public static final String VERSION_SILENTLIB = "SL_VERSION";
+  public static final int BUILD_NUM = 0;
+  public static final String DEPENDENCIES = "required-after:silentlib@[" + VERSION_SILENTLIB + ",);";
+  public static final String ACCEPTED_MC_VERSIONS = "[1.10.2,1.12]";
   public static final String RESOURCE_PREFIX = MOD_ID_LOWER + ":";
 
   public static SimpleNetworkWrapper networkManager;
@@ -51,15 +52,6 @@ public class ScalingHealth {
   public static LocalizationHelper localizationHelper;
 
   public static SRegistry registry = new SRegistry(MOD_ID_LOWER, logHelper);
-
-//  public static CreativeTabs creativeTab = new CreativeTabs("tab" + MOD_ID) {
-//
-//    @Override
-//    public Item getTabIconItem() {
-//
-//      return Items.ACACIA_BOAT;
-//    }
-//  };
 
   @Instance(MOD_ID_LOWER)
   public static ScalingHealth instance;
@@ -73,15 +65,15 @@ public class ScalingHealth {
     localizationHelper = new LocalizationHelper(MOD_ID_LOWER).setReplaceAmpersand(true);
     SilentLib.instance.registerLocalizationHelperForMod(MOD_ID_LOWER, localizationHelper);
 
-    ConfigScalingHealth.init(event.getSuggestedConfigurationFile());
-    ConfigScalingHealth.save();
+    ConfigScalingHealth.INSTANCE.init(event.getSuggestedConfigurationFile());
+    ConfigScalingHealth.INSTANCE.save();
 
-    ModBlocks.init(registry);
-    ModItems.init(registry);
+    registry.addRegistrationHandler(new ModBlocks(), Block.class);
+    registry.addRegistrationHandler(new ModItems(), Item.class);
 
     // TODO: Achievements?
 
-    GameRegistry.registerWorldGenerator(new SHWorldGenerator(), 0);
+    GameRegistry.registerWorldGenerator(new SHWorldGenerator(true), 0);
 
     proxy.preInit(registry);
   }
@@ -104,11 +96,11 @@ public class ScalingHealth {
     event.registerServerCommand(new CommandScalingHealth());
   }
 
-  @EventHandler
-  public void onMissingMapping(FMLMissingMappingsEvent event) {
-
-    for (FMLMissingMappingsEvent.MissingMapping mismap : event.get()) {
-      MC10IdRemapper.remap(mismap);
-    }
-  }
+//  @EventHandler
+//  public void onMissingMapping(MissingMappings event) {
+//
+//    for (MissingMappings. mismap : event.get()) {
+//      MC10IdRemapper.remap(mismap);
+//    }
+//  }
 }

@@ -6,28 +6,21 @@ import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.IChunkGenerator;
-import net.minecraft.world.chunk.IChunkProvider;
 import net.minecraft.world.gen.feature.WorldGenMinable;
-import net.minecraftforge.fml.common.IWorldGenerator;
+import net.silentchaos512.lib.world.WorldGeneratorSL;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.init.ModBlocks;
 
-public class SHWorldGenerator implements IWorldGenerator {
+public class SHWorldGenerator extends WorldGeneratorSL {
 
-  @Override
-  public void generate(Random random, int chunkX, int chunkZ, World world,
-      IChunkGenerator chunkGenerator, IChunkProvider chunkProvider) {
+  public SHWorldGenerator(boolean allowRetrogren) {
 
-    switch (world.provider.getDimension()) {
-      case -1: break;
-      case  1: break;
-      default: generateSurface(world, random, chunkX * 16, chunkZ * 16);
-    }
+    super(allowRetrogren, ScalingHealth.MOD_ID_LOWER + "_retrogen");
   }
 
-  private void generateSurface(World world, Random random, int posX, int posZ) {
+  @Override
+  public void generateSurface(World world, Random random, int posX, int posZ) {
 
     int i, x, y, z, meta, veinCount, veinSize, minHeight, maxHeight;
     BlockPos pos;
@@ -65,5 +58,15 @@ public class SHWorldGenerator implements IWorldGenerator {
       pos = new BlockPos(x, y, z);
       new WorldGenMinable(state, veinSize).generate(world, random, pos);
     }
+  }
+
+  @Override
+  protected void generateNether(World world, Random random, int posX, int posZ) {
+
+  }
+
+  @Override
+  protected void generateEnd(World world, Random random, int posX, int posZ) {
+
   }
 }

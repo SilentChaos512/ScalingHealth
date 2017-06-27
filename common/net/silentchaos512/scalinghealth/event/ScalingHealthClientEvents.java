@@ -33,7 +33,7 @@ public class ScalingHealthClientEvents {
     int width = res.getScaledWidth();
     int height = res.getScaledHeight();
 
-    FontRenderer fontRender = Minecraft.getMinecraft().fontRendererObj;
+    FontRenderer fontRender = Minecraft.getMinecraft().fontRenderer;
 
     GL11.glPushMatrix();
     float scale = 0.6f;

@@ -31,7 +31,7 @@ public class KeyTrackerSH extends KeyTrackerSL {
     if (keyShowDifficultyBarAlways.isPressed()) {
       // Toggle the "Render Difficulty Meter Always" config option.
       ConfigScalingHealth.RENDER_DIFFICULTY_METER_ALWAYS = !ConfigScalingHealth.RENDER_DIFFICULTY_METER_ALWAYS;
-      ConfigScalingHealth.save();
+      ConfigScalingHealth.INSTANCE.save();
     } else if (keyShowDifficultyBar.isPressed()) {
       // Briefly show the difficulty meter.
       DifficultyDisplayHandler.INSTANCE.showBar();

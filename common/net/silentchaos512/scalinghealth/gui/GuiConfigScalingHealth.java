@@ -12,8 +12,8 @@ public class GuiConfigScalingHealth extends GuiConfig {
 
   public GuiConfigScalingHealth(GuiScreen parent) {
 
-    super(parent, ConfigScalingHealth.getConfigElements(), ScalingHealth.MOD_ID_LOWER, false, false,
-        "Scaling Health Config");
+    super(parent, ConfigScalingHealth.INSTANCE.getConfigElements(), ScalingHealth.MOD_ID_LOWER,
+        false, false, "Scaling Health Config");
   }
 
   @Override

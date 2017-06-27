@@ -1,15 +1,11 @@
 package net.silentchaos512.scalinghealth.client.render.entity;
 
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.culling.ICamera;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
@@ -42,7 +38,7 @@ public class RenderBlightFire extends Render<EntityBlightFire> {
     if (parent == null)
       return false;
 
-    AxisAlignedBB axisalignedbb = parent.getRenderBoundingBox().expandXyz(0.5D);
+    AxisAlignedBB axisalignedbb = parent.getRenderBoundingBox().grow(0.5D);
 
     if (axisalignedbb.hasNaN() || axisalignedbb.getAverageEdgeLength() == 0.0D) {
       axisalignedbb = new AxisAlignedBB(parent.posX - 2.0D, parent.posY - 2.0D, parent.posZ - 2.0D,
@@ -67,7 +63,7 @@ public class RenderBlightFire extends Render<EntityBlightFire> {
     float f = parent.width * 1.6F;
     GlStateManager.scale(f, f, f);
     Tessellator tessellator = Tessellator.getInstance();
-    VertexBuffer vertexbuffer = tessellator.getBuffer();
+    BufferBuilder vertexbuffer = tessellator.getBuffer();
 
     float f1 = 0.5F;
     float f2 = 0.0F;

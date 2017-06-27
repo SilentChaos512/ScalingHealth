@@ -99,8 +99,8 @@ public class ScalingHealthCommonEvents {
   public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
 
     if (event.getModID().equals(ScalingHealth.MOD_ID_LOWER)) {
-      ConfigScalingHealth.load();
-      ConfigScalingHealth.save();
+      ConfigScalingHealth.INSTANCE.load();
+      ConfigScalingHealth.INSTANCE.save();
     }
   }
 }

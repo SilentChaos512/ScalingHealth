@@ -2,7 +2,9 @@ package net.silentchaos512.scalinghealth.event;
 
 import java.util.List;
 
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -13,7 +15,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.silentchaos512.lib.util.ChatHelper;
 import net.silentchaos512.lib.util.LocalizationHelper;
-import net.silentchaos512.lib.util.PlayerHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.entity.EntityBlightFire;
@@ -84,10 +85,12 @@ public class BlightHandler {
 
     LocalizationHelper loc = ScalingHealth.localizationHelper;
 
-    if (event.getSource().getEntity() instanceof EntityPlayer) {
-      // Killed by a player.
+    Entity entitySource = event.getSource().getTrueSource();
+    boolean isTamedAnimal = entitySource instanceof EntityTameable && ((EntityTameable) entitySource).isTamed();
+    if (entitySource instanceof EntityPlayer || isTamedAnimal) {
+      // Killed by a player or a player's pet.
       EntityLivingBase blight = event.getEntityLiving();
-      EntityPlayer player = (EntityPlayer) event.getSource().getEntity();
+      EntityPlayer player = (EntityPlayer) event.getSource().getTrueSource();
 
       // Tell all players that the blight was killed.
       if (ConfigScalingHealth.BLIGHT_NOTIFY_PLAYERS_ON_DEATH) {
@@ -114,10 +117,15 @@ public class BlightHandler {
         String blightName = loc.getLocalizedString("blight", "name", blight.getName());
         message = message.replaceFirst(blight.getName(), blightName);
 
-        if (message.startsWith("Blight Squid") && message.contains("drowned"))
-          message += "... again";
-        if (message.endsWith("suffocated in a wall"))
+        if (message.contains("drowned")) {
+          if (message.startsWith("Blight Squid"))
+            message += "... again";
+          else
+            message += "... gg";
+        }
+        else if (message.endsWith("suffocated in a wall")) {
           message += " *slow clap*";
+        }
 
         ScalingHealth.logHelper.info(message);
         for (EntityPlayer p : blight.world.getPlayers(EntityPlayer.class, e -> true))

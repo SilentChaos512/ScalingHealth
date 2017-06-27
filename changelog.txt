@@ -1,5 +1,19 @@
+1.0.10
+Updated for Silent Lib 2.2.3 and Forge 2373
+Fixed: Blights not dropping hearts when killed by pets.
+
+1.0.9
+Changed: Heart container texture, courtesy of spawnus_
+
+1.0.8
+Forge 2340
+Removed: A debug line I accidentally left in.
+Fixed: Heart crystal ore not being in any creative tab.
+
 1.0.7
+Added: A config to control how many heart crystal shards drop from each ore. Note that fortune can double the base amount.
 Changed: Many difficulty configs can now be set to negative values, allowing far greater control over the difficulty system!
+Behind the scenes: Updated the config class to the Silent Lib "AdaptiveConfig". Currently this is not being used for anything, but your config file will now track the last build you used.
 
 1.0.6
 Added: Config to lose difficulty on death. Set to a negative number if you want to GAIN difficulty on death. Defaults to 0.

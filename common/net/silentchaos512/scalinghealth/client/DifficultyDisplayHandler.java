@@ -99,7 +99,7 @@ public class DifficultyDisplayHandler extends Gui {
       float textScale = 0.6f;
       GlStateManager.pushMatrix();
       GlStateManager.scale(textScale, textScale, 1.0f);
-      mc.fontRendererObj.drawStringWithShadow("DIFFICULTY", posX / textScale + 4,
+      mc.fontRenderer.drawStringWithShadow("DIFFICULTY", posX / textScale + 4,
           posY / textScale - 9, 0xFFFFFF);
       GlStateManager.popMatrix();
 

@@ -66,9 +66,9 @@ public class DifficultyHandler {
     EntityLivingBase entity = event.getEntityLiving();
     DamageSource source = event.getSource();
 
-    if (source.getSourceOfDamage() instanceof EntityPlayer) {
+    if (source.getTrueSource() instanceof EntityPlayer) {
       if (entity instanceof IMob) {
-        EntityPlayer player = (EntityPlayer) source.getSourceOfDamage();
+        EntityPlayer player = (EntityPlayer) source.getTrueSource();
         PlayerData data = SHPlayerDataHandler.get(player);
         data.incrementDifficulty(ConfigScalingHealth.DIFFICULTY_PER_KILL);
       }
