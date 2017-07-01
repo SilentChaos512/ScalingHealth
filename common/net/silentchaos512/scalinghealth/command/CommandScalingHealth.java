@@ -11,22 +11,15 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
-import net.silentchaos512.lib.ICommandSL;
+import net.silentchaos512.lib.command.CommandBaseSL;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
-public class CommandScalingHealth implements ICommandSL {
+public class CommandScalingHealth extends CommandBaseSL {
 
   public static final String NUMFORMAT = "%.2f";
-
-  @Override
-  public int compareTo(ICommand arg0) {
-
-    // TODO Auto-generated method stub
-    return 0;
-  }
 
   @Override
   public String getName() {
@@ -38,12 +31,6 @@ public class CommandScalingHealth implements ICommandSL {
   public String getUsage(ICommandSender sender) {
 
     return "Usage: /" + getName() + " <difficulty|health> <value> [player]";
-  }
-
-  @Override
-  public List<String> getAliases() {
-
-    return Lists.newArrayList();
   }
 
   @Override

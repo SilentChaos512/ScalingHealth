@@ -1,6 +1,5 @@
 package net.silentchaos512.scalinghealth.client.render.entity;
 
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.culling.ICamera;
@@ -11,6 +10,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
+import net.silentchaos512.lib.client.render.BufferBuilderSL;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.client.ClientTickHandler;
 import net.silentchaos512.scalinghealth.entity.EntityBlightFire;
@@ -63,7 +63,7 @@ public class RenderBlightFire extends Render<EntityBlightFire> {
     float f = parent.width * 1.6F;
     GlStateManager.scale(f, f, f);
     Tessellator tessellator = Tessellator.getInstance();
-    BufferBuilder vertexbuffer = tessellator.getBuffer();
+    BufferBuilderSL vertexbuffer = BufferBuilderSL.INSTANCE.acquireBuffer(tessellator);
 
     float f1 = 0.5F;
     float f2 = 0.0F;
