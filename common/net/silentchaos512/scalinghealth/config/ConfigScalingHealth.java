@@ -269,6 +269,9 @@ public class ConfigScalingHealth extends AdaptiveConfig {
           BLIGHT_BLACKLIST_DEFAULTS,
           "Mobs listed here will never become blights, but can still receive extra health. There is"
           + " also a blacklist for extra health."));
+      BLIGHT_NOTIFY_PLAYERS_ON_DEATH = loadBoolean("Notify Players on Death", CAT_MOB_BLIGHT,
+          BLIGHT_NOTIFY_PLAYERS_ON_DEATH,
+          "Let all players know when a blight dies in chat.");
 
       // Pets
       PET_REGEN_DELAY = loadInt("Regen Delay", CAT_PETS,
