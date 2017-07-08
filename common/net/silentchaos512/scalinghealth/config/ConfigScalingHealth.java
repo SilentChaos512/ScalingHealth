@@ -85,6 +85,8 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static int HEARTS_DROPPED_BY_BOSS_MAX = 6;
   public static int HEARTS_DROPPED_BY_BLIGHT_MIN = 0;
   public static int HEARTS_DROPPED_BY_BLIGHT_MAX = 2;
+  public static boolean HEARTS_INCREASE_HEALTH = true;
+  public static int HEARTS_HEALTH_RESTORED = 4;
 
   // Difficulty
   public static float DIFFICULTY_MAX = 250;
@@ -126,7 +128,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static final String CAT_WORLD = CAT_MAIN + split + "world";
 
   public static final ConfigScalingHealth INSTANCE = new ConfigScalingHealth();
-  
+
   public ConfigScalingHealth() {
 
     super(ScalingHealth.MOD_ID_LOWER, true, ScalingHealth.BUILD_NUM);
@@ -136,7 +138,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public void init(File file) {
 
     // Re-route to different location.
-    String path = file.getPath().replaceFirst("\\.cfg$", "/main.cfg"); 
+    String path = file.getPath().replaceFirst("\\.cfg$", "/main.cfg");
     super.init(new File(path));
   }
 
@@ -185,7 +187,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
       PLAYER_HEALTH_MAX = loadInt("Max Health", CAT_PLAYER_HEALTH,
           PLAYER_HEALTH_MAX, 0, Integer.MAX_VALUE,
           "The maximum amount of health (in half hearts) the player can reach. Zero means unlimited.");
-      PLAYER_HEALTH_LOST_ON_DEATH = (int) loadFloat("Health Lost on Death", CAT_PLAYER_HEALTH,
+      PLAYER_HEALTH_LOST_ON_DEATH = (int) config.getFloat("Health Lost on Death", CAT_PLAYER_HEALTH,
           PLAYER_HEALTH_LOST_ON_DEATH, Integer.MIN_VALUE, Integer.MAX_VALUE,
           "The amount of health (in half hearts) the player will lose each time they die.");
       // Regen
@@ -206,7 +208,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
           "The number of ticks between each bonus regen tick (a half heart being healed).");
 
       // Mobs
-      DIFFICULTY_DAMAGE_MULTIPLIER = loadFloat("Damage Modifier", CAT_MOB,
+      DIFFICULTY_DAMAGE_MULTIPLIER = config.getFloat("Damage Modifier", CAT_MOB,
           DIFFICULTY_DAMAGE_MULTIPLIER, 0f, Float.MAX_VALUE,
           "A multiplier for extra attack strength all mobs will receive. Set to 0 to disable extra attack strength.");
       // Health
@@ -216,11 +218,11 @@ public class ConfigScalingHealth extends AdaptiveConfig {
       ALLOW_HOSTILE_EXTRA_HEALTH = loadBoolean("Allow Hostile Extra Health", CAT_MOB_HEALTH,
           ALLOW_HOSTILE_EXTRA_HEALTH,
           "Allow hostile mobs (monsters) to spawn with extra health based on difficulty.");
-      DIFFICULTY_GENERIC_HEALTH_MULTIPLIER = loadFloat("Base Health Modifier", CAT_MOB_HEALTH,
+      DIFFICULTY_GENERIC_HEALTH_MULTIPLIER = config.getFloat("Base Health Modifier", CAT_MOB_HEALTH,
           DIFFICULTY_GENERIC_HEALTH_MULTIPLIER, 0f, Float.MAX_VALUE,
           "The minimum extra health a mob will have per point of difficulty. For example, at difficulty 30, "
               + "a mob that normally has 20 health would have at least 50 health.");
-      DIFFICULTY_PEACEFUL_HEALTH_MULTIPLIER = loadFloat("Base Health Modifier Peaceful", CAT_MOB_HEALTH,
+      DIFFICULTY_PEACEFUL_HEALTH_MULTIPLIER = config.getFloat("Base Health Modifier Peaceful", CAT_MOB_HEALTH,
           DIFFICULTY_PEACEFUL_HEALTH_MULTIPLIER, 0f, Float.MAX_VALUE,
           "The minimum extra health a peaceful will have per point of difficulty. Same as "
               + "\"Base Health Modifier\", but for peaceful mobs!");
@@ -233,7 +235,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
       if (MOB_HEALTH_BLACKLIST == null)
         MOB_HEALTH_BLACKLIST = Lists.newArrayList(MOB_HEALTH_BLACKLIST_DEFAULTS);
       // Blights
-      BLIGHT_CHANCE_MULTIPLIER = loadFloat("Blight Chance Multiplier", CAT_MOB_BLIGHT,
+      BLIGHT_CHANCE_MULTIPLIER = config.getFloat("Blight Chance Multiplier", CAT_MOB_BLIGHT,
           BLIGHT_CHANCE_MULTIPLIER, 0f, Float.MAX_VALUE,
           "Determines the chance of a mob spawning as a blight. Formula is "
               + "blightChanceMulti * currentDifficulty / maxDifficulty");
@@ -253,7 +255,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
       BLIGHT_FIRE_RESIST = loadBoolean("Fire Resist", CAT_MOB_BLIGHT,
           BLIGHT_FIRE_RESIST,
           "Should blights have the fire resistance potion effect?");
-      BLIGHT_XP_MULTIPLIER = loadFloat("XP Multiplier", CAT_MOB_BLIGHT,
+      BLIGHT_XP_MULTIPLIER = config.getFloat("XP Multiplier", CAT_MOB_BLIGHT,
           BLIGHT_XP_MULTIPLIER, 0f, 1000.0f,
           "The multiplier applied to the amount of XP dropped when a blight is killed.");
       BLIGHT_SUPERCHARGE_CREEPERS = loadBoolean("Supercharge Creepers", CAT_MOB_BLIGHT,
@@ -265,10 +267,10 @@ public class ConfigScalingHealth extends AdaptiveConfig {
           + " also a blacklist for extra health."));
 
       // Items
-      HEART_DROP_CHANCE_HOSTILE = loadFloat("Heart Drop Chance", CAT_ITEMS,
+      HEART_DROP_CHANCE_HOSTILE = config.getFloat("Heart Drop Chance", CAT_ITEMS,
           HEART_DROP_CHANCE_HOSTILE, 0f, 1f,
           "The chance of a hostile mob dropping a heart canister when killed.");
-      HEART_DROP_CHANCE_PASSIVE = loadFloat("Heart Drop Chance (Passive)", CAT_ITEMS,
+      HEART_DROP_CHANCE_PASSIVE = config.getFloat("Heart Drop Chance (Passive)", CAT_ITEMS,
           HEART_DROP_CHANCE_PASSIVE, 0f, 1f,
           "The chance of a passive mob (animals) dropping a heart canister when killed.");
 
@@ -290,34 +292,41 @@ public class ConfigScalingHealth extends AdaptiveConfig {
       if (HEARTS_DROPPED_BY_BLIGHT_MAX < HEARTS_DROPPED_BY_BLIGHT_MIN)
         HEARTS_DROPPED_BY_BLIGHT_MAX = HEARTS_DROPPED_BY_BLIGHT_MIN;
 
+      HEARTS_INCREASE_HEALTH = loadBoolean("Hearts Increase Max Health", CAT_ITEMS,
+          HEARTS_INCREASE_HEALTH,
+          "If set to false, hearts will no longer increase the player's maximum health, but can still be used for healing.");
+      HEARTS_HEALTH_RESTORED = loadInt("Hearts Health Restored", CAT_ITEMS,
+          HEARTS_HEALTH_RESTORED, 0, 2000,
+          "The amount of health that will be restored when using a heart container.");
+
       // Difficulty
-      DIFFICULTY_MAX = loadFloat("Max Value", CAT_DIFFICULTY,
+      DIFFICULTY_MAX = config.getFloat("Max Value", CAT_DIFFICULTY,
           DIFFICULTY_MAX, 0f, Float.MAX_VALUE,
           "The maximum difficult level that can be reached. Note that values beyond 250 are not"
           + " tested, and extremely high values may produce strange results.");
-      DIFFICULTY_DEFAULT = loadFloat("Starting Value", CAT_DIFFICULTY,
+      DIFFICULTY_DEFAULT = config.getFloat("Starting Value", CAT_DIFFICULTY,
           DIFFICULTY_DEFAULT, 0f, Float.MAX_VALUE,
           "The starting difficulty level for new worlds.");
-      DIFFICULTY_PER_SECOND = loadFloat("Increase Per Second", CAT_DIFFICULTY,
+      DIFFICULTY_PER_SECOND = config.getFloat("Increase Per Second", CAT_DIFFICULTY,
           DIFFICULTY_PER_SECOND, -1000f, 1000f,
           "The amount of difficulty added each second. In Difficult Life, the option was named per tick, "
           + "but was actually applied each second. Negative numbers will decrease difficulty over time.");
-      DIFFICULTY_PER_BLOCK = loadFloat("Difficulty Per Block", CAT_DIFFICULTY,
+      DIFFICULTY_PER_BLOCK = config.getFloat("Difficulty Per Block", CAT_DIFFICULTY,
           DIFFICULTY_PER_BLOCK, -1000f, 1000f,
           "The amount of difficulty added per unit distance from the origin/spanw, assuming \"Area Mode\" "
           + "is set to a distance-based option. Negative numbers will decrease difficulty over distance.");
-      DIFFICULTY_PER_KILL = loadFloat("Difficulty Per Kill", CAT_DIFFICULTY,
+      DIFFICULTY_PER_KILL = config.getFloat("Difficulty Per Kill", CAT_DIFFICULTY,
           DIFFICULTY_PER_KILL, -1000f, 1000f,
           "The difficulty gained for each hostile mob killed. Set to 0 to disable. Negative numbers"
           + " cause difficulty to decrease with each kill.");
-      DIFFICULTY_IDLE_MULTI = loadFloat("Idle Multiplier", CAT_DIFFICULTY,
+      DIFFICULTY_IDLE_MULTI = config.getFloat("Idle Multiplier", CAT_DIFFICULTY,
           DIFFICULTY_IDLE_MULTI, 0f, 100f,
           "Difficulty added per second is multiplied by this if the player is not moving.");
-      DIFFICULTY_LOST_ON_DEATH = loadFloat("Lost On Death", CAT_DIFFICULTY,
+      DIFFICULTY_LOST_ON_DEATH = config.getFloat("Lost On Death", CAT_DIFFICULTY,
           DIFFICULTY_LOST_ON_DEATH, -1000f, 1000f,
           "The difficulty a player loses on death. Entering a negative number will cause the player"
           + " to gain difficulty instead!");
-      DIFFICULTY_GROUP_AREA_BONUS = loadFloat("Group Area Bonus", CAT_DIFFICULTY,
+      DIFFICULTY_GROUP_AREA_BONUS = config.getFloat("Group Area Bonus", CAT_DIFFICULTY,
           DIFFICULTY_GROUP_AREA_BONUS, -10f, 10f,
           "Adds this much extra difficulty per additional player in the area. So, area difficulty will"
           + " be multiplied by: 1 + group_bonus * (players_in_area - 1)");
@@ -335,7 +344,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
 
       // World
       String cat = CAT_WORLD + split + "heart_crystal_ore";
-      HEART_CRYSTAL_ORE_VEIN_COUNT = loadFloat("Veins Per Chunk", cat,
+      HEART_CRYSTAL_ORE_VEIN_COUNT = config.getFloat("Veins Per Chunk", cat,
           HEART_CRYSTAL_ORE_VEIN_COUNT, 0, 10000,
           "The number of veins per chunk. The fractional part is a probability of an extra vein in each chunk.");
       HEART_CRYSTAL_ORE_VEIN_SIZE = loadInt("Vein Size", cat,
@@ -351,10 +360,10 @@ public class ConfigScalingHealth extends AdaptiveConfig {
         HEART_CRYSTAL_ORE_MAX_HEIGHT = 35;
         HEART_CRYSTAL_ORE_MIN_HEIGHT = 10;
       }
-      HEART_CRYSTAL_ORE_EXTRA_VEIN_RATE = loadFloat("Extra Vein Rate", cat,
+      HEART_CRYSTAL_ORE_EXTRA_VEIN_RATE = config.getFloat("Extra Vein Rate", cat,
           HEART_CRYSTAL_ORE_EXTRA_VEIN_RATE, 0f, 1f,
           "The number of extra possible veins per chunk away from spawn. The default value will reach the cap at 50,000 blocks from spawn.");
-      HEART_CRYSTAL_ORE_EXTRA_VEIN_CAP = loadFloat("Extra Vein Cap", cat,
+      HEART_CRYSTAL_ORE_EXTRA_VEIN_CAP = config.getFloat("Extra Vein Cap", cat,
           HEART_CRYSTAL_ORE_EXTRA_VEIN_CAP, 0f, 1000f,
           "The maximum number of extra veins created by distance from spawn.");
       HEART_CRYSTAL_ORE_QUANTITY_DROPPED = loadInt("Quantity Dropped", cat,

@@ -32,15 +32,32 @@ public class ItemHeartContainer extends ItemSL {
     if (!world.isRemote) {
       PlayerData data = SHPlayerDataHandler.get(player);
 
-      if (data == null || (data.getMaxHealth() >= ConfigScalingHealth.PLAYER_HEALTH_MAX
-          && ConfigScalingHealth.PLAYER_HEALTH_MAX > 0)) {
-        return new ActionResult<ItemStack>(EnumActionResult.PASS, stack);
+      boolean healthIncreaseAllowed = ConfigScalingHealth.HEARTS_INCREASE_HEALTH && data != null
+          && (ConfigScalingHealth.PLAYER_HEALTH_MAX == 0 || data.getMaxHealth() < ConfigScalingHealth.PLAYER_HEALTH_MAX);
+
+      // Heal the player (this is separate from the "healing" of the newly added heart, if that's allowed).
+      boolean consumed = false;
+      if (ConfigScalingHealth.HEARTS_HEALTH_RESTORED > 0 && player.getHealth() < player.getMaxHealth()) {
+        player.heal(ConfigScalingHealth.HEARTS_HEALTH_RESTORED);
+        consumed = true;
+      }
+
+      // End here if health increases are not allowed.
+      if (!healthIncreaseAllowed) {
+        if (consumed) {
+          world.playSound(null, player.getPosition(), SoundEvents.ENTITY_PLAYER_BURP, SoundCategory.PLAYERS, 1.0f,
+              1.0f + 0.1f * (float) ScalingHealth.random.nextGaussian());
+          StackHelper.shrink(stack, 1);
+          return new ActionResult(EnumActionResult.SUCCESS, stack);
+        } else {
+          return new ActionResult<ItemStack>(EnumActionResult.PASS, stack);
+        }
       }
 
       data.incrementMaxHealth(2);
       StackHelper.shrink(stack, 1);
-      world.playSound(null, player.getPosition(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP,
-          SoundCategory.PLAYERS, 1.0f, 0.7f + 0.1f * (float) ScalingHealth.random.nextGaussian());
+      world.playSound(null, player.getPosition(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 1.0f,
+          0.7f + 0.1f * (float) ScalingHealth.random.nextGaussian());
     }
     return new ActionResult(EnumActionResult.SUCCESS, stack);
   }
