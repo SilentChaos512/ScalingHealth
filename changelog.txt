@@ -1,4 +1,6 @@
 1.1.1
+Added: Heart containers now heal (configurable, defaults to 4 (2 hearts), set to 0 to disable)
+Added: Config to disable max health increases from heart containers, allowing them to be used exclusively as healing items.
 
 1.1.0
 Updated for Silent Lib 2.2.5 (adds MC 1.10.2 and 1.11.2 compatibility)

@@ -78,6 +78,9 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   private static List<String> BLIGHT_BLACKLIST;
   private static String[] BLIGHT_BLACKLIST_DEFAULTS = new String[] { "WitherBoss", "Villager" };
 
+  // Pets
+  public static int PET_REGEN_DELAY = 600;
+
   // Items
   public static float HEART_DROP_CHANCE_HOSTILE = 0.01F;
   public static float HEART_DROP_CHANCE_PASSIVE = 0.001f;
@@ -122,6 +125,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static final String CAT_MOB = CAT_MAIN + split + "mob";
   public static final String CAT_MOB_HEALTH = CAT_MOB + split + "health";
   public static final String CAT_MOB_BLIGHT = CAT_MOB + split + "blights";
+  public static final String CAT_PETS = CAT_MAIN + split + "pets";
   public static final String CAT_ITEMS = CAT_MAIN + split + "items";
   public static final String CAT_DIFFICULTY = CAT_MAIN + split + "difficulty";
   public static final String CAT_NETWORK = CAT_MAIN + split + "network";
@@ -265,6 +269,11 @@ public class ConfigScalingHealth extends AdaptiveConfig {
           BLIGHT_BLACKLIST_DEFAULTS,
           "Mobs listed here will never become blights, but can still receive extra health. There is"
           + " also a blacklist for extra health."));
+
+      // Pets
+      PET_REGEN_DELAY = loadInt("Regen Delay", CAT_PETS,
+          PET_REGEN_DELAY, 0, 72000,
+          "The number of ticks between regen ticks on pets. Set to 0 to disable pet regen.");
 
       // Items
       HEART_DROP_CHANCE_HOSTILE = config.getFloat("Heart Drop Chance", CAT_ITEMS,
