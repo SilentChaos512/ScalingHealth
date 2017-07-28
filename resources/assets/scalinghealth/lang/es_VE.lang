@@ -1,0 +1,38 @@
+# Translate by: Dorzar / VeryHardChamp
+# Última actualización: 23/07/2017
+
+##########
+# Blocks #
+##########
+
+tile.scalinghealth:CrystalOre.name=Mena de corazón rojo
+
+
+
+#########
+# Items #
+#########
+
+item.scalinghealth:CrystalShard.name=Fragmento de corazón rojo
+item.scalinghealth:HeartContainer.name=Corazón rojo
+
+
+
+###########
+# Blights #
+###########
+
+blight.scalinghealth:name=%s raro
+blight.scalinghealth:killedByPlayer=¡%s raro ha sido asesinado por %s!
+
+
+
+############
+# Commands #
+############
+
+command.outOfBounds=Los valores deben estar entre %s y %s.
+command.showDifficulty=Dificultad de %s: %s / %s
+command.setDifficulty=Dificultad del jugador %s cambiada a %s.
+command.showHealth=Vida de %s: %s / %s
+command.setHealth=Vida del jugador %s cambiada a %d.
