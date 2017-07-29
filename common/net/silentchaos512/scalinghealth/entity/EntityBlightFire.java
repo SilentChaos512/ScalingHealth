@@ -3,11 +3,10 @@ package net.silentchaos512.scalinghealth.entity;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
-import net.silentchaos512.scalinghealth.ScalingHealth;
 
 public class EntityBlightFire extends Entity implements IEntityAdditionalSpawnData {
 
@@ -33,6 +32,11 @@ public class EntityBlightFire extends Entity implements IEntityAdditionalSpawnDa
     if (!world.isRemote && (parent == null || parent.isDead)) {
       setDead();
       return;
+    }
+
+    // Occasionally players get a blight fire... what?
+    if (parent instanceof EntityPlayer) {
+      setDead();
     }
 
     // Update position manually in case fire is not riding the blight.

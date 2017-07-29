@@ -36,7 +36,7 @@ public enum EnumAreaDifficultyMode {
     //@formatter:on
 
     for (EnumAreaDifficultyMode mode : values())
-      if (mode.name().equals(str))
+      if (mode.name().equalsIgnoreCase(str))
         return mode;
     return defaultValue;
   }

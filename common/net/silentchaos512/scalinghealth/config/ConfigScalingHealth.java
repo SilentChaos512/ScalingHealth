@@ -14,6 +14,7 @@ import net.silentchaos512.lib.config.AdaptiveConfig;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.lib.EnumAreaDifficultyMode;
 import net.silentchaos512.scalinghealth.lib.EnumHealthModMode;
+import net.silentchaos512.scalinghealth.lib.EnumResetTime;
 
 public class ConfigScalingHealth extends AdaptiveConfig {
 
@@ -48,6 +49,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static int PLAYER_STARTING_HEALTH = 20;
   public static int PLAYER_HEALTH_MAX = 0;
   public static int PLAYER_HEALTH_LOST_ON_DEATH = 0;
+  public static EnumResetTime PLAYER_HEALTH_RESET_TIME = EnumResetTime.NONE;
   // Regen
   public static boolean ENABLE_BONUS_HEALTH_REGEN = true;
   public static int BONUS_HEALTH_REGEN_MIN_FOOD = 10;
@@ -103,6 +105,8 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static float DIFFICULTY_GROUP_AREA_BONUS = 0.05f;
   public static int DIFFICULTY_SEARCH_RADIUS = 160;
   public static EnumAreaDifficultyMode AREA_DIFFICULTY_MODE = EnumAreaDifficultyMode.WEIGHTED_AVERAGE;
+  public static EnumResetTime DIFFFICULTY_RESET_TIME = EnumResetTime.NONE;
+  
 
   // Network
   public static int PACKET_DELAY = 20;
@@ -194,6 +198,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
       PLAYER_HEALTH_LOST_ON_DEATH = (int) config.getFloat("Health Lost on Death", CAT_PLAYER_HEALTH,
           PLAYER_HEALTH_LOST_ON_DEATH, Integer.MIN_VALUE, Integer.MAX_VALUE,
           "The amount of health (in half hearts) the player will lose each time they die.");
+      PLAYER_HEALTH_RESET_TIME = EnumResetTime.loadFromConfig(config, PLAYER_HEALTH_RESET_TIME, CAT_PLAYER_HEALTH);
       // Regen
       ENABLE_BONUS_HEALTH_REGEN = loadBoolean("Enable Bonus Regen", CAT_PLAYER_REGEN,
           ENABLE_BONUS_HEALTH_REGEN,
@@ -347,6 +352,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
           "The distance from a newly spawned mob to search for players to determine its difficulty "
           + "level. Set to 0 for unlimited range.");
       AREA_DIFFICULTY_MODE = EnumAreaDifficultyMode.loadFromConfig(config, AREA_DIFFICULTY_MODE);
+      DIFFFICULTY_RESET_TIME = EnumResetTime.loadFromConfig(config, DIFFFICULTY_RESET_TIME, CAT_DIFFICULTY);
 
       // Network
       PACKET_DELAY = loadInt("Packet Delay", CAT_NETWORK,

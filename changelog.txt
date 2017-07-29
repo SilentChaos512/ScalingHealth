@@ -1,3 +1,7 @@
+1.1.2
+Added: Configs that can be used to reset players' health and/or difficulty at regular intervals. You can set the resets to occur daily, weekly (specifying the weekday of your choice), or monthly.
+Added: es_VE.lang (couresy of Dorzar)
+
 1.1.1
 Added: Heart containers now heal (configurable, defaults to 4 (2 hearts), set to 0 to disable)
 Added: Config to disable max health increases from heart containers, allowing them to be used exclusively as healing items.

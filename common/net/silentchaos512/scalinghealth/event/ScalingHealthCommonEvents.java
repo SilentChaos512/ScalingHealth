@@ -1,5 +1,6 @@
 package net.silentchaos512.scalinghealth.event;
 
+import java.util.Calendar;
 import java.util.Random;
 
 import net.minecraft.entity.EntityLivingBase;
@@ -10,6 +11,7 @@ import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
+import net.silentchaos512.lib.util.ChatHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.init.ModItems;
@@ -28,8 +30,7 @@ public class ScalingHealthCommonEvents {
       Random rand = ScalingHealth.random;
       int stackSize = 0;
 
-      float dropRate = entityLiving instanceof IMob ? ConfigScalingHealth.HEART_DROP_CHANCE_HOSTILE
-          : ConfigScalingHealth.HEART_DROP_CHANCE_PASSIVE;
+      float dropRate = entityLiving instanceof IMob ? ConfigScalingHealth.HEART_DROP_CHANCE_HOSTILE : ConfigScalingHealth.HEART_DROP_CHANCE_PASSIVE;
 
       if (event.isRecentlyHit() && rand.nextFloat() <= dropRate) {
         stackSize += 1;
@@ -47,8 +48,7 @@ public class ScalingHealthCommonEvents {
   }
 
   @SubscribeEvent
-  public void onPlayerRespawn(
-      net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent event) {
+  public void onPlayerRespawn(net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent event) {
 
     // Set player health correctly after respawn.
     if (event.player instanceof EntityPlayerMP) {
@@ -64,9 +64,7 @@ public class ScalingHealthCommonEvents {
 
       // Lose difficulty on death?
       double currentDifficulty = data.getDifficulty();
-      double newDifficulty = MathHelper.clamp(
-          currentDifficulty - ConfigScalingHealth.DIFFICULTY_LOST_ON_DEATH, 0,
-          ConfigScalingHealth.DIFFICULTY_MAX);
+      double newDifficulty = MathHelper.clamp(currentDifficulty - ConfigScalingHealth.DIFFICULTY_LOST_ON_DEATH, 0, ConfigScalingHealth.DIFFICULTY_MAX);
       data.setDifficulty(newDifficulty);
 
       // Apply health modifier
@@ -85,6 +83,23 @@ public class ScalingHealthCommonEvents {
     if (event.player instanceof EntityPlayerMP) {
       EntityPlayerMP player = (EntityPlayerMP) event.player;
       PlayerData data = SHPlayerDataHandler.get(player);
+
+      // Resets, based on config?
+      Calendar today = Calendar.getInstance();
+      Calendar lastTimePlayed = data.getLastTimePlayed();
+
+      if (ConfigScalingHealth.DIFFFICULTY_RESET_TIME.shouldReset(today, lastTimePlayed)) {
+        ScalingHealth.logHelper.info(String.format("Reset player %s's difficulty to %d", player.getName(), (int) ConfigScalingHealth.DIFFICULTY_DEFAULT));
+        ChatHelper.sendMessage(player, "[Scaling Health] Your difficulty has been reset.");
+        data.setDifficulty(ConfigScalingHealth.DIFFICULTY_DEFAULT);
+      }
+      if (ConfigScalingHealth.PLAYER_HEALTH_RESET_TIME.shouldReset(today, lastTimePlayed)) {
+        data.setMaxHealth(ConfigScalingHealth.PLAYER_STARTING_HEALTH);
+        ScalingHealth.logHelper.info(String.format("Reset player %s's health to %d", player.getName(), (int) ConfigScalingHealth.PLAYER_STARTING_HEALTH));
+        ChatHelper.sendMessage(player, "[Scaling Health] Your health has been reset.");
+      }
+
+      data.getLastTimePlayed().setTime(today.getTime());
 
       // Apply health modifier
       float health = player.getHealth();

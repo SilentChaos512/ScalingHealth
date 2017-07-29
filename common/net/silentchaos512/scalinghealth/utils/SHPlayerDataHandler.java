@@ -2,6 +2,7 @@ package net.silentchaos512.scalinghealth.utils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -100,12 +101,10 @@ public class SHPlayerDataHandler {
         SHPlayerDataHandler.get(player).tick();
 
         // Get data from nearby players.
-        if (!player.world.isRemote
-            && player.world.getTotalWorldTime() % 5 * ConfigScalingHealth.PACKET_DELAY == 0) {
+        if (!player.world.isRemote && player.world.getTotalWorldTime() % 5 * ConfigScalingHealth.PACKET_DELAY == 0) {
           int radius = ConfigScalingHealth.DIFFICULTY_SEARCH_RADIUS;
           int radiusSquared = radius <= 0 ? Integer.MAX_VALUE : radius * radius;
-          for (EntityPlayer p : player.world.getPlayers(EntityPlayer.class,
-              p -> !p.equals(player) && p.getDistanceSq(player.getPosition()) < radiusSquared)) {
+          for (EntityPlayer p : player.world.getPlayers(EntityPlayer.class, p -> !p.equals(player) && p.getDistanceSq(player.getPosition()) < radiusSquared)) {
             MessageDataSync message = new MessageDataSync(get(p), p);
             NetworkHandler.INSTANCE.sendTo(message, (EntityPlayerMP) player);
           }
@@ -128,10 +127,12 @@ public class SHPlayerDataHandler {
     public static final String NBT_DIFFICULTY = "difficulty";
     public static final String NBT_HEALTH = "health";
     public static final String NBT_MAX_HEALTH = "max_health";
+    public static final String NBT_LAST_LOGIN = "last_login";
 
     double difficulty = 0.0D;
     float health = 20;
     float maxHealth = ConfigScalingHealth.PLAYER_STARTING_HEALTH;
+    Calendar lastTimePlayed = Calendar.getInstance();
 
     public WeakReference<EntityPlayer> playerWR;
     private final boolean client;
@@ -198,6 +199,11 @@ public class SHPlayerDataHandler {
         player.heal(amount);
     }
 
+    public Calendar getLastTimePlayed() {
+
+      return lastTimePlayed;
+    }
+
     private void tick() {
 
       if (!client) {
@@ -255,6 +261,12 @@ public class SHPlayerDataHandler {
       tags.setDouble(NBT_DIFFICULTY, difficulty);
       tags.setFloat(NBT_HEALTH, health);
       tags.setFloat(NBT_MAX_HEALTH, maxHealth);
+
+      int year = lastTimePlayed.get(Calendar.YEAR);
+      int month = lastTimePlayed.get(Calendar.MONTH) + 1;
+      int date = lastTimePlayed.get(Calendar.DATE);
+      String dateString = year + "/" + month + "/" + date;
+      tags.setString(NBT_LAST_LOGIN, dateString);
     }
 
     public void load() {
@@ -273,6 +285,20 @@ public class SHPlayerDataHandler {
       difficulty = tags.getDouble(NBT_DIFFICULTY);
       health = tags.getFloat(NBT_HEALTH);
       maxHealth = tags.getFloat(NBT_MAX_HEALTH);
+
+      String lastDatePlayed = tags.getString(NBT_LAST_LOGIN);
+      String[] dateParts = lastDatePlayed.split("/");
+      if (dateParts.length >= 3) {
+        try {
+          int year = Integer.parseInt(dateParts[0]);
+          int month = Integer.parseInt(dateParts[1]) - 1;
+          int date = Integer.parseInt(dateParts[2]);
+          lastTimePlayed.set(year, month, date);
+        } catch (NumberFormatException ex) {
+          ScalingHealth.logHelper.warning("Could not parse player's last login time.");
+          ex.printStackTrace();
+        }
+      }
     }
   }
 }
