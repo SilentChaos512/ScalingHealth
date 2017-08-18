@@ -21,12 +21,14 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.silentchaos512.lib.util.StackHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.api.event.BlightSpawnEvent;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.network.NetworkHandler;
 import net.silentchaos512.scalinghealth.network.message.MessageMarkBlight;
@@ -152,6 +154,12 @@ public class DifficultyHandler {
   }
 
   private void makeEntityBlight(EntityLivingBase entityLiving, Random rand) {
+
+    BlightSpawnEvent event = new BlightSpawnEvent((EntityLiving) entityLiving, entityLiving.world,
+        (float) entityLiving.posX, (float) entityLiving.posY, (float) entityLiving.posZ);
+    if (MinecraftForge.EVENT_BUS.post(event)) {
+      return;
+    }
 
     //@formatter:off
     BlightHandler.markBlight(entityLiving);
