@@ -17,6 +17,8 @@ import net.silentchaos512.scalinghealth.entity.EntityBlightFire;
 
 public class RenderBlightFire extends Render<EntityBlightFire> {
 
+  public static final float FIRE_SCALE = 1.8F;
+
   protected final ResourceLocation TEXTURE = new ResourceLocation(ScalingHealth.MOD_ID_LOWER,
       "textures/entity/blightfire.png");
 
@@ -60,7 +62,7 @@ public class RenderBlightFire extends Render<EntityBlightFire> {
     GlStateManager.disableLighting();
     GlStateManager.pushMatrix();
     GlStateManager.translate(x, y - parent.height + 0.5, z);
-    float f = parent.width * 1.6F;
+    float f = parent.width * FIRE_SCALE;
     GlStateManager.scale(f, f, f);
     Tessellator tessellator = Tessellator.getInstance();
     BufferBuilderSL vertexbuffer = BufferBuilderSL.INSTANCE.acquireBuffer(tessellator);
