@@ -1,3 +1,9 @@
+1.1.4
+Fixed: Difficulty meter not rendering when InGame Info XML is installed (#24)
+
+1.1.3
+Marked compatible with 1.12.1
+
 1.1.2
 Added: Configs that can be used to reset players' health and/or difficulty at regular intervals. You can set the resets to occur daily, weekly (specifying the weekday of your choice), or monthly.
 Added: es_VE.lang (couresy of Dorzar)

@@ -1,22 +1,15 @@
 buildscript {
     repositories {
         jcenter()
-        maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
+        maven { url = "http://files.minecraftforge.net/maven" }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
     }
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-//plugins {
-//    id "net.minecraftforge.gradle.forge" version "2.0.2"
-//}
-
-version = "1.1.2"
+version = "1.1.4"
 def silentlib_version = "2.2.6"
 def buildNum = 0;
 group = "net.silentchaos512.scalinghealth"
