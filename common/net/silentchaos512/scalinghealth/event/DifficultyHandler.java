@@ -77,15 +77,13 @@ public class DifficultyHandler {
 
   private boolean increaseEntityHealth(EntityLivingBase entityLiving) {
 
-    float difficulty = (float) ConfigScalingHealth.AREA_DIFFICULTY_MODE
-        .getAreaDifficulty(entityLiving.world, entityLiving.getPosition());
+    float difficulty = (float) ConfigScalingHealth.AREA_DIFFICULTY_MODE.getAreaDifficulty(entityLiving.world, entityLiving.getPosition());
     Random rand = ScalingHealth.random;
     boolean makeBlight = false;
 
     // Make blight?
     if (!entityBlacklistedFromBecomingBlight(entityLiving)) {
-      float chance = (float) (difficulty / ConfigScalingHealth.DIFFICULTY_MAX
-          * ConfigScalingHealth.BLIGHT_CHANCE_MULTIPLIER);
+      float chance = (float) (difficulty / ConfigScalingHealth.DIFFICULTY_MAX * ConfigScalingHealth.BLIGHT_CHANCE_MULTIPLIER);
       if (rand.nextFloat() < chance) {
         makeBlight = true;
         difficulty *= 3;
@@ -94,18 +92,16 @@ public class DifficultyHandler {
 
     float genAddedHealth = difficulty;
     float genAddedDamage = 0;
-    float baseMaxHealth = (float) entityLiving
-        .getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue();
+    float baseMaxHealth = (float) entityLiving.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue();
+    float healthMultiplier = entityLiving instanceof IMob ? ConfigScalingHealth.DIFFICULTY_GENERIC_HEALTH_MULTIPLIER
+        : ConfigScalingHealth.DIFFICULTY_PEACEFUL_HEALTH_MULTIPLIER;
 
-    if (entityLiving instanceof IMob)
-      genAddedHealth *= ConfigScalingHealth.DIFFICULTY_GENERIC_HEALTH_MULTIPLIER;
-    else
-      genAddedHealth *= ConfigScalingHealth.DIFFICULTY_PEACEFUL_HEALTH_MULTIPLIER;
+    genAddedHealth *= healthMultiplier;
 
     difficulty -= genAddedHealth;
 
     if (difficulty > 0) {
-      float diffIncrease = difficulty * rand.nextFloat();
+      float diffIncrease = 2 * healthMultiplier * difficulty * rand.nextFloat();
       difficulty -= diffIncrease;
       genAddedHealth += diffIncrease;
     }
@@ -141,8 +137,7 @@ public class DifficultyHandler {
         ModifierHandler.setMaxHealth(entityLiving, healthMulti + baseMaxHealth, 1);
         break;
       default:
-        ScalingHealth.logHelper.severe("Unknown mob health scaling mode: "
-            + ConfigScalingHealth.MOB_HEALTH_SCALING_MODE.name());
+        ScalingHealth.logHelper.severe("Unknown mob health scaling mode: " + ConfigScalingHealth.MOB_HEALTH_SCALING_MODE.name());
         break;
     }
     ModifierHandler.addAttackDamage(entityLiving, genAddedDamage, 0);
@@ -255,8 +250,7 @@ public class DifficultyHandler {
   private boolean canIncreaseEntityHealth(EntityLivingBase entityLiving) {
 
     return entityLiving.getAttributeMap() != null && entityLiving.ticksExisted > 1
-        && entityLiving.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
-            .getModifier(ModifierHandler.MODIFIER_ID_HEALTH) == null;
+        && entityLiving.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getModifier(ModifierHandler.MODIFIER_ID_HEALTH) == null;
   }
 
   private boolean entityBlacklistedFromBecomingBlight(EntityLivingBase entityLiving) {

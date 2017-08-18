@@ -36,7 +36,6 @@ public class DifficultyDisplayHandler extends Gui {
   @SubscribeEvent
   public void onRenderOverlay(RenderGameOverlayEvent.Post event) {
 
-    // TODO: Configs?
     if (event.getType() != ElementType.TEXT || ConfigScalingHealth.DIFFICULTY_MAX <= 0
         || !ConfigScalingHealth.RENDER_DIFFICULTY_METER)
       return;
