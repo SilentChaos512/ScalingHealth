@@ -6,6 +6,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.MobEffects;
+import net.minecraft.potion.PotionEffect;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
@@ -26,6 +28,7 @@ public class BlightHandler {
 
   public static final String NBT_BLIGHT = ScalingHealth.MOD_ID_OLD + ".IsBlight";
 
+  public static int POTION_APPLY_TIME = 1 * 1200;
   public static int UPDATE_DELAY = 200;
   public static int UPDATE_DELAY_SALT = 5 + ScalingHealth.random.nextInt(10);
 
@@ -70,6 +73,26 @@ public class BlightHandler {
         return fire;
 
     return null;
+  }
+
+  public static void applyBlightPotionEffects(EntityLivingBase entityLiving) {
+
+    // Invisibility
+    if (ConfigScalingHealth.BLIGHT_INVISIBLE)
+      entityLiving.addPotionEffect(new PotionEffect(
+          MobEffects.INVISIBILITY, POTION_APPLY_TIME, 0, true, false));
+    // Fire Resistance
+    if (ConfigScalingHealth.BLIGHT_FIRE_RESIST)
+      entityLiving.addPotionEffect(new PotionEffect(
+          MobEffects.FIRE_RESISTANCE, POTION_APPLY_TIME, 0, true, false));
+    // Speed
+    if (ConfigScalingHealth.BLIGHT_AMP_SPEED > 0)
+      entityLiving.addPotionEffect(new PotionEffect(
+          MobEffects.SPEED, POTION_APPLY_TIME, ConfigScalingHealth.BLIGHT_AMP_SPEED, true, false));
+    // Strength
+    if (ConfigScalingHealth.BLIGHT_AMP_STRENGTH > 0)
+      entityLiving.addPotionEffect(new PotionEffect(
+          MobEffects.STRENGTH, POTION_APPLY_TIME, ConfigScalingHealth.BLIGHT_AMP_STRENGTH, true, false));
   }
 
   // **********
@@ -169,6 +192,9 @@ public class BlightHandler {
         // Assign a blight fire if necessary.
         if (getBlightFire(entityLiving) == null)
           spawnBlightFire(entityLiving);
+
+        // Refresh potion effects
+        applyBlightPotionEffects(entityLiving);
       }
     }
   }

@@ -59,6 +59,8 @@ public class ConfigScalingHealth extends AdaptiveConfig {
 
   // Mobs
   public static float DIFFICULTY_DAMAGE_MULTIPLIER = 0.1f;
+  public static float POTION_CHANCE_HOSTILE = 0.375f;
+  public static float POTION_CHANCE_PASSIVE = 0.025f;
   // Mob Health
   public static boolean ALLOW_PEACEFUL_EXTRA_HEALTH = true;
   public static boolean ALLOW_HOSTILE_EXTRA_HEALTH = true;
@@ -225,6 +227,18 @@ public class ConfigScalingHealth extends AdaptiveConfig {
       DIFFICULTY_DAMAGE_MULTIPLIER = config.getFloat("Damage Modifier", CAT_MOB,
           DIFFICULTY_DAMAGE_MULTIPLIER, 0f, Float.MAX_VALUE,
           "A multiplier for extra attack strength all mobs will receive. Set to 0 to disable extra attack strength.");
+      POTION_CHANCE_HOSTILE = config.getFloat("Potion Chance (Hostiles)", CAT_MOB,
+          POTION_CHANCE_HOSTILE, 0f, 1f,
+          "The chance that an extra potion effect will be applied to any hostile mob. Note that"
+          + " this effect requires the mob to have a certain amount of \"difficulty\" left after"
+          + " it has been given extra health and damage. So entering 1 won't guarantee potion"
+          + " effects.");
+      POTION_CHANCE_PASSIVE = config.getFloat("Potion Chance (Passives)", CAT_MOB,
+          POTION_CHANCE_PASSIVE, 0f, 1f,
+          "The chance that an extra potion effect will be applied to any passive mob. Note that"
+          + " this effect requires the mob to have a certain amount of \"difficulty\" left after"
+          + " it has been given extra health and damage. So entering 1 won't guarantee potion"
+          + " effects.");
       // Health
       ALLOW_PEACEFUL_EXTRA_HEALTH = loadBoolean("Allow Peaceful Extra Health", CAT_MOB_HEALTH,
           ALLOW_PEACEFUL_EXTRA_HEALTH,

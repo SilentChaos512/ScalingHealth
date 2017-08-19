@@ -36,6 +36,7 @@ import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.network.NetworkHandler;
 import net.silentchaos512.scalinghealth.network.message.MessageMarkBlight;
 import net.silentchaos512.scalinghealth.utils.EquipmentTierMap;
+import net.silentchaos512.scalinghealth.utils.MobPotionMap;
 import net.silentchaos512.scalinghealth.utils.ModifierHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
@@ -43,6 +44,20 @@ import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 public class DifficultyHandler {
 
   public static DifficultyHandler INSTANCE = new DifficultyHandler();
+
+  public static int POTION_APPLY_TIME = 10 * 1200;
+
+  public MobPotionMap potionMap = new MobPotionMap();
+
+  public void initPotionMap() {
+
+    potionMap.put(MobEffects.STRENGTH, 30, 0);
+    potionMap.put(MobEffects.SPEED, 10, 0);
+    potionMap.put(MobEffects.SPEED, 30, 1);
+    potionMap.put(MobEffects.FIRE_RESISTANCE, 10, 0);
+    potionMap.put(MobEffects.INVISIBILITY, 20, 0);
+    potionMap.put(MobEffects.RESISTANCE, 30, 0);
+  }
 
   @SubscribeEvent
   public void onMobSpawn(LivingUpdateEvent event) {
@@ -86,6 +101,7 @@ public class DifficultyHandler {
     float difficulty = (float) ConfigScalingHealth.AREA_DIFFICULTY_MODE.getAreaDifficulty(entityLiving.world, entityLiving.getPosition());
     Random rand = ScalingHealth.random;
     boolean makeBlight = false;
+    boolean isHostile = entityLiving instanceof IMob;
 
     // Make blight?
     if (!entityBlacklistedFromBecomingBlight(entityLiving)) {
@@ -99,7 +115,7 @@ public class DifficultyHandler {
     float genAddedHealth = difficulty;
     float genAddedDamage = 0;
     float baseMaxHealth = (float) entityLiving.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue();
-    float healthMultiplier = entityLiving instanceof IMob ? ConfigScalingHealth.DIFFICULTY_GENERIC_HEALTH_MULTIPLIER
+    float healthMultiplier = isHostile ? ConfigScalingHealth.DIFFICULTY_GENERIC_HEALTH_MULTIPLIER
         : ConfigScalingHealth.DIFFICULTY_PEACEFUL_HEALTH_MULTIPLIER;
 
     genAddedHealth *= healthMultiplier;
@@ -119,8 +135,15 @@ public class DifficultyHandler {
       genAddedDamage = diffIncrease * ConfigScalingHealth.DIFFICULTY_DAMAGE_MULTIPLIER;
     }
 
-    if (difficulty > 0) {
-      // TODO: Random potion effects? (DLEventHandler:217)
+    // Random potion effect
+    float potionChance = isHostile ? ConfigScalingHealth.POTION_CHANCE_HOSTILE
+        : ConfigScalingHealth.POTION_CHANCE_PASSIVE;
+    if (difficulty > 0 && rand.nextFloat() < potionChance) {
+      MobPotionMap.PotionEntry pot = potionMap.getRandom(rand, (int) difficulty);
+      if (pot != null) {
+        difficulty -= pot.cost;
+        entityLiving.addPotionEffect(new PotionEffect(pot.potion, POTION_APPLY_TIME));
+      }
     }
 
     // Apply extra health and damage.
@@ -162,7 +185,7 @@ public class DifficultyHandler {
     BlightSpawnEvent event = new BlightSpawnEvent.Pre((EntityLiving) entityLiving, entityLiving.world, (float) entityLiving.posX, (float) entityLiving.posY,
         (float) entityLiving.posZ);
     if (MinecraftForge.EVENT_BUS.post(event)) {
-      // Someone canceled the blightification.
+      // Someone canceled the "blightification"
       return;
     }
 
@@ -170,26 +193,11 @@ public class DifficultyHandler {
     BlightHandler.markBlight(entityLiving);
     BlightHandler.spawnBlightFire(entityLiving);
 
-    // ===============
-    // Potions Effects
-    // ===============
+    // ==============
+    // Potion Effects
+    // ==============
 
-    // Invisibility
-    if (ConfigScalingHealth.BLIGHT_INVISIBLE)
-      entityLiving.addPotionEffect(new PotionEffect(
-          MobEffects.INVISIBILITY, Integer.MAX_VALUE, 0, true, false));
-    // Fire Resistance
-    if (ConfigScalingHealth.BLIGHT_FIRE_RESIST)
-      entityLiving.addPotionEffect(new PotionEffect(
-          MobEffects.FIRE_RESISTANCE, Integer.MAX_VALUE, 0, true, false));
-    // Speed
-    if (ConfigScalingHealth.BLIGHT_AMP_SPEED > 0)
-      entityLiving.addPotionEffect(new PotionEffect(
-          MobEffects.SPEED, Integer.MAX_VALUE, ConfigScalingHealth.BLIGHT_AMP_SPEED, true, false));
-    // Strength
-    if (ConfigScalingHealth.BLIGHT_AMP_STRENGTH > 0)
-      entityLiving.addPotionEffect(new PotionEffect(
-          MobEffects.STRENGTH, Integer.MAX_VALUE, ConfigScalingHealth.BLIGHT_AMP_STRENGTH, true, false));
+    BlightHandler.applyBlightPotionEffects(entityLiving);
 
     // ================
     // Random Equipment
@@ -233,7 +241,6 @@ public class DifficultyHandler {
         ItemStack oldEquipment = entity.getHeldItemMainhand();
         if (StackHelper.isEmpty(oldEquipment)) {
           ItemStack newEquipment = selectEquipmentForSlot(EntityEquipmentSlot.MAINHAND, tier);
-          ScalingHealth.logHelper.debug(newEquipment);
           if (StackHelper.isValid(newEquipment)) {
             entity.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, newEquipment);
           }

@@ -5,6 +5,7 @@ import javax.annotation.Nonnull;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.Potion;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
@@ -120,5 +121,21 @@ public class ScalingHealthAPI {
   public static void addBlightEquipment(ItemStack stack, EntityEquipmentSlot slot, int tier) {
 
     addBlightEquipment(new StackProducer(stack), slot, tier);
+  }
+
+  /**
+   * Adds a potion effect that any mob can spawn with.
+   * 
+   * @param potion
+   *          The potion.
+   * @param cost
+   *          The amount of "difficulty" the potion requires. A mob must have this much difficulty left after health and
+   *          damage boosts to receive this effect. So effects with higher costs are less likely to occur.
+   * @param amplifier
+   *          The amplifier on the potion effect. An amplifier of 0 means level 1.
+   */
+  public static void addMobSpawnPotion(Potion potion, int cost, int amplifier) {
+
+    DifficultyHandler.INSTANCE.potionMap.put(potion, cost, amplifier);
   }
 }
