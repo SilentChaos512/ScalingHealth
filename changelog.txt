@@ -1,4 +1,5 @@
 1.2.0
+Added: Difficulty meter now shows an actual number for the area difficulty.
 Added: Config settings for blight equipment (new category: mob/blights/equipment)
 Added: Any mob can now receive a single, beneficial potion effect. Chance is configurable, lasts just 10 minutes. It's nothing too crazy.
 Added: An API for modders to work with.
