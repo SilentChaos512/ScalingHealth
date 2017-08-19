@@ -1,5 +1,11 @@
 1.2.0
-Added: An API.
+Added: Config settings for blight equipment (new category: mob/blights/equipment)
+Added: An API for modders to work with.
+Added (API): Getters for area/player difficulty. A method to add difficulty to the player.
+Added (API): Method to add equipment that blights can spawn with. Blights can now receive items for their main/offhands, in addition to armor.
+Added (API): Blight spawn events (Pre and Post phases)
+Changed: Made blight fires a little bit bigger.
+Fixed: [1.11.2, 1.12.x] Blights not spawning with armor *facepalms*
 Fixed: Difficulty meter not rendering when InGame Info XML is installed (#24)
 
 1.1.3

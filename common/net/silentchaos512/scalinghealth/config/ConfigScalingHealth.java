@@ -79,6 +79,11 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static boolean BLIGHT_NOTIFY_PLAYERS_ON_DEATH = true;
   private static List<String> BLIGHT_BLACKLIST;
   private static String[] BLIGHT_BLACKLIST_DEFAULTS = new String[] { "WitherBoss", "Villager" };
+  // Blight equipment
+  public static int BLIGHT_EQUIPMENT_HIGHEST_COMMON_TIER = 1;
+  public static float BLIGHT_EQUIPMENT_TIER_UP_CHANCE = 0.095f;
+  public static float BLIGHT_EQUIPMENT_ARMOR_PIECE_CHANCE = 0.5f;
+  public static float BLIGHT_EQUIPMENT_HAND_PIECE_CHANCE = 0.5f;
 
   // Pets
   public static int PET_REGEN_DELAY = 600;
@@ -106,7 +111,6 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static int DIFFICULTY_SEARCH_RADIUS = 160;
   public static EnumAreaDifficultyMode AREA_DIFFICULTY_MODE = EnumAreaDifficultyMode.WEIGHTED_AVERAGE;
   public static EnumResetTime DIFFFICULTY_RESET_TIME = EnumResetTime.NONE;
-  
 
   // Network
   public static int PACKET_DELAY = 20;
@@ -129,6 +133,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static final String CAT_MOB = CAT_MAIN + split + "mob";
   public static final String CAT_MOB_HEALTH = CAT_MOB + split + "health";
   public static final String CAT_MOB_BLIGHT = CAT_MOB + split + "blights";
+  public static final String CAT_MOB_BLIGHT_EQUIP = CAT_MOB_BLIGHT + split + "equipment";
   public static final String CAT_PETS = CAT_MAIN + split + "pets";
   public static final String CAT_ITEMS = CAT_MAIN + split + "items";
   public static final String CAT_DIFFICULTY = CAT_MAIN + split + "difficulty";
@@ -277,6 +282,26 @@ public class ConfigScalingHealth extends AdaptiveConfig {
       BLIGHT_NOTIFY_PLAYERS_ON_DEATH = loadBoolean("Notify Players on Death", CAT_MOB_BLIGHT,
           BLIGHT_NOTIFY_PLAYERS_ON_DEATH,
           "Let all players know when a blight dies in chat.");
+      // Blight equipment
+      BLIGHT_EQUIPMENT_HIGHEST_COMMON_TIER = loadInt("Highest Common Tier", CAT_MOB_BLIGHT_EQUIP,
+          BLIGHT_EQUIPMENT_HIGHEST_COMMON_TIER, 0, 4,
+          "The highest commonly-occuring equipment tier for blights. This goes from 0 to 4"
+          + " inclusive. For armor, the defaults (tiers 0 to 4) are leather, gold, chainmail,"
+          + " iron, and diamond.");
+      BLIGHT_EQUIPMENT_TIER_UP_CHANCE = config.getFloat("Tier Up Chance", CAT_MOB_BLIGHT_EQUIP,
+          BLIGHT_EQUIPMENT_TIER_UP_CHANCE, 0f, 1f,
+          "The chance that a higher tier will be selected for a blight. A common tier is chosen"
+          + " first, then it has a few chances to increase.");
+      BLIGHT_EQUIPMENT_ARMOR_PIECE_CHANCE = config.getFloat("Armor Piece Chance", CAT_MOB_BLIGHT_EQUIP,
+          BLIGHT_EQUIPMENT_ARMOR_PIECE_CHANCE, 0f, 1f,
+          "The chance of an additional armor piece being given. Every blight receives a helmet,"
+          + " then has this probability of receiving a chestplate. If it gets a chestplate, it has"
+          + " this probability of receiving leggings, etc.");
+      BLIGHT_EQUIPMENT_HAND_PIECE_CHANCE = config.getFloat("Hand Piece Chance", CAT_MOB_BLIGHT_EQUIP,
+          BLIGHT_EQUIPMENT_HAND_PIECE_CHANCE, 0f, 1f,
+          "The chance that a blight will receive equipment in their hands (swords, etc.) They only"
+          + " get a chance at an offhand item if a main hand item is selected. Depending on the"
+          + " mods you have installed, there may not be any hand equipment to chose from.");
 
       // Pets
       PET_REGEN_DELAY = loadInt("Regen Delay", CAT_PETS,

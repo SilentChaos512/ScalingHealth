@@ -1,6 +1,8 @@
 package net.silentchaos512.scalinghealth.event;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -21,6 +23,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
@@ -32,6 +35,7 @@ import net.silentchaos512.scalinghealth.api.event.BlightSpawnEvent;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.network.NetworkHandler;
 import net.silentchaos512.scalinghealth.network.message.MessageMarkBlight;
+import net.silentchaos512.scalinghealth.utils.EquipmentTierMap;
 import net.silentchaos512.scalinghealth.utils.ModifierHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
@@ -155,9 +159,10 @@ public class DifficultyHandler {
 
   private void makeEntityBlight(EntityLivingBase entityLiving, Random rand) {
 
-    BlightSpawnEvent event = new BlightSpawnEvent((EntityLiving) entityLiving, entityLiving.world,
-        (float) entityLiving.posX, (float) entityLiving.posY, (float) entityLiving.posZ);
+    BlightSpawnEvent event = new BlightSpawnEvent.Pre((EntityLiving) entityLiving, entityLiving.world, (float) entityLiving.posX, (float) entityLiving.posY,
+        (float) entityLiving.posZ);
     if (MinecraftForge.EVENT_BUS.post(event)) {
+      // Someone canceled the blightification.
       return;
     }
 
@@ -192,30 +197,65 @@ public class DifficultyHandler {
 
     if (entityLiving instanceof EntityLiving) {
       EntityLiving entity = (EntityLiving) entityLiving;
-      int i = rand.nextInt(2);
-      float f = 0.5f;
 
-      for (int j = 0; j < 3; ++j)
-        if (rand.nextFloat() < 0.095f)
-          ++i;
+      // Select a tier (0 to 4)
+      final int highestTier = 4;
+      final int commonTier = ConfigScalingHealth.BLIGHT_EQUIPMENT_HIGHEST_COMMON_TIER;
+      int tier = rand.nextInt(1 + commonTier);
+      for (int j = 0; j < highestTier - commonTier; ++j) {
+        if (rand.nextFloat() < ConfigScalingHealth.BLIGHT_EQUIPMENT_TIER_UP_CHANCE) {
+          ++tier;
+        }
+      }
+      tier = MathHelper.clamp(tier, 0, highestTier);
 
-      for (int j = 3; j >= 0; --j) {
-        EntityEquipmentSlot slot = EntityEquipmentSlot.values()[j + 2];
-        ItemStack stack = entity.getItemStackFromSlot(slot); // FIXME?
+      float pieceChance = ConfigScalingHealth.BLIGHT_EQUIPMENT_ARMOR_PIECE_CHANCE;
 
-        if (j < 3 && rand.nextFloat() < f) break;
+      // Armor slots
+      for (EntityEquipmentSlot slot : ORDERED_SLOTS) {
+        ItemStack oldEquipment = entity.getItemStackFromSlot(slot);
 
-        if (stack == null) {
-          ItemStack stack1 = selectArmorForSlot(j + 1, i);
-          if (stack1 != null)
-            entity.setItemStackToSlot(slot, stack1);
+        if (slot != EntityEquipmentSlot.HEAD && rand.nextFloat() > pieceChance)
+          break;
+
+        if (StackHelper.isEmpty(oldEquipment)) {
+          ItemStack newEquipment = selectEquipmentForSlot(slot, tier);
+          if (StackHelper.isValid(newEquipment)) {
+            entity.setItemStackToSlot(slot, newEquipment);
+          }
+        }
+      }
+
+      // Hand slots
+      pieceChance = ConfigScalingHealth.BLIGHT_EQUIPMENT_HAND_PIECE_CHANCE;
+      if (rand.nextFloat() > pieceChance) {
+        // Main hand
+        ItemStack oldEquipment = entity.getHeldItemMainhand();
+        if (StackHelper.isEmpty(oldEquipment)) {
+          ItemStack newEquipment = selectEquipmentForSlot(EntityEquipmentSlot.MAINHAND, tier);
+          ScalingHealth.logHelper.debug(newEquipment);
+          if (StackHelper.isValid(newEquipment)) {
+            entity.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, newEquipment);
+          }
+        }
+
+        // Off hand (only if we tried to do main hand)
+        if (rand.nextFloat() > pieceChance) {
+          oldEquipment = entity.getHeldItemOffhand();
+          if (StackHelper.isEmpty(oldEquipment)) {
+            ItemStack newEquipment = selectEquipmentForSlot(EntityEquipmentSlot.OFFHAND, tier);
+            if (StackHelper.isValid(newEquipment)) {
+              entity.setItemStackToSlot(EntityEquipmentSlot.OFFHAND, newEquipment);
+            }
+          }
         }
       }
     }
 
+    // Add random enchantments
     for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
       ItemStack stack = entityLiving.getItemStackFromSlot(slot);
-      if (stack != null)
+      if (StackHelper.isValid(stack))
         EnchantmentHelper.addRandomEnchantment(rand, stack, 30, false);
     }
 
@@ -233,6 +273,9 @@ public class DifficultyHandler {
     MessageMarkBlight message = new MessageMarkBlight(entityLiving);
     NetworkHandler.INSTANCE.sendToAllAround(message, new TargetPoint(entityLiving.dimension,
         entityLiving.posX, entityLiving.posY, entityLiving.posZ, 128));
+
+    MinecraftForge.EVENT_BUS.post(new BlightSpawnEvent.Post((EntityLiving) entityLiving, entityLiving.world, (float) entityLiving.posX, (float) entityLiving.posY,
+        (float) entityLiving.posZ));
 
     // @formatter:on
   }
@@ -275,60 +318,64 @@ public class DifficultyHandler {
     //@formatter:on
   }
 
-  private ItemStack selectArmorForSlot(int slot, int tier) {
+  // **************************************************************************
+  // Equipment
+  // **************************************************************************
 
-    Item item = null;
+  private EntityEquipmentSlot[] ORDERED_SLOTS = { EntityEquipmentSlot.HEAD, EntityEquipmentSlot.CHEST, EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET };
+
+  public EquipmentTierMap mapHelmets = new EquipmentTierMap(5, EntityEquipmentSlot.HEAD);
+  public EquipmentTierMap mapChestplates = new EquipmentTierMap(5, EntityEquipmentSlot.CHEST);
+  public EquipmentTierMap mapLeggings = new EquipmentTierMap(5, EntityEquipmentSlot.LEGS);
+  public EquipmentTierMap mapBoots = new EquipmentTierMap(5, EntityEquipmentSlot.FEET);
+  public EquipmentTierMap mapMainhands = new EquipmentTierMap(5, EntityEquipmentSlot.MAINHAND);
+  public EquipmentTierMap mapOffhands = new EquipmentTierMap(5, EntityEquipmentSlot.OFFHAND);
+
+  public void initDefaultEquipment() {
+
+    mapHelmets.put(new ItemStack(Items.LEATHER_HELMET), 0);
+    mapHelmets.put(new ItemStack(Items.GOLDEN_HELMET), 1);
+    mapHelmets.put(new ItemStack(Items.CHAINMAIL_HELMET), 2);
+    mapHelmets.put(new ItemStack(Items.IRON_HELMET), 3);
+    mapHelmets.put(new ItemStack(Items.DIAMOND_HELMET), 4);
+
+    mapChestplates.put(new ItemStack(Items.LEATHER_CHESTPLATE), 0);
+    mapChestplates.put(new ItemStack(Items.GOLDEN_CHESTPLATE), 1);
+    mapChestplates.put(new ItemStack(Items.CHAINMAIL_CHESTPLATE), 2);
+    mapChestplates.put(new ItemStack(Items.IRON_CHESTPLATE), 3);
+    mapChestplates.put(new ItemStack(Items.DIAMOND_CHESTPLATE), 4);
+
+    mapLeggings.put(new ItemStack(Items.LEATHER_LEGGINGS), 0);
+    mapLeggings.put(new ItemStack(Items.GOLDEN_LEGGINGS), 1);
+    mapLeggings.put(new ItemStack(Items.CHAINMAIL_LEGGINGS), 2);
+    mapLeggings.put(new ItemStack(Items.IRON_LEGGINGS), 3);
+    mapLeggings.put(new ItemStack(Items.DIAMOND_LEGGINGS), 4);
+
+    mapBoots.put(new ItemStack(Items.LEATHER_BOOTS), 0);
+    mapBoots.put(new ItemStack(Items.GOLDEN_BOOTS), 1);
+    mapBoots.put(new ItemStack(Items.CHAINMAIL_BOOTS), 2);
+    mapBoots.put(new ItemStack(Items.IRON_BOOTS), 3);
+    mapBoots.put(new ItemStack(Items.DIAMOND_BOOTS), 4);
+  }
+
+  private ItemStack selectEquipmentForSlot(EntityEquipmentSlot slot, int tier) {
+
+    tier = MathHelper.clamp(tier, 0, 4);
     switch (slot) {
-      case 4:
-        if (tier == 0)
-          item = Items.LEATHER_HELMET;
-        else if (tier == 1)
-          item = Items.GOLDEN_HELMET;
-        else if (tier == 2)
-          item = Items.CHAINMAIL_HELMET;
-        else if (tier == 3)
-          item = Items.IRON_HELMET;
-        else if (tier == 4)
-          item = Items.DIAMOND_HELMET;
-        break;
-      case 3:
-        if (tier == 0)
-          item = Items.LEATHER_CHESTPLATE;
-        else if (tier == 1)
-          item = Items.GOLDEN_CHESTPLATE;
-        else if (tier == 2)
-          item = Items.CHAINMAIL_CHESTPLATE;
-        else if (tier == 3)
-          item = Items.IRON_CHESTPLATE;
-        else if (tier == 4)
-          item = Items.DIAMOND_CHESTPLATE;
-        break;
-      case 2:
-        if (tier == 0)
-          item = Items.LEATHER_LEGGINGS;
-        else if (tier == 1)
-          item = Items.GOLDEN_LEGGINGS;
-        else if (tier == 2)
-          item = Items.CHAINMAIL_LEGGINGS;
-        else if (tier == 3)
-          item = Items.IRON_LEGGINGS;
-        else if (tier == 4)
-          item = Items.DIAMOND_LEGGINGS;
-        break;
-      case 1:
-        if (tier == 0)
-          item = Items.LEATHER_BOOTS;
-        else if (tier == 1)
-          item = Items.GOLDEN_BOOTS;
-        else if (tier == 2)
-          item = Items.CHAINMAIL_BOOTS;
-        else if (tier == 3)
-          item = Items.IRON_BOOTS;
-        else if (tier == 4)
-          item = Items.DIAMOND_BOOTS;
-        break;
+      case CHEST:
+        return mapChestplates.getRandom(tier);
+      case FEET:
+        return mapBoots.getRandom(tier);
+      case HEAD:
+        return mapHelmets.getRandom(tier);
+      case LEGS:
+        return mapLeggings.getRandom(tier);
+      case MAINHAND:
+        return mapMainhands.getRandom(tier);
+      case OFFHAND:
+        return mapOffhands.getRandom(tier);
+      default:
+        return StackHelper.empty();
     }
-
-    return item == null ? StackHelper.empty() : new ItemStack(item);
   }
 }

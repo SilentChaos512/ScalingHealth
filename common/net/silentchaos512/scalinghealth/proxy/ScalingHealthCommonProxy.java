@@ -22,6 +22,7 @@ public class ScalingHealthCommonProxy extends CommonProxy {
     super.preInit(registry);
 
     ModEntities.init(registry);
+    DifficultyHandler.INSTANCE.initDefaultEquipment();
 
     NetworkHandler.init();
 
