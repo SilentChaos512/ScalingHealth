@@ -28,7 +28,7 @@ public class BlightHandler {
 
   public static final String NBT_BLIGHT = ScalingHealth.MOD_ID_OLD + ".IsBlight";
 
-  public static int POTION_APPLY_TIME = 1 * 1200;
+  public static int POTION_APPLY_TIME = 4 * 1200;
   public static int UPDATE_DELAY = 200;
   public static int UPDATE_DELAY_SALT = 5 + ScalingHealth.random.nextInt(10);
 
@@ -79,20 +79,20 @@ public class BlightHandler {
 
     // Invisibility
     if (ConfigScalingHealth.BLIGHT_INVISIBLE)
-      entityLiving.addPotionEffect(new PotionEffect(
-          MobEffects.INVISIBILITY, POTION_APPLY_TIME, 0, true, false));
+      entityLiving.addPotionEffect(
+          new PotionEffect(MobEffects.INVISIBILITY, POTION_APPLY_TIME, 0, true, false));
     // Fire Resistance
     if (ConfigScalingHealth.BLIGHT_FIRE_RESIST)
-      entityLiving.addPotionEffect(new PotionEffect(
-          MobEffects.FIRE_RESISTANCE, POTION_APPLY_TIME, 0, true, false));
+      entityLiving.addPotionEffect(
+          new PotionEffect(MobEffects.FIRE_RESISTANCE, POTION_APPLY_TIME, 0, true, false));
     // Speed
     if (ConfigScalingHealth.BLIGHT_AMP_SPEED > 0)
-      entityLiving.addPotionEffect(new PotionEffect(
-          MobEffects.SPEED, POTION_APPLY_TIME, ConfigScalingHealth.BLIGHT_AMP_SPEED, true, false));
+      entityLiving.addPotionEffect(new PotionEffect(MobEffects.SPEED, POTION_APPLY_TIME,
+          ConfigScalingHealth.BLIGHT_AMP_SPEED, true, false));
     // Strength
     if (ConfigScalingHealth.BLIGHT_AMP_STRENGTH > 0)
-      entityLiving.addPotionEffect(new PotionEffect(
-          MobEffects.STRENGTH, POTION_APPLY_TIME, ConfigScalingHealth.BLIGHT_AMP_STRENGTH, true, false));
+      entityLiving.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, POTION_APPLY_TIME,
+          ConfigScalingHealth.BLIGHT_AMP_STRENGTH, true, false));
   }
 
   // **********
@@ -109,16 +109,24 @@ public class BlightHandler {
     LocalizationHelper loc = ScalingHealth.localizationHelper;
 
     Entity entitySource = event.getSource().getTrueSource();
-    boolean isTamedAnimal = entitySource instanceof EntityTameable && ((EntityTameable) entitySource).isTamed();
+    boolean isTamedAnimal = entitySource instanceof EntityTameable
+        && ((EntityTameable) entitySource).isTamed();
     if (entitySource instanceof EntityPlayer || isTamedAnimal) {
       // Killed by a player or a player's pet.
       EntityLivingBase blight = event.getEntityLiving();
-      EntityPlayer player = (EntityPlayer) event.getSource().getTrueSource();
+      EntityPlayer player;
+      EntityLivingBase actualKiller;
+      if (isTamedAnimal) {
+        player = (EntityPlayer) ((EntityTameable) entitySource).getOwner();
+        actualKiller = (EntityLivingBase) entitySource;
+      } else {
+        actualKiller = player = (EntityPlayer) entitySource;
+      }
 
       // Tell all players that the blight was killed.
       if (ConfigScalingHealth.BLIGHT_NOTIFY_PLAYERS_ON_DEATH) {
         String message = loc.getLocalizedString("blight", "killedByPlayer", blight.getName(),
-            player.getName());
+            actualKiller.getName());
         ScalingHealth.logHelper.info(message);
         for (EntityPlayer p : player.world.getPlayers(EntityPlayer.class, e -> true))
           ChatHelper.sendMessage(p, message);
@@ -145,8 +153,7 @@ public class BlightHandler {
             message += "... again";
           else
             message += "... gg";
-        }
-        else if (message.endsWith("suffocated in a wall")) {
+        } else if (message.endsWith("suffocated in a wall")) {
           message += " *slow clap*";
         }
 

@@ -9,7 +9,7 @@ buildscript {
 }
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.2.0"
+version = "1.2.1"
 def silentlib_version = "2.2.6"
 def buildNum = 0;
 group = "net.silentchaos512.scalinghealth"

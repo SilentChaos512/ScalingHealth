@@ -195,8 +195,9 @@ public class SHPlayerDataHandler {
       setMaxHealth(maxHealth + amount);
 
       EntityPlayer player = playerWR.get();
-      if (player != null)
-        player.heal(amount);
+      if (player != null) {
+        player.setHealth(player.getHealth() + amount);
+      }
     }
 
     public Calendar getLastTimePlayed() {

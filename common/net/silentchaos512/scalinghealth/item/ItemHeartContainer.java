@@ -38,7 +38,8 @@ public class ItemHeartContainer extends ItemSL {
       // Heal the player (this is separate from the "healing" of the newly added heart, if that's allowed).
       boolean consumed = false;
       if (ConfigScalingHealth.HEARTS_HEALTH_RESTORED > 0 && player.getHealth() < player.getMaxHealth()) {
-        player.heal(ConfigScalingHealth.HEARTS_HEALTH_RESTORED);
+        float currentHealth = player.getHealth();
+        player.setHealth(currentHealth + ConfigScalingHealth.HEARTS_HEALTH_RESTORED);
         consumed = true;
       }
 
