@@ -63,14 +63,13 @@ public class DifficultyHandler {
   public void onMobSpawn(LivingUpdateEvent event) {
 
     // Increase mob health and make blights?
-    if (!(event.getEntity() instanceof EntityLivingBase))
+    if (!(event.getEntity() instanceof EntityLiving))
       return;
 
-    EntityLivingBase entityLiving = (EntityLivingBase) event.getEntity();
+    EntityLiving entityLiving = (EntityLiving) event.getEntity();
 
     //@formatter:off
     if (entityLiving.world.isRemote
-        || entityLiving instanceof EntityPlayer
         || entityBlacklistedFromHealthIncrease(entityLiving)
         || !canIncreaseEntityHealth(entityLiving))
       return;
@@ -180,7 +179,7 @@ public class DifficultyHandler {
     return makeBlight;
   }
 
-  private void makeEntityBlight(EntityLivingBase entityLiving, Random rand) {
+  private void makeEntityBlight(EntityLiving entityLiving, Random rand) {
 
     BlightSpawnEvent event = new BlightSpawnEvent.Pre((EntityLiving) entityLiving, entityLiving.world, (float) entityLiving.posX, (float) entityLiving.posY,
         (float) entityLiving.posZ);
