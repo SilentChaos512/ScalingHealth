@@ -10,6 +10,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
+import net.silentchaos512.scalinghealth.utils.ModifierHandler;
+import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
+import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
 public class PlayerBonusRegenHandler {
 
@@ -26,6 +29,13 @@ public class PlayerBonusRegenHandler {
 
   @SubscribeEvent
   public void onPlayerTick(PlayerTickEvent event) {
+
+    // TODO: Remove this?
+    // Apply our attribute modifier every single tick! Trying to solve issue #43.
+    PlayerData data = SHPlayerDataHandler.get(event.player);
+    if (data != null) {
+      ModifierHandler.setMaxHealth(event.player, data.getMaxHealth(), 0);
+    }
 
     if (event.side == Side.CLIENT || !ConfigScalingHealth.ENABLE_BONUS_HEALTH_REGEN)
       return;

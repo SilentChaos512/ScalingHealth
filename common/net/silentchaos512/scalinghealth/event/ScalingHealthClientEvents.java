@@ -7,6 +7,9 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -70,9 +73,21 @@ public class ScalingHealthClientEvents {
         areaMode.getAreaDifficulty(world, player.getPosition()), areaMode.name());
     ret += String.format("Player Difficulty = %.4f\n", data.getDifficulty());
     ret += "Player Health = " + player.getHealth() + " / " + player.getMaxHealth() + "\n";
+
+    // Display all health attribute modifiers.
+    IAttributeInstance attr = player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
+    if (attr.getModifiers().size() > 0) {
+      for (AttributeModifier mod : attr.getModifiers()) {
+        ret += "         " + mod.toString() + "\n";
+      }
+    } else {
+      ret += "        No modifiers! That should not happen.";
+    }
+
     int regenTimer = PlayerBonusRegenHandler.INSTANCE.getTimerForPlayer(player);
     ret += String.format("Regen Timer = %d (%ds)", regenTimer, regenTimer / 20) + "\n";
-    ret += String.format("Food = %d (%.2f)", player.getFoodStats().getFoodLevel(), player.getFoodStats().getSaturationLevel()) + "\n";
+    ret += String.format("Food = %d (%.2f)", player.getFoodStats().getFoodLevel(),
+        player.getFoodStats().getSaturationLevel()) + "\n";
 
     // Blight count
     int blightCount = world.getEntities(EntityLivingBase.class, e -> BlightHandler.isBlight(e))

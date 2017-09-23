@@ -1,3 +1,7 @@
+1.2.2
+Update version range to include 1.12.2.
+Fixed: A crash with Metamorph (possibly other unreported crashes?)
+
 1.2.0
 Added: Difficulty meter now shows an actual number for the area difficulty.
 Added: Config settings for blight equipment (new category: mob/blights/equipment)
