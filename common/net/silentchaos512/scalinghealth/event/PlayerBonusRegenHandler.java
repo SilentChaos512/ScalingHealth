@@ -30,13 +30,6 @@ public class PlayerBonusRegenHandler {
   @SubscribeEvent
   public void onPlayerTick(PlayerTickEvent event) {
 
-    // TODO: Remove this?
-    // Apply our attribute modifier every single tick! Trying to solve issue #43.
-    PlayerData data = SHPlayerDataHandler.get(event.player);
-    if (data != null) {
-      ModifierHandler.setMaxHealth(event.player, data.getMaxHealth(), 0);
-    }
-
     if (event.side == Side.CLIENT || !ConfigScalingHealth.ENABLE_BONUS_HEALTH_REGEN)
       return;
 

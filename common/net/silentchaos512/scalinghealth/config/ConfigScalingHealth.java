@@ -6,12 +6,10 @@ import java.util.List;
 
 import com.google.common.collect.Lists;
 
-import net.minecraftforge.common.config.ConfigCategory;
-import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fml.client.config.IConfigElement;
 import net.silentchaos512.lib.config.AdaptiveConfig;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.client.HeartDisplayHandler;
 import net.silentchaos512.scalinghealth.lib.EnumAreaDifficultyMode;
 import net.silentchaos512.scalinghealth.lib.EnumHealthModMode;
 import net.silentchaos512.scalinghealth.lib.EnumResetTime;
@@ -22,6 +20,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
 
   // Client
   public static boolean CHANGE_HEART_RENDERING = true;
+  public static HeartDisplayHandler.TextStyle HEART_DISPLAY_TEXT_STYLE = HeartDisplayHandler.TextStyle.ROWS;
   public static boolean RENDER_DIFFICULTY_METER = true;
   public static boolean RENDER_DIFFICULTY_METER_ALWAYS = false;
   public static int DIFFICULTY_METER_DISPLAY_TIME = 160;
@@ -186,6 +185,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
       CHANGE_HEART_RENDERING = loadBoolean("Custom Heart Rendering", CAT_CLIENT,
           CHANGE_HEART_RENDERING,
           "Replace vanilla heart rendering.");
+      HEART_DISPLAY_TEXT_STYLE = HeartDisplayHandler.TextStyle.loadFromConfig(config);
       loadHeartColors(config);
 
       // Players

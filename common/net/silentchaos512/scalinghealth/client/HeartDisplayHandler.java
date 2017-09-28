@@ -3,6 +3,7 @@ package net.silentchaos512.scalinghealth.client;
 import java.util.Random;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -14,14 +15,45 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 
 public class HeartDisplayHandler extends Gui {
 
+  public static enum TextStyle {
+
+    DISABLED, ROWS, HEALTH_AND_MAX;
+
+    public static TextStyle loadFromConfig(Configuration config) {
+
+      String[] validValues = new String[values().length];
+      for (TextStyle style : values()) {
+        validValues[style.ordinal()] = style.name();
+      }
+
+      String value = config.getString("Health Text Style", ConfigScalingHealth.CAT_CLIENT,
+          ROWS.name(),
+          "Determines what the text next to your hearts will display. DISABLED will display"
+              + " nothing, ROWS will display the number of remaining rows that have health left,"
+              + " and HEALTH_AND_MAX will display your actual health and max health values.",
+          validValues);
+
+      for (TextStyle style : values()) {
+        if (value.equalsIgnoreCase(style.name())) {
+          return style;
+        }
+      }
+
+      return ROWS;
+    }
+  }
+
   public static final ResourceLocation TEXTURE = new ResourceLocation(ScalingHealth.MOD_ID_LOWER,
       "textures/gui/hud.png");
+
+  public static HeartDisplayHandler INSTANCE = null;
 
   long lastSystemTime = 0;
   long healthUpdateCounter = 0;
@@ -30,15 +62,47 @@ public class HeartDisplayHandler extends Gui {
   int lastPlayerHealth = 0;
   Random rand = new Random();
 
+  public HeartDisplayHandler() {
+
+    if (INSTANCE == null) {
+      INSTANCE = this;
+    }
+  }
+
   @SubscribeEvent
   public void onHealthBar(RenderGameOverlayEvent.Pre event) {
 
-    if (!ConfigScalingHealth.CHANGE_HEART_RENDERING || event.getType() != ElementType.HEALTH)
-      return;
-    event.setCanceled(true);
-
     Minecraft mc = Minecraft.getMinecraft();
     EntityPlayer player = mc.player;
+
+    TextStyle style = ConfigScalingHealth.HEART_DISPLAY_TEXT_STYLE;
+    if (event.getType() == ElementType.TEXT
+        && style != TextStyle.DISABLED
+        && !player.capabilities.isCreativeMode) {
+      final float scale = style == TextStyle.ROWS ? 0.65f : 0.5f;
+      final int width = event.getResolution().getScaledWidth();
+      final int height = event.getResolution().getScaledHeight();
+      final int left = (int) ((width / 2 - 91) / scale);
+      final int top = (int) ((height - GuiIngameForge.left_height + 21 + (1 / scale)) / scale);
+
+      // Draw health string
+      String healthString = style == TextStyle.HEALTH_AND_MAX
+          ? (int) player.getHealth() + "/" + (int) player.getMaxHealth()
+          : (int) Math.ceil(player.getHealth() / 20) + "x";
+      FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
+      int stringWidth = fontRenderer.getStringWidth(healthString);
+      GlStateManager.pushMatrix();
+      GlStateManager.scale(scale, scale, 1f);
+      fontRenderer.drawStringWithShadow(healthString, left - stringWidth - 2, top, 0xDDDDDD);
+      GlStateManager.popMatrix();
+    }
+
+    if (event.getType() != ElementType.HEALTH || !ConfigScalingHealth.CHANGE_HEART_RENDERING) {
+      return;
+    }
+
+    event.setCanceled(true);
+
     final boolean hardcoreMode = mc.world.getWorldInfo().isHardcoreModeEnabled();
 
     int width = event.getResolution().getScaledWidth();
@@ -72,13 +136,13 @@ public class HeartDisplayHandler extends Gui {
     float absorb = MathHelper.ceil(player.getAbsorptionAmount());
 
     int healthRows = MathHelper.ceil((healthMax + absorb) / 2f / 10f);
-    int rowHeight = Math.max(10 - (healthRows - 2), 3); // TODO: Remove?
+    int rowHeight = Math.max(10 - (healthRows - 2), 3);
 
     rand.setSeed(updateCounter * 312871);
 
-    int left = width / 2 - 91;
-    int top = height - GuiIngameForge.left_height;
-    GuiIngameForge.left_height += healthRows * rowHeight; // TODO: Remove?
+    final int left = width / 2 - 91;
+    final int top = height - GuiIngameForge.left_height;
+    GuiIngameForge.left_height += healthRows * rowHeight;
     if (rowHeight != 10)
       GuiIngameForge.left_height += 10 - rowHeight;
 

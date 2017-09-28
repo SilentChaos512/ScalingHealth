@@ -81,7 +81,7 @@ public class ScalingHealthClientEvents {
         ret += "         " + mod.toString() + "\n";
       }
     } else {
-      ret += "        No modifiers! That should not happen.";
+      ret += "        No modifiers! That should not happen.\n";
     }
 
     int regenTimer = PlayerBonusRegenHandler.INSTANCE.getTimerForPlayer(player);

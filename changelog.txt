@@ -1,3 +1,7 @@
+1.2.3
+Added: A small bit of text to the left of hearts to show your current and max health. Can be disabled (look under the client category).
+Added: Debug mode now shows all modifiers being applied to your health. If your health isn't coming out to the number you think it should, this might help you figure out which mod(s) are changing it.
+
 1.2.2
 Update version range to include 1.12.2.
 Fixed: A crash with Metamorph (possibly other unreported crashes?)
