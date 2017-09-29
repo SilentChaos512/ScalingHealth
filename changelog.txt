@@ -1,5 +1,8 @@
-1.2.3
-Added: A small bit of text to the left of hearts to show your current and max health. Can be disabled (look under the client category).
+1.3.0
+Requires Silent Lib 2.2.9. Cuts support for Minecraft 1.10.2 and 1.11.2.
+Added: Bandages and medkits. These items will restore a percentage of your health over a set amount of time. Bandages restore 30% over 60 seconds, and medkits restore 70% over 35 seconds. Movement speed is reduced by 25% while in effect.
+Added: Heart dust. Crafted from a heart container and used to craft bandages and medkits. You get 24 dust from each heart, but you can't craft them back.
+Added: A small bit of text to the left of hearts. By default (ROWS mode), this will show how many rows of hearts (full and partial) you currently have, but does nothing to indicate your max health. Change to the HEALTH_AND_MAX mode to make the text display your current and max health values (the actual numbers Minecraft stores, so it's in half-hearts). Set to DISABLED to remove the text.
 Added: Debug mode now shows all modifiers being applied to your health. If your health isn't coming out to the number you think it should, this might help you figure out which mod(s) are changing it.
 
 1.2.2

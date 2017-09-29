@@ -12,6 +12,18 @@ tile.scalinghealth:CrystalOre.name=Heart Crystal Ore
 
 item.scalinghealth:CrystalShard.name=Heart Crystal Shard
 item.scalinghealth:HeartContainer.name=Heart Container
+item.scalinghealth:HeartDust.name=Heart Dust
+item.scalinghealth:HealingItem0.name=Bandages
+item.scalinghealth:HealingItem1.name=Medkit
+item.scalinghealth:HealingItem.healingValue=Restores %d%% of your health over %d seconds.
+item.scalinghealth:HealingItem.howToUse=Use for %d seconds to apply.
+
+
+###########
+# Potions #
+###########
+
+effect.scalinghealth:bandaged=Bandaged
 
 
 

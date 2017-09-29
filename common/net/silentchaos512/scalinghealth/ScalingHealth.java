@@ -4,6 +4,7 @@ import java.util.Random;
 
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
+import net.minecraft.potion.Potion;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -22,6 +23,7 @@ import net.silentchaos512.scalinghealth.command.CommandScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.init.ModBlocks;
 import net.silentchaos512.scalinghealth.init.ModItems;
+import net.silentchaos512.scalinghealth.init.ModPotions;
 import net.silentchaos512.scalinghealth.proxy.ScalingHealthCommonProxy;
 import net.silentchaos512.scalinghealth.world.SHWorldGenerator;
 
@@ -42,7 +44,7 @@ public class ScalingHealth {
   public static final String VERSION_SILENTLIB = "SL_VERSION";
   public static final int BUILD_NUM = 0;
   public static final String DEPENDENCIES = "required-after:silentlib@[" + VERSION_SILENTLIB + ",);";
-  public static final String ACCEPTED_MC_VERSIONS = "[1.10.2,1.12.2]";
+  public static final String ACCEPTED_MC_VERSIONS = "[1.12,1.12.2]";
   public static final String RESOURCE_PREFIX = MOD_ID_LOWER + ":";
 
   public static SimpleNetworkWrapper networkManager;
@@ -68,6 +70,7 @@ public class ScalingHealth {
     ConfigScalingHealth.INSTANCE.init(event.getSuggestedConfigurationFile());
     ConfigScalingHealth.INSTANCE.save();
 
+    registry.addRegistrationHandler(new ModPotions(), Potion.class);
     registry.addRegistrationHandler(new ModBlocks(), Block.class);
     registry.addRegistrationHandler(new ModItems(), Item.class);
 
