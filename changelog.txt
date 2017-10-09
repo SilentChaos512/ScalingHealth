@@ -1,7 +1,9 @@
 1.3.1
 Added: Config to blacklist mob extra health by dimension (main/mob/health/Dimension Blacklist) (#37)
 Added: Config for difficulty change on boss kills (main/difficulty/Difficulty Per Boss Kill) (#42)
+Added: Config to blacklist all bosses from becoming blights (main/mob/blights/Blacklist All Bosses) (#46)
 Added: Color setting for the new health text. GREEN_TO_RED mode (default) displays green at full health and moves to red as you take damage. WHITE is just white. PSYCHEDELIC lets you taste the rainbow.
+Changed: Entity blacklists now check for registry names, but the old entity ID's will still match too (#46)
 
 1.3.0
 Requires Silent Lib 2.2.9. Cuts support for Minecraft 1.10.2 and 1.11.2.

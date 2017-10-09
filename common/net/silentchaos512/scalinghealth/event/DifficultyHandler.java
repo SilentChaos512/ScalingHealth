@@ -1,8 +1,6 @@
 package net.silentchaos512.scalinghealth.event;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -19,7 +17,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.init.MobEffects;
 import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
@@ -35,6 +32,7 @@ import net.silentchaos512.scalinghealth.api.event.BlightSpawnEvent;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.network.NetworkHandler;
 import net.silentchaos512.scalinghealth.network.message.MessageMarkBlight;
+import net.silentchaos512.scalinghealth.utils.EntityMatchList;
 import net.silentchaos512.scalinghealth.utils.EquipmentTierMap;
 import net.silentchaos512.scalinghealth.utils.MobPotionMap;
 import net.silentchaos512.scalinghealth.utils.ModifierHandler;
@@ -301,13 +299,12 @@ public class DifficultyHandler {
     if (!ConfigScalingHealth.ALLOW_PEACEFUL_EXTRA_HEALTH && entityLiving instanceof EntityAnimal)
       return true;
 
-    String entityId = EntityList.getEntityString(entityLiving);
-    List<String> blacklist = ConfigScalingHealth.getMobHealthBlacklist();
+    EntityMatchList blacklist = ConfigScalingHealth.MOB_HEALTH_BLACKLIST;
     List<Integer> dimBlacklist = ConfigScalingHealth.MOB_HEALTH_DIMENSION_BLACKLIST;
 
-    if (entityId == null || blacklist == null || dimBlacklist == null) return false;
+    if (blacklist == null || dimBlacklist == null) return false;
 
-    return blacklist.contains(entityId) || dimBlacklist.contains(entityLiving.dimension);
+    return blacklist.contains(entityLiving) || dimBlacklist.contains(entityLiving.dimension);
     //@formatter:on
   }
 
@@ -322,13 +319,12 @@ public class DifficultyHandler {
     // @formatter:off
     if (entityLiving == null) return true;
 
-    String entityId = EntityList.getEntityString(entityLiving);
-    List<String> blacklist = ConfigScalingHealth.getMobBlightBlacklist();
+    EntityMatchList blacklist = ConfigScalingHealth.BLIGHT_BLACKLIST;
     boolean isBoss = !entityLiving.isNonBoss();
 
-    if (entityId == null || blacklist == null) return false;
+    if (blacklist == null) return false;
 
-    return blacklist.contains(entityId) || (isBoss && ConfigScalingHealth.BLIGHT_BLACKLIST_ALL_BOSSES);
+    return blacklist.contains(entityLiving) || (isBoss && ConfigScalingHealth.BLIGHT_BLACKLIST_ALL_BOSSES);
     //@formatter:on
   }
 

@@ -14,6 +14,7 @@ import net.silentchaos512.scalinghealth.client.HeartDisplayHandler;
 import net.silentchaos512.scalinghealth.lib.EnumAreaDifficultyMode;
 import net.silentchaos512.scalinghealth.lib.EnumHealthModMode;
 import net.silentchaos512.scalinghealth.lib.EnumResetTime;
+import net.silentchaos512.scalinghealth.utils.EntityMatchList;
 
 public class ConfigScalingHealth extends AdaptiveConfig {
 
@@ -68,8 +69,8 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static float DIFFICULTY_GENERIC_HEALTH_MULTIPLIER = 0.5F;
   public static float DIFFICULTY_PEACEFUL_HEALTH_MULTIPLIER = 0.25F;
   public static EnumHealthModMode MOB_HEALTH_SCALING_MODE = EnumHealthModMode.MULTI_HALF;
-  public static List<Integer> MOB_HEALTH_DIMENSION_BLACKLIST = new ArrayList<>(); 
-  private static List<String> MOB_HEALTH_BLACKLIST;
+  public static List<Integer> MOB_HEALTH_DIMENSION_BLACKLIST = new ArrayList<>();
+  public static EntityMatchList MOB_HEALTH_BLACKLIST = new EntityMatchList();
   private static String[] MOB_HEALTH_BLACKLIST_DEFAULTS = new String[] {};
   // Blights
   public static float BLIGHT_CHANCE_MULTIPLIER = 0.0625F;
@@ -82,8 +83,9 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static boolean BLIGHT_SUPERCHARGE_CREEPERS = true;
   public static boolean BLIGHT_NOTIFY_PLAYERS_ON_DEATH = true;
   public static boolean BLIGHT_BLACKLIST_ALL_BOSSES = false;
-  private static List<String> BLIGHT_BLACKLIST;
-  private static String[] BLIGHT_BLACKLIST_DEFAULTS = new String[] { "WitherBoss", "Villager" };
+  public static EntityMatchList BLIGHT_BLACKLIST = new EntityMatchList();
+  private static String[] BLIGHT_BLACKLIST_DEFAULTS = new String[] { "minecraft:wither",
+      "minecraft:villager", "minecolonies:citizen" };
   // Blight equipment
   public static int BLIGHT_EQUIPMENT_HIGHEST_COMMON_TIER = 1;
   public static float BLIGHT_EQUIPMENT_TIER_UP_CHANCE = 0.095f;
@@ -270,13 +272,14 @@ public class ConfigScalingHealth extends AdaptiveConfig {
           MOB_HEALTH_DIMENSION_BLACKLIST.add(Integer.parseInt(str));
         }
       }
-      MOB_HEALTH_BLACKLIST = Arrays.asList(config.getStringList("Blacklist", CAT_MOB_HEALTH,
+      MOB_HEALTH_BLACKLIST.clear();
+      for (String str : config.getStringList("Blacklist", CAT_MOB_HEALTH,
           MOB_HEALTH_BLACKLIST_DEFAULTS,
           "Mobs listed here will never receive extra health, and will not become blights. There is"
           + " also a separate blacklist for blights, if you still want the mob in question to have"
-          + " extra health."));
-      if (MOB_HEALTH_BLACKLIST == null)
-        MOB_HEALTH_BLACKLIST = Lists.newArrayList(MOB_HEALTH_BLACKLIST_DEFAULTS);
+          + " extra health.")) {
+        MOB_HEALTH_BLACKLIST.add(str);
+      }
       // Blights
       BLIGHT_CHANCE_MULTIPLIER = config.getFloat("Blight Chance Multiplier", CAT_MOB_BLIGHT,
           BLIGHT_CHANCE_MULTIPLIER, 0f, Float.MAX_VALUE,
@@ -304,10 +307,13 @@ public class ConfigScalingHealth extends AdaptiveConfig {
       BLIGHT_SUPERCHARGE_CREEPERS = loadBoolean("Supercharge Creepers", CAT_MOB_BLIGHT,
           BLIGHT_SUPERCHARGE_CREEPERS,
           "Blight creepers will also be supercharged (like when they are struck by lightning).");
-      BLIGHT_BLACKLIST = Arrays.asList(config.getStringList("Blacklist", CAT_MOB_BLIGHT,
+      BLIGHT_BLACKLIST.clear();
+      for (String str : config.getStringList("Blacklist", CAT_MOB_BLIGHT,
           BLIGHT_BLACKLIST_DEFAULTS,
           "Mobs listed here will never become blights, but can still receive extra health. There is"
-          + " also a blacklist for extra health."));
+          + " also a blacklist for extra health.")) {
+        BLIGHT_BLACKLIST.add(str);
+      }
       BLIGHT_BLACKLIST_ALL_BOSSES = loadBoolean("Blacklist All Bosses", CAT_MOB_BLIGHT,
           BLIGHT_BLACKLIST_ALL_BOSSES,
           "If enabled, no bosses can become blights. If you need more control, use the Blacklist"
@@ -455,20 +461,6 @@ public class ConfigScalingHealth extends AdaptiveConfig {
       ScalingHealth.logHelper.severe("Could not load configuration file!");
       ex.printStackTrace();
     }
-  }
-
-  public static List<String> getMobHealthBlacklist() {
-
-    if (MOB_HEALTH_BLACKLIST == null)
-      MOB_HEALTH_BLACKLIST = Lists.newArrayList();
-    return MOB_HEALTH_BLACKLIST;
-  }
-
-  public static List<String> getMobBlightBlacklist() {
-
-    if (BLIGHT_BLACKLIST == null)
-      BLIGHT_BLACKLIST = Lists.newArrayList();
-    return BLIGHT_BLACKLIST;
   }
 
   private static void loadHeartColors(Configuration c) {
