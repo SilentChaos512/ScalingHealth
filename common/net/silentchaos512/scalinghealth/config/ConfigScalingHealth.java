@@ -1,6 +1,7 @@
 package net.silentchaos512.scalinghealth.config;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -67,6 +68,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static float DIFFICULTY_GENERIC_HEALTH_MULTIPLIER = 0.5F;
   public static float DIFFICULTY_PEACEFUL_HEALTH_MULTIPLIER = 0.25F;
   public static EnumHealthModMode MOB_HEALTH_SCALING_MODE = EnumHealthModMode.MULTI_HALF;
+  public static List<Integer> MOB_HEALTH_DIMENSION_BLACKLIST = new ArrayList<>(); 
   private static List<String> MOB_HEALTH_BLACKLIST;
   private static String[] MOB_HEALTH_BLACKLIST_DEFAULTS = new String[] {};
   // Blights
@@ -257,6 +259,15 @@ public class ConfigScalingHealth extends AdaptiveConfig {
           "The minimum extra health a peaceful will have per point of difficulty. Same as "
               + "\"Base Health Modifier\", but for peaceful mobs!");
       MOB_HEALTH_SCALING_MODE = EnumHealthModMode.loadFromConfig(config, MOB_HEALTH_SCALING_MODE);
+      String[] dimList = config.getStringList("Dimension Blacklist", CAT_MOB_HEALTH, new String[0],
+          "Mobs will not gain extra health or become blights in these dimensions. Integers only,"
+          + " any other entries will be silently ignored.");
+      MOB_HEALTH_DIMENSION_BLACKLIST.clear();
+      for (String str : dimList) {
+        if (canParseInt(str)) {
+          MOB_HEALTH_DIMENSION_BLACKLIST.add(Integer.parseInt(str));
+        }
+      }
       MOB_HEALTH_BLACKLIST = Arrays.asList(config.getStringList("Blacklist", CAT_MOB_HEALTH,
           MOB_HEALTH_BLACKLIST_DEFAULTS,
           "Mobs listed here will never receive extra health, and will not become blights. There is"
@@ -470,6 +481,16 @@ public class ConfigScalingHealth extends AdaptiveConfig {
       ScalingHealth.logHelper.warning(
           "Failed to load heart colors because a value could not be parsed. Make sure all values are valid hexadecimal integers. Try using an online HTML color picker if you are having problems.");
       ex.printStackTrace();
+    }
+  }
+
+  public boolean canParseInt(String str) {
+
+    try {
+      Integer.parseInt(str);
+      return true;
+    } catch (NumberFormatException ex) {
+      return false;
     }
   }
 }

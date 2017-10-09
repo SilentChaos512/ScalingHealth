@@ -297,10 +297,11 @@ public class DifficultyHandler {
 
     String entityId = EntityList.getEntityString(entityLiving);
     List<String> blacklist = ConfigScalingHealth.getMobHealthBlacklist();
+    List<Integer> dimBlacklist = ConfigScalingHealth.MOB_HEALTH_DIMENSION_BLACKLIST;
 
-    if (entityId == null || blacklist == null) return false;
+    if (entityId == null || blacklist == null || dimBlacklist == null) return false;
 
-    return blacklist.contains(entityId);
+    return blacklist.contains(entityId) || dimBlacklist.contains(entityLiving.dimension);
     //@formatter:on
   }
 
