@@ -109,6 +109,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static float DIFFICULTY_PER_SECOND = DIFFICULTY_MAX / (HOURS_TO_MAX_DIFFICULTY * 3600);
   public static float DIFFICULTY_PER_BLOCK = DIFFICULTY_MAX / 100000;
   public static float DIFFICULTY_PER_KILL = 0;
+  public static float DIFFICULTY_PER_BOSS_KILL = 0;
   public static float DIFFICULTY_IDLE_MULTI = 0.7f;
   public static float DIFFICULTY_LOST_ON_DEATH = 0f;
   public static float DIFFICULTY_GROUP_AREA_BONUS = 0.05f;
@@ -387,6 +388,10 @@ public class ConfigScalingHealth extends AdaptiveConfig {
       DIFFICULTY_PER_KILL = config.getFloat("Difficulty Per Kill", CAT_DIFFICULTY,
           DIFFICULTY_PER_KILL, -1000f, 1000f,
           "The difficulty gained for each hostile mob killed. Set to 0 to disable. Negative numbers"
+          + " cause difficulty to decrease with each kill.");
+      DIFFICULTY_PER_BOSS_KILL = config.getFloat("Difficulty Per Boss Kill", CAT_DIFFICULTY,
+          DIFFICULTY_PER_BOSS_KILL, -1000f, 1000f,
+          "The difficulty gained for each boss mob killed. Set to 0 to disable. Negative numbers"
           + " cause difficulty to decrease with each kill.");
       DIFFICULTY_IDLE_MULTI = config.getFloat("Idle Multiplier", CAT_DIFFICULTY,
           DIFFICULTY_IDLE_MULTI, 0f, 100f,

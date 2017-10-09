@@ -83,14 +83,20 @@ public class DifficultyHandler {
   @SubscribeEvent
   public void onMobDeath(LivingDeathEvent event) {
 
-    EntityLivingBase entity = event.getEntityLiving();
+    EntityLivingBase killedEntity = event.getEntityLiving();
     DamageSource source = event.getSource();
 
+    // Killed by player?
     if (source.getTrueSource() instanceof EntityPlayer) {
-      if (entity instanceof IMob) {
+      // Is hostile mob?
+      if (killedEntity instanceof IMob) {
         EntityPlayer player = (EntityPlayer) source.getTrueSource();
         PlayerData data = SHPlayerDataHandler.get(player);
-        data.incrementDifficulty(ConfigScalingHealth.DIFFICULTY_PER_KILL);
+        // Boss or not? Change difficulty accordingly.
+        if (killedEntity.isNonBoss())
+          data.incrementDifficulty(ConfigScalingHealth.DIFFICULTY_PER_KILL);
+        else
+          data.incrementDifficulty(ConfigScalingHealth.DIFFICULTY_PER_BOSS_KILL);
       }
     }
   }
