@@ -1,5 +1,6 @@
 package net.silentchaos512.scalinghealth.client;
 
+import java.awt.Color;
 import java.util.Random;
 
 import net.minecraft.client.Minecraft;
@@ -21,6 +22,8 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 
 public class HeartDisplayHandler extends Gui {
+
+  private static final float COLOR_CHANGE_PERIOD = 150;
 
   public static enum TextStyle {
 
@@ -50,6 +53,34 @@ public class HeartDisplayHandler extends Gui {
     }
   }
 
+  public static enum TextColor {
+
+    GREEN_TO_RED, WHITE, PSYCHEDELIC;
+
+    public static TextColor loadFromConfig(Configuration config) {
+
+      String[] validValues = new String[values().length];
+      for (TextColor style : values()) {
+        validValues[style.ordinal()] = style.name();
+      }
+
+      String value = config.getString("Health Text Color", ConfigScalingHealth.CAT_CLIENT,
+          GREEN_TO_RED.name(),
+          "Determines the color of the text next to your hearts. GREEN_TO_RED displays green at"
+              + " full health, and moves to red as you lose health. WHITE will just be good old"
+              + " fashioned white text. Set to PSYCHEDELIC if you want to taste the rainbow.",
+          validValues);
+
+      for (TextColor style : values()) {
+        if (value.equalsIgnoreCase(style.name())) {
+          return style;
+        }
+      }
+
+      return GREEN_TO_RED;
+    }
+  }
+
   public static final ResourceLocation TEXTURE = new ResourceLocation(ScalingHealth.MOD_ID_LOWER,
       "textures/gui/hud.png");
 
@@ -76,8 +107,8 @@ public class HeartDisplayHandler extends Gui {
     EntityPlayer player = mc.player;
 
     TextStyle style = ConfigScalingHealth.HEART_DISPLAY_TEXT_STYLE;
-    if (event.getType() == ElementType.TEXT
-        && style != TextStyle.DISABLED
+    TextColor styleColor = ConfigScalingHealth.HEART_DISPLAY_TEXT_COLOR;
+    if (event.getType() == ElementType.TEXT && style != TextStyle.DISABLED
         && !player.capabilities.isCreativeMode) {
       final float scale = style == TextStyle.ROWS ? 0.65f : 0.5f;
       final int width = event.getResolution().getScaledWidth();
@@ -91,9 +122,23 @@ public class HeartDisplayHandler extends Gui {
           : (int) Math.ceil(player.getHealth() / 20) + "x";
       FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
       int stringWidth = fontRenderer.getStringWidth(healthString);
+      int color = 0xDDDDDD;
+      switch (styleColor) {
+        case GREEN_TO_RED:
+          color = Color.HSBtoRGB(0.34f * playerHealth / player.getMaxHealth(), 0.7f, 1.0f);
+          break;
+        case PSYCHEDELIC:
+          color = Color.HSBtoRGB(
+              (ClientTickHandler.ticksInGame % COLOR_CHANGE_PERIOD) / COLOR_CHANGE_PERIOD,
+              0.55f * playerHealth / player.getMaxHealth(), 1.0f);
+          break;
+        case WHITE:
+          color = 0xDDDDDD;
+          break;
+      }
       GlStateManager.pushMatrix();
       GlStateManager.scale(scale, scale, 1f);
-      fontRenderer.drawStringWithShadow(healthString, left - stringWidth - 2, top, 0xDDDDDD);
+      fontRenderer.drawStringWithShadow(healthString, left - stringWidth - 2, top, color);
       GlStateManager.popMatrix();
     }
 
