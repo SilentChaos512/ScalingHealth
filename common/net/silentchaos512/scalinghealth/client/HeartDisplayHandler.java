@@ -114,7 +114,8 @@ public class HeartDisplayHandler extends Gui {
       final int width = event.getResolution().getScaledWidth();
       final int height = event.getResolution().getScaledHeight();
       final int left = (int) ((width / 2 - 91) / scale);
-      final int top = (int) ((height - GuiIngameForge.left_height + 21 + (1 / scale)) / scale);
+      // GuiIngameForge.left_height == 59 in normal cases. Making it a constant should fix some issues.
+      final int top = (int) ((height - 59 + 21 + (1 / scale)) / scale);
 
       // Draw health string
       String healthString = style == TextStyle.HEALTH_AND_MAX
