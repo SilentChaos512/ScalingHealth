@@ -324,10 +324,11 @@ public class DifficultyHandler {
 
     String entityId = EntityList.getEntityString(entityLiving);
     List<String> blacklist = ConfigScalingHealth.getMobBlightBlacklist();
+    boolean isBoss = !entityLiving.isNonBoss();
 
     if (entityId == null || blacklist == null) return false;
 
-    return blacklist.contains(entityId);
+    return blacklist.contains(entityId) || (isBoss && ConfigScalingHealth.BLIGHT_BLACKLIST_ALL_BOSSES);
     //@formatter:on
   }
 

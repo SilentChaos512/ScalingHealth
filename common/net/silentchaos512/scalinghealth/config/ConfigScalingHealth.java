@@ -81,6 +81,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static float BLIGHT_XP_MULTIPLIER = 10f;
   public static boolean BLIGHT_SUPERCHARGE_CREEPERS = true;
   public static boolean BLIGHT_NOTIFY_PLAYERS_ON_DEATH = true;
+  public static boolean BLIGHT_BLACKLIST_ALL_BOSSES = false;
   private static List<String> BLIGHT_BLACKLIST;
   private static String[] BLIGHT_BLACKLIST_DEFAULTS = new String[] { "WitherBoss", "Villager" };
   // Blight equipment
@@ -307,6 +308,10 @@ public class ConfigScalingHealth extends AdaptiveConfig {
           BLIGHT_BLACKLIST_DEFAULTS,
           "Mobs listed here will never become blights, but can still receive extra health. There is"
           + " also a blacklist for extra health."));
+      BLIGHT_BLACKLIST_ALL_BOSSES = loadBoolean("Blacklist All Bosses", CAT_MOB_BLIGHT,
+          BLIGHT_BLACKLIST_ALL_BOSSES,
+          "If enabled, no bosses can become blights. If you need more control, use the Blacklist"
+          + " instead.");
       BLIGHT_NOTIFY_PLAYERS_ON_DEATH = loadBoolean("Notify Players on Death", CAT_MOB_BLIGHT,
           BLIGHT_NOTIFY_PLAYERS_ON_DEATH,
           "Let all players know when a blight dies in chat.");
