@@ -30,7 +30,6 @@ public class BlightHandler {
 
   public static final String NBT_BLIGHT = ScalingHealth.MOD_ID_OLD + ".IsBlight";
 
-  public static int POTION_APPLY_TIME = 4 * 1200;
   public static int UPDATE_DELAY = 200;
   public static int UPDATE_DELAY_SALT = 5 + ScalingHealth.random.nextInt(10);
 
@@ -79,21 +78,28 @@ public class BlightHandler {
 
   public static void applyBlightPotionEffects(EntityLivingBase entityLiving) {
 
+    int duration = ConfigScalingHealth.BLIGHT_POTION_DURATION;
+    if (duration < 0) {
+      duration = Integer.MAX_VALUE;
+    } else if (duration == 0) {
+      return;
+    }
+
     // Invisibility
     if (ConfigScalingHealth.BLIGHT_INVISIBLE)
-      entityLiving.addPotionEffect(
-          new PotionEffect(MobEffects.INVISIBILITY, POTION_APPLY_TIME, 0, true, false));
+      entityLiving
+          .addPotionEffect(new PotionEffect(MobEffects.INVISIBILITY, duration, 0, true, false));
     // Fire Resistance
     if (ConfigScalingHealth.BLIGHT_FIRE_RESIST)
-      entityLiving.addPotionEffect(
-          new PotionEffect(MobEffects.FIRE_RESISTANCE, POTION_APPLY_TIME, 0, true, false));
+      entityLiving
+          .addPotionEffect(new PotionEffect(MobEffects.FIRE_RESISTANCE, duration, 0, true, false));
     // Speed
     if (ConfigScalingHealth.BLIGHT_AMP_SPEED > 0)
-      entityLiving.addPotionEffect(new PotionEffect(MobEffects.SPEED, POTION_APPLY_TIME,
+      entityLiving.addPotionEffect(new PotionEffect(MobEffects.SPEED, duration,
           ConfigScalingHealth.BLIGHT_AMP_SPEED, true, false));
     // Strength
     if (ConfigScalingHealth.BLIGHT_AMP_STRENGTH > 0)
-      entityLiving.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, POTION_APPLY_TIME,
+      entityLiving.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, duration,
           ConfigScalingHealth.BLIGHT_AMP_STRENGTH, true, false));
   }
 

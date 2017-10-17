@@ -80,6 +80,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static float BLIGHT_CHANCE_MULTIPLIER = 0.0625F;
   public static int BLIGHT_AMP_SPEED = 8;
   public static int BLIGHT_AMP_STRENGTH = 2;
+  public static int BLIGHT_POTION_DURATION;
   public static boolean BLIGHT_FIRE_RIDES_BLIGHT = false;
   public static boolean BLIGHT_INVISIBLE = false;
   public static boolean BLIGHT_FIRE_RESIST = true;
@@ -307,6 +308,11 @@ public class ConfigScalingHealth extends AdaptiveConfig {
       BLIGHT_AMP_STRENGTH = loadInt("Amplifier Strength", CAT_MOB_BLIGHT,
           BLIGHT_AMP_STRENGTH, 0, 99,
           "The amplifier level on the strength potion effect applied to blights.");
+      BLIGHT_POTION_DURATION = loadInt("Potion Duration", CAT_MOB_BLIGHT,
+          5 * 1200, -1, Integer.MAX_VALUE,
+          "The duration (in ticks) of the potion effects applied to blights. The effects are"
+          + " refreshed frequently, so this value doesn't matter in most cases... except for the"
+          + " lingering potion effects left by blight creepers. Set to -1 for infinite time.");
       BLIGHT_FIRE_RIDES_BLIGHT = loadBoolean("Fire Rides Blights", CAT_MOB_BLIGHT,
           BLIGHT_FIRE_RIDES_BLIGHT,
           "Blight's fire will be set to ride the blight. This will make the fire follow the blight"
