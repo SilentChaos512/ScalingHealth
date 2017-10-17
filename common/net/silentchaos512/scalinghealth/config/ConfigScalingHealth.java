@@ -100,6 +100,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static int PET_REGEN_DELAY = 600;
 
   // Items
+  public static boolean HEART_DROP_SHARDS_INSTEAD = false;
   public static float HEART_DROP_CHANCE_HOSTILE = 0.01F;
   public static float HEART_DROP_CHANCE_PASSIVE = 0.001f;
   public static int HEARTS_DROPPED_BY_BOSS_MIN = 3;
@@ -363,6 +364,9 @@ public class ConfigScalingHealth extends AdaptiveConfig {
           "The number of ticks between regen ticks on pets. Set to 0 to disable pet regen.");
 
       // Items
+      HEART_DROP_SHARDS_INSTEAD = config.getBoolean("Drop Shards Instead of Containers", CAT_ITEMS,
+          false,
+          "If enabled, heart crystal shards will drop instead of heart containers.");
       HEART_DROP_CHANCE_HOSTILE = config.getFloat("Heart Drop Chance", CAT_ITEMS,
           HEART_DROP_CHANCE_HOSTILE, 0f, 1f,
           "The chance of a hostile mob dropping a heart canister when killed.");

@@ -3,10 +3,18 @@ package net.silentchaos512.scalinghealth.event;
 import java.util.Calendar;
 import java.util.Random;
 
+import javax.annotation.Nullable;
+
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.IMob;
+import net.minecraft.entity.passive.EntityTameable;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.Item;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -25,30 +33,76 @@ public class ScalingHealthCommonEvents {
   public void onLivingDrops(LivingDropsEvent event) {
 
     // Handle heart drops.
-    EntityLivingBase entityLiving = event.getEntityLiving();
-    if (!entityLiving.world.isRemote) {
+    // Was a player responsible for the death?
+    EntityPlayer player = getPlayerThatCausedDeath(event.getSource());
+    if (player == null || (player instanceof FakePlayer
+        && !ConfigScalingHealth.FAKE_PLAYERS_CAN_GENERATE_HEARTS)) {
+      return;
+    }
+
+    EntityLivingBase killedEntity = event.getEntityLiving();
+    if (!killedEntity.world.isRemote) {
       Random rand = ScalingHealth.random;
       int stackSize = 0;
 
-      float dropRate = entityLiving instanceof IMob ? ConfigScalingHealth.HEART_DROP_CHANCE_HOSTILE : ConfigScalingHealth.HEART_DROP_CHANCE_PASSIVE;
+      // Different drop rates for hostiles and passives.
+      float dropRate = killedEntity instanceof IMob ? ConfigScalingHealth.HEART_DROP_CHANCE_HOSTILE
+          : ConfigScalingHealth.HEART_DROP_CHANCE_PASSIVE;
 
+      // Basic heart drops for all mobs.
       if (event.isRecentlyHit() && rand.nextFloat() <= dropRate) {
         stackSize += 1;
       }
 
-      if (!entityLiving.isNonBoss()) {
+      // Heart drops for bosses.
+      if (!killedEntity.isNonBoss()) {
         int min = ConfigScalingHealth.HEARTS_DROPPED_BY_BOSS_MIN;
         int max = ConfigScalingHealth.HEARTS_DROPPED_BY_BOSS_MAX;
         stackSize += min + rand.nextInt(max - min + 1);
       }
 
-      if (stackSize > 0)
-        entityLiving.dropItem(ModItems.heart, stackSize);
+      if (stackSize > 0) {
+        Item itemToDrop = ConfigScalingHealth.HEART_DROP_SHARDS_INSTEAD ? ModItems.crystalShard
+            : ModItems.heart;
+        killedEntity.dropItem(itemToDrop, stackSize);
+      }
     }
   }
 
+  /**
+   * Get the player that caused a mob's death. Could be a FakePlayer or null.
+   * 
+   * @return The player that caused the damage, or the owner of the tamed animal that caused the damage.
+   */
+  private @Nullable EntityPlayer getPlayerThatCausedDeath(DamageSource source) {
+
+    if (source == null) {
+      return null;
+    }
+
+    // Player is true source.
+    Entity entitySource = source.getTrueSource();
+    if (entitySource instanceof EntityPlayer) {
+      return (EntityPlayer) entitySource;
+    }
+
+    // Player's pet is true source.
+    boolean isTamedAnimal = entitySource instanceof EntityTameable
+        && ((EntityTameable) entitySource).isTamed();
+    if (entitySource instanceof EntityTameable) {
+      EntityTameable tamed = (EntityTameable) entitySource;
+      if (tamed.isTamed() && tamed.getOwner() instanceof EntityPlayer) {
+        return (EntityPlayer) tamed.getOwner();
+      }
+    }
+
+    // No player responsible.
+    return null;
+  }
+
   @SubscribeEvent
-  public void onPlayerRespawn(net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent event) {
+  public void onPlayerRespawn(
+      net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent event) {
 
     // Set player health correctly after respawn.
     if (event.player instanceof EntityPlayerMP) {
@@ -64,7 +118,9 @@ public class ScalingHealthCommonEvents {
 
       // Lose difficulty on death?
       double currentDifficulty = data.getDifficulty();
-      double newDifficulty = MathHelper.clamp(currentDifficulty - ConfigScalingHealth.DIFFICULTY_LOST_ON_DEATH, 0, ConfigScalingHealth.DIFFICULTY_MAX);
+      double newDifficulty = MathHelper.clamp(
+          currentDifficulty - ConfigScalingHealth.DIFFICULTY_LOST_ON_DEATH, 0,
+          ConfigScalingHealth.DIFFICULTY_MAX);
       data.setDifficulty(newDifficulty);
 
       // Apply health modifier
@@ -89,13 +145,15 @@ public class ScalingHealthCommonEvents {
       Calendar lastTimePlayed = data.getLastTimePlayed();
 
       if (ConfigScalingHealth.DIFFFICULTY_RESET_TIME.shouldReset(today, lastTimePlayed)) {
-        ScalingHealth.logHelper.info(String.format("Reset player %s's difficulty to %d", player.getName(), (int) ConfigScalingHealth.DIFFICULTY_DEFAULT));
+        ScalingHealth.logHelper.info(String.format("Reset player %s's difficulty to %d",
+            player.getName(), (int) ConfigScalingHealth.DIFFICULTY_DEFAULT));
         ChatHelper.sendMessage(player, "[Scaling Health] Your difficulty has been reset.");
         data.setDifficulty(ConfigScalingHealth.DIFFICULTY_DEFAULT);
       }
       if (ConfigScalingHealth.PLAYER_HEALTH_RESET_TIME.shouldReset(today, lastTimePlayed)) {
         data.setMaxHealth(ConfigScalingHealth.PLAYER_STARTING_HEALTH);
-        ScalingHealth.logHelper.info(String.format("Reset player %s's health to %d", player.getName(), (int) ConfigScalingHealth.PLAYER_STARTING_HEALTH));
+        ScalingHealth.logHelper.info(String.format("Reset player %s's health to %d",
+            player.getName(), (int) ConfigScalingHealth.PLAYER_STARTING_HEALTH));
         ChatHelper.sendMessage(player, "[Scaling Health] Your health has been reset.");
       }
 

@@ -7,8 +7,10 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.MobEffects;
+import net.minecraft.item.Item;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
@@ -133,11 +135,16 @@ public class BlightHandler {
       }
 
       // Drop hearts!
+      boolean canGetHearts = player instanceof FakePlayer
+          ? ConfigScalingHealth.FAKE_PLAYERS_CAN_GENERATE_HEARTS : true;
       int heartCount = ScalingHealth.random.nextInt(ConfigScalingHealth.HEARTS_DROPPED_BY_BLIGHT_MAX
           - ConfigScalingHealth.HEARTS_DROPPED_BY_BLIGHT_MIN + 1)
           + ConfigScalingHealth.HEARTS_DROPPED_BY_BLIGHT_MIN;
-      if (heartCount > 0)
-        blight.dropItem(ModItems.heart, heartCount);
+      if (canGetHearts && heartCount > 0) {
+        Item itemToDrop = ConfigScalingHealth.HEART_DROP_SHARDS_INSTEAD ? ModItems.crystalShard
+            : ModItems.heart;
+        blight.dropItem(itemToDrop, heartCount);
+      }
     } else {
       // Killed by something else.
       EntityLivingBase blight = event.getEntityLiving();
