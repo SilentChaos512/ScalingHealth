@@ -29,7 +29,6 @@ public class EntityMatchList {
     for (String entry : list) {
       if (entry.equalsIgnoreCase(id) || entry.equalsIgnoreCase(idOld)
           || ("minecraft:" + entry).equalsIgnoreCase(id)) {
-        ScalingHealth.logHelper.debug(entity.getName() + " is blacklisted!");
         return true;
       }
     }

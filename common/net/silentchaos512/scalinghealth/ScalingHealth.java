@@ -50,7 +50,7 @@ public class ScalingHealth {
   public static SimpleNetworkWrapper networkManager;
 
   public static Random random = new Random();
-  public static LogHelper logHelper = new LogHelper(MOD_NAME);
+  public static LogHelper logHelper = new LogHelper(MOD_NAME, BUILD_NUM);
   public static LocalizationHelper localizationHelper;
 
   public static SRegistry registry = new SRegistry(MOD_ID_LOWER, logHelper);
