@@ -7,11 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.math.BlockPos.MutableBlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
@@ -28,7 +30,11 @@ public class SHPlayerDataHandler {
 
   private static Map<Integer, PlayerData> playerData = new HashMap();
 
-  public static PlayerData get(EntityPlayer player) {
+  public static @Nullable PlayerData get(EntityPlayer player) {
+
+    if (player instanceof FakePlayer && !ConfigScalingHealth.FAKE_PLAYERS_HAVE_DIFFICULTY) {
+      return null;
+    }
 
     int key = getKey(player);
     if (!playerData.containsKey(key)) {

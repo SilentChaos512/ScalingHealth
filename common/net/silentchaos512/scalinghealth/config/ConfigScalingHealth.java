@@ -59,6 +59,10 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static int BONUS_HEALTH_REGEN_INITIAL_DELAY = 400;
   public static int BONUS_HEALTH_REGEN_DELAY = 100;
 
+  // Fake Players
+  public static boolean FAKE_PLAYERS_CAN_GENERATE_HEARTS = true;
+  public static boolean FAKE_PLAYERS_HAVE_DIFFICULTY = false;
+
   // Mobs
   public static float DIFFICULTY_DAMAGE_MULTIPLIER = 0.1f;
   public static float POTION_CHANCE_HOSTILE = 0.375f;
@@ -136,6 +140,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static final String CAT_MAIN = "main";
   public static final String CAT_CLIENT = CAT_MAIN + split + "client";
   public static final String CAT_PLAYER = CAT_MAIN + split + "player";
+  public static final String CAT_FAKE_PLAYER = CAT_MAIN + split + "fake_players";
   public static final String CAT_PLAYER_HEALTH = CAT_PLAYER + split + "health";
   public static final String CAT_PLAYER_REGEN = CAT_PLAYER + split + "regen";
   public static final String CAT_MOB = CAT_MAIN + split + "mob";
@@ -230,6 +235,16 @@ public class ConfigScalingHealth extends AdaptiveConfig {
       BONUS_HEALTH_REGEN_DELAY = loadInt("Delay", CAT_PLAYER_REGEN,
           BONUS_HEALTH_REGEN_DELAY, 0, Integer.MAX_VALUE,
           "The number of ticks between each bonus regen tick (a half heart being healed).");
+
+      // Fake Players
+      FAKE_PLAYERS_CAN_GENERATE_HEARTS = loadBoolean("Can Generate Hearts", CAT_FAKE_PLAYER,
+          FAKE_PLAYERS_CAN_GENERATE_HEARTS,
+          "If enabled, fake players will be able to get heart container drops when killing mobs."
+          + " Disabling should prevent at least some mob grinders from getting heart drops.");
+      FAKE_PLAYERS_HAVE_DIFFICULTY = loadBoolean("Have Difficulty", CAT_FAKE_PLAYER,
+          FAKE_PLAYERS_HAVE_DIFFICULTY,
+          "If enabled, fake players can accumulate difficulty in the same way as real players."
+          + " Enabling this could act as a sort of penalty for using mob grinders.");
 
       // Mobs
       DIFFICULTY_DAMAGE_MULTIPLIER = config.getFloat("Damage Modifier", CAT_MOB,
@@ -394,7 +409,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
           + "but was actually applied each second. Negative numbers will decrease difficulty over time.");
       DIFFICULTY_PER_BLOCK = config.getFloat("Difficulty Per Block", CAT_DIFFICULTY,
           DIFFICULTY_PER_BLOCK, -1000f, 1000f,
-          "The amount of difficulty added per unit distance from the origin/spanw, assuming \"Area Mode\" "
+          "The amount of difficulty added per unit distance from the origin/spawn, assuming \"Area Mode\" "
           + "is set to a distance-based option. Negative numbers will decrease difficulty over distance.");
       DIFFICULTY_PER_KILL = config.getFloat("Difficulty Per Kill", CAT_DIFFICULTY,
           DIFFICULTY_PER_KILL, -1000f, 1000f,

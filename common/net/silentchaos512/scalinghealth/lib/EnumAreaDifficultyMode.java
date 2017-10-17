@@ -6,13 +6,22 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.common.util.FakePlayerFactory;
+import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
 public enum EnumAreaDifficultyMode {
 
-  WEIGHTED_AVERAGE, AVERAGE, MIN_LEVEL, MAX_LEVEL, DISTANCE_FROM_SPAWN, DISTANCE_FROM_ORIGIN, DISTANCE_AND_TIME;
+  WEIGHTED_AVERAGE,
+  AVERAGE,
+  MIN_LEVEL,
+  MAX_LEVEL,
+  DISTANCE_FROM_SPAWN,
+  DISTANCE_FROM_ORIGIN,
+  DISTANCE_AND_TIME;
 
   public static EnumAreaDifficultyMode loadFromConfig(Configuration c,
       EnumAreaDifficultyMode defaultValue) {
@@ -128,7 +137,8 @@ public enum EnumAreaDifficultyMode {
     }
 
     // Clamp to difficulty range (intentionally done before group bonus)
-    ret = ret < 0 ? 0 : ret > ConfigScalingHealth.DIFFICULTY_MAX ? ConfigScalingHealth.DIFFICULTY_MAX : ret;
+    ret = ret < 0 ? 0
+        : ret > ConfigScalingHealth.DIFFICULTY_MAX ? ConfigScalingHealth.DIFFICULTY_MAX : ret;
 
     // Group bonus?
     if (addGroupBonus)

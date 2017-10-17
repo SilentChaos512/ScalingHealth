@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Random;
 
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.EntityList;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
@@ -90,11 +89,13 @@ public class DifficultyHandler {
       if (killedEntity instanceof IMob) {
         EntityPlayer player = (EntityPlayer) source.getTrueSource();
         PlayerData data = SHPlayerDataHandler.get(player);
-        // Boss or not? Change difficulty accordingly.
-        if (killedEntity.isNonBoss())
-          data.incrementDifficulty(ConfigScalingHealth.DIFFICULTY_PER_KILL);
-        else
-          data.incrementDifficulty(ConfigScalingHealth.DIFFICULTY_PER_BOSS_KILL);
+        if (data != null) {
+          // Boss or not? Change difficulty accordingly.
+          if (killedEntity.isNonBoss())
+            data.incrementDifficulty(ConfigScalingHealth.DIFFICULTY_PER_KILL);
+          else
+            data.incrementDifficulty(ConfigScalingHealth.DIFFICULTY_PER_BOSS_KILL);
+        }
       }
     }
   }

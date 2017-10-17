@@ -1,4 +1,6 @@
 1.3.1
+Added: Config to allow/prevent fake players from getting heart container drops (main/fake_players/Can Generate Hearts)
+Added: Config to allow/prevent fake players from accumulating difficulty (main/fake_players/Have Difficulty) (WIP on #48, doesn't really do anything of note right now)
 Added: Config to blacklist mob extra health by dimension (main/mob/health/Dimension Blacklist) (#37)
 Added: Config for difficulty change on boss kills (main/difficulty/Difficulty Per Boss Kill) (#42)
 Added: Config to blacklist all bosses from becoming blights (main/mob/blights/Blacklist All Bosses) (#46)
