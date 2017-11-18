@@ -1,3 +1,6 @@
+1.3.3
+Added: Config to add difficulty to players when sleeping through the night (#53)
+
 1.3.2
 Added: Config to replace heart container drops with heart crystal shards.
 Added: Config to set blight potion duration. This is just to customize the duration of the lingering effects from blight creeper explosions. Blights will still refresh their potions infinitely. Set to -1 if you want infinite duration from lingering effects.

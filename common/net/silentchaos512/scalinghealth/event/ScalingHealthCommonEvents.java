@@ -16,6 +16,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
@@ -165,6 +166,16 @@ public class ScalingHealthCommonEvents {
       ModifierHandler.setMaxHealth(player, maxHealth, 0);
       if (health > maxHealth && maxHealth > 0)
         player.setHealth(maxHealth);
+    }
+  }
+
+  @SubscribeEvent
+  public void onPlayerWakeUp(PlayerWakeUpEvent event) {
+
+    EntityPlayer player = event.getEntityPlayer();
+    PlayerData data = SHPlayerDataHandler.get(player);
+    if (data != null) {
+      data.incrementDifficulty(ConfigScalingHealth.DIFFICULTY_FOR_SLEEPING);
     }
   }
 
