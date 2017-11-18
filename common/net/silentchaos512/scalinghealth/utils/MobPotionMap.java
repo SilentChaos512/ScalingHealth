@@ -16,6 +16,11 @@ public class MobPotionMap {
     list.add(new PotionEntry(potion, weight, amplifier));
   }
 
+  public void clear() {
+
+    list.clear();
+  }
+
   public PotionEntry getRandom(Random rand, int maxWeight) {
 
     temp.clear();

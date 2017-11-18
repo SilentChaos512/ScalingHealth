@@ -68,7 +68,6 @@ public class ScalingHealth {
     SilentLib.instance.registerLocalizationHelperForMod(MOD_ID_LOWER, localizationHelper);
 
     ConfigScalingHealth.INSTANCE.init(event.getSuggestedConfigurationFile());
-    ConfigScalingHealth.INSTANCE.save();
 
     registry.addRegistrationHandler(new ModPotions(), Potion.class);
     registry.addRegistrationHandler(new ModBlocks(), Block.class);
@@ -85,6 +84,7 @@ public class ScalingHealth {
   public void init(FMLInitializationEvent event) {
 
     proxy.init(registry);
+    ConfigScalingHealth.INSTANCE.save();
   }
 
   @EventHandler
@@ -98,12 +98,4 @@ public class ScalingHealth {
 
     event.registerServerCommand(new CommandScalingHealth());
   }
-
-//  @EventHandler
-//  public void onMissingMapping(MissingMappings event) {
-//
-//    for (MissingMappings. mismap : event.get()) {
-//      MC10IdRemapper.remap(mismap);
-//    }
-//  }
 }

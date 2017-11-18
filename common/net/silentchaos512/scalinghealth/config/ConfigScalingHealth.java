@@ -149,6 +149,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static final String CAT_MOB = CAT_MAIN + split + "mob";
   public static final String CAT_MOB_HEALTH = CAT_MOB + split + "health";
   public static final String CAT_MOB_BLIGHT = CAT_MOB + split + "blights";
+  public static final String CAT_MOB_POTION = CAT_MOB + split + "potion";
   public static final String CAT_MOB_BLIGHT_EQUIP = CAT_MOB_BLIGHT + split + "equipment";
   public static final String CAT_PETS = CAT_MAIN + split + "pets";
   public static final String CAT_ITEMS = CAT_MAIN + split + "items";
@@ -364,6 +365,8 @@ public class ConfigScalingHealth extends AdaptiveConfig {
           "The chance that a blight will receive equipment in their hands (swords, etc.) They only"
           + " get a chance at an offhand item if a main hand item is selected. Depending on the"
           + " mods you have installed, there may not be any hand equipment to chose from.");
+      config.setCategoryComment(CAT_MOB_POTION, "Potion effects applied to non-blights.");
+      config.setCategoryRequiresMcRestart(CAT_MOB_POTION, true);
 
       // Pets
       PET_REGEN_DELAY = loadInt("Regen Delay", CAT_PETS,

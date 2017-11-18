@@ -14,11 +14,12 @@ import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
-import net.minecraft.init.MobEffects;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -43,17 +44,66 @@ public class DifficultyHandler {
   public static DifficultyHandler INSTANCE = new DifficultyHandler();
 
   public static int POTION_APPLY_TIME = 10 * 1200;
+  static final String[] POTION_DEFAULTS = { //@formatter:off
+      "minecraft:strength,30,1",
+      "minecraft:speed,10,1",
+      "minecraft:speed,50,2",
+      "minecraft:fire_resistance,10,1",
+      "minecraft:invisibility,25,1",
+      "minecraft:resistance,30,1"
+  }; //@formatter:on
 
   public MobPotionMap potionMap = new MobPotionMap();
 
   public void initPotionMap() {
 
-    potionMap.put(MobEffects.STRENGTH, 30, 0);
-    potionMap.put(MobEffects.SPEED, 10, 0);
-    potionMap.put(MobEffects.SPEED, 30, 1);
-    potionMap.put(MobEffects.FIRE_RESISTANCE, 10, 0);
-    potionMap.put(MobEffects.INVISIBILITY, 20, 0);
-    potionMap.put(MobEffects.RESISTANCE, 30, 0);
+    potionMap.clear();
+
+    String[] lines = ConfigScalingHealth.INSTANCE.getConfiguration().getStringList("Mob Potions",
+        ConfigScalingHealth.CAT_MOB_POTION, POTION_DEFAULTS,
+        "The potion effects that mobs can spawn with. You can add effects from other mods if you"
+        + " want to, or remove existing ones. Each line has 3 values separated by commas: the"
+        + " potion ID, the minimum difficulty (higher = less common), and the level (1 = level I,"
+        + " 2 = level II, etc).");
+
+    for (String line : lines) {
+      String[] params = line.split(",");
+      if (params.length >= 3) {
+        // Ignore extra parameters
+        if (params.length > 3) {
+          ScalingHealth.logHelper.warning("Mob potion effects: extra parameters in line: " + line
+              + ". Ignoring extra parameters and processing the first 3.");
+        }
+
+        // Parse parameters.
+        int index = -1;
+        String id = "null";
+        Potion potion = null;
+        int minDiff = 0, level = 0;
+        try {
+          id = params[++index];
+          potion = Potion.REGISTRY.getObject(new ResourceLocation(id));
+          if (potion == null)
+            throw new NullPointerException();
+          minDiff = Integer.parseInt(params[++index]);
+          level = Integer.parseInt(params[++index]);
+        } catch (NumberFormatException ex) {
+          ScalingHealth.logHelper.warning("Mob potion effects: could not parse parameter " + index
+              + " as integer. Ignoring entire line: " + line);
+          continue;
+        } catch (NullPointerException ex) {
+          ScalingHealth.logHelper.warning("Mob potion effects: potion \"" + id + "\" does not exist.");
+          continue;
+        }
+
+        // Put it in the map if nothing goes wrong!
+        potionMap.put(potion, minDiff, level - 1);
+      } else {
+        ScalingHealth.logHelper.warning(
+            "Mob potion effects: malformed line (need 3 comma-separated values): " + line
+            + "Ignoring entire line.");
+      }
+    }
   }
 
   @SubscribeEvent

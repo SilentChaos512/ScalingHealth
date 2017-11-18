@@ -166,7 +166,7 @@ public class BlightHandler {
             message += "... again";
           else
             message += "... gg";
-        } else if (message.endsWith("suffocated in a wall")) {
+        } else if (message.contains("suffocated in a wall")) {
           message += " *slow clap*";
         }
 

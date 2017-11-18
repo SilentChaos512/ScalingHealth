@@ -2,7 +2,6 @@ package net.silentchaos512.scalinghealth.proxy;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.silentchaos512.lib.proxy.CommonProxy;
 import net.silentchaos512.lib.registry.SRegistry;
 import net.silentchaos512.scalinghealth.event.BlightHandler;
@@ -23,7 +22,6 @@ public class ScalingHealthCommonProxy extends CommonProxy {
 
     ModEntities.init(registry);
     DifficultyHandler.INSTANCE.initDefaultEquipment();
-    DifficultyHandler.INSTANCE.initPotionMap();
 
     NetworkHandler.init();
 
@@ -33,6 +31,14 @@ public class ScalingHealthCommonProxy extends CommonProxy {
     MinecraftForge.EVENT_BUS.register(DifficultyHandler.INSTANCE);
     MinecraftForge.EVENT_BUS.register(BlightHandler.INSTANCE);
     MinecraftForge.EVENT_BUS.register(PetEventHandler.INSTANCE);
+  }
+
+  @Override
+  public void init(SRegistry registry) {
+
+    super.init(registry);
+
+    DifficultyHandler.INSTANCE.initPotionMap();
   }
 
   public EntityPlayer getClientPlayer() {
