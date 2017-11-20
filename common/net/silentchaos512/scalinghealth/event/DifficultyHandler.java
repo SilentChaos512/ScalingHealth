@@ -41,6 +41,8 @@ import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
 public class DifficultyHandler {
 
+  public static final String NBT_ENTITY_DIFFICULTY = ScalingHealth.RESOURCE_PREFIX + "difficulty";
+
   public static DifficultyHandler INSTANCE = new DifficultyHandler();
 
   public static int POTION_APPLY_TIME = 10 * 1200;
@@ -156,6 +158,8 @@ public class DifficultyHandler {
     Random rand = ScalingHealth.random;
     boolean makeBlight = false;
     boolean isHostile = entityLiving instanceof IMob;
+
+    entityLiving.getEntityData().setShort(NBT_ENTITY_DIFFICULTY, (short) difficulty);
 
     // Make blight?
     if (!entityBlacklistedFromBecomingBlight(entityLiving)) {

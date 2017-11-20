@@ -16,8 +16,10 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
+import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.silentchaos512.lib.util.ChatHelper;
@@ -68,6 +70,26 @@ public class ScalingHealthCommonEvents {
         killedEntity.dropItem(itemToDrop, stackSize);
       }
     }
+  }
+
+  @SubscribeEvent(priority = EventPriority.HIGHEST)
+  public void onXPDropped(LivingExperienceDropEvent event) {
+
+    EntityLivingBase entityLiving = event.getEntityLiving();
+
+    // Additional XP from all mobs.
+    short difficulty = entityLiving.getEntityData().getShort(DifficultyHandler.NBT_ENTITY_DIFFICULTY);
+    float multi = 1.0f + ConfigScalingHealth.MOB_XP_BOOST * difficulty;
+
+    float amount = event.getDroppedExperience();
+    amount *= multi;
+
+    // Additional XP from blights.
+    if (BlightHandler.isBlight(entityLiving)) {
+      amount *= ConfigScalingHealth.BLIGHT_XP_MULTIPLIER;
+    }
+
+    event.setDroppedExperience(Math.round(amount));
   }
 
   /**

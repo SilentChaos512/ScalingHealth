@@ -177,17 +177,6 @@ public class BlightHandler {
     }
   }
 
-  @SubscribeEvent(priority = EventPriority.HIGHEST)
-  public void onXPDropped(LivingExperienceDropEvent event) {
-
-    if (!isBlight(event.getEntityLiving()))
-      return;
-
-    int amount = event.getDroppedExperience();
-    amount *= ConfigScalingHealth.BLIGHT_XP_MULTIPLIER;
-    event.setDroppedExperience(amount);
-  }
-
   @SubscribeEvent
   public void onBlightUpdate(LivingUpdateEvent event) {
 

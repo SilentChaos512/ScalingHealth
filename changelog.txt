@@ -1,4 +1,5 @@
 1.3.3
+Added: Config to add additional XP to all mobs. Default gives an extra 1% per difficulty. Only works on mobs spawned since this update. (#51)
 Added: Config to tweak potions applied to non-blights. You can add/remove effects and specify the minimum difficulty requirement and potion level. This is under the new mob/potion category. If changed in-game, you must restart Minecraft. (#52)
 Added: Config to add difficulty to players when sleeping through the night (#53)
 
