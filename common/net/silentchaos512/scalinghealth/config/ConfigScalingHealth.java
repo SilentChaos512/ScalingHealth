@@ -29,6 +29,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static int DIFFICULTY_METER_DISPLAY_TIME = 160;
   public static int DIFFICULTY_METER_POS_X = 5;
   public static int DIFFICULTY_METER_POS_Y = -30;
+  public static boolean WARN_WHEN_SLEEPING = true;
   public static int[] HEART_COLORS = {//
       0xBF0000, // 0 red
       0xE66000, // 25 orange-red
@@ -199,6 +200,8 @@ public class ConfigScalingHealth extends AdaptiveConfig {
       DIFFICULTY_METER_POS_Y = loadInt("Position Y", CAT_CLIENT,
           DIFFICULTY_METER_POS_Y, Integer.MIN_VALUE, Integer.MAX_VALUE,
           "Sets position of the difficulty meter. Negative numbers anchor it to the bottom of the screen.");
+      WARN_WHEN_SLEEPING = loadBoolean("Warn When Sleeping", CAT_CLIENT, true,
+          "If difficulty is set to change when the player sleeps, they will be warned when they get in bed.");
       CHANGE_HEART_RENDERING = loadBoolean("Custom Heart Rendering", CAT_CLIENT,
           CHANGE_HEART_RENDERING,
           "Replace vanilla heart rendering.");

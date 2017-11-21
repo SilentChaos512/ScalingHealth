@@ -10,15 +10,19 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayer.SleepResult;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
+import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.eventhandler.Event.Result;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
@@ -78,7 +82,8 @@ public class ScalingHealthCommonEvents {
     EntityLivingBase entityLiving = event.getEntityLiving();
 
     // Additional XP from all mobs.
-    short difficulty = entityLiving.getEntityData().getShort(DifficultyHandler.NBT_ENTITY_DIFFICULTY);
+    short difficulty = entityLiving.getEntityData()
+        .getShort(DifficultyHandler.NBT_ENTITY_DIFFICULTY);
     float multi = 1.0f + ConfigScalingHealth.MOB_XP_BOOST * difficulty;
 
     float amount = event.getDroppedExperience();
@@ -192,12 +197,27 @@ public class ScalingHealthCommonEvents {
   }
 
   @SubscribeEvent
+  public void onPlayerSleepInBed(PlayerSleepInBedEvent event) {
+
+    if (!event.getEntityPlayer().world.isRemote && event.getResultStatus() == SleepResult.OK
+        && ConfigScalingHealth.WARN_WHEN_SLEEPING
+        && ConfigScalingHealth.DIFFICULTY_FOR_SLEEPING > 0f) {
+      ChatHelper.sendStatusMessage(event.getEntityPlayer(),
+          TextFormatting.RED + ScalingHealth.localizationHelper.getMiscText("sleepWarning"), false);
+    }
+  }
+
+  @SubscribeEvent
   public void onPlayerWakeUp(PlayerWakeUpEvent event) {
 
-    EntityPlayer player = event.getEntityPlayer();
-    PlayerData data = SHPlayerDataHandler.get(player);
-    if (data != null) {
-      data.incrementDifficulty(ConfigScalingHealth.DIFFICULTY_FOR_SLEEPING);
+    ScalingHealth.logHelper.debug(event.getEntityPlayer().world.isRemote, event.updateWorld(),
+        event.shouldSetSpawn());
+    if (!event.getEntityPlayer().world.isRemote && !event.updateWorld()) {
+      EntityPlayer player = event.getEntityPlayer();
+      PlayerData data = SHPlayerDataHandler.get(player);
+      if (data != null) {
+        data.incrementDifficulty(ConfigScalingHealth.DIFFICULTY_FOR_SLEEPING);
+      }
     }
   }
 

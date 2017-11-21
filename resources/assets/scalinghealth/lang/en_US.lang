@@ -45,3 +45,11 @@ command.showDifficulty=Difficulty of %s: %s / %s
 command.setDifficulty=Set difficulty of player %s to %s.
 command.showHealth=Health of %s: %s / %s
 command.setHealth=Set health of player %s to %d.
+
+
+
+########
+# Misc #
+########
+
+misc.scalinghealth:sleepWarning=[Scaling Health] WARNING: Sleeping will change your difficulty!
