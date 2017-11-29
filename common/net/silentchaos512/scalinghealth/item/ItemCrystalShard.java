@@ -17,6 +17,6 @@ public class ItemCrystalShard extends ItemSL {
   @Override
   public void addRecipes(RecipeMaker recipes) {
 
-    recipes.addShaped("heart_container", new ItemStack(ModItems.heart), "sss", "sss", "sss", 's', this);
+    recipes.addShaped("heart_container", new ItemStack(ModItems.heart), "sss", "sss", "sss", 's', new ItemStack(this));
   }
 }
