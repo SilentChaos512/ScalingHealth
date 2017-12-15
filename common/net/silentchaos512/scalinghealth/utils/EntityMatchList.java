@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
+import net.minecraft.util.ResourceLocation;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 
 public class EntityMatchList {
@@ -23,7 +24,11 @@ public class EntityMatchList {
 
   public boolean contains(Entity entity) {
 
-    String id = EntityList.getKey(entity).getResourcePath();
+    ResourceLocation resource = EntityList.getKey(entity);
+    if (resource == null) {
+      return false;
+    }
+    String id = resource.getResourcePath();
     String idOld = EntityList.getEntityString(entity);
 
     for (String entry : list) {
