@@ -1,4 +1,7 @@
 1.3.5
+Added: Difficulty per blight kill config (how did I miss that?)
+Added: Difficulty per peaceful kill config
+Added: Config to set difficulty changes by mob (difficulty/Difficulty Per Kill By Mob) (#57)
 Fixed (probably): Entity blacklist causing crashes in some cases (#58)
 
 1.3.4

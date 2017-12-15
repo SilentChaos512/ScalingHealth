@@ -1,22 +1,28 @@
 package net.silentchaos512.scalinghealth.config;
 
 import java.io.File;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 import com.google.common.collect.Lists;
 
 import net.minecraftforge.common.config.Configuration;
 import net.silentchaos512.lib.config.AdaptiveConfig;
+import net.silentchaos512.lib.config.ConfigMultiValueLineParser;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.client.HeartDisplayHandler;
 import net.silentchaos512.scalinghealth.lib.EnumAreaDifficultyMode;
 import net.silentchaos512.scalinghealth.lib.EnumHealthModMode;
 import net.silentchaos512.scalinghealth.lib.EnumResetTime;
+import net.silentchaos512.scalinghealth.utils.EntityDifficultyChangeList;
 import net.silentchaos512.scalinghealth.utils.EntityMatchList;
 
 public class ConfigScalingHealth extends AdaptiveConfig {
+
+  public static NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.US);
 
   public static boolean DEBUG_MODE = false;
 
@@ -120,12 +126,15 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static float DIFFICULTY_PER_SECOND = DIFFICULTY_MAX / (HOURS_TO_MAX_DIFFICULTY * 3600);
   public static float DIFFICULTY_PER_BLOCK = DIFFICULTY_MAX / 100000;
   public static float DIFFICULTY_PER_KILL = 0;
+  public static float DIFFICULTY_PER_BLIGHT_KILL = 0;
   public static float DIFFICULTY_PER_BOSS_KILL = 0;
+  public static float DIFFICULTY_PER_PASSIVE_KILL = 0;
   public static float DIFFICULTY_FOR_SLEEPING = 0;
   public static float DIFFICULTY_IDLE_MULTI = 0.7f;
   public static float DIFFICULTY_LOST_ON_DEATH = 0f;
   public static float DIFFICULTY_GROUP_AREA_BONUS = 0.05f;
   public static int DIFFICULTY_SEARCH_RADIUS = 160;
+  public static EntityDifficultyChangeList DIFFICULTY_PER_KILL_BY_MOB = new EntityDifficultyChangeList();
   public static EnumAreaDifficultyMode AREA_DIFFICULTY_MODE = EnumAreaDifficultyMode.WEIGHTED_AVERAGE;
   public static EnumResetTime DIFFFICULTY_RESET_TIME = EnumResetTime.NONE;
 
@@ -437,6 +446,14 @@ public class ConfigScalingHealth extends AdaptiveConfig {
           DIFFICULTY_PER_KILL, -1000f, 1000f,
           "The difficulty gained for each hostile mob killed. Set to 0 to disable. Negative numbers"
           + " cause difficulty to decrease with each kill.");
+      DIFFICULTY_PER_PASSIVE_KILL = config.getFloat("Difficulty Per Passive Kill", CAT_DIFFICULTY,
+          0f, -1000f, 1000f,
+          "The difficulty change for each passive mob killed. Set to 0 to disable. Positive numbers"
+          + " will increase difficulty with each kill, negative numbers will decrease it instead.");
+      DIFFICULTY_PER_BLIGHT_KILL = config.getFloat("Difficulty Per Blight Kill", CAT_DIFFICULTY,
+          0f, -1000f, 1000f,
+          "The difficulty gained or lost for each blight killed. Set to 0 to disable. Positive numbers"
+          + " will increase difficulty, negative numbers will decrease it.");
       DIFFICULTY_PER_BOSS_KILL = config.getFloat("Difficulty Per Boss Kill", CAT_DIFFICULTY,
           DIFFICULTY_PER_BOSS_KILL, -1000f, 1000f,
           "The difficulty gained for each boss mob killed. Set to 0 to disable. Negative numbers"
@@ -460,6 +477,21 @@ public class ConfigScalingHealth extends AdaptiveConfig {
           DIFFICULTY_SEARCH_RADIUS, 0, Short.MAX_VALUE,
           "The distance from a newly spawned mob to search for players to determine its difficulty "
           + "level. Set to 0 for unlimited range.");
+      ConfigMultiValueLineParser parser = new ConfigMultiValueLineParser("Difficulty Per Kill By Mob",
+          ScalingHealth.logHelper, "\\s", String.class, Float.class, Float.class);
+      DIFFICULTY_PER_KILL_BY_MOB.clear();
+      for (String str : config.getStringList("Difficulty Per Kill By Mob", CAT_DIFFICULTY,
+          new String[] { },
+          "Lets you set difficulty changes for individual mobs. Each line has 3 values separated by"
+          + " spaces: entity ID, standard kill change, blight kill change. For example, entering"
+          + " \"minecraft:zombie 0.1 -20\" will cause zombie kills to add 0.1 difficulty, but"
+          + " killing a blight zombie will remove 20 difficulty instead.")) {
+        Object[] values = parser.parse(str);
+        if (values != null) {
+          // Shouldn't need any safety checks, the parser returns null if any error occurs.
+          DIFFICULTY_PER_KILL_BY_MOB.put((String) values[0], (float) values[1], (float) values[2]);
+        }
+      }
       AREA_DIFFICULTY_MODE = EnumAreaDifficultyMode.loadFromConfig(config, AREA_DIFFICULTY_MODE);
       DIFFFICULTY_RESET_TIME = EnumResetTime.loadFromConfig(config, DIFFFICULTY_RESET_TIME, CAT_DIFFICULTY);
 
@@ -534,6 +566,25 @@ public class ConfigScalingHealth extends AdaptiveConfig {
       return true;
     } catch (NumberFormatException ex) {
       return false;
+    }
+  }
+
+  public boolean canParseFloat(String str) {
+
+    try {
+      Float.parseFloat(str);
+      return true;
+    } catch (NumberFormatException ex) {
+      return false;
+    }
+  }
+
+  public float tryParseFloat(String str) {
+
+    try {
+      return Float.parseFloat(str);
+    } catch (NumberFormatException ex) {
+      return 0f;
     }
   }
 }

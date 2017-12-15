@@ -37,6 +37,7 @@ import net.silentchaos512.scalinghealth.utils.EquipmentTierMap;
 import net.silentchaos512.scalinghealth.utils.MobPotionMap;
 import net.silentchaos512.scalinghealth.utils.ModifierHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
+import net.silentchaos512.scalinghealth.utils.EntityDifficultyChangeList.DifficultyChanges;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
 public class DifficultyHandler {
@@ -132,29 +133,30 @@ public class DifficultyHandler {
   @SubscribeEvent
   public void onMobDeath(LivingDeathEvent event) {
 
-    EntityLivingBase killedEntity = event.getEntityLiving();
+    EntityLivingBase killed = event.getEntityLiving();
     DamageSource source = event.getSource();
 
     // Killed by player?
     if (source.getTrueSource() instanceof EntityPlayer) {
-      // Is hostile mob?
-      if (killedEntity instanceof IMob) {
-        EntityPlayer player = (EntityPlayer) source.getTrueSource();
-        PlayerData data = SHPlayerDataHandler.get(player);
-        if (data != null) {
-          // Boss or not? Change difficulty accordingly.
-          if (killedEntity.isNonBoss())
-            data.incrementDifficulty(ConfigScalingHealth.DIFFICULTY_PER_KILL);
-          else
-            data.incrementDifficulty(ConfigScalingHealth.DIFFICULTY_PER_BOSS_KILL);
+      DifficultyChanges changes = ConfigScalingHealth.DIFFICULTY_PER_KILL_BY_MOB.get(killed);
+      EntityPlayer player = (EntityPlayer) source.getTrueSource();
+      PlayerData data = SHPlayerDataHandler.get(player);
+      if (data != null) {
+        boolean isBlight = BlightHandler.isBlight(killed);
+        float amount = isBlight ? changes.onBlightKill : changes.onStandardKill;
+        if (ConfigScalingHealth.DEBUG_MODE) {
+          ScalingHealth.logHelper.info("Killed " + (isBlight ? "Blight " : "") + killed.getName()
+              + ": difficulty " + (amount > 0 ? "+" : "") + amount);
         }
+        data.incrementDifficulty(amount);
       }
     }
   }
 
   private boolean increaseEntityHealth(EntityLivingBase entityLiving) {
 
-    float difficulty = (float) ConfigScalingHealth.AREA_DIFFICULTY_MODE.getAreaDifficulty(entityLiving.world, entityLiving.getPosition());
+    float difficulty = (float) ConfigScalingHealth.AREA_DIFFICULTY_MODE
+        .getAreaDifficulty(entityLiving.world, entityLiving.getPosition());
     Random rand = ScalingHealth.random;
     boolean makeBlight = false;
     boolean isHostile = entityLiving instanceof IMob;
@@ -163,7 +165,8 @@ public class DifficultyHandler {
 
     // Make blight?
     if (!entityBlacklistedFromBecomingBlight(entityLiving)) {
-      float chance = (float) (difficulty / ConfigScalingHealth.DIFFICULTY_MAX * ConfigScalingHealth.BLIGHT_CHANCE_MULTIPLIER);
+      float chance = (float) (difficulty / ConfigScalingHealth.DIFFICULTY_MAX
+          * ConfigScalingHealth.BLIGHT_CHANCE_MULTIPLIER);
       if (rand.nextFloat() < chance) {
         makeBlight = true;
         difficulty *= 3;
@@ -172,7 +175,8 @@ public class DifficultyHandler {
 
     float genAddedHealth = difficulty;
     float genAddedDamage = 0;
-    float baseMaxHealth = (float) entityLiving.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue();
+    float baseMaxHealth = (float) entityLiving
+        .getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue();
     float healthMultiplier = isHostile ? ConfigScalingHealth.DIFFICULTY_GENERIC_HEALTH_MULTIPLIER
         : ConfigScalingHealth.DIFFICULTY_PEACEFUL_HEALTH_MULTIPLIER;
 
@@ -224,7 +228,8 @@ public class DifficultyHandler {
         ModifierHandler.setMaxHealth(entityLiving, healthMulti + baseMaxHealth, 1);
         break;
       default:
-        ScalingHealth.logHelper.severe("Unknown mob health scaling mode: " + ConfigScalingHealth.MOB_HEALTH_SCALING_MODE.name());
+        ScalingHealth.logHelper.severe("Unknown mob health scaling mode: "
+            + ConfigScalingHealth.MOB_HEALTH_SCALING_MODE.name());
         break;
     }
     ModifierHandler.addAttackDamage(entityLiving, genAddedDamage, 0);
@@ -240,7 +245,8 @@ public class DifficultyHandler {
 
   private void makeEntityBlight(EntityLiving entityLiving, Random rand) {
 
-    BlightSpawnEvent event = new BlightSpawnEvent.Pre((EntityLiving) entityLiving, entityLiving.world, (float) entityLiving.posX, (float) entityLiving.posY,
+    BlightSpawnEvent event = new BlightSpawnEvent.Pre((EntityLiving) entityLiving,
+        entityLiving.world, (float) entityLiving.posX, (float) entityLiving.posY,
         (float) entityLiving.posZ);
     if (MinecraftForge.EVENT_BUS.post(event)) {
       // Someone canceled the "blightification"
@@ -366,7 +372,8 @@ public class DifficultyHandler {
   private boolean canIncreaseEntityHealth(EntityLivingBase entityLiving) {
 
     return entityLiving.getAttributeMap() != null && entityLiving.ticksExisted > 1
-        && entityLiving.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getModifier(ModifierHandler.MODIFIER_ID_HEALTH) == null;
+        && entityLiving.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
+            .getModifier(ModifierHandler.MODIFIER_ID_HEALTH) == null;
   }
 
   private boolean entityBlacklistedFromBecomingBlight(EntityLivingBase entityLiving) {
@@ -387,7 +394,8 @@ public class DifficultyHandler {
   // Equipment
   // **************************************************************************
 
-  private EntityEquipmentSlot[] ORDERED_SLOTS = { EntityEquipmentSlot.HEAD, EntityEquipmentSlot.CHEST, EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET };
+  private EntityEquipmentSlot[] ORDERED_SLOTS = { EntityEquipmentSlot.HEAD,
+      EntityEquipmentSlot.CHEST, EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET };
 
   public EquipmentTierMap mapHelmets = new EquipmentTierMap(5, EntityEquipmentSlot.HEAD);
   public EquipmentTierMap mapChestplates = new EquipmentTierMap(5, EntityEquipmentSlot.CHEST);
