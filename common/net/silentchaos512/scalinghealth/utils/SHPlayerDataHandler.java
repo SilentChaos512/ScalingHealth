@@ -42,7 +42,7 @@ public class SHPlayerDataHandler {
     }
 
     PlayerData data = playerData.get(key);
-    if (data.playerWR.get() != player) {
+    if (data != null && data.playerWR.get() != player) {
       NBTTagCompound tags = new NBTTagCompound();
       data.writeToNBT(tags);
       playerData.remove(key);
