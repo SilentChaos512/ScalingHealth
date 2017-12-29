@@ -120,8 +120,8 @@ public class DifficultyHandler {
 
     //@formatter:off
     if (entityLiving.world.isRemote
-        || entityBlacklistedFromHealthIncrease(entityLiving)
-        || !canIncreaseEntityHealth(entityLiving))
+        || !canIncreaseEntityHealth(entityLiving)
+        || entityBlacklistedFromHealthIncrease(entityLiving))
       return;
     //@formatter:on
 

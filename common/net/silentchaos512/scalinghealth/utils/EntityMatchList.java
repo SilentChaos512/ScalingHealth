@@ -28,7 +28,7 @@ public class EntityMatchList {
     if (resource == null) {
       return false;
     }
-    String id = resource.getResourcePath();
+    String id = resource.toString();
     String idOld = EntityList.getEntityString(entity);
 
     for (String entry : list) {

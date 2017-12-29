@@ -23,7 +23,7 @@ public class EntityDifficultyChangeList {
     if (resource == null) {
       return defaultValues(entity);
     }
-    String id = resource.getResourcePath();
+    String id = resource.toString();
     String idOld = EntityList.getEntityString(entity);
 
     for (Entry<String, DifficultyChanges> entry : map.entrySet()) {
