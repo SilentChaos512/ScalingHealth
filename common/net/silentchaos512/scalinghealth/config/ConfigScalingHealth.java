@@ -3,12 +3,11 @@ package net.silentchaos512.scalinghealth.config;
 import java.io.File;
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
-import com.google.common.collect.Lists;
-
+import gnu.trove.map.hash.THashMap;
 import net.minecraftforge.common.config.Configuration;
 import net.silentchaos512.lib.config.AdaptiveConfig;
 import net.silentchaos512.lib.config.ConfigMultiValueLineParser;
@@ -135,6 +134,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static float DIFFICULTY_GROUP_AREA_BONUS = 0.05f;
   public static int DIFFICULTY_SEARCH_RADIUS = 160;
   public static EntityDifficultyChangeList DIFFICULTY_PER_KILL_BY_MOB = new EntityDifficultyChangeList();
+  public static Map<Integer, Float> DIFFICULTY_DIMENSION_MULTIPLIER = new THashMap<Integer, Float>();
   public static EnumAreaDifficultyMode AREA_DIFFICULTY_MODE = EnumAreaDifficultyMode.WEIGHTED_AVERAGE;
   public static EnumResetTime DIFFFICULTY_RESET_TIME = EnumResetTime.NONE;
 
@@ -187,6 +187,8 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public void load() {
 
     try {
+      ConfigMultiValueLineParser parser;
+
       //@formatter:off
 
       DEBUG_MODE = loadBoolean("Debug Mode", CAT_MAIN,
@@ -477,7 +479,8 @@ public class ConfigScalingHealth extends AdaptiveConfig {
           DIFFICULTY_SEARCH_RADIUS, 0, Short.MAX_VALUE,
           "The distance from a newly spawned mob to search for players to determine its difficulty "
           + "level. Set to 0 for unlimited range.");
-      ConfigMultiValueLineParser parser = new ConfigMultiValueLineParser("Difficulty Per Kill By Mob",
+      // Difficulty Per Kill By Mob
+      parser = new ConfigMultiValueLineParser("Difficulty Per Kill By Mob",
           ScalingHealth.logHelper, "\\s", String.class, Float.class, Float.class);
       DIFFICULTY_PER_KILL_BY_MOB.clear();
       for (String str : config.getStringList("Difficulty Per Kill By Mob", CAT_DIFFICULTY,
@@ -490,6 +493,19 @@ public class ConfigScalingHealth extends AdaptiveConfig {
         if (values != null) {
           // Shouldn't need any safety checks, the parser returns null if any error occurs.
           DIFFICULTY_PER_KILL_BY_MOB.put((String) values[0], (float) values[1], (float) values[2]);
+        }
+      }
+      // Difficulty Dimension Multiplier
+      parser = new ConfigMultiValueLineParser("Difficulty Dimension Multiplier",
+          ScalingHealth.logHelper, "\\s", Integer.class, Float.class);
+      for (String str : config.getStringList("Difficulty Dimension Multiplier", CAT_DIFFICULTY,
+          new String[] {},
+          "Allows difficulty multipliers to be set for specific dimensions. Use the dimension ID"
+          + " and the multiplier you want, separated by a space. For example, \"-1 1.5\" would"
+          + " make difficulty increase 1.5x faster in the Nether.")) {
+        Object[] values = parser.parse(str);
+        if (values != null) {
+          DIFFICULTY_DIMENSION_MULTIPLIER.put((int) values[0], (float) values[1]);
         }
       }
       AREA_DIFFICULTY_MODE = EnumAreaDifficultyMode.loadFromConfig(config, AREA_DIFFICULTY_MODE);

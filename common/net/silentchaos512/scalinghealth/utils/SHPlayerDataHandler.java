@@ -107,10 +107,12 @@ public class SHPlayerDataHandler {
         SHPlayerDataHandler.get(player).tick();
 
         // Get data from nearby players.
-        if (!player.world.isRemote && player.world.getTotalWorldTime() % 5 * ConfigScalingHealth.PACKET_DELAY == 0) {
+        if (!player.world.isRemote
+            && player.world.getTotalWorldTime() % 5 * ConfigScalingHealth.PACKET_DELAY == 0) {
           int radius = ConfigScalingHealth.DIFFICULTY_SEARCH_RADIUS;
           int radiusSquared = radius <= 0 ? Integer.MAX_VALUE : radius * radius;
-          for (EntityPlayer p : player.world.getPlayers(EntityPlayer.class, p -> !p.equals(player) && p.getDistanceSq(player.getPosition()) < radiusSquared)) {
+          for (EntityPlayer p : player.world.getPlayers(EntityPlayer.class,
+              p -> !p.equals(player) && p.getDistanceSq(player.getPosition()) < radiusSquared)) {
             MessageDataSync message = new MessageDataSync(get(p), p);
             NetworkHandler.INSTANCE.sendTo(message, (EntityPlayerMP) player);
           }
@@ -165,6 +167,12 @@ public class SHPlayerDataHandler {
     }
 
     public void incrementDifficulty(double amount) {
+
+      EntityPlayer player = playerWR.get();
+      if (player != null
+          && ConfigScalingHealth.DIFFICULTY_DIMENSION_MULTIPLIER.containsKey(player.dimension)) {
+        amount *= ConfigScalingHealth.DIFFICULTY_DIMENSION_MULTIPLIER.get(player.dimension);
+      }
 
       setDifficulty(difficulty + amount);
     }
