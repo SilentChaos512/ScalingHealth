@@ -7,6 +7,7 @@ import javax.annotation.Nullable;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.monster.EntitySlime;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
@@ -55,6 +56,9 @@ public class ScalingHealthCommonEvents {
       // Different drop rates for hostiles and passives.
       float dropRate = killedEntity instanceof IMob ? ConfigScalingHealth.HEART_DROP_CHANCE_HOSTILE
           : ConfigScalingHealth.HEART_DROP_CHANCE_PASSIVE;
+      if (killedEntity instanceof EntitySlime) {
+        dropRate /= 6f;
+      }
 
       // Basic heart drops for all mobs.
       if (event.isRecentlyHit() && rand.nextFloat() <= dropRate) {

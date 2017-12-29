@@ -1,4 +1,6 @@
-
+1.3.6
+Changed: Slimes (including magma cubes and probably most modded slimes) now drop far fewer hearts.
+Fixed: Entity lists not matching mod entities (#61)
 
 1.3.5
 Added: Difficulty per blight kill config (how did I miss that?)
