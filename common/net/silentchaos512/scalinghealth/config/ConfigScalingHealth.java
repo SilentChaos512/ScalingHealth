@@ -117,6 +117,8 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static int HEARTS_DROPPED_BY_BLIGHT_MAX = 2;
   public static boolean HEARTS_INCREASE_HEALTH = true;
   public static int HEARTS_HEALTH_RESTORED = 4;
+  public static float CURSED_HEART_DIFFICULTY_CHANGE;
+  public static float ENCHANTED_HEART_DIFFICULTY_CHANGE;
 
   // Difficulty
   public static float DIFFICULTY_MAX = 250;
@@ -427,6 +429,15 @@ public class ConfigScalingHealth extends AdaptiveConfig {
       HEARTS_HEALTH_RESTORED = loadInt("Hearts Health Restored", CAT_ITEMS,
           HEARTS_HEALTH_RESTORED, 0, 2000,
           "The amount of health that will be restored when using a heart container.");
+
+      String catCursedHeart = CAT_ITEMS + split + "cursed_heart";
+      CURSED_HEART_DIFFICULTY_CHANGE = config.getFloat("Difficulty Change", catCursedHeart,
+          10f, -1000f, 1000f,
+          "The amount of difficulty added/removed when using a cursed heart");
+      String catEnchantedHeart = CAT_ITEMS + split + "enchanted_heart";
+      ENCHANTED_HEART_DIFFICULTY_CHANGE = config.getFloat("Difficulty Change", catEnchantedHeart,
+          -10f, -1000f, 1000f,
+          "The amount of difficulty added/removed when using an enchanted heart");
 
       // Difficulty
       DIFFICULTY_MAX = config.getFloat("Max Value", CAT_DIFFICULTY,

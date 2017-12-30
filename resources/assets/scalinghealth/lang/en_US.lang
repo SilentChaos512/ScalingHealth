@@ -11,6 +11,8 @@ tile.scalinghealth:CrystalOre.name=Heart Crystal Ore
 #########
 
 item.scalinghealth:CrystalShard.name=Heart Crystal Shard
+item.scalinghealth:DifficultyChanger0.name=Enchanted Heart
+item.scalinghealth:DifficultyChanger1.name=Cursed Heart
 item.scalinghealth:HeartContainer.name=Heart Container
 item.scalinghealth:HeartDust.name=Heart Dust
 item.scalinghealth:HealingItem0.name=Bandages
