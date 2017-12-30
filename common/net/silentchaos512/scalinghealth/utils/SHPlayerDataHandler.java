@@ -23,6 +23,7 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.network.NetworkHandler;
 import net.silentchaos512.scalinghealth.network.message.MessageDataSync;
+import net.silentchaos512.scalinghealth.scoreboard.SHScoreCriteria;
 
 public class SHPlayerDataHandler {
 
@@ -164,6 +165,10 @@ public class SHPlayerDataHandler {
     public void setDifficulty(double value) {
 
       difficulty = MathHelper.clamp(value, 0, ConfigScalingHealth.DIFFICULTY_MAX);
+      EntityPlayer player = playerWR.get();
+      if (player != null) {
+        SHScoreCriteria.updateScore(player, (int) difficulty);
+      }
     }
 
     public void incrementDifficulty(double amount) {
