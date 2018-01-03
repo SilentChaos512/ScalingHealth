@@ -1,5 +1,11 @@
+1.3.7
+Added: Debug mode will now log all spawns.
+Fixed (maybe): Some entities (notably Lycanites) not receiving extra health/damage (#64)
+Fixed: New difficulty changer items appearing in all creative tabs (#67)
+
 1.3.6
 Added: Items that change difficulty (Cursed Heart and Enchanted Heart). They still need some polishing, but are functional. No recipes are included, you will need to make your own. (#57)
+Added: Scoreboard criteria for difficulty (scalinghealth:difficulty) (#62)
 Changed: Slimes (including magma cubes and probably most modded slimes) now drop far fewer hearts.
 Fixed: Entity lists not matching mod entities (#61)
 

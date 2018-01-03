@@ -7,6 +7,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.monster.EntityMob;
@@ -113,14 +114,13 @@ public class DifficultyHandler {
   public void onMobSpawn(LivingUpdateEvent event) {
 
     // Increase mob health and make blights?
-    if (!(event.getEntity() instanceof EntityLiving))
+    if (event.getEntity().world.isRemote || !(event.getEntity() instanceof EntityLiving))
       return;
 
     EntityLiving entityLiving = (EntityLiving) event.getEntity();
 
     //@formatter:off
-    if (entityLiving.world.isRemote
-        || !canIncreaseEntityHealth(entityLiving)
+    if (!canIncreaseEntityHealth(entityLiving)
         || entityBlacklistedFromHealthIncrease(entityLiving))
       return;
     //@formatter:on
@@ -172,6 +172,8 @@ public class DifficultyHandler {
         difficulty *= 3;
       }
     }
+
+    float totalDifficulty = difficulty;
 
     float genAddedHealth = difficulty;
     float genAddedDamage = 0;
@@ -237,8 +239,11 @@ public class DifficultyHandler {
     // Heal.
     entityLiving.setHealth(entityLiving.getMaxHealth());
 
-    // ScalingHealth.logHelper.info(
-    // entityLiving.getName() + ": Health +" + genAddedHealth + ", Damage +" + genAddedDamage);
+    if (ConfigScalingHealth.DEBUG_MODE) {
+      ScalingHealth.logHelper
+          .info(String.format("Spawn debug: %s: Difficulty=%.2f, Health +%.2f, Damage +%.2f",
+              entityLiving.getName(), totalDifficulty, genAddedHealth, genAddedDamage));
+    }
 
     return makeBlight;
   }
@@ -371,9 +376,14 @@ public class DifficultyHandler {
 
   private boolean canIncreaseEntityHealth(EntityLivingBase entityLiving) {
 
-    return entityLiving.getAttributeMap() != null && entityLiving.ticksExisted > 1
-        && entityLiving.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
-            .getModifier(ModifierHandler.MODIFIER_ID_HEALTH) == null;
+    if (entityLiving == null)
+      return false;
+
+    AttributeModifier modifier = entityLiving.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
+        .getModifier(ModifierHandler.MODIFIER_ID_HEALTH);
+    // The tickExisted > 1 kinda helps with Lycanites, but checking for a modifier amount of 0 should catch issues with
+    // some mobs not receiving health increases.
+    return entityLiving.ticksExisted > 1 && (modifier == null || modifier.getAmount() == 0.0);
   }
 
   private boolean entityBlacklistedFromBecomingBlight(EntityLivingBase entityLiving) {
