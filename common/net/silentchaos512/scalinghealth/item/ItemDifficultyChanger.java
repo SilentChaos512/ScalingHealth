@@ -11,6 +11,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.silentchaos512.lib.item.ItemSL;
+import net.silentchaos512.lib.util.ItemHelper;
 import net.silentchaos512.lib.util.StackHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
@@ -41,6 +42,9 @@ public class ItemDifficultyChanger extends ItemSL {
   @SideOnly(Side.CLIENT)
   @Override
   public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> list) {
+
+    if (!ItemHelper.isInCreativeTab(this, tab))
+      return;
 
     list.add(new ItemStack(this, 1, 0));
     list.add(new ItemStack(this, 1, 1));
