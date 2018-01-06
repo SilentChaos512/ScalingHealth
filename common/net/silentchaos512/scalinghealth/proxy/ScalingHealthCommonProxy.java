@@ -2,8 +2,11 @@ package net.silentchaos512.scalinghealth.proxy;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.Loader;
 import net.silentchaos512.lib.proxy.CommonProxy;
 import net.silentchaos512.lib.registry.SRegistry;
+import net.silentchaos512.scalinghealth.compat.morpheus.SHMorpheusCompat;
+import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.event.BlightHandler;
 import net.silentchaos512.scalinghealth.event.DifficultyHandler;
 import net.silentchaos512.scalinghealth.event.PetEventHandler;
@@ -31,6 +34,10 @@ public class ScalingHealthCommonProxy extends CommonProxy {
     MinecraftForge.EVENT_BUS.register(DifficultyHandler.INSTANCE);
     MinecraftForge.EVENT_BUS.register(BlightHandler.INSTANCE);
     MinecraftForge.EVENT_BUS.register(PetEventHandler.INSTANCE);
+
+    // Morpheus compat
+    if (Loader.isModLoaded("morpheus") && ConfigScalingHealth.MORPHEUS_OVERRIDE)
+      SHMorpheusCompat.init();
   }
 
   @Override

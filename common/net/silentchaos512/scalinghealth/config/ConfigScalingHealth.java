@@ -152,6 +152,9 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static float HEART_CRYSTAL_ORE_EXTRA_VEIN_RATE = HEART_CRYSTAL_ORE_EXTRA_VEIN_CAP / 3125;
   public static int HEART_CRYSTAL_ORE_QUANTITY_DROPPED = 1;
 
+  // Compatibility
+  public static boolean MORPHEUS_OVERRIDE;
+
   static final String split = Configuration.CATEGORY_SPLITTER;
   public static final String CAT_MAIN = "main";
   public static final String CAT_CLIENT = CAT_MAIN + split + "client";
@@ -169,6 +172,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static final String CAT_DIFFICULTY = CAT_MAIN + split + "difficulty";
   public static final String CAT_NETWORK = CAT_MAIN + split + "network";
   public static final String CAT_WORLD = CAT_MAIN + split + "world";
+  public static final String CAT_COMPAT = CAT_MAIN + split + "compatibility";
 
   public static final ConfigScalingHealth INSTANCE = new ConfigScalingHealth();
 
@@ -555,6 +559,11 @@ public class ConfigScalingHealth extends AdaptiveConfig {
       HEART_CRYSTAL_ORE_QUANTITY_DROPPED = loadInt("Quantity Dropped", cat,
           HEART_CRYSTAL_ORE_QUANTITY_DROPPED, 1, 64,
           "The base number of heart crystal shards dropped by the ore. Fortune III can double this value at most.");
+
+      // Compatibility
+      config.setCategoryRequiresMcRestart(CAT_COMPAT, true);
+      MORPHEUS_OVERRIDE = config.getBoolean("Morpheus Support", CAT_COMPAT, true,
+          "Override the Morpheus new day handler to fire sleep events. Without this, difficulty will not increase when sleeping.");
 
       //@formatter:on
     } catch (Exception ex) {
