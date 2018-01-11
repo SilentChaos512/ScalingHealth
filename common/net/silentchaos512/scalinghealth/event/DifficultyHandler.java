@@ -331,7 +331,7 @@ public class DifficultyHandler {
     // Add random enchantments
     for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
       ItemStack stack = entityLiving.getItemStackFromSlot(slot);
-      if (StackHelper.isValid(stack))
+      if (StackHelper.isValid(stack) && !stack.isItemEnchanted())
         EnchantmentHelper.addRandomEnchantment(rand, stack, 30, false);
     }
 
