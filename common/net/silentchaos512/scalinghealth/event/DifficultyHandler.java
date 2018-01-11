@@ -250,11 +250,6 @@ public class DifficultyHandler {
 
   private void makeEntityBlight(EntityLiving entityLiving, Random rand) {
 
-    // Is mob already a blight?
-    if (BlightHandler.isBlight(entityLiving)) {
-      return;
-    }
-
     BlightSpawnEvent event = new BlightSpawnEvent.Pre((EntityLiving) entityLiving,
         entityLiving.world, (float) entityLiving.posX, (float) entityLiving.posY,
         (float) entityLiving.posZ);
@@ -336,7 +331,6 @@ public class DifficultyHandler {
     // Add random enchantments
     for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
       ItemStack stack = entityLiving.getItemStackFromSlot(slot);
-      // FIXME #70
       if (StackHelper.isValid(stack))
         EnchantmentHelper.addRandomEnchantment(rand, stack, 30, false);
     }
