@@ -4,11 +4,9 @@ import java.util.List;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.common.util.FakePlayerFactory;
-import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
@@ -56,6 +54,12 @@ public enum EnumAreaDifficultyMode {
   }
 
   public double getAreaDifficulty(World world, BlockPos pos, boolean addGroupBonus) {
+
+    return getAreaDifficulty(world, pos, addGroupBonus, true);
+  }
+
+  public double getAreaDifficulty(World world, BlockPos pos, boolean addGroupBonus,
+      boolean clampValue) {
 
     // Get players in range. TODO: Only get player list for types that need it?
     int radius = ConfigScalingHealth.DIFFICULTY_SEARCH_RADIUS;
@@ -130,15 +134,15 @@ public enum EnumAreaDifficultyMode {
         break;
 
       case DISTANCE_AND_TIME:
-        double difficultyFromPlayers = WEIGHTED_AVERAGE.getAreaDifficulty(world, pos, false);
-        double difficultyFromDistance = DISTANCE_FROM_SPAWN.getAreaDifficulty(world, pos, false);
-        ret = difficultyFromPlayers + difficultyFromDistance;
+        double diffFromPlayers = WEIGHTED_AVERAGE.getAreaDifficulty(world, pos, false, false);
+        double diffFromDistance = DISTANCE_FROM_SPAWN.getAreaDifficulty(world, pos, false, false);
+        ret = diffFromPlayers + diffFromDistance;
         break;
     }
 
     // Clamp to difficulty range (intentionally done before group bonus)
-    ret = ret < 0 ? 0
-        : ret > ConfigScalingHealth.DIFFICULTY_MAX ? ConfigScalingHealth.DIFFICULTY_MAX : ret;
+    if (clampValue)
+      ret = MathHelper.clamp(ret, 0, ConfigScalingHealth.DIFFICULTY_MAX);
 
     // Group bonus?
     if (addGroupBonus)
