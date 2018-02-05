@@ -164,9 +164,19 @@ public class SHPlayerDataHandler {
 
     public void setDifficulty(double value) {
 
-      difficulty = MathHelper.clamp(value, ConfigScalingHealth.DIFFICULTY_MIN,
-          ConfigScalingHealth.DIFFICULTY_MAX);
       EntityPlayer player = playerWR.get();
+
+      // Player exempt from difficulty?
+      if (ConfigScalingHealth.DIFFICULTY_EXEMPT_PLAYERS.contains(player)) {
+        difficulty = 0;
+      }
+      // Non-exempt, just clamp between min and max configs.
+      else {
+        difficulty = MathHelper.clamp(value, ConfigScalingHealth.DIFFICULTY_MIN,
+            ConfigScalingHealth.DIFFICULTY_MAX);
+      }
+
+      // Update scoreboard
       if (player != null) {
         SHScoreCriteria.updateScore(player, (int) difficulty);
       }

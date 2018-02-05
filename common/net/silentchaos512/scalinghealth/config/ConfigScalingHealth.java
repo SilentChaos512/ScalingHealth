@@ -18,6 +18,7 @@ import net.silentchaos512.scalinghealth.lib.EnumHealthModMode;
 import net.silentchaos512.scalinghealth.lib.EnumResetTime;
 import net.silentchaos512.scalinghealth.utils.EntityDifficultyChangeList;
 import net.silentchaos512.scalinghealth.utils.EntityMatchList;
+import net.silentchaos512.scalinghealth.utils.PlayerMatchList;
 
 public class ConfigScalingHealth extends AdaptiveConfig {
 
@@ -136,6 +137,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static float DIFFICULTY_LOST_ON_DEATH = 0f;
   public static float DIFFICULTY_GROUP_AREA_BONUS = 0.05f;
   public static int DIFFICULTY_SEARCH_RADIUS = 160;
+  public static PlayerMatchList DIFFICULTY_EXEMPT_PLAYERS = new PlayerMatchList();
   public static EntityDifficultyChangeList DIFFICULTY_PER_KILL_BY_MOB = new EntityDifficultyChangeList();
   public static Map<Integer, Float> DIFFICULTY_DIMENSION_MULTIPLIER = new THashMap<Integer, Float>();
   public static EnumAreaDifficultyMode AREA_DIFFICULTY_MODE = EnumAreaDifficultyMode.WEIGHTED_AVERAGE;
@@ -498,6 +500,13 @@ public class ConfigScalingHealth extends AdaptiveConfig {
           DIFFICULTY_SEARCH_RADIUS, 0, Short.MAX_VALUE,
           "The distance from a newly spawned mob to search for players to determine its difficulty "
           + "level. Set to 0 for unlimited range.");
+      // Player exemptions
+      DIFFICULTY_EXEMPT_PLAYERS.clear();
+      for (String name : config.getStringList("Exempt Players", CAT_DIFFICULTY, new String[0],
+          "Players listed here will be \"exempt\" from the difficulty system. Exempt players are"
+          + " still part of difficulty calculations, but are treated as having zero difficulty.")) {
+        DIFFICULTY_EXEMPT_PLAYERS.add(name);
+      }
       // Difficulty Per Kill By Mob
       parser = new ConfigMultiValueLineParser("Difficulty Per Kill By Mob",
           ScalingHealth.logHelper, "\\s", String.class, Float.class, Float.class);
