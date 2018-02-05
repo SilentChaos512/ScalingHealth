@@ -151,8 +151,8 @@ public class ScalingHealthCommonEvents {
       // Lose difficulty on death?
       double currentDifficulty = data.getDifficulty();
       double newDifficulty = MathHelper.clamp(
-          currentDifficulty - ConfigScalingHealth.DIFFICULTY_LOST_ON_DEATH, 0,
-          ConfigScalingHealth.DIFFICULTY_MAX);
+          currentDifficulty - ConfigScalingHealth.DIFFICULTY_LOST_ON_DEATH,
+          ConfigScalingHealth.DIFFICULTY_MIN, ConfigScalingHealth.DIFFICULTY_MAX);
       data.setDifficulty(newDifficulty);
 
       // Apply health modifier

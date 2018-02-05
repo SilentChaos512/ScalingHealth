@@ -1,3 +1,7 @@
+1.3.9
+Added: A minimum difficulty config, defaults to 0.
+Fixed: Negative values not working with difficulty per block config (#75)
+
 1.3.8
 Fixed: Difficulty not increasing when sleeping using Morpheus (#60)
 Fixed: Blight equipment receiving an unlimited number of enchantments (#70)

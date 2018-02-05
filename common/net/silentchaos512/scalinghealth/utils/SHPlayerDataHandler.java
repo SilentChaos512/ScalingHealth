@@ -164,7 +164,8 @@ public class SHPlayerDataHandler {
 
     public void setDifficulty(double value) {
 
-      difficulty = MathHelper.clamp(value, 0, ConfigScalingHealth.DIFFICULTY_MAX);
+      difficulty = MathHelper.clamp(value, ConfigScalingHealth.DIFFICULTY_MIN,
+          ConfigScalingHealth.DIFFICULTY_MAX);
       EntityPlayer player = playerWR.get();
       if (player != null) {
         SHScoreCriteria.updateScore(player, (int) difficulty);

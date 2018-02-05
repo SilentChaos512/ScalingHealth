@@ -142,7 +142,8 @@ public enum EnumAreaDifficultyMode {
 
     // Clamp to difficulty range (intentionally done before group bonus)
     if (clampValue)
-      ret = MathHelper.clamp(ret, 0, ConfigScalingHealth.DIFFICULTY_MAX);
+      ret = MathHelper.clamp(ret, ConfigScalingHealth.DIFFICULTY_MIN,
+          ConfigScalingHealth.DIFFICULTY_MAX);
 
     // Group bonus?
     if (addGroupBonus)

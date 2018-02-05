@@ -92,8 +92,10 @@ public class CommandScalingHealth extends CommandBaseSL {
     } else {
       // Try set difficulty.
       // Bounds check.
-      if (value < 0 || value > ConfigScalingHealth.DIFFICULTY_MAX) {
-        tell(sender, "outOfBounds", true, String.format(NUMFORMAT, 0.0f),
+      if (value < ConfigScalingHealth.DIFFICULTY_MIN
+          || value > ConfigScalingHealth.DIFFICULTY_MAX) {
+        tell(sender, "outOfBounds", true,
+            String.format(NUMFORMAT, ConfigScalingHealth.DIFFICULTY_MIN),
             String.format("%.2f", ConfigScalingHealth.DIFFICULTY_MAX));
         return;
       }
@@ -171,7 +173,8 @@ public class CommandScalingHealth extends CommandBaseSL {
       Object... args) {
 
     String value = fromLocalizationFile
-        ? ScalingHealth.localizationHelper.getLocalizedString("command." + key, args) : key;
+        ? ScalingHealth.localizationHelper.getLocalizedString("command." + key, args)
+        : key;
     sender.sendMessage(new TextComponentString(value));
   }
 }

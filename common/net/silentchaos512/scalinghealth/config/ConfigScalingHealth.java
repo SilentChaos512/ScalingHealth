@@ -121,6 +121,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static float ENCHANTED_HEART_DIFFICULTY_CHANGE;
 
   // Difficulty
+  public static float DIFFICULTY_MIN = 0;
   public static float DIFFICULTY_MAX = 250;
   public static float DIFFICULTY_DEFAULT = 0;
   public static int HOURS_TO_MAX_DIFFICULTY = 60; // Not actually loaded, just to make calc below clear.
@@ -444,6 +445,9 @@ public class ConfigScalingHealth extends AdaptiveConfig {
           "The amount of difficulty added/removed when using an enchanted heart");
 
       // Difficulty
+      DIFFICULTY_MIN = config.getFloat("Min Value", CAT_DIFFICULTY,
+          0, 0, Float.MAX_VALUE,
+          "The minimum difficulty value. This can be different from the starting value.");
       DIFFICULTY_MAX = config.getFloat("Max Value", CAT_DIFFICULTY,
           DIFFICULTY_MAX, 0f, Float.MAX_VALUE,
           "The maximum difficult level that can be reached. Note that values beyond 250 are not"
