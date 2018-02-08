@@ -7,6 +7,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
+import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
@@ -60,6 +61,11 @@ public enum EnumAreaDifficultyMode {
 
   public double getAreaDifficulty(World world, BlockPos pos, boolean addGroupBonus,
       boolean clampValue) {
+
+    if (!world.isRemote && !world.getGameRules().getBoolean(ScalingHealth.GAME_RULE_DIFFICULTY)) {
+      // Difficulty is disabled via game rule.
+      return 0.0;
+    }
 
     // Get players in range. TODO: Only get player list for types that need it?
     int radius = ConfigScalingHealth.DIFFICULTY_SEARCH_RADIUS;

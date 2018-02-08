@@ -5,6 +5,9 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.potion.Potion;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.GameRules;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -12,6 +15,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -43,9 +47,12 @@ public class ScalingHealth {
   public static final String VERSION = "@VERSION@";
   public static final String VERSION_SILENTLIB = "SL_VERSION";
   public static final int BUILD_NUM = 0;
-  public static final String DEPENDENCIES = "required-after:silentlib@[" + VERSION_SILENTLIB + ",);after:morpheus";
+  public static final String DEPENDENCIES = "required-after:silentlib@[" + VERSION_SILENTLIB
+      + ",);after:morpheus";
   public static final String ACCEPTED_MC_VERSIONS = "[1.12,1.12.2]";
   public static final String RESOURCE_PREFIX = MOD_ID_LOWER + ":";
+
+  public static final String GAME_RULE_DIFFICULTY = "ScalingHealthDifficulty";
 
   public static SimpleNetworkWrapper networkManager;
 
@@ -97,5 +104,15 @@ public class ScalingHealth {
   public void onServerLoad(FMLServerStartingEvent event) {
 
     event.registerServerCommand(new CommandScalingHealth());
+  }
+
+  @EventHandler
+  public void onServerStarted(FMLServerStartedEvent event) {
+
+    MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+    if (server != null) {
+      server.worlds[0].getGameRules().addGameRule(GAME_RULE_DIFFICULTY, "true",
+          GameRules.ValueType.BOOLEAN_VALUE);
+    }
   }
 }

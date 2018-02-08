@@ -185,9 +185,15 @@ public class SHPlayerDataHandler {
     public void incrementDifficulty(double amount) {
 
       EntityPlayer player = playerWR.get();
-      if (player != null
-          && ConfigScalingHealth.DIFFICULTY_DIMENSION_MULTIPLIER.containsKey(player.dimension)) {
-        amount *= ConfigScalingHealth.DIFFICULTY_DIMENSION_MULTIPLIER.get(player.dimension);
+      if (player != null) {
+        // Difficulty disabled via game rule?
+        if (!player.world.getGameRules().getBoolean(ScalingHealth.GAME_RULE_DIFFICULTY)) {
+          return;
+        }
+        // Multiplier for this dimension?
+        if (ConfigScalingHealth.DIFFICULTY_DIMENSION_MULTIPLIER.containsKey(player.dimension)) {
+          amount *= ConfigScalingHealth.DIFFICULTY_DIMENSION_MULTIPLIER.get(player.dimension);
+        }
       }
 
       setDifficulty(difficulty + amount);

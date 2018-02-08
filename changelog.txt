@@ -1,3 +1,6 @@
+1.3.10
+Added: A game rule (ScalingHealthDiffficulty) to enable/disable the difficulty system. When disabled, mobs will no longer gain extra health and damage, regardless of any other settings. Players will also stop accumulating difficulty, but their current value will remain unchanged. (#80)
+
 1.3.9
 Added: A config to exempt specific players from gaining difficulty. Add the name of each player (not case sensitive) who does not want to have the difficulty system to the list. Exempt players are still part of difficulty calculations, but they count as having zero difficulty. (#71)
 Added: A minimum difficulty config, defaults to 0.
