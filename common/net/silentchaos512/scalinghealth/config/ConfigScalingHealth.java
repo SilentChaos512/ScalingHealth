@@ -78,6 +78,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   // Mob Health
   public static boolean ALLOW_PEACEFUL_EXTRA_HEALTH = true;
   public static boolean ALLOW_HOSTILE_EXTRA_HEALTH = true;
+  public static boolean ALLOW_BOSS_EXTRA_HEALTH = true;
   public static float DIFFICULTY_GENERIC_HEALTH_MULTIPLIER = 0.5F;
   public static float DIFFICULTY_PEACEFUL_HEALTH_MULTIPLIER = 0.25F;
   public static EnumHealthModMode MOB_HEALTH_SCALING_MODE = EnumHealthModMode.MULTI_HALF;
@@ -95,6 +96,8 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static float BLIGHT_XP_MULTIPLIER = 10f;
   public static boolean BLIGHT_SUPERCHARGE_CREEPERS = true;
   public static boolean BLIGHT_NOTIFY_PLAYERS_ON_DEATH = true;
+  public static boolean BLIGHT_BLACKLIST_ALL_HOSTILES = false;
+  public static boolean BLIGHT_BLACKLIST_ALL_PASSIVES = true;
   public static boolean BLIGHT_BLACKLIST_ALL_BOSSES = false;
   public static EntityMatchList BLIGHT_BLACKLIST = new EntityMatchList();
   private static String[] BLIGHT_BLACKLIST_DEFAULTS = new String[] { "minecraft:wither",
@@ -301,6 +304,9 @@ public class ConfigScalingHealth extends AdaptiveConfig {
       ALLOW_HOSTILE_EXTRA_HEALTH = loadBoolean("Allow Hostile Extra Health", CAT_MOB_HEALTH,
           ALLOW_HOSTILE_EXTRA_HEALTH,
           "Allow hostile mobs (monsters) to spawn with extra health based on difficulty.");
+      ALLOW_BOSS_EXTRA_HEALTH = loadBoolean("Allow Boss Extra Health", CAT_MOB_HEALTH,
+          ALLOW_BOSS_EXTRA_HEALTH,
+          "Allow boss mobs (dragon, wither, etc.) to spawn with extra health based on difficulty.");
       DIFFICULTY_GENERIC_HEALTH_MULTIPLIER = config.getFloat("Base Health Modifier", CAT_MOB_HEALTH,
           DIFFICULTY_GENERIC_HEALTH_MULTIPLIER, 0f, Float.MAX_VALUE,
           "The minimum extra health a mob will have per point of difficulty. For example, at difficulty 30, "
@@ -366,6 +372,12 @@ public class ConfigScalingHealth extends AdaptiveConfig {
           + " also a blacklist for extra health.")) {
         BLIGHT_BLACKLIST.add(str);
       }
+      BLIGHT_BLACKLIST_ALL_HOSTILES = loadBoolean("Blacklist All Hostiles", CAT_MOB_BLIGHT,
+          BLIGHT_BLACKLIST_ALL_HOSTILES,
+          "If enabled, no hostile mobs can become blights.");
+      BLIGHT_BLACKLIST_ALL_PASSIVES = loadBoolean("Blacklist All Passives", CAT_MOB_BLIGHT,
+          BLIGHT_BLACKLIST_ALL_PASSIVES,
+          "If enabled, no passive (peaceful) mobs can become blights.");
       BLIGHT_BLACKLIST_ALL_BOSSES = loadBoolean("Blacklist All Bosses", CAT_MOB_BLIGHT,
           BLIGHT_BLACKLIST_ALL_BOSSES,
           "If enabled, no bosses can become blights. If you need more control, use the Blacklist"

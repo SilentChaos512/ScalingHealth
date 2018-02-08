@@ -66,9 +66,9 @@ public class DifficultyHandler {
     String[] lines = ConfigScalingHealth.INSTANCE.getConfiguration().getStringList("Mob Potions",
         ConfigScalingHealth.CAT_MOB_POTION, POTION_DEFAULTS,
         "The potion effects that mobs can spawn with. You can add effects from other mods if you"
-        + " want to, or remove existing ones. Each line has 3 values separated by commas: the"
-        + " potion ID, the minimum difficulty (higher = less common), and the level (1 = level I,"
-        + " 2 = level II, etc).");
+            + " want to, or remove existing ones. Each line has 3 values separated by commas: the"
+            + " potion ID, the minimum difficulty (higher = less common), and the level (1 = level I,"
+            + " 2 = level II, etc).");
 
     for (String line : lines) {
       String[] params = line.split(",");
@@ -96,16 +96,17 @@ public class DifficultyHandler {
               + " as integer. Ignoring entire line: " + line);
           continue;
         } catch (NullPointerException ex) {
-          ScalingHealth.logHelper.warning("Mob potion effects: potion \"" + id + "\" does not exist.");
+          ScalingHealth.logHelper
+              .warning("Mob potion effects: potion \"" + id + "\" does not exist.");
           continue;
         }
 
         // Put it in the map if nothing goes wrong!
         potionMap.put(potion, minDiff, level - 1);
       } else {
-        ScalingHealth.logHelper.warning(
-            "Mob potion effects: malformed line (need 3 comma-separated values): " + line
-            + "Ignoring entire line.");
+        ScalingHealth.logHelper
+            .warning("Mob potion effects: malformed line (need 3 comma-separated values): " + line
+                + "Ignoring entire line.");
       }
     }
   }
@@ -358,20 +359,25 @@ public class DifficultyHandler {
 
   private boolean entityBlacklistedFromHealthIncrease(EntityLivingBase entityLiving) {
 
-    //@formatter:off
-    if (entityLiving == null) return true;
-    if (!ConfigScalingHealth.ALLOW_HOSTILE_EXTRA_HEALTH && entityLiving instanceof EntityMob)
+    if (entityLiving == null)
       return true;
-    if (!ConfigScalingHealth.ALLOW_PEACEFUL_EXTRA_HEALTH && entityLiving instanceof EntityAnimal)
+
+    boolean isBoss = !entityLiving.isNonBoss();
+    boolean isHostile = entityLiving instanceof IMob;
+    boolean isPassive = !isHostile;
+
+    if ((!ConfigScalingHealth.ALLOW_HOSTILE_EXTRA_HEALTH && isHostile)
+        || (!ConfigScalingHealth.ALLOW_PEACEFUL_EXTRA_HEALTH && isPassive)
+        || (!ConfigScalingHealth.ALLOW_BOSS_EXTRA_HEALTH && isBoss))
       return true;
 
     EntityMatchList blacklist = ConfigScalingHealth.MOB_HEALTH_BLACKLIST;
     List<Integer> dimBlacklist = ConfigScalingHealth.MOB_HEALTH_DIMENSION_BLACKLIST;
 
-    if (blacklist == null || dimBlacklist == null) return false;
+    if (blacklist == null || dimBlacklist == null)
+      return false;
 
     return blacklist.contains(entityLiving) || dimBlacklist.contains(entityLiving.dimension);
-    //@formatter:on
   }
 
   private boolean canIncreaseEntityHealth(EntityLivingBase entityLiving) {
@@ -388,16 +394,21 @@ public class DifficultyHandler {
 
   private boolean entityBlacklistedFromBecomingBlight(EntityLivingBase entityLiving) {
 
-    // @formatter:off
-    if (entityLiving == null) return true;
+    if (entityLiving == null)
+      return true;
 
     EntityMatchList blacklist = ConfigScalingHealth.BLIGHT_BLACKLIST;
     boolean isBoss = !entityLiving.isNonBoss();
+    boolean isHostile = entityLiving instanceof IMob;
+    boolean isPassive = !isHostile;
 
-    if (blacklist == null) return false;
+    if (blacklist == null)
+      return false;
 
-    return blacklist.contains(entityLiving) || (isBoss && ConfigScalingHealth.BLIGHT_BLACKLIST_ALL_BOSSES);
-    //@formatter:on
+    return blacklist.contains(entityLiving)
+        || (isHostile && ConfigScalingHealth.BLIGHT_BLACKLIST_ALL_HOSTILES)
+        || (isPassive && ConfigScalingHealth.BLIGHT_BLACKLIST_ALL_PASSIVES)
+        || (isBoss && ConfigScalingHealth.BLIGHT_BLACKLIST_ALL_BOSSES);
   }
 
   // **************************************************************************

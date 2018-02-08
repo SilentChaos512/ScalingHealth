@@ -1,4 +1,6 @@
 1.3.10
+Added: Config to toggle all bosses receiving extra health (#79)
+Added: Configs to blacklist all hostile or all passive mobs from becoming blights. Passives are blacklisted by default. (#79)
 Added: A game rule (ScalingHealthDiffficulty) to enable/disable the difficulty system. When disabled, mobs will no longer gain extra health and damage, regardless of any other settings. Players will also stop accumulating difficulty, but their current value will remain unchanged. (#80)
 
 1.3.9
