@@ -13,6 +13,7 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
+import net.silentchaos512.scalinghealth.world.ScalingHealthSavedData;
 
 public class SHMorpheusCompat {
 
@@ -47,8 +48,13 @@ public class SHMorpheusCompat {
       for (EntityPlayer player : world.getPlayers(EntityPlayer.class, e -> true)) {
         PlayerData data = SHPlayerDataHandler.get(player);
         if (data != null) {
-          data.incrementDifficulty(ConfigScalingHealth.DIFFICULTY_FOR_SLEEPING);
+          data.incrementDifficulty(ConfigScalingHealth.DIFFICULTY_FOR_SLEEPING, false);
         }
+      }
+
+      ScalingHealthSavedData data = ScalingHealthSavedData.get(world);
+      if (data != null) {
+        data.difficulty += ConfigScalingHealth.DIFFICULTY_FOR_SLEEPING;
       }
     }
   }

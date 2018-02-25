@@ -21,9 +21,12 @@ import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
+import net.silentchaos512.scalinghealth.lib.EnumAreaDifficultyMode;
 import net.silentchaos512.scalinghealth.network.NetworkHandler;
 import net.silentchaos512.scalinghealth.network.message.MessageDataSync;
+import net.silentchaos512.scalinghealth.network.message.MessageWorldDataSync;
 import net.silentchaos512.scalinghealth.scoreboard.SHScoreCriteria;
+import net.silentchaos512.scalinghealth.world.ScalingHealthSavedData;
 
 public class SHPlayerDataHandler {
 
@@ -125,8 +128,16 @@ public class SHPlayerDataHandler {
     public void onPlayerLogin(PlayerLoggedInEvent event) {
 
       if (event.player instanceof EntityPlayerMP) {
+        EntityPlayerMP playerMP = (EntityPlayerMP) event.player;
+
         MessageDataSync message = new MessageDataSync(get(event.player), event.player);
-        NetworkHandler.INSTANCE.sendTo(message, (EntityPlayerMP) event.player);
+        NetworkHandler.INSTANCE.sendTo(message, playerMP);
+
+        if (ConfigScalingHealth.AREA_DIFFICULTY_MODE == EnumAreaDifficultyMode.SERVER_WIDE) {
+          MessageWorldDataSync message2 = new MessageWorldDataSync(
+              ScalingHealthSavedData.get(event.player.world));
+          NetworkHandler.INSTANCE.sendTo(message2, playerMP);
+        }
       }
     }
   }
@@ -184,6 +195,11 @@ public class SHPlayerDataHandler {
 
     public void incrementDifficulty(double amount) {
 
+      incrementDifficulty(amount, false);
+    }
+
+    public void incrementDifficulty(double amount, boolean alsoAffectWorldDifficulty) {
+
       EntityPlayer player = playerWR.get();
       if (player != null) {
         // Difficulty disabled via game rule?
@@ -197,6 +213,14 @@ public class SHPlayerDataHandler {
       }
 
       setDifficulty(difficulty + amount);
+
+      if (alsoAffectWorldDifficulty) {
+        ScalingHealthSavedData data = ScalingHealthSavedData.get(player.world);
+        if (data != null) {
+          data.difficulty += amount;
+          data.markDirty();
+        }
+      }
     }
 
     public float getHealth() {
@@ -258,7 +282,7 @@ public class SHPlayerDataHandler {
 
           // TODO: Multiplier for other dimensions?
 
-          incrementDifficulty(amount);
+          incrementDifficulty(amount, false);
 
           lastPosX = (int) player.posX;
           lastPosY = (int) player.posY;
@@ -277,8 +301,16 @@ public class SHPlayerDataHandler {
 
       if (!client) {
         EntityPlayer player = playerWR.get();
+        EntityPlayerMP playerMP = (EntityPlayerMP) player;
+
         MessageDataSync message = new MessageDataSync(get(player), player);
-        NetworkHandler.INSTANCE.sendTo(message, (EntityPlayerMP) player);
+        NetworkHandler.INSTANCE.sendTo(message, playerMP);
+
+        if (ConfigScalingHealth.AREA_DIFFICULTY_MODE == EnumAreaDifficultyMode.SERVER_WIDE) {
+          MessageWorldDataSync message2 = new MessageWorldDataSync(
+              ScalingHealthSavedData.get(player.world));
+          NetworkHandler.INSTANCE.sendTo(message2, playerMP);
+        }
       }
     }
 

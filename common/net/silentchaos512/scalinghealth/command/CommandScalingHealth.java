@@ -5,17 +5,18 @@ import java.util.List;
 import com.google.common.collect.Lists;
 
 import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.World;
 import net.silentchaos512.lib.command.CommandBaseSL;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
+import net.silentchaos512.scalinghealth.world.ScalingHealthSavedData;
 
 public class CommandScalingHealth extends CommandBaseSL {
 
@@ -30,7 +31,7 @@ public class CommandScalingHealth extends CommandBaseSL {
   @Override
   public String getUsage(ICommandSender sender) {
 
-    return "Usage: /" + getName() + " <difficulty|health> <value> [player]";
+    return "Usage: /" + getName() + " <difficulty|health|world_difficulty> <value> [player]";
   }
 
   @Override
@@ -68,6 +69,8 @@ public class CommandScalingHealth extends CommandBaseSL {
       executeDifficulty(server, sender, value, targetPlayer);
     } else if (command.equals("health")) {
       executeHealth(server, sender, value, targetPlayer);
+    } else if (command.equals("world_difficulty")) {
+      executeWorldDifficulty(server, sender, value, sender.getEntityWorld());
     }
   }
 
@@ -103,6 +106,39 @@ public class CommandScalingHealth extends CommandBaseSL {
       // Change it!
       data.setDifficulty(value);
       tell(sender, "setDifficulty", true, targetPlayer.getName(), String.format(NUMFORMAT, value));
+    }
+  }
+
+  private void executeWorldDifficulty(MinecraftServer server, ICommandSender sender, double value,
+      World world) {
+
+    ScalingHealthSavedData data = ScalingHealthSavedData.get(world);
+    if (data == null) {
+      tell(sender, "World data is null!", false);
+      return;
+    }
+
+    if (value < 0) {
+      // Report difficulty
+      double current = data.difficulty;
+      String strCurrent = String.format(NUMFORMAT, current);
+      String strMax = String.format(NUMFORMAT, ConfigScalingHealth.DIFFICULTY_MAX);
+      tell(sender, "showWorldDifficulty", true, strCurrent, strMax);
+    } else {
+      // Try set difficulty.
+      // Bounds check.
+      if (value < ConfigScalingHealth.DIFFICULTY_MIN
+          || value > ConfigScalingHealth.DIFFICULTY_MAX) {
+        tell(sender, "outOfBounds", true,
+            String.format(NUMFORMAT, ConfigScalingHealth.DIFFICULTY_MIN),
+            String.format("%.2f", ConfigScalingHealth.DIFFICULTY_MAX));
+        return;
+      }
+
+      // Change it!
+      data.difficulty = value;
+      data.markDirty();
+      tell(sender, "setWorldDifficulty", true, String.format(NUMFORMAT, value));
     }
   }
 
@@ -159,7 +195,7 @@ public class CommandScalingHealth extends CommandBaseSL {
   public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender,
       String[] args, BlockPos pos) {
 
-    return Lists.newArrayList("difficulty", "health");
+    return Lists.newArrayList("difficulty", "health", "world_difficulty");
   }
 
   @Override

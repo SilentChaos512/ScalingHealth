@@ -57,7 +57,7 @@ public class ScalingHealthAPI {
     if (player != null) {
       PlayerData data = SHPlayerDataHandler.get(player);
       if (data != null) {
-        data.incrementDifficulty(amount);
+        data.incrementDifficulty(amount, false);
       }
     }
   }

@@ -111,8 +111,7 @@ public class ScalingHealth {
 
     MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
     if (server != null) {
-      server.worlds[0].getGameRules().addGameRule(GAME_RULE_DIFFICULTY, "true",
-          GameRules.ValueType.BOOLEAN_VALUE);
+      server.worlds[0].getGameRules().setOrCreateGameRule(GAME_RULE_DIFFICULTY, "true");
     }
   }
 }

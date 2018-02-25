@@ -12,8 +12,10 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
+import net.silentchaos512.scalinghealth.lib.EnumAreaDifficultyMode;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
+import net.silentchaos512.scalinghealth.world.ScalingHealthSavedData;
 
 public class DifficultyDisplayHandler extends Gui {
 
@@ -51,6 +53,9 @@ public class DifficultyDisplayHandler extends Gui {
     int difficulty = (int) data.getDifficulty();
     int areaDifficulty = MathHelper.clamp((int) ConfigScalingHealth.AREA_DIFFICULTY_MODE.getAreaDifficulty(player.world, player.getPosition()), 0,
         (int) ConfigScalingHealth.DIFFICULTY_MAX);
+    if (ConfigScalingHealth.AREA_DIFFICULTY_MODE == EnumAreaDifficultyMode.SERVER_WIDE) {
+      difficulty = areaDifficulty;
+    }
     int timeSinceLastUpdate = ClientTickHandler.ticksInGame - lastUpdateTime;
 
     if (difficulty != lastDifficultyDisplayed) {

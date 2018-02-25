@@ -220,8 +220,10 @@ public class ScalingHealthCommonEvents {
       EntityPlayer player = event.getEntityPlayer();
       PlayerData data = SHPlayerDataHandler.get(player);
       if (data != null) {
-        data.incrementDifficulty(ConfigScalingHealth.DIFFICULTY_FOR_SLEEPING);
+        data.incrementDifficulty(ConfigScalingHealth.DIFFICULTY_FOR_SLEEPING, false);
       }
+
+      // TODO: World difficulty increase?
     }
   }
 

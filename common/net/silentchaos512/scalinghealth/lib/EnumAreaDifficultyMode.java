@@ -11,6 +11,7 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
+import net.silentchaos512.scalinghealth.world.ScalingHealthSavedData;
 
 public enum EnumAreaDifficultyMode {
 
@@ -20,7 +21,8 @@ public enum EnumAreaDifficultyMode {
   MAX_LEVEL,
   DISTANCE_FROM_SPAWN,
   DISTANCE_FROM_ORIGIN,
-  DISTANCE_AND_TIME;
+  DISTANCE_AND_TIME,
+  SERVER_WIDE;
 
   public static EnumAreaDifficultyMode loadFromConfig(Configuration c,
       EnumAreaDifficultyMode defaultValue) {
@@ -39,7 +41,8 @@ public enum EnumAreaDifficultyMode {
         + "  MAX_LEVEL - The highest difficulty level of all nearby players.\n"
         + "  DISTANCE_FROM_SPAWN - Based on the mob's distance from spawn.\n"
         + "  DISTANCE_FROM_ORIGIN - Based on the mob's distance from the origin.\n"
-        + "  DISTANCE_AND_TIME - Mix of DISTANCE_FROM_SPAWN and WEIGHTED_AVERAGE.",
+        + "  DISTANCE_AND_TIME - Mix of DISTANCE_FROM_SPAWN and WEIGHTED_AVERAGE.\n"
+        + "  SERVER_WIDE - Difficulty is tracked at a server level, individual player difficulty has no impact.",
         validValues);
     //@formatter:on
 
@@ -143,6 +146,11 @@ public enum EnumAreaDifficultyMode {
         double diffFromPlayers = WEIGHTED_AVERAGE.getAreaDifficulty(world, pos, false, false);
         double diffFromDistance = DISTANCE_FROM_SPAWN.getAreaDifficulty(world, pos, false, false);
         ret = diffFromPlayers + diffFromDistance;
+        break;
+      case SERVER_WIDE:
+        ScalingHealthSavedData data = ScalingHealthSavedData.get(world);
+        if (data != null)
+          ret = data.difficulty;
         break;
     }
 

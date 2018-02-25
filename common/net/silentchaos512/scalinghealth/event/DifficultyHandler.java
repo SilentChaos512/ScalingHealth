@@ -10,9 +10,7 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.effect.EntityLightningBolt;
 import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.entity.monster.EntityMob;
 import net.minecraft.entity.monster.IMob;
-import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Items;
 import net.minecraft.inventory.EntityEquipmentSlot;
@@ -26,6 +24,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.silentchaos512.lib.util.StackHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -33,13 +32,14 @@ import net.silentchaos512.scalinghealth.api.event.BlightSpawnEvent;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.network.NetworkHandler;
 import net.silentchaos512.scalinghealth.network.message.MessageMarkBlight;
+import net.silentchaos512.scalinghealth.utils.EntityDifficultyChangeList.DifficultyChanges;
 import net.silentchaos512.scalinghealth.utils.EntityMatchList;
 import net.silentchaos512.scalinghealth.utils.EquipmentTierMap;
 import net.silentchaos512.scalinghealth.utils.MobPotionMap;
 import net.silentchaos512.scalinghealth.utils.ModifierHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
-import net.silentchaos512.scalinghealth.utils.EntityDifficultyChangeList.DifficultyChanges;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
+import net.silentchaos512.scalinghealth.world.ScalingHealthSavedData;
 
 public class DifficultyHandler {
 
@@ -149,7 +149,7 @@ public class DifficultyHandler {
           ScalingHealth.logHelper.info("Killed " + (isBlight ? "Blight " : "") + killed.getName()
               + ": difficulty " + (amount > 0 ? "+" : "") + amount);
         }
-        data.incrementDifficulty(amount);
+        data.incrementDifficulty(amount, true);
       }
     }
   }
@@ -382,7 +382,8 @@ public class DifficultyHandler {
 
   private boolean canIncreaseEntityHealth(EntityLivingBase entityLiving) {
 
-    if (entityLiving == null)
+    if (entityLiving == null
+        || !entityLiving.world.getGameRules().getBoolean(ScalingHealth.GAME_RULE_DIFFICULTY))
       return false;
 
     AttributeModifier modifier = entityLiving.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
@@ -409,6 +410,16 @@ public class DifficultyHandler {
         || (isHostile && ConfigScalingHealth.BLIGHT_BLACKLIST_ALL_HOSTILES)
         || (isPassive && ConfigScalingHealth.BLIGHT_BLACKLIST_ALL_PASSIVES)
         || (isBoss && ConfigScalingHealth.BLIGHT_BLACKLIST_ALL_BOSSES);
+  }
+
+  @SubscribeEvent
+  public void onWorldTick(WorldTickEvent event) {
+
+    if (event.world.getTotalWorldTime() % 20 == 0) {
+      ScalingHealthSavedData data = ScalingHealthSavedData.get(event.world);
+      data.difficulty += ConfigScalingHealth.DIFFICULTY_PER_SECOND;
+      data.markDirty();
+    }
   }
 
   // **************************************************************************

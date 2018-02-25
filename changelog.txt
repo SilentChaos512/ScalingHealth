@@ -1,3 +1,7 @@
+1.3.11
+Added: New area difficulty mode, SERVER_WIDE. A difficulty value is now tracked for the world and will be used if this new area mode is selected. Basically, this makes the difficulty system work more like Difficulty Life did.
+Fixed: Disabling difficulty with the new game rule making mobs unkillable (#86)
+
 1.3.10
 Added: Config to toggle all bosses receiving extra health (#79)
 Added: Configs to blacklist all hostile or all passive mobs from becoming blights. Passives are blacklisted by default. (#79)
