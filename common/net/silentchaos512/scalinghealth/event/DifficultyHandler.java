@@ -196,8 +196,14 @@ public class DifficultyHandler {
     // Increase attack damage.
     if (difficulty > 0) {
       float diffIncrease = difficulty * rand.nextFloat();
-      difficulty -= diffIncrease;
       genAddedDamage = diffIncrease * ConfigScalingHealth.DIFFICULTY_DAMAGE_MULTIPLIER;
+      // Clamp the value so it doesn't go over the maximum config.
+      if (ConfigScalingHealth.DIFFICULTY_DAMAGE_MAX_BOOST > 0f) {
+        genAddedDamage = MathHelper.clamp(genAddedDamage, 0f,
+            ConfigScalingHealth.DIFFICULTY_DAMAGE_MAX_BOOST);
+      }
+      // Decrease difficulty based on the damage actually added, instead of diffIncrease.
+      difficulty -= genAddedDamage / ConfigScalingHealth.DIFFICULTY_DAMAGE_MULTIPLIER;
     }
 
     // Random potion effect

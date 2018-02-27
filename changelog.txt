@@ -1,5 +1,6 @@
 1.3.11
-Added: New area difficulty mode, SERVER_WIDE. A difficulty value is now tracked for the world and will be used if this new area mode is selected. Basically, this makes the difficulty system work more like Difficulty Life did.
+Added: New area difficulty mode, SERVER_WIDE. A difficulty value is now tracked for the world and will be used if this new area mode is selected. Basically, this makes the difficulty system work more like Difficulty Life did. (#83)
+Added: Max damage bonus config, which let's you cap the extra attack damage mobs get (#78)
 Fixed: Disabling difficulty with the new game rule making mobs unkillable (#86)
 
 1.3.10

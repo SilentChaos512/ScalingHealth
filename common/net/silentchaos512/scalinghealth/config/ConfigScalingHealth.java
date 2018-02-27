@@ -72,6 +72,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
 
   // Mobs
   public static float DIFFICULTY_DAMAGE_MULTIPLIER = 0.1f;
+  public static float DIFFICULTY_DAMAGE_MAX_BOOST = 10.0f;
   public static float POTION_CHANCE_HOSTILE = 0.375f;
   public static float POTION_CHANCE_PASSIVE = 0.025f;
   public static float MOB_XP_BOOST = 0.01f;
@@ -281,6 +282,9 @@ public class ConfigScalingHealth extends AdaptiveConfig {
       DIFFICULTY_DAMAGE_MULTIPLIER = config.getFloat("Damage Modifier", CAT_MOB,
           DIFFICULTY_DAMAGE_MULTIPLIER, 0f, Float.MAX_VALUE,
           "A multiplier for extra attack strength all mobs will receive. Set to 0 to disable extra attack strength.");
+      DIFFICULTY_DAMAGE_MAX_BOOST = config.getFloat("Max Damage Bonus", CAT_MOB,
+          DIFFICULTY_DAMAGE_MAX_BOOST, 0f, 1000f,
+          "The maximum extra attack damage a mob can receive. Zero means unlimited.");
       POTION_CHANCE_HOSTILE = config.getFloat("Potion Chance (Hostiles)", CAT_MOB,
           POTION_CHANCE_HOSTILE, 0f, 1f,
           "The chance that an extra potion effect will be applied to any hostile mob. Note that"
