@@ -88,8 +88,8 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   private static String[] MOB_HEALTH_BLACKLIST_DEFAULTS = new String[] {};
   // Blights
   public static float BLIGHT_CHANCE_MULTIPLIER = 0.0625F;
-  public static int BLIGHT_AMP_SPEED = 8;
-  public static int BLIGHT_AMP_STRENGTH = 2;
+  public static int BLIGHT_AMP_SPEED = 4;
+  public static int BLIGHT_AMP_STRENGTH = 1;
   public static int BLIGHT_POTION_DURATION;
   public static boolean BLIGHT_FIRE_RIDES_BLIGHT = false;
   public static boolean BLIGHT_INVISIBLE = false;
