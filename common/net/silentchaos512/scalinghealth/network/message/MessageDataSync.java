@@ -18,6 +18,7 @@ public class MessageDataSync extends Message {
 
   public NBTTagCompound tags;
   public String playerName;
+  public int experienceLevel;
 
   public MessageDataSync() {
 
@@ -28,6 +29,7 @@ public class MessageDataSync extends Message {
     tags = new NBTTagCompound();
     data.writeToNBT(tags);
     this.playerName = player.getName();
+    this.experienceLevel = player.experienceLevel;
   }
 
   @Override
@@ -46,6 +48,8 @@ public class MessageDataSync extends Message {
           ModifierHandler.setMaxHealth(player, data.getMaxHealth(), 0);
         if (data.getHealth() > 0f)
           player.setHealth(data.getHealth());
+
+        player.experienceLevel = experienceLevel;
       }
     });
 

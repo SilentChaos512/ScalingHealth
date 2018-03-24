@@ -54,8 +54,6 @@ public class ScalingHealth {
 
   public static final String GAME_RULE_DIFFICULTY = "ScalingHealthDifficulty";
 
-  public static SimpleNetworkWrapper networkManager;
-
   public static Random random = new Random();
   public static LogHelper logHelper = new LogHelper(MOD_NAME, BUILD_NUM);
   public static LocalizationHelper localizationHelper;
