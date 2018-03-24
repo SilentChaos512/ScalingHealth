@@ -1,14 +1,19 @@
 package net.silentchaos512.scalinghealth.item;
 
+import java.util.List;
+
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -41,6 +46,31 @@ public class ItemDifficultyChanger extends ItemSL {
     super(2, ScalingHealth.MOD_ID_LOWER, "DifficultyChanger");
     setHasSubtypes(true);
     setCreativeTab(CreativeTabs.COMBAT);
+  }
+
+  @Override
+  public void addInformation(ItemStack stack, World world, List<String> list, ITooltipFlag flag) {
+
+    if (stack.getItemDamage() > 1) {
+      return;
+    }
+
+    String amountStr = String.format("%d",
+        stack.getItemDamage() == Type.ENCHANTED.ordinal()
+            ? (int) ConfigScalingHealth.ENCHANTED_HEART_DIFFICULTY_CHANGE
+            : (int) ConfigScalingHealth.CURSED_HEART_DIFFICULTY_CHANGE);
+    if (amountStr.matches("^\\d+")) {
+      amountStr = "+" + amountStr;
+    }
+
+    String line = ScalingHealth.localizationHelper.getItemSubText(itemName, "effectDesc", amountStr);
+    list.add(TextFormatting.WHITE + line);
+  }
+
+  @Override
+  public EnumRarity getRarity(ItemStack stack) {
+
+    return EnumRarity.EPIC;
   }
 
   @SideOnly(Side.CLIENT)

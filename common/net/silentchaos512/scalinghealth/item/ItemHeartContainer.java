@@ -1,14 +1,19 @@
 package net.silentchaos512.scalinghealth.item;
 
+import java.util.List;
+
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.item.EnumRarity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.silentchaos512.lib.item.ItemSL;
 import net.silentchaos512.lib.util.ChatHelper;
@@ -28,6 +33,23 @@ public class ItemHeartContainer extends ItemSL {
 
     super(1, ScalingHealth.MOD_ID_LOWER, "HeartContainer");
     setCreativeTab(CreativeTabs.MISC);
+  }
+
+  @Override
+  public void addInformation(ItemStack stack, World world, List<String> list, ITooltipFlag flag) {
+
+    List<String> lines = ScalingHealth.localizationHelper.getItemDescriptionLines(itemName);
+    if (lines.size() > 0) {
+      String line = lines.get(0);
+      lines.set(0, TextFormatting.WHITE + line);
+      list.addAll(lines);
+    }
+  }
+
+  @Override
+  public EnumRarity getRarity(ItemStack stack) {
+    
+    return EnumRarity.RARE;
   }
 
   @Override
