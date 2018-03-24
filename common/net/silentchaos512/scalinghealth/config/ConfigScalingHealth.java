@@ -65,6 +65,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static int BONUS_HEALTH_REGEN_MAX_FOOD = 20;
   public static int BONUS_HEALTH_REGEN_INITIAL_DELAY = 400;
   public static int BONUS_HEALTH_REGEN_DELAY = 100;
+  public static float BONUS_HEALTH_REGEN_EXHAUSTION = 0.1f;
 
   // Fake Players
   public static boolean FAKE_PLAYERS_CAN_GENERATE_HEARTS = true;
@@ -267,6 +268,9 @@ public class ConfigScalingHealth extends AdaptiveConfig {
       BONUS_HEALTH_REGEN_DELAY = loadInt("Delay", CAT_PLAYER_REGEN,
           BONUS_HEALTH_REGEN_DELAY, 0, Integer.MAX_VALUE,
           "The number of ticks between each bonus regen tick (a half heart being healed).");
+      BONUS_HEALTH_REGEN_EXHAUSTION = config.getFloat("Exhaustion Added", CAT_PLAYER_REGEN,
+          BONUS_HEALTH_REGEN_EXHAUSTION, 0f, 1f,
+          "The food consumption for each half heart regenerated.");
 
       // Fake Players
       FAKE_PLAYERS_CAN_GENERATE_HEARTS = loadBoolean("Can Generate Hearts", CAT_FAKE_PLAYER,
