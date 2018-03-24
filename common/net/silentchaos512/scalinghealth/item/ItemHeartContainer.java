@@ -10,9 +10,11 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
 import net.silentchaos512.lib.item.ItemSL;
+import net.silentchaos512.lib.util.Color;
 import net.silentchaos512.lib.util.StackHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
+import net.silentchaos512.scalinghealth.lib.EnumModParticles;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
@@ -46,7 +48,7 @@ public class ItemHeartContainer extends ItemSL {
       // End here if health increases are not allowed.
       if (!healthIncreaseAllowed) {
         if (consumed) {
-          world.playSound(null, player.getPosition(), SoundEvents.ENTITY_PLAYER_BURP, SoundCategory.PLAYERS, 1.0f,
+          world.playSound(null, player.getPosition(), SoundEvents.ENTITY_PLAYER_BURP, SoundCategory.PLAYERS, 0.5f,
               1.0f + 0.1f * (float) ScalingHealth.random.nextGaussian());
           StackHelper.shrink(stack, 1);
           return new ActionResult(EnumActionResult.SUCCESS, stack);
@@ -55,9 +57,23 @@ public class ItemHeartContainer extends ItemSL {
         }
       }
 
+      // Increase health, consume heart.
       data.incrementMaxHealth(2);
       StackHelper.shrink(stack, 1);
-      world.playSound(null, player.getPosition(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 1.0f,
+
+      // Particles and sound.
+      double particleX = player.posX;
+      double particleY = player.posY + 0.65f * player.height;
+      double particleZ = player.posZ;
+      for (int i = 0; i < 40 - 10 * ScalingHealth.proxy.getParticleSettings(); ++i) {
+        double xSpeed = 0.08 * ScalingHealth.random.nextGaussian();
+        double ySpeed = 0.05 * ScalingHealth.random.nextGaussian();
+        double zSpeed = 0.08 * ScalingHealth.random.nextGaussian();
+        ScalingHealth.proxy.spawnParticles(EnumModParticles.HEART_CONTAINER,
+            new Color(1f, 0f, 0f), world, particleX, particleY, particleZ, xSpeed, ySpeed,
+            zSpeed);
+      }
+      world.playSound(null, player.getPosition(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 0.5f,
           0.7f + 0.1f * (float) ScalingHealth.random.nextGaussian());
     }
     return new ActionResult(EnumActionResult.SUCCESS, stack);

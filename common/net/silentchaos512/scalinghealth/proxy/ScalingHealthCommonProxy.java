@@ -1,10 +1,12 @@
 package net.silentchaos512.scalinghealth.proxy;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
 import net.silentchaos512.lib.proxy.CommonProxy;
 import net.silentchaos512.lib.registry.SRegistry;
+import net.silentchaos512.lib.util.Color;
 import net.silentchaos512.scalinghealth.compat.morpheus.SHMorpheusCompat;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.event.BlightHandler;
@@ -13,6 +15,7 @@ import net.silentchaos512.scalinghealth.event.PetEventHandler;
 import net.silentchaos512.scalinghealth.event.PlayerBonusRegenHandler;
 import net.silentchaos512.scalinghealth.event.ScalingHealthCommonEvents;
 import net.silentchaos512.scalinghealth.init.ModEntities;
+import net.silentchaos512.scalinghealth.lib.EnumModParticles;
 import net.silentchaos512.scalinghealth.network.NetworkHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 
@@ -46,6 +49,11 @@ public class ScalingHealthCommonProxy extends CommonProxy {
     super.init(registry);
 
     DifficultyHandler.INSTANCE.initPotionMap();
+  }
+
+  public void spawnParticles(EnumModParticles type, Color color, World world, double x, double y,
+      double z, double motionX, double motionY, double motionZ) {
+
   }
 
   public EntityPlayer getClientPlayer() {

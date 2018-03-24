@@ -2,19 +2,23 @@ package net.silentchaos512.scalinghealth.item;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.silentchaos512.lib.item.ItemSL;
+import net.silentchaos512.lib.util.Color;
 import net.silentchaos512.lib.util.ItemHelper;
 import net.silentchaos512.lib.util.StackHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
+import net.silentchaos512.scalinghealth.lib.EnumModParticles;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
@@ -60,14 +64,49 @@ public class ItemDifficultyChanger extends ItemSL {
       return new ActionResult<ItemStack>(EnumActionResult.PASS, stack);
     }
 
+    double particleX = player.posX;
+    double particleY = player.posY + 0.65f * player.height;
+    double particleZ = player.posZ;
+
     switch (Type.getByMeta(stack.getItemDamage())) {
+      // Enchanted Heart
       case ENCHANTED:
+        // Lower difficulty, consume 1 from stack.
         data.incrementDifficulty(ConfigScalingHealth.ENCHANTED_HEART_DIFFICULTY_CHANGE);
         StackHelper.shrink(stack, 1);
+
+        // Particles and sound effect!
+        for (int i = 0; i < 20 - 5 * ScalingHealth.proxy.getParticleSettings(); ++i) {
+          double xSpeed = 0.08 * ScalingHealth.random.nextGaussian();
+          double ySpeed = 0.05 * ScalingHealth.random.nextGaussian();
+          double zSpeed = 0.08 * ScalingHealth.random.nextGaussian();
+          ScalingHealth.proxy.spawnParticles(EnumModParticles.ENCHANTED_HEART,
+              new Color(1f, 1f, 0.5f), world, particleX, particleY, particleZ, xSpeed, ySpeed,
+              zSpeed);
+        }
+        world.playSound(null, player.getPosition(), SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE,
+            SoundCategory.PLAYERS, 0.4f, 1.7f);
+
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
+      // Cursed Heart
       case CURSED:
+        // Raise difficulty, consume 1 from stack.
         data.incrementDifficulty(ConfigScalingHealth.CURSED_HEART_DIFFICULTY_CHANGE);
         StackHelper.shrink(stack, 1);
+
+        // Particles and sound effect!
+        for (int i = 0; i < 20 - 5 * ScalingHealth.proxy.getParticleSettings(); ++i) {
+          double xSpeed = 0.08 * ScalingHealth.random.nextGaussian();
+          double ySpeed = 0.05 * ScalingHealth.random.nextGaussian();
+          double zSpeed = 0.08 * ScalingHealth.random.nextGaussian();
+          ScalingHealth.proxy.spawnParticles(EnumModParticles.CURSED_HEART,
+              new Color(0.4f, 0f, 0.6f), world, particleX, particleY, particleZ, xSpeed, ySpeed,
+              zSpeed);
+        }
+        world.playSound(null, player.getPosition(), SoundEvents.BLOCK_FIRE_EXTINGUISH,
+            SoundCategory.PLAYERS, 0.3f,
+            (float) (0.7f + 0.05f * ScalingHealth.random.nextGaussian()));
+
         return new ActionResult<ItemStack>(EnumActionResult.SUCCESS, stack);
       default:
         ScalingHealth.logHelper.warning("DifficultyChanger invalid meta: " + stack.getItemDamage());
