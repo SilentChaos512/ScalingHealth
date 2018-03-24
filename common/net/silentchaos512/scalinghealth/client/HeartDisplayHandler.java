@@ -250,7 +250,8 @@ public class HeartDisplayHandler extends Gui {
     mc.renderEngine.bindTexture(TEXTURE);
 
     health = MathHelper.ceil(player.getHealth());
-    for (int i = 0; i < health / 20; ++i) {
+    int rowCount = health / 20;
+    for (int i = Math.max(0, rowCount - 2); i < rowCount; ++i) {
       int renderHearts = Math.min((health - 20 * (i + 1)) / 2, 10);
       int rowColor = getColorForRow(i);
 
