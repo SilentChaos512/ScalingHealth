@@ -150,6 +150,10 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static Map<Integer, Float> DIFFICULTY_DIMENSION_MULTIPLIER = new THashMap<Integer, Float>();
   public static EnumAreaDifficultyMode AREA_DIFFICULTY_MODE = EnumAreaDifficultyMode.WEIGHTED_AVERAGE;
   public static EnumResetTime DIFFFICULTY_RESET_TIME = EnumResetTime.NONE;
+  public static boolean DIFFICULTY_LUNAR_MULTIPLIERS_ENABLED = false;
+  public static float[] DIFFICULTY_LUNAR_MULTIPLIERS = new float[8];
+  static final String[] DEFAULT_DIFFICULTY_LUNAR_MULTIPLIERS = new String[] { "1.5", "1.3", "1.2",
+      "1.0", "0.8", "1.0", "1.2", "1.3" };
 
   // Network
   public static int PACKET_DELAY = 20;
@@ -181,6 +185,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static final String CAT_PETS = CAT_MAIN + split + "pets";
   public static final String CAT_ITEMS = CAT_MAIN + split + "items";
   public static final String CAT_DIFFICULTY = CAT_MAIN + split + "difficulty";
+  public static final String CAT_DIFFICULTY_LUNAR_PHASES = CAT_DIFFICULTY + split + "lunar_phases";
   public static final String CAT_NETWORK = CAT_MAIN + split + "network";
   public static final String CAT_WORLD = CAT_MAIN + split + "world";
   public static final String CAT_COMPAT = CAT_MAIN + split + "compatibility";
@@ -567,6 +572,25 @@ public class ConfigScalingHealth extends AdaptiveConfig {
         if (values != null) {
           DIFFICULTY_DIMENSION_MULTIPLIER.put((int) values[0], (float) values[1]);
         }
+      }
+      DIFFICULTY_LUNAR_MULTIPLIERS_ENABLED = loadBoolean("Lunar Phases Enabled", CAT_DIFFICULTY_LUNAR_PHASES, false,
+          "Enable lunar phase difficulty multipliers. Difficulty will receive a multiplier based"
+          + " on the phase of the moon.");
+      parser = new ConfigMultiValueLineParser("Lunar Phase Multipliers", ScalingHealth.logHelper, "\\s", Float.class);
+      int lunarPhaseIndex = 0;
+      for (String str : config.getStringList("Lunar Phase Multipliers", CAT_DIFFICULTY_LUNAR_PHASES,
+          DEFAULT_DIFFICULTY_LUNAR_MULTIPLIERS,
+          "Difficulty multipliers for each lunar phase. There must be exactly 8 values. The first"
+          + " is full moon, the fifth is new moon.")) {
+        Object[] values = parser.parse(str);
+        if (values != null && lunarPhaseIndex < 8) {
+          DIFFICULTY_LUNAR_MULTIPLIERS[lunarPhaseIndex] = (float) values[0];
+        }
+        ++lunarPhaseIndex;
+      }
+      if (lunarPhaseIndex != 8) {
+        ScalingHealth.logHelper.warning("Config \"Lunar Phase Multipliers\" has the wrong number"
+            + " of values. Needs 8, has " + lunarPhaseIndex);
       }
       AREA_DIFFICULTY_MODE = EnumAreaDifficultyMode.loadFromConfig(config, AREA_DIFFICULTY_MODE);
       DIFFFICULTY_RESET_TIME = EnumResetTime.loadFromConfig(config, DIFFFICULTY_RESET_TIME, CAT_DIFFICULTY);

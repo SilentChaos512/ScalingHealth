@@ -162,6 +162,13 @@ public class DifficultyHandler {
     boolean makeBlight = false;
     boolean isHostile = entityLiving instanceof IMob;
 
+    // Lunar phase multipliers?
+    if (ConfigScalingHealth.DIFFICULTY_LUNAR_MULTIPLIERS_ENABLED && entityLiving.world.getWorldTime() % 24000 > 12000) {
+      int moonPhase = entityLiving.world.getMoonPhase() % 8;
+      float multi = ConfigScalingHealth.DIFFICULTY_LUNAR_MULTIPLIERS[moonPhase];
+      difficulty *= multi;
+    }
+
     entityLiving.getEntityData().setShort(NBT_ENTITY_DIFFICULTY, (short) difficulty);
 
     // Make blight?
