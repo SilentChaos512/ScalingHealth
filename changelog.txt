@@ -1,10 +1,12 @@
 1.3.12
 Added: Config for XP cost to use heart containers (default is 3 levels)
+Added: An outline on your last (highest) heart, if you have more than 10. Can be disabled or changed to any color (default is white)
 Added: Config for food consumption (exhaustion) of bonus player regen. Value also increased. Default is 0.1 (still many times less than vanilla regen), old value was 0.025.
 Added: Particle effects for heart container and cursed/enchanted hearts (#57)
 Added: Sound effects for cursed/enchanted hearts (#57)
 Added: More tooltips!
 Fixed: All rows of hearts drawing, instead of just the top two (FPS boost for players with lots of hearts)
+Fixed: Some other minor heart rendering issues
 
 1.3.11
 Added: New area difficulty mode, SERVER_WIDE. A difficulty value is now tracked for the world and will be used if this new area mode is selected. Basically, this makes the difficulty system work more like Difficulty Life did. (#83)

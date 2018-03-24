@@ -100,7 +100,7 @@ public class HeartDisplayHandler extends Gui {
     }
   }
 
-  @SubscribeEvent
+  @SubscribeEvent(receiveCanceled = true)
   public void onHealthBar(RenderGameOverlayEvent.Pre event) {
 
     Minecraft mc = Minecraft.getMinecraft();
@@ -247,6 +247,7 @@ public class HeartDisplayHandler extends Gui {
     int potionOffset = player.isPotionActive(MobEffects.WITHER) ? 18
         : (player.isPotionActive(MobEffects.POISON) ? 9 : 0) + (hardcoreMode ? 27 : 0);
 
+    // Draw extra hearts (only top 2 rows)
     mc.renderEngine.bindTexture(TEXTURE);
 
     health = MathHelper.ceil(player.getHealth());
@@ -254,18 +255,39 @@ public class HeartDisplayHandler extends Gui {
     for (int i = Math.max(0, rowCount - 2); i < rowCount; ++i) {
       int renderHearts = Math.min((health - 20 * (i + 1)) / 2, 10);
       int rowColor = getColorForRow(i);
+      boolean anythingDrawn = false;
 
-      for (int j = 0; j < renderHearts; ++j) {
-        int y = 0 + (j == regen ? -2 : 0);
+      // Draw the hearts
+      int j;
+      int y = 0;
+      for (j = 0; j < renderHearts; ++j) {
+        y = 0 + (j == regen ? -2 : 0);
         drawTexturedModalRect(left + 8 * j, top + y, 0, potionOffset, 9, 9, rowColor);
       }
+      anythingDrawn = j > 0;
 
-      if (health % 2 == 1 && renderHearts < 10)
+      // Half heart on the end?
+      if (health % 2 == 1 && renderHearts < 10) {
         drawTexturedModalRect(left + 8 * renderHearts, top, 9, potionOffset, 9, 9, rowColor);
+        anythingDrawn = true;
+      }
+
+      // Outline for last heart, to make seeing max health a little easier.
+      if (ConfigScalingHealth.LAST_HEART_OUTLINE_ENABLED && anythingDrawn
+          && i == MathHelper.ceil(player.getMaxHealth() / 20) - 2) {
+        j = (int) ((player.getMaxHealth() % 20) / 2) - 1;
+        if (j < 0) {
+          j += 10;
+        }
+        drawTexturedModalRect(left + 8 * j, top + y, 17, 9, 10, 9,
+            ConfigScalingHealth.LAST_HEART_OUTLINE_COLOR);
+      }
     }
 
+    // Shiny glint on top of the hearts, a single white pixel in the upper left <3
     for (int i = 0; i < 10 && i < health / 2; ++i) {
-      drawTexturedModalRect(left + 8 * i, top, 17, potionOffset, 9, 9, 0xFFFFFF);
+      int y = 0 + (i == regen ? -2 : 0);
+      drawTexturedModalRect(left + 8 * i, top + y, 17, potionOffset, 9, 9, 0xAAFFFFFF);
     }
 
     GlStateManager.disableBlend();
@@ -275,12 +297,15 @@ public class HeartDisplayHandler extends Gui {
   protected void drawTexturedModalRect(int x, int y, int textureX, int textureY, int width,
       int height, int color) {
 
+    float a = ((color >> 24) & 255) / 255f;
+    if (a <= 0f)
+      a = 1f;
     float r = ((color >> 16) & 255) / 255f;
     float g = ((color >> 8) & 255) / 255f;
     float b = (color & 255) / 255f;
-    GlStateManager.color(r, g, b);
+    GlStateManager.color(r, g, b, a);
     drawTexturedModalRect(x, y, textureX, textureY, width, height);
-    GlStateManager.color(1f, 1f, 1f);
+    GlStateManager.color(1f, 1f, 1f, 1f);
   }
 
   protected int getColorForRow(int row) {

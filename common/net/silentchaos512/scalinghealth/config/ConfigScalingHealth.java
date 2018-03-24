@@ -36,6 +36,8 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static int DIFFICULTY_METER_POS_X = 5;
   public static int DIFFICULTY_METER_POS_Y = -30;
   public static boolean WARN_WHEN_SLEEPING = true;
+  public static boolean LAST_HEART_OUTLINE_ENABLED = true;
+  public static int LAST_HEART_OUTLINE_COLOR = 0xFFFFFF;
   public static int[] HEART_COLORS = {//
       0xBF0000, // 0 red
       0xE66000, // 25 orange-red
@@ -233,6 +235,12 @@ public class ConfigScalingHealth extends AdaptiveConfig {
           "Replace vanilla heart rendering.");
       HEART_DISPLAY_TEXT_STYLE = HeartDisplayHandler.TextStyle.loadFromConfig(config);
       HEART_DISPLAY_TEXT_COLOR = HeartDisplayHandler.TextColor.loadFromConfig(config);
+      LAST_HEART_OUTLINE_ENABLED = loadBoolean("Last Heart Outline Enabled", CAT_CLIENT,
+          LAST_HEART_OUTLINE_ENABLED,
+          "Outline your last (highest) heart in a different color. This makes seeing your max health a little easier.");
+      LAST_HEART_OUTLINE_COLOR = loadInt("Last Heart Outline Color", CAT_CLIENT,
+          LAST_HEART_OUTLINE_COLOR,
+          "The color of your last (highest) heart outline.");
       loadHeartColors(config);
 
       // Players
