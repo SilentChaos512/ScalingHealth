@@ -16,6 +16,7 @@ import net.silentchaos512.scalinghealth.client.HeartDisplayHandler;
 import net.silentchaos512.scalinghealth.lib.EnumAreaDifficultyMode;
 import net.silentchaos512.scalinghealth.lib.EnumHealthModMode;
 import net.silentchaos512.scalinghealth.lib.EnumResetTime;
+import net.silentchaos512.scalinghealth.lib.module.ModuleAprilTricks;
 import net.silentchaos512.scalinghealth.utils.EntityDifficultyChangeList;
 import net.silentchaos512.scalinghealth.utils.EntityMatchList;
 import net.silentchaos512.scalinghealth.utils.PlayerMatchList;
@@ -189,6 +190,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static final String CAT_NETWORK = CAT_MAIN + split + "network";
   public static final String CAT_WORLD = CAT_MAIN + split + "world";
   public static final String CAT_COMPAT = CAT_MAIN + split + "compatibility";
+  public static final String CAT_HOLIDAYS = CAT_MAIN + split + "holidays";
 
   public static final ConfigScalingHealth INSTANCE = new ConfigScalingHealth();
 
@@ -633,6 +635,8 @@ public class ConfigScalingHealth extends AdaptiveConfig {
       config.setCategoryRequiresMcRestart(CAT_COMPAT, true);
       MORPHEUS_OVERRIDE = config.getBoolean("Morpheus Support", CAT_COMPAT, true,
           "Override the Morpheus new day handler to fire sleep events. Without this, difficulty will not increase when sleeping.");
+
+      ModuleAprilTricks.instance.loadConfig(config);
 
       //@formatter:on
     } catch (Exception ex) {

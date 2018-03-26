@@ -1,5 +1,7 @@
 package net.silentchaos512.scalinghealth.client.render.entity;
 
+import org.lwjgl.util.Color;
+
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.culling.ICamera;
@@ -14,6 +16,7 @@ import net.silentchaos512.lib.client.render.BufferBuilderSL;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.client.ClientTickHandler;
 import net.silentchaos512.scalinghealth.entity.EntityBlightFire;
+import net.silentchaos512.scalinghealth.lib.module.ModuleAprilTricks;
 
 public class RenderBlightFire extends Render<EntityBlightFire> {
 
@@ -21,6 +24,8 @@ public class RenderBlightFire extends Render<EntityBlightFire> {
 
   protected final ResourceLocation TEXTURE = new ResourceLocation(ScalingHealth.MOD_ID_LOWER,
       "textures/entity/blightfire.png");
+  protected final ResourceLocation TEXTURE_GRAY = new ResourceLocation(ScalingHealth.MOD_ID_LOWER,
+      "textures/entity/blightfire_gray.png");
 
   public RenderBlightFire(RenderManager renderManager) {
 
@@ -30,7 +35,9 @@ public class RenderBlightFire extends Render<EntityBlightFire> {
   @Override
   protected ResourceLocation getEntityTexture(EntityBlightFire entity) {
 
-    return TEXTURE;
+    return ModuleAprilTricks.instance.isRightDay() && ModuleAprilTricks.instance.isEnabled()
+        ? TEXTURE_GRAY
+        : TEXTURE;
   }
 
   public boolean shouldRender(EntityBlightFire fire, ICamera camera, double camX, double camY,
@@ -74,13 +81,23 @@ public class RenderBlightFire extends Render<EntityBlightFire> {
 
     GlStateManager.rotate(-this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
     GlStateManager.translate(0.0F, 0.0F, (float) ((int) f3) * 0.02F);
-    GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+
+    if (ModuleAprilTricks.instance.isRightDay() && ModuleAprilTricks.instance.isEnabled()) {
+      float changeRate = 40f + parent.getEntityId() % 80f;
+      Color color = new Color();
+      float hue = ((ClientTickHandler.ticksInGame + parent.getEntityId()) % changeRate / changeRate);
+      color.fromHSB(hue, 1f, 1f);
+      GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f,
+          1.0F);
+    } else {
+      GlStateManager.color(1f, 1f, 1f, 1f);
+    }
 
     float f5 = 0.0F;
     int i = 0;
 
     vertexbuffer.begin(7, DefaultVertexFormats.POSITION_TEX);
-    this.bindTexture(TEXTURE);
+    this.bindTexture(getEntityTexture(fire));
 
     while (f3 > 0.0F) {
       boolean flag = i % 2 == 0;

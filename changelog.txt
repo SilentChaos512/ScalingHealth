@@ -6,6 +6,7 @@ Added: Config for food consumption (exhaustion) of bonus player regen. Value als
 Added: Particle effects for heart container and cursed/enchanted hearts (#57)
 Added: Sound effects for cursed/enchanted hearts (#57)
 Added: More tooltips!
+Added: ???
 Fixed: All rows of hearts drawing, instead of just the top two (FPS boost for players with lots of hearts)
 Fixed: Some other minor heart rendering issues
 

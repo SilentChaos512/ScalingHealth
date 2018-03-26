@@ -15,9 +15,11 @@ import net.minecraft.entity.player.EntityPlayer.SleepResult;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
@@ -31,6 +33,8 @@ import net.silentchaos512.lib.util.ChatHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.init.ModItems;
+import net.silentchaos512.scalinghealth.init.ModSounds;
+import net.silentchaos512.scalinghealth.lib.module.ModuleAprilTricks;
 import net.silentchaos512.scalinghealth.utils.ModifierHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
@@ -133,6 +137,20 @@ public class ScalingHealthCommonEvents {
   }
 
   @SubscribeEvent
+  public void onPlayerDied(LivingDeathEvent event) {
+
+    if (event.getEntity() == null || !(event.getEntity() instanceof EntityPlayer)) {
+      return;
+    }
+
+    EntityPlayer player = (EntityPlayer) event.getEntity();
+
+    if (ModuleAprilTricks.instance.isEnabled() && ModuleAprilTricks.instance.isRightDay()) {
+      ScalingHealth.proxy.playSoundOnClient(player, ModSounds.PLAYER_DIED, 0.6f, 1f);
+    }
+  }
+
+  @SubscribeEvent
   public void onPlayerRespawn(
       net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerRespawnEvent event) {
 
@@ -197,6 +215,10 @@ public class ScalingHealthCommonEvents {
       ModifierHandler.setMaxHealth(player, maxHealth, 0);
       // if (health > maxHealth && maxHealth > 0)
       // player.setHealth(maxHealth);
+    }
+
+    if (ModuleAprilTricks.instance.isEnabled() && ModuleAprilTricks.instance.isRightDay()) {
+      ChatHelper.sendMessage(event.player, TextFormatting.RED + "[Scaling Health] It's April Fool's time... hehehe.");
     }
   }
 

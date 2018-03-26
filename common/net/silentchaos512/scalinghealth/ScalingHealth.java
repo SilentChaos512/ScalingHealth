@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.potion.Potion;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.world.GameRules;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
@@ -28,6 +29,7 @@ import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.init.ModBlocks;
 import net.silentchaos512.scalinghealth.init.ModItems;
 import net.silentchaos512.scalinghealth.init.ModPotions;
+import net.silentchaos512.scalinghealth.init.ModSounds;
 import net.silentchaos512.scalinghealth.proxy.ScalingHealthCommonProxy;
 import net.silentchaos512.scalinghealth.world.SHWorldGenerator;
 
@@ -77,6 +79,7 @@ public class ScalingHealth {
     registry.addRegistrationHandler(new ModPotions(), Potion.class);
     registry.addRegistrationHandler(new ModBlocks(), Block.class);
     registry.addRegistrationHandler(new ModItems(), Item.class);
+    registry.addRegistrationHandler(new ModSounds(), SoundEvent.class);
 
     // TODO: Achievements?
 
