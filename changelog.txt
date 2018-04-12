@@ -1,6 +1,7 @@
 1.3.14
 Fixed: Distance calculations overflowing, resulting in unkillable entities with NaN max health. Bugged entities should fix themselves when you get close to them. (#89)
 Fixed: Returning from the End through the portal counting as "dying", potentially resulting in changes to health or difficulty. (#91)
+Fixed: Server crash when lunar phases are enabled (#97)
 
 1.3.13
 Fixed: Server crash

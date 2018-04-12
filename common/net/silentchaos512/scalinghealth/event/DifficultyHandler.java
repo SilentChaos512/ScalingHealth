@@ -21,6 +21,7 @@ import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
@@ -157,16 +158,17 @@ public class DifficultyHandler {
 
   private boolean increaseEntityHealth(EntityLivingBase entityLiving) {
 
-    float difficulty = (float) ConfigScalingHealth.AREA_DIFFICULTY_MODE
-        .getAreaDifficulty(entityLiving.world, entityLiving.getPosition());
+    World world = entityLiving.world;
+    float difficulty = (float) ConfigScalingHealth.AREA_DIFFICULTY_MODE.getAreaDifficulty(world,
+        entityLiving.getPosition());
     Random rand = ScalingHealth.random;
     boolean makeBlight = false;
     boolean isHostile = entityLiving instanceof IMob;
 
     // Lunar phase multipliers?
     if (ConfigScalingHealth.DIFFICULTY_LUNAR_MULTIPLIERS_ENABLED
-        && entityLiving.world.getWorldTime() % 24000 > 12000) {
-      int moonPhase = entityLiving.world.getMoonPhase() % 8;
+        && world.getWorldTime() % 24000 > 12000) {
+      int moonPhase = world.provider.getMoonPhase(world.getWorldTime()) % 8;
       float multi = ConfigScalingHealth.DIFFICULTY_LUNAR_MULTIPLIERS[moonPhase];
       difficulty *= multi;
     }
