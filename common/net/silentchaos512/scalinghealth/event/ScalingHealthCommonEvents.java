@@ -160,25 +160,28 @@ public class ScalingHealthCommonEvents {
       PlayerData data = SHPlayerDataHandler.get(player);
 
       // Lose health on death?
-      if (ConfigScalingHealth.PLAYER_HEALTH_LOST_ON_DEATH > 0) {
+      if (ConfigScalingHealth.PLAYER_HEALTH_LOST_ON_DEATH > 0 && !event.isEndConquered()) {
         float newHealth = data.getMaxHealth() - ConfigScalingHealth.PLAYER_HEALTH_LOST_ON_DEATH;
         float startHealth = ConfigScalingHealth.PLAYER_STARTING_HEALTH;
         data.setMaxHealth(newHealth < startHealth ? startHealth : newHealth);
       }
 
       // Lose difficulty on death?
-      double currentDifficulty = data.getDifficulty();
-      double newDifficulty = MathHelper.clamp(
-          currentDifficulty - ConfigScalingHealth.DIFFICULTY_LOST_ON_DEATH,
-          ConfigScalingHealth.DIFFICULTY_MIN, ConfigScalingHealth.DIFFICULTY_MAX);
-      data.setDifficulty(newDifficulty);
+      if (!event.isEndConquered()) {
+        double currentDifficulty = data.getDifficulty();
+        double newDifficulty = MathHelper.clamp(
+            currentDifficulty - ConfigScalingHealth.DIFFICULTY_LOST_ON_DEATH,
+            ConfigScalingHealth.DIFFICULTY_MIN, ConfigScalingHealth.DIFFICULTY_MAX);
+        data.setDifficulty(newDifficulty);
+      }
 
       // Apply health modifier
       float health = player.getHealth();
       float maxHealth = data.getMaxHealth();
       ModifierHandler.setMaxHealth(player, maxHealth, 0);
-      if (health != maxHealth && maxHealth > 0)
+      if (health != maxHealth && maxHealth > 0) {
         player.setHealth(maxHealth);
+      }
     }
   }
 
@@ -218,7 +221,8 @@ public class ScalingHealthCommonEvents {
     }
 
     if (ModuleAprilTricks.instance.isEnabled() && ModuleAprilTricks.instance.isRightDay()) {
-      ChatHelper.sendMessage(event.player, TextFormatting.RED + "[Scaling Health] It's April Fool's time... hehehe.");
+      ChatHelper.sendMessage(event.player,
+          TextFormatting.RED + "[Scaling Health] It's April Fool's time... hehehe.");
     }
   }
 
