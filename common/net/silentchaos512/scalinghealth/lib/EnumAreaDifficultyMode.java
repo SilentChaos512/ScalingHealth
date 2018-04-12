@@ -136,8 +136,8 @@ public enum EnumAreaDifficultyMode {
       case DISTANCE_FROM_SPAWN:
         origin = world.getSpawnPoint();
       case DISTANCE_FROM_ORIGIN:
-        int dx = pos.getX() - origin.getX();
-        int dz = pos.getZ() - origin.getZ();
+        double dx = pos.getX() - origin.getX();
+        double dz = pos.getZ() - origin.getZ();
         double distance = Math.sqrt(dx * dx + dz * dz);
         ret = distance * ConfigScalingHealth.DIFFICULTY_PER_BLOCK;
         break;

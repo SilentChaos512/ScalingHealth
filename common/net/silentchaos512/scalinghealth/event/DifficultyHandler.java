@@ -19,6 +19,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -163,7 +164,8 @@ public class DifficultyHandler {
     boolean isHostile = entityLiving instanceof IMob;
 
     // Lunar phase multipliers?
-    if (ConfigScalingHealth.DIFFICULTY_LUNAR_MULTIPLIERS_ENABLED && entityLiving.world.getWorldTime() % 24000 > 12000) {
+    if (ConfigScalingHealth.DIFFICULTY_LUNAR_MULTIPLIERS_ENABLED
+        && entityLiving.world.getWorldTime() % 24000 > 12000) {
       int moonPhase = entityLiving.world.getMoonPhase() % 8;
       float multi = ConfigScalingHealth.DIFFICULTY_LUNAR_MULTIPLIERS[moonPhase];
       difficulty *= multi;
@@ -254,9 +256,11 @@ public class DifficultyHandler {
     entityLiving.setHealth(entityLiving.getMaxHealth());
 
     if (ConfigScalingHealth.DEBUG_MODE) {
-      ScalingHealth.logHelper
-          .info(String.format("Spawn debug: %s: Difficulty=%.2f, Health +%.2f, Damage +%.2f",
-              entityLiving.getName(), totalDifficulty, genAddedHealth, genAddedDamage));
+      BlockPos pos = entityLiving.getPosition();
+      String line = "Spawn debug: %s (%d, %d, %d): Difficulty=%.2f, Health +%.2f, Damage +%.2f";
+      line = String.format(line, entityLiving.getName(), pos.getX(), pos.getY(), pos.getZ(),
+          totalDifficulty, genAddedHealth, genAddedDamage);
+      ScalingHealth.logHelper.info(line);
     }
 
     return makeBlight;
@@ -403,7 +407,9 @@ public class DifficultyHandler {
         .getModifier(ModifierHandler.MODIFIER_ID_HEALTH);
     // The tickExisted > 1 kinda helps with Lycanites, but checking for a modifier amount of 0 should catch issues with
     // some mobs not receiving health increases.
-    return entityLiving.ticksExisted > 1 && (modifier == null || modifier.getAmount() == 0.0);
+    // ScalingHealth.logHelper.debug(modifier != null ? modifier.getAmount() : null);
+    return entityLiving.ticksExisted > 1
+        && (modifier == null || modifier.getAmount() == 0.0 || modifier.getAmount() == Double.NaN);
   }
 
   private boolean entityBlacklistedFromBecomingBlight(EntityLivingBase entityLiving) {
