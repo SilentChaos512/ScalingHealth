@@ -98,7 +98,8 @@ public class DifficultyDisplayHandler extends Gui {
       float textScale = 0.6f;
       GlStateManager.pushMatrix();
       GlStateManager.scale(textScale, textScale, 1.0f);
-      mc.fontRenderer.drawStringWithShadow("DIFFICULTY", posX / textScale + 4, posY / textScale - 9, 0xFFFFFF);
+      String localizedString = ScalingHealth.localizationHelper.getLocalizedString("misc", "difficultyMeterText");
+      mc.fontRenderer.drawStringWithShadow(localizedString, posX / textScale + 4, posY / textScale - 9, 0xFFFFFF);
       // Text Difficulty
       String str = String.format("%d", areaDifficulty);
       int strWidth = mc.fontRenderer.getStringWidth(str);
