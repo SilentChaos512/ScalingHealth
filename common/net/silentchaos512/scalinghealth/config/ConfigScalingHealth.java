@@ -474,7 +474,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
           "The amount of health that will be restored when using a heart container.");
       HEART_XP_LEVEL_COST = loadInt("Heart XP Level Cost", CAT_ITEMS,
           HEART_XP_LEVEL_COST, 0, 100,
-          "The number of experience (XP) levels required to use a heart container.");
+          "The number of levels required to use a heart container.");
 
       String catCursedHeart = CAT_ITEMS + split + "cursed_heart";
       CURSED_HEART_DIFFICULTY_CHANGE = config.getFloat("Difficulty Change", catCursedHeart,
