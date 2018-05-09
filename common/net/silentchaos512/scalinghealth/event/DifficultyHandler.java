@@ -257,7 +257,7 @@ public class DifficultyHandler {
     // Heal.
     entityLiving.setHealth(entityLiving.getMaxHealth());
 
-    if (ConfigScalingHealth.DEBUG_MODE) {
+    if (ConfigScalingHealth.DEBUG_MODE && ConfigScalingHealth.DEBUG_LOG_SPAWNS) {
       BlockPos pos = entityLiving.getPosition();
       String line = "Spawn debug: %s (%d, %d, %d): Difficulty=%.2f, Health +%.2f, Damage +%.2f";
       line = String.format(line, entityLiving.getName(), pos.getX(), pos.getY(), pos.getZ(),

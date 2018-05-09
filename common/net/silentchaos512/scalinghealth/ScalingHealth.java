@@ -115,4 +115,9 @@ public class ScalingHealth {
       server.worlds[0].getGameRules().setOrCreateGameRule(GAME_RULE_DIFFICULTY, "true");
     }
   }
+
+  public int getBuildNumber() {
+
+    return BUILD_NUM;
+  }
 }

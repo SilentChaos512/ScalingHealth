@@ -13,6 +13,7 @@ import net.silentchaos512.lib.config.AdaptiveConfig;
 import net.silentchaos512.lib.config.ConfigMultiValueLineParser;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.client.HeartDisplayHandler;
+import net.silentchaos512.scalinghealth.event.DamageScaling;
 import net.silentchaos512.scalinghealth.lib.EnumAreaDifficultyMode;
 import net.silentchaos512.scalinghealth.lib.EnumHealthModMode;
 import net.silentchaos512.scalinghealth.lib.EnumResetTime;
@@ -25,7 +26,11 @@ public class ConfigScalingHealth extends AdaptiveConfig {
 
   public static NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.US);
 
+  // Debug TODO: Add a debug category to config
   public static boolean DEBUG_MODE = false;
+  // FIXME: These are not loaded yet!
+  public static boolean DEBUG_LOG_SPAWNS = false;
+  public static boolean DEBUG_LOG_PLAYER_DAMAGE = true;
 
   // Client
   public static boolean CHANGE_HEART_RENDERING = true;
@@ -177,6 +182,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static final String CAT_CLIENT = CAT_MAIN + split + "client";
   public static final String CAT_PLAYER = CAT_MAIN + split + "player";
   public static final String CAT_FAKE_PLAYER = CAT_MAIN + split + "fake_players";
+  public static final String CAT_PLAYER_DAMAGE = CAT_PLAYER + split + "damage";
   public static final String CAT_PLAYER_HEALTH = CAT_PLAYER + split + "health";
   public static final String CAT_PLAYER_REGEN = CAT_PLAYER + split + "regen";
   public static final String CAT_MOB = CAT_MAIN + split + "mob";
@@ -215,7 +221,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
       ConfigMultiValueLineParser parser;
 
       //@formatter:off
-
+ 
       DEBUG_MODE = loadBoolean("Debug Mode", CAT_MAIN,
           DEBUG_MODE,
           "Draws random stuffs on the screen! And maybe does some other things.");
@@ -288,6 +294,8 @@ public class ConfigScalingHealth extends AdaptiveConfig {
       BONUS_HEALTH_REGEN_EXHAUSTION = config.getFloat("Exhaustion Added", CAT_PLAYER_REGEN,
           BONUS_HEALTH_REGEN_EXHAUSTION, 0f, 1f,
           "The food consumption for each half heart regenerated.");
+      // Damage Scaling
+      DamageScaling.instance.loadConfig(config);
 
       // Fake Players
       FAKE_PLAYERS_CAN_GENERATE_HEARTS = loadBoolean("Can Generate Hearts", CAT_FAKE_PLAYER,
