@@ -22,6 +22,7 @@ import net.silentchaos512.scalinghealth.utils.EntityDifficultyChangeList;
 import net.silentchaos512.scalinghealth.utils.EntityMatchList;
 import net.silentchaos512.scalinghealth.utils.PlayerMatchList;
 
+// TODO: Major cleanup needed!
 public class ConfigScalingHealth extends AdaptiveConfig {
 
   public static NumberFormat NUMBER_FORMAT = NumberFormat.getInstance(Locale.US);
@@ -151,7 +152,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static float DIFFICULTY_IDLE_MULTI = 0.7f;
   public static float DIFFICULTY_LOST_ON_DEATH = 0f;
   public static float DIFFICULTY_GROUP_AREA_BONUS = 0.05f;
-  public static int DIFFICULTY_SEARCH_RADIUS = 160;
+  public static int DIFFICULTY_SEARCH_RADIUS = 256;
   public static PlayerMatchList DIFFICULTY_EXEMPT_PLAYERS = new PlayerMatchList();
   public static EntityDifficultyChangeList DIFFICULTY_PER_KILL_BY_MOB = new EntityDifficultyChangeList();
   public static Map<Integer, Float> DIFFICULTY_DIMENSION_MULTIPLIER = new THashMap<Integer, Float>();
@@ -374,10 +375,10 @@ public class ConfigScalingHealth extends AdaptiveConfig {
           "Determines the chance of a mob spawning as a blight. Formula is "
               + "blightChanceMulti * currentDifficulty / maxDifficulty");
       BLIGHT_AMP_SPEED = loadInt("Amplifier Speed", CAT_MOB_BLIGHT,
-          BLIGHT_AMP_SPEED, 0, 99,
+          BLIGHT_AMP_SPEED, -1, 99,
           "The amplifier level on the speed potion effect applied to blights.");
       BLIGHT_AMP_STRENGTH = loadInt("Amplifier Strength", CAT_MOB_BLIGHT,
-          BLIGHT_AMP_STRENGTH, 0, 99,
+          BLIGHT_AMP_STRENGTH, -1, 99,
           "The amplifier level on the strength potion effect applied to blights.");
       BLIGHT_POTION_DURATION = loadInt("Potion Duration", CAT_MOB_BLIGHT,
           5 * 1200, -1, Integer.MAX_VALUE,

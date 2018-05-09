@@ -84,6 +84,8 @@ public class BlightHandler {
       return;
     }
 
+    // TODO: Replace specific potion effects with a list where users can add specific effects.
+
     // Invisibility
     if (ConfigScalingHealth.BLIGHT_INVISIBLE)
       entityLiving
@@ -93,11 +95,11 @@ public class BlightHandler {
       entityLiving
           .addPotionEffect(new PotionEffect(MobEffects.FIRE_RESISTANCE, duration, 0, true, false));
     // Speed
-    if (ConfigScalingHealth.BLIGHT_AMP_SPEED > 0)
+    if (ConfigScalingHealth.BLIGHT_AMP_SPEED > -1)
       entityLiving.addPotionEffect(new PotionEffect(MobEffects.SPEED, duration,
           ConfigScalingHealth.BLIGHT_AMP_SPEED, true, false));
     // Strength
-    if (ConfigScalingHealth.BLIGHT_AMP_STRENGTH > 0)
+    if (ConfigScalingHealth.BLIGHT_AMP_STRENGTH > -1)
       entityLiving.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, duration,
           ConfigScalingHealth.BLIGHT_AMP_STRENGTH, true, false));
   }
