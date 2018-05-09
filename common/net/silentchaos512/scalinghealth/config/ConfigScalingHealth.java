@@ -91,6 +91,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static EntityMatchList MOB_HEALTH_BLACKLIST = new EntityMatchList();
   private static String[] MOB_HEALTH_BLACKLIST_DEFAULTS = new String[] {};
   // Blights
+  public static boolean BLIGHT_ALWAYS = false;
   public static float BLIGHT_CHANCE_MULTIPLIER = 0.0625F;
   public static int BLIGHT_AMP_SPEED = 4;
   public static int BLIGHT_AMP_STRENGTH = 1;
@@ -358,6 +359,8 @@ public class ConfigScalingHealth extends AdaptiveConfig {
         MOB_HEALTH_BLACKLIST.add(str);
       }
       // Blights
+      BLIGHT_ALWAYS = config.getBoolean("All Mobs Are Blights", CAT_MOB_BLIGHT, false,
+          "If true, every mob that can be a blight will be one.");
       BLIGHT_CHANCE_MULTIPLIER = config.getFloat("Blight Chance Multiplier", CAT_MOB_BLIGHT,
           BLIGHT_CHANCE_MULTIPLIER, 0f, Float.MAX_VALUE,
           "Determines the chance of a mob spawning as a blight. Formula is "
