@@ -158,9 +158,14 @@ public class DifficultyHandler {
 
   private boolean increaseEntityHealth(EntityLivingBase entityLiving) {
 
+    // If true, enables old behavior where health/damage subtract from difficulty as applied.
+    // TODO: Should this be a config, or should old behavior just be removed?
+    final boolean statsTakeDifficulty = false;
+
     World world = entityLiving.world;
     float difficulty = (float) ConfigScalingHealth.AREA_DIFFICULTY_MODE.getAreaDifficulty(world,
         entityLiving.getPosition());
+    float originalDifficulty = difficulty;
     Random rand = ScalingHealth.random;
     boolean makeBlight = false;
     boolean isHostile = entityLiving instanceof IMob;
@@ -196,11 +201,13 @@ public class DifficultyHandler {
 
     genAddedHealth *= healthMultiplier;
 
-    difficulty -= genAddedHealth;
+    if (statsTakeDifficulty)
+      difficulty -= genAddedHealth;
 
     if (difficulty > 0) {
       float diffIncrease = 2 * healthMultiplier * difficulty * rand.nextFloat();
-      difficulty -= diffIncrease;
+      if (statsTakeDifficulty)
+        difficulty -= diffIncrease;
       genAddedHealth += diffIncrease;
     }
 
@@ -214,7 +221,8 @@ public class DifficultyHandler {
             ConfigScalingHealth.DIFFICULTY_DAMAGE_MAX_BOOST);
       }
       // Decrease difficulty based on the damage actually added, instead of diffIncrease.
-      difficulty -= genAddedDamage / ConfigScalingHealth.DIFFICULTY_DAMAGE_MULTIPLIER;
+      if (statsTakeDifficulty)
+        difficulty -= genAddedDamage / ConfigScalingHealth.DIFFICULTY_DAMAGE_MULTIPLIER;
     }
 
     // Random potion effect
@@ -223,7 +231,8 @@ public class DifficultyHandler {
     if (difficulty > 0 && rand.nextFloat() < potionChance) {
       MobPotionMap.PotionEntry pot = potionMap.getRandom(rand, (int) difficulty);
       if (pot != null) {
-        difficulty -= pot.cost;
+        if (statsTakeDifficulty)
+          difficulty -= pot.cost;
         entityLiving.addPotionEffect(new PotionEffect(pot.potion, POTION_APPLY_TIME));
       }
     }
@@ -257,7 +266,7 @@ public class DifficultyHandler {
     // Heal.
     entityLiving.setHealth(entityLiving.getMaxHealth());
 
-    if (ConfigScalingHealth.DEBUG_MODE && ConfigScalingHealth.DEBUG_LOG_SPAWNS) {
+    if (ConfigScalingHealth.DEBUG_MODE && ConfigScalingHealth.DEBUG_LOG_SPAWNS && originalDifficulty > 0f) {
       BlockPos pos = entityLiving.getPosition();
       String line = "Spawn debug: %s (%d, %d, %d): Difficulty=%.2f, Health +%.2f, Damage +%.2f";
       line = String.format(line, entityLiving.getName(), pos.getX(), pos.getY(), pos.getZ(),
