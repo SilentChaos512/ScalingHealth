@@ -176,11 +176,13 @@ public class ScalingHealthCommonEvents {
       }
 
       // Apply health modifier
-      float health = player.getHealth();
-      float maxHealth = data.getMaxHealth();
-      ModifierHandler.setMaxHealth(player, maxHealth, 0);
-      if (health != maxHealth && maxHealth > 0) {
-        player.setHealth(maxHealth);
+      if (ConfigScalingHealth.ALLOW_PLAYER_MODIFIED_HEALTH) {
+        float health = player.getHealth();
+        float maxHealth = data.getMaxHealth();
+        ModifierHandler.setMaxHealth(player, maxHealth, 0);
+        if (health != maxHealth && maxHealth > 0) {
+          player.setHealth(maxHealth);
+        }
       }
     }
   }
@@ -213,11 +215,11 @@ public class ScalingHealthCommonEvents {
       data.getLastTimePlayed().setTime(today.getTime());
 
       // Apply health modifier
-      float health = player.getHealth();
-      float maxHealth = data.getMaxHealth();
-      ModifierHandler.setMaxHealth(player, maxHealth, 0);
-      // if (health > maxHealth && maxHealth > 0)
-      // player.setHealth(maxHealth);
+      if (ConfigScalingHealth.ALLOW_PLAYER_MODIFIED_HEALTH) {
+        float health = player.getHealth();
+        float maxHealth = data.getMaxHealth();
+        ModifierHandler.setMaxHealth(player, maxHealth, 0);
+      }
     }
 
     if (ModuleAprilTricks.instance.isEnabled() && ModuleAprilTricks.instance.isRightDay()) {

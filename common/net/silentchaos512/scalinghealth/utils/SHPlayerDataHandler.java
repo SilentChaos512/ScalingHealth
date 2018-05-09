@@ -237,6 +237,9 @@ public class SHPlayerDataHandler {
 
     public void setMaxHealth(float value) {
 
+      if (!ConfigScalingHealth.ALLOW_PLAYER_MODIFIED_HEALTH)
+        return;
+
       int configMax = ConfigScalingHealth.PLAYER_HEALTH_MAX;
       configMax = configMax <= 0 ? Integer.MAX_VALUE : configMax;
 

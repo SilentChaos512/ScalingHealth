@@ -44,10 +44,11 @@ public class MessageDataSync extends Message {
         data.readFromNBT(tags);
 
         // Set players health and max health.
-        if (ConfigScalingHealth.ALLOW_PLAYER_MODIFIED_HEALTH)
+        if (ConfigScalingHealth.ALLOW_PLAYER_MODIFIED_HEALTH) {
           ModifierHandler.setMaxHealth(player, data.getMaxHealth(), 0);
-        if (data.getHealth() > 0f)
-          player.setHealth(data.getHealth());
+          if (data.getHealth() > 0f)
+            player.setHealth(data.getHealth());
+        }
 
         player.experienceLevel = experienceLevel;
       }
