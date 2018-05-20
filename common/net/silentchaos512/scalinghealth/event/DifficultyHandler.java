@@ -178,8 +178,6 @@ public class DifficultyHandler {
       difficulty *= multi;
     }
 
-    entityLiving.getEntityData().setShort(NBT_ENTITY_DIFFICULTY, (short) difficulty);
-
     // Make blight?
     if (!entityBlacklistedFromBecomingBlight(entityLiving)) {
       float chance = (float) (difficulty / ConfigScalingHealth.DIFFICULTY_MAX
@@ -189,6 +187,8 @@ public class DifficultyHandler {
         difficulty *= 3;
       }
     }
+    
+    entityLiving.getEntityData().setShort(NBT_ENTITY_DIFFICULTY, (short) difficulty);
 
     float totalDifficulty = difficulty;
 

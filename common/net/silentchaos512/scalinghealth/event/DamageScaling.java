@@ -3,6 +3,9 @@ package net.silentchaos512.scalinghealth.event;
 import java.util.Map;
 
 import gnu.trove.map.hash.THashMap;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.common.config.Configuration;
@@ -26,16 +29,19 @@ public class DamageScaling {
 
   private float genericScale;
   private float difficultyWeight;
+  private boolean affectHostileMobs;
+  private boolean affectPassiveMobs;
   private Mode scaleMode;
   private Map<String, Float> scalingMap = new THashMap<>();
 
   @SubscribeEvent
   public void onPlayerHurt(LivingHurtEvent event) {
 
-    if (!(event.getEntity() instanceof EntityPlayer))
+    EntityLivingBase entity = event.getEntityLiving();
+    if ((entity instanceof IMob && !affectHostileMobs) || (!(entity instanceof EntityPlayer) && !affectPassiveMobs))
       return;
 
-    EntityPlayer player = (EntityPlayer) event.getEntity();
+    //EntityPlayer player = (EntityPlayer) event.getEntity();
     DamageSource source = event.getSource();
 
     // Shouldn't happen but... I've seen stranger things.
@@ -53,15 +59,16 @@ public class DamageScaling {
     float affectedAmount = 0f;
     switch (scaleMode) {
       case AREA_DIFFICULTY:
-        affectedAmount = (float) ScalingHealthAPI.getAreaDifficulty(player.world, player.getPosition());
+        affectedAmount = (float) ScalingHealthAPI.getAreaDifficulty(entity.world, entity.getPosition());
         affectedAmount *= difficultyWeight;
         break;
       case MAX_HEALTH:
-        int baseHealth = ConfigScalingHealth.PLAYER_STARTING_HEALTH;
-        affectedAmount = (player.getMaxHealth() - baseHealth) / baseHealth;
+        double baseHealth = entity instanceof EntityPlayer ? ConfigScalingHealth.PLAYER_STARTING_HEALTH
+            : entity.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue();
+        affectedAmount = (float) ((entity.getMaxHealth() - baseHealth) / baseHealth);
         break;
       case PLAYER_DIFFICULTY:
-        affectedAmount = (float) ScalingHealthAPI.getPlayerDifficulty(player);
+        affectedAmount = (float) ScalingHealthAPI.getEntityDifficulty(entity);
         affectedAmount *= difficultyWeight;
         break;
     }
@@ -97,6 +104,9 @@ public class DamageScaling {
         "How much each point of difficulty affects damage scaling. With the default value of 0.04 (1/25th) and max difficulty of 250, that's up to a 10x multiplier on added damage. So player's would"
             + " take 11x damage at max difficulty, if the source scale is set to 1.0.");
     scaleMode = Mode.loadConfig(config);
+
+    affectHostileMobs = config.getBoolean("Affect Hostile Mobs", category, false, "Also apply damage scaling to hostile mobs when they take damage.");
+    affectPassiveMobs = config.getBoolean("Affect Passive Mobs", category, false, "Also apply damage scaling to passive mobs when they take damage.");
 
     // The parser is used to extract multiple values of different types from a single string. Parsing returns an Object
     // array if successful, or null if anything goes wrong. The parser also handles error logging.

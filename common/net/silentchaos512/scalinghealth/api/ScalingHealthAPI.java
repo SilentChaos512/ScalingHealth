@@ -2,6 +2,7 @@ package net.silentchaos512.scalinghealth.api;
 
 import javax.annotation.Nonnull;
 
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
@@ -60,6 +61,18 @@ public class ScalingHealthAPI {
         data.incrementDifficulty(amount, false);
       }
     }
+  }
+
+  /**
+   * For players, gets the player's difficulty. For other entities, it gets the difficulty they spawned with. Non-player
+   * difficulty is stored as a short, so it will always be a whole number.
+   */
+  public static double getEntityDifficulty(@Nonnull EntityLivingBase entity) {
+
+    if (entity instanceof EntityPlayer)
+      return getPlayerDifficulty((EntityPlayer) entity);
+
+    return entity.getEntityData().getShort(DifficultyHandler.NBT_ENTITY_DIFFICULTY);
   }
 
   // **************************************************************************
