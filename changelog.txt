@@ -1,4 +1,5 @@
 1.3.16
+Changed: Commands have been reworked! You can now specify whether you want to get/set/add/sub the value. Fully supports the "@" notation now, you can even affect multiple players with one command (in theory). And tab completion works better. (#107, #72)
 Fixed: Kill command having some strange effects if outOfWorld damage is scaled (#110)
 
 1.3.15

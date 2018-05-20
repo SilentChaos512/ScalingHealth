@@ -2,14 +2,20 @@ package net.silentchaos512.scalinghealth.command;
 
 import java.util.List;
 
-import com.google.common.collect.Lists;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import com.google.common.collect.ImmutableList;
 
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.silentchaos512.lib.command.CommandBaseSL;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -31,86 +37,78 @@ public class CommandScalingHealth extends CommandBaseSL {
   @Override
   public String getUsage(ICommandSender sender) {
 
-    return "Usage: /" + getName() + " <difficulty|health|world_difficulty> <value> [player]";
+    return TextFormatting.RED + "Usage: /" + getName() + " <difficulty|health|world_difficulty> <get|set|add|sub> [value] [player]";
   }
 
   @Override
-  public void execute(MinecraftServer server, ICommandSender sender, String[] args)
-      throws CommandException {
+  public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 
-    if (args.length < 1) {
+    if (args.length < 2) {
       tell(sender, getUsage(sender), false);
       return;
     }
 
     // Get arguments.
     String command = args[0];
-    double value = -1D;
-    EntityPlayer targetPlayer = null;
-
-    if (args.length > 1) {
-      try {
-        value = Double.parseDouble(args[1]);
-      } catch (Exception ex) {
-        tell(sender, getUsage(sender), false);
-        return;
-      }
-    }
-    if (args.length > 2) {
-      String name = args[2];
-      targetPlayer = server.getPlayerList().getPlayerByUsername(name);
-      if (targetPlayer == null) {
-        tell(sender, "playerNotFound", true, name);
-        return;
-      }
-    }
-
-    if (command.equals("difficulty")) {
-      executeDifficulty(server, sender, value, targetPlayer);
-    } else if (command.equals("health")) {
-      executeHealth(server, sender, value, targetPlayer);
-    } else if (command.equals("world_difficulty")) {
-      executeWorldDifficulty(server, sender, value, sender.getEntityWorld());
-    }
-  }
-
-  private void executeDifficulty(MinecraftServer server, ICommandSender sender, double value,
-      EntityPlayer targetPlayer) {
-
-    if (targetPlayer == null)
-      targetPlayer = (EntityPlayer) sender;
-    PlayerData data = SHPlayerDataHandler.get(targetPlayer);
-
-    if (data == null) {
-      tell(sender, "Player data is null!", false);
+    SubCommand subCommand = SubCommand.fromArg(args[1]);
+    boolean isGet = subCommand == SubCommand.GET;
+    if (subCommand == null || (!isGet && args.length < 3)) {
+      tell(sender, getUsage(sender), false);
       return;
     }
+    double value = isGet ? -1D : parseDouble(args[2]);
+    List<EntityPlayerMP> targets = args.length < 4 ? ImmutableList.of(getCommandSenderAsPlayer(sender)) : getPlayers(server, sender, args[3]);
 
-    if (value < 0) {
-      // Report difficulty.
-      double current = data.getDifficulty();
-      String strCurrent = String.format(NUMFORMAT, current);
-      String strMax = String.format(NUMFORMAT, ConfigScalingHealth.DIFFICULTY_MAX);
-      tell(sender, "showDifficulty", true, targetPlayer.getName(), strCurrent, strMax);
-    } else {
-      // Try set difficulty.
-      // Bounds check.
-      if (value < ConfigScalingHealth.DIFFICULTY_MIN
-          || value > ConfigScalingHealth.DIFFICULTY_MAX) {
-        tell(sender, "outOfBounds", true,
-            String.format(NUMFORMAT, ConfigScalingHealth.DIFFICULTY_MIN),
-            String.format("%.2f", ConfigScalingHealth.DIFFICULTY_MAX));
-        return;
+    if (command.equals("difficulty"))
+      executeDifficulty(server, sender, subCommand, value, targets);
+    else if (command.equals("health"))
+      executeHealth(server, sender, subCommand, value, targets);
+    else if (command.equals("world_difficulty"))
+      executeWorldDifficulty(server, sender, subCommand, value, sender.getEntityWorld());
+    else
+      tell(sender, getUsage(sender), false);
+  }
+
+  private void executeDifficulty(MinecraftServer server, ICommandSender sender, @Nonnull SubCommand subCommand, double value, List<EntityPlayerMP> targets) {
+
+    if (targets.isEmpty())
+      return;
+
+    for (EntityPlayerMP player : targets) {
+      PlayerData data = SHPlayerDataHandler.get(player);
+
+      if (data == null) {
+        tell(sender, "Player data is null for " + player.getName(), false);
+        continue;
       }
 
-      // Change it!
-      data.setDifficulty(value);
-      tell(sender, "setDifficulty", true, targetPlayer.getName(), String.format(NUMFORMAT, value));
+      if (subCommand == SubCommand.GET) {
+        // Report difficulty
+        double current = data.getDifficulty();
+        String strCurrent = String.format(NUMFORMAT, current);
+        String strMax = String.format(NUMFORMAT, ConfigScalingHealth.DIFFICULTY_MAX);
+        tell(sender, "showDifficulty", true, player.getName(), strCurrent, strMax);
+      } else {
+        // Try set difficulty
+        double current = data.getDifficulty();
+        double toSet = getValueToSet(subCommand, value, current);
+        double min = getMinValue(subCommand, current, ConfigScalingHealth.DIFFICULTY_MIN, ConfigScalingHealth.DIFFICULTY_MAX);
+        double max = getMaxValue(subCommand, current, ConfigScalingHealth.DIFFICULTY_MIN, ConfigScalingHealth.DIFFICULTY_MAX);
+
+        // Bounds check
+        if (!checkBounds(subCommand, value, toSet, current, min, max)) {
+          tell(sender, TextFormatting.RED, "outOfBounds", true, String.format(NUMFORMAT, min), String.format(NUMFORMAT, max));
+          return;
+        }
+
+        // Change it!
+        data.setDifficulty(toSet);
+        tell(sender, "setDifficulty", true, player.getName(), String.format(NUMFORMAT, toSet));
+      }
     }
   }
 
-  private void executeWorldDifficulty(MinecraftServer server, ICommandSender sender, double value,
-      World world) {
+  private void executeWorldDifficulty(MinecraftServer server, ICommandSender sender, @Nonnull SubCommand subCommand, double value, World world) {
 
     ScalingHealthSavedData data = ScalingHealthSavedData.get(world);
     if (data == null) {
@@ -118,68 +116,151 @@ public class CommandScalingHealth extends CommandBaseSL {
       return;
     }
 
-    if (value < 0) {
+    if (subCommand == SubCommand.GET) {
       // Report difficulty
       double current = data.difficulty;
       String strCurrent = String.format(NUMFORMAT, current);
       String strMax = String.format(NUMFORMAT, ConfigScalingHealth.DIFFICULTY_MAX);
       tell(sender, "showWorldDifficulty", true, strCurrent, strMax);
     } else {
-      // Try set difficulty.
-      // Bounds check.
-      if (value < ConfigScalingHealth.DIFFICULTY_MIN
-          || value > ConfigScalingHealth.DIFFICULTY_MAX) {
-        tell(sender, "outOfBounds", true,
-            String.format(NUMFORMAT, ConfigScalingHealth.DIFFICULTY_MIN),
-            String.format("%.2f", ConfigScalingHealth.DIFFICULTY_MAX));
+      // Try set difficulty
+      double current = data.difficulty;
+      double toSet = getValueToSet(subCommand, value, current);
+      double min = getMinValue(subCommand, current, ConfigScalingHealth.DIFFICULTY_MIN, ConfigScalingHealth.DIFFICULTY_MAX);
+      double max = getMaxValue(subCommand, current, ConfigScalingHealth.DIFFICULTY_MIN, ConfigScalingHealth.DIFFICULTY_MAX);
+
+      // Bounds check
+      if (!checkBounds(subCommand, value, toSet, current, min, max)) {
+        tell(sender, TextFormatting.RED, "outOfBounds", true, String.format(NUMFORMAT, min), String.format(NUMFORMAT, max));
         return;
       }
 
       // Change it!
-      data.difficulty = value;
+      data.difficulty = toSet;
       data.markDirty();
-      tell(sender, "setWorldDifficulty", true, String.format(NUMFORMAT, value));
+      tell(sender, "setWorldDifficulty", true, String.format(NUMFORMAT, toSet));
     }
   }
 
-  private void executeHealth(MinecraftServer server, ICommandSender sender, double value,
-      EntityPlayer targetPlayer) {
+  private void executeHealth(MinecraftServer server, ICommandSender sender, @Nonnull SubCommand subCommand, double value, List<EntityPlayerMP> targets) {
 
-    if (targetPlayer == null)
-      targetPlayer = (EntityPlayer) sender;
-    PlayerData data = SHPlayerDataHandler.get(targetPlayer);
-
-    if (data == null) {
-      tell(sender, "Player data is null!", false);
+    if (targets.isEmpty())
       return;
-    }
 
-    if (value < 0) {
-      // Report health.
-      float current = targetPlayer.getHealth();
-      float max = targetPlayer.getMaxHealth();
-      String strCurrent = String.format(NUMFORMAT, current);
-      String strMax = String.format(NUMFORMAT, max);
-      tell(sender, "showHealth", true, targetPlayer.getName(), strCurrent, strMax);
-    } else {
-      // Bounds check.
-      int max = ConfigScalingHealth.PLAYER_HEALTH_MAX;
-      max = max <= 0 ? Integer.MAX_VALUE : max;
-      if (value < 2 || value > max) {
-        tell(sender, "outOfBounds", true, 2, max);
-        return;
+    for (EntityPlayerMP player : targets) {
+      PlayerData data = SHPlayerDataHandler.get(player);
+
+      if (data == null) {
+        tell(sender, "Player data is null for " + player.getName(), false);
+        continue;
       }
 
-      // Change it!
-      float currentHealth = targetPlayer.getHealth();
-      float toHeal = (float) (value - currentHealth);
-      data.setMaxHealth((float) value);
+      if (subCommand == SubCommand.GET) {
+        // Report health.
+        float current = player.getHealth();
+        float max = player.getMaxHealth();
+        float modValue = data.getMaxHealth() - ConfigScalingHealth.PLAYER_STARTING_HEALTH;
+        String strCurrent = String.format(NUMFORMAT, current);
+        String strMax = String.format(NUMFORMAT, max);
+        String strMod = (modValue >= 0f ? "+" : "") + modValue;
+        tell(sender, "showHealth", true, player.getName(), strCurrent, strMax, strMod);
+      } else {
+        // Try set health.
+        double current = data.getMaxHealth();
+        double toSet = getValueToSet(subCommand, value, current);
+        double hardMax = ConfigScalingHealth.PLAYER_HEALTH_MAX;
+        hardMax = (int) (hardMax <= 0 ? SharedMonsterAttributes.MAX_HEALTH.clampValue(Integer.MAX_VALUE) : hardMax);
+        double min = getMinValue(subCommand, current, 2, hardMax);
+        double max = getMaxValue(subCommand, current, 2, hardMax);
 
-      if (toHeal > 0)
-        targetPlayer.heal(toHeal);
+        // Bounds check
+        if (!checkBounds(subCommand, value, toSet, current, min, max)) {
+          tell(sender, TextFormatting.RED, "outOfBounds", true, min, max);
+          return;
+        }
 
-      tell(sender, "setHealth", true, targetPlayer.getName(), value);
+        // Change it!
+        float toHeal = (float) (toSet - current);
+        data.setMaxHealth((float) toSet);
+
+        if (toHeal > 0)
+          player.heal(toHeal);
+
+        tell(sender, "setHealth", true, player.getName(), toSet);
+      }
     }
+  }
+
+  /**
+   * Gets the actual value to set, based on subCommand. Does not check that the value is valid.
+   * 
+   * @param subCommand
+   *          The subcommand (most likely SET/ADD/SUB)
+   * @param current
+   *          The current value ({@link PlayerData#getMaxHealth()}, {@link PlayerData#getDifficulty()}, etc.)
+   * @param current
+   *          The current value (data.getMaxHealth(), data.getDifficulty(), etc)
+   * @return The value that will be set, assuming it is valid.
+   */
+  private double getValueToSet(SubCommand subCommand, double value, double current) {
+
+    double toSet = value;
+    if (subCommand == SubCommand.ADD)
+      toSet = current + value;
+    else if (subCommand == SubCommand.SUB)
+      toSet = current - value;
+    return toSet;
+  }
+
+  /**
+   * Gets the minimum value the player could enter, based on subCommand.
+   * 
+   * @param subCommand
+   *          The subcommand (most likely SET/ADD/SUB)
+   * @param current
+   *          The current value ({@link PlayerData#getMaxHealth()}, {@link PlayerData#getDifficulty()}, etc.)
+   * @param min
+   *          The minimum allowed absolute value.
+   * @param max
+   *          The maximum allowed absolute value.
+   * @return The minimum value that can be entered, adjusted for the subcommand.
+   */
+  private double getMinValue(SubCommand subCommand, double current, double min, double max) {
+
+    if (subCommand == SubCommand.ADD)
+      return min - current;
+    else if (subCommand == SubCommand.SUB)
+      return current - max;
+    else
+      return min;
+  }
+
+  /**
+   * Gets the maximum value the player could enter, based on subCommand.
+   * 
+   * @param subCommand
+   *          The subcommand (most likely SET/ADD/SUB)
+   * @param current
+   *          The current value ({@link PlayerData#getMaxHealth()}, {@link PlayerData#getDifficulty()}, etc.)
+   * @param min
+   *          The minimum allowed absolute value.
+   * @param max
+   *          The maximum allowed absolute value.
+   * @return The maximum value that can be entered, adjusted for the subcommand.
+   */
+  private double getMaxValue(SubCommand subCommand, double current, double min, double max) {
+
+    if (subCommand == SubCommand.ADD)
+      return max - current;
+    else if (subCommand == SubCommand.SUB)
+      return current - min;
+    else
+      return max;
+  }
+
+  private boolean checkBounds(SubCommand subCommand, double value, double toSet, double current, double min, double max) {
+
+    return !(value < min || value > max);
   }
 
   @Override
@@ -187,30 +268,52 @@ public class CommandScalingHealth extends CommandBaseSL {
 
     return ((server.isDedicatedServer() && !(sender instanceof EntityPlayer))
         || server.isSinglePlayer() && server.worlds[0].getWorldInfo().areCommandsAllowed())
-        || server.getPlayerList().getOppedPlayers()
-            .getGameProfileFromName(sender.getName()) != null;
+        || server.getPlayerList().getOppedPlayers().getGameProfileFromName(sender.getName()) != null;
   }
 
   @Override
-  public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender,
-      String[] args, BlockPos pos) {
+  public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos) {
 
-    return Lists.newArrayList("difficulty", "health", "world_difficulty");
+    if (args.length == 1)
+      return getListOfStringsMatchingLastWord(args, "difficulty", "health", "world_difficulty");
+    else if (args.length == 2)
+      return getListOfStringsMatchingLastWord(args, "get", "set", "add", "sub");
+    else if (isUsernameIndex(args, args.length))
+      return getListOfStringsMatchingLastWord(args, server.getOnlinePlayerNames());
+    else
+      return ImmutableList.of();
   }
 
   @Override
   public boolean isUsernameIndex(String[] args, int index) {
 
-    // TODO Auto-generated method stub
-    return false;
+    return args.length > 2 && args[1].equals("get") ? index == 3 : index == 4;
   }
 
-  private void tell(ICommandSender sender, String key, boolean fromLocalizationFile,
-      Object... args) {
+  private void tell(ICommandSender sender, String key, boolean fromLocalizationFile, Object... args) {
+
+    tell(sender, TextFormatting.RESET, key, fromLocalizationFile, args);
+  }
+
+  private void tell(ICommandSender sender, TextFormatting format, String key, boolean fromLocalizationFile, Object... args) {
 
     String value = fromLocalizationFile
         ? ScalingHealth.localizationHelper.getLocalizedString("command." + key, args)
         : key;
-    sender.sendMessage(new TextComponentString(value));
+    sender.sendMessage(new TextComponentString(format + value));
+  }
+
+  static enum SubCommand {
+
+    GET, SET, ADD, SUB;
+
+    @Nullable
+    static SubCommand fromArg(String arg) {
+
+      for (SubCommand val : values())
+        if (val.name().equalsIgnoreCase(arg))
+          return val;
+      return null;
+    }
   }
 }

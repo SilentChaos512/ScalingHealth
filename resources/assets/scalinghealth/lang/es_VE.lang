@@ -34,5 +34,5 @@ blight.scalinghealth:killedByPlayer=¡%s raro ha sido asesinado por %s!
 command.outOfBounds=Los valores deben estar entre %s y %s.
 command.showDifficulty=Dificultad de %s: %s / %s
 command.setDifficulty=Dificultad del jugador %s cambiada a %s.
-command.showHealth=Vida de %s: %s / %s
+command.showHealth=Vida de %s: %s / %s (%s)
 command.setHealth=Vida del jugador %s cambiada a %d.
