@@ -291,9 +291,9 @@ public class SHPlayerDataHandler {
           lastPosY = (int) player.posY;
           lastPosZ = (int) player.posZ;
         }
+        health = player.getHealth();
         // Sync with client?
         if (player.world.getTotalWorldTime() % ConfigScalingHealth.PACKET_DELAY == 0) {
-          health = player.getHealth();
           save();
           sendUpdateMessage();
         }

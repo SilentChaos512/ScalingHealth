@@ -181,7 +181,7 @@ public class ScalingHealthCommonEvents {
         float maxHealth = data.getMaxHealth();
         ModifierHandler.setMaxHealth(player, maxHealth, 0);
         if (health != maxHealth && maxHealth > 0) {
-          player.setHealth(maxHealth);
+          player.setHealth(player.getMaxHealth());
         }
       }
     }

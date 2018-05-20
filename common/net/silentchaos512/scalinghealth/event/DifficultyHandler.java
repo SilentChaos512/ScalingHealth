@@ -420,7 +420,7 @@ public class DifficultyHandler {
     // some mobs not receiving health increases.
     // ScalingHealth.logHelper.debug(modifier != null ? modifier.getAmount() : null);
     return entityLiving.ticksExisted > 1
-        && (modifier == null || modifier.getAmount() == 0.0 || modifier.getAmount() == Double.NaN);
+        && (modifier == null || modifier.getAmount() == 0.0 || Double.isNaN(modifier.getAmount()));
   }
 
   private boolean entityBlacklistedFromBecomingBlight(EntityLivingBase entityLiving) {
