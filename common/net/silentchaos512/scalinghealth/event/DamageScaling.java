@@ -69,7 +69,15 @@ public class DamageScaling {
     // Calculate damage to add to the original.
     float original = event.getAmount();
     float change = scale * affectedAmount * original;
-    event.setAmount(event.getAmount() + change);
+    float newAmount = event.getAmount() + change;
+
+    // Bounds and error checks
+    if (newAmount < 0f)
+      newAmount = 0f;
+    if (!Float.isNaN(newAmount))
+      event.setAmount(newAmount);
+    else
+      event.setAmount(Float.MAX_VALUE);
 
     LogHelper log = ScalingHealth.logHelper;
     if (ConfigScalingHealth.DEBUG_MODE && ConfigScalingHealth.DEBUG_LOG_PLAYER_DAMAGE) {
