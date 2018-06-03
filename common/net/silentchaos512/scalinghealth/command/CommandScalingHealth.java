@@ -9,6 +9,7 @@ import com.google.common.collect.ImmutableList;
 
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -57,7 +58,7 @@ public class CommandScalingHealth extends CommandBaseSL {
       return;
     }
     double value = isGet ? -1D : parseDouble(args[2]);
-    List<EntityPlayerMP> targets = args.length < 4 ? ImmutableList.of(getCommandSenderAsPlayer(sender)) : getPlayers(server, sender, args[3]);
+    List<EntityPlayerMP> targets = getTargetPlayers(server, sender, isGet, args);
 
     if (command.equals("difficulty"))
       executeDifficulty(server, sender, subCommand, value, targets);
@@ -67,6 +68,14 @@ public class CommandScalingHealth extends CommandBaseSL {
       executeWorldDifficulty(server, sender, subCommand, value, sender.getEntityWorld());
     else
       tell(sender, getUsage(sender), false);
+  }
+
+  private List<EntityPlayerMP> getTargetPlayers(MinecraftServer server, ICommandSender sender, boolean isGet, String[] args) throws PlayerNotFoundException, CommandException {
+
+    int index = isGet ? 2 : 3;
+    return args.length < index + 1
+        ? ImmutableList.of(getCommandSenderAsPlayer(sender))
+        : getPlayers(server, sender, args[index]);
   }
 
   private void executeDifficulty(MinecraftServer server, ICommandSender sender, @Nonnull SubCommand subCommand, double value, List<EntityPlayerMP> targets) {

@@ -2,6 +2,7 @@
 Added: Config to blacklist/whitelist specific mobs with the "Always Blight" mode (#102)
 Changed: Revert health text being disabled when custom heart rendering is disabled (#113)
 Changed: Idle multiplier now accepts negative values (#112)
+Fixed: The "get" commands not checking the right player (#111)
 
 1.3.16
 Added: Configs to apply the new damage scaling system to mobs (#99)
