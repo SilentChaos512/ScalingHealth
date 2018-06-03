@@ -81,7 +81,7 @@ public class DamageScaling {
     // Bounds and error checks
     if (newAmount < 0f)
       newAmount = 0f;
-    if (!Float.isNaN(newAmount))
+    if (Float.isFinite(newAmount))
       event.setAmount(newAmount);
     else
       event.setAmount(Float.MAX_VALUE);
