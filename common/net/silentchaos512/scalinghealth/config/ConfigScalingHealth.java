@@ -540,7 +540,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
           "If a player sleeps through the night, add this much difficulty. Set to a negative number"
           + " to subtract from the difficulty instead.");
       DIFFICULTY_IDLE_MULTI = config.getFloat("Idle Multiplier", CAT_DIFFICULTY,
-          DIFFICULTY_IDLE_MULTI, 0f, 100f,
+          DIFFICULTY_IDLE_MULTI, -100f, 100f,
           "Difficulty added per second is multiplied by this if the player is not moving.");
       DIFFICULTY_LOST_ON_DEATH = config.getFloat("Lost On Death", CAT_DIFFICULTY,
           DIFFICULTY_LOST_ON_DEATH, -1000f, 1000f,
