@@ -111,6 +111,7 @@ public class ConfigScalingHealth extends AdaptiveConfig {
   public static boolean BLIGHT_BLACKLIST_ALL_HOSTILES = false;
   public static boolean BLIGHT_BLACKLIST_ALL_PASSIVES = true;
   public static boolean BLIGHT_BLACKLIST_ALL_BOSSES = false;
+  public static EntityMatchList BLIGHT_ALL_MATCH_LIST = new EntityMatchList();
   public static EntityMatchList BLIGHT_BLACKLIST = new EntityMatchList();
   private static String[] BLIGHT_BLACKLIST_DEFAULTS = new String[] { "minecraft:wither",
       "minecraft:villager", "minecolonies:citizen" };
@@ -401,6 +402,8 @@ public class ConfigScalingHealth extends AdaptiveConfig {
       BLIGHT_SUPERCHARGE_CREEPERS = loadBoolean("Supercharge Creepers", CAT_MOB_BLIGHT,
           BLIGHT_SUPERCHARGE_CREEPERS,
           "Blight creepers will also be supercharged (like when they are struck by lightning).");
+      BLIGHT_ALL_MATCH_LIST.loadConfig(config, "Always Blight", CAT_MOB_BLIGHT, new String[0], false,
+          "If \"All Mobs Are Blights\" is enabled, this list can be used to filter mobs.");
       BLIGHT_BLACKLIST.clear();
       for (String str : config.getStringList("Blacklist", CAT_MOB_BLIGHT,
           BLIGHT_BLACKLIST_DEFAULTS,

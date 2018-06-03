@@ -182,7 +182,8 @@ public class DifficultyHandler {
     if (!entityBlacklistedFromBecomingBlight(entityLiving)) {
       float chance = (float) (difficulty / ConfigScalingHealth.DIFFICULTY_MAX
           * ConfigScalingHealth.BLIGHT_CHANCE_MULTIPLIER);
-      if (ConfigScalingHealth.BLIGHT_ALWAYS || rand.nextFloat() < chance) {
+      if ((ConfigScalingHealth.BLIGHT_ALWAYS && ConfigScalingHealth.BLIGHT_ALL_MATCH_LIST.matches(entityLiving))
+          || rand.nextFloat() < chance) {
         makeBlight = true;
         difficulty *= 3;
       }
