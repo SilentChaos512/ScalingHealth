@@ -109,7 +109,7 @@ public class HeartDisplayHandler extends Gui {
     TextStyle style = ConfigScalingHealth.HEART_DISPLAY_TEXT_STYLE;
     TextColor styleColor = ConfigScalingHealth.HEART_DISPLAY_TEXT_COLOR;
     if (event.getType() == ElementType.TEXT && style != TextStyle.DISABLED
-        && ConfigScalingHealth.CHANGE_HEART_RENDERING && mc.playerController.gameIsSurvivalOrAdventure()) {
+        && mc.playerController.gameIsSurvivalOrAdventure()) {
       final float scale = style == TextStyle.ROWS ? 0.65f : 0.5f;
       final int width = event.getResolution().getScaledWidth();
       final int height = event.getResolution().getScaledHeight();
