@@ -116,6 +116,9 @@ public class DifficultyHandler {
   @SubscribeEvent
   public void onMobSpawn(LivingUpdateEvent event) {
 
+    if (ConfigScalingHealth.DIFFICULTY_MAX <= 0)
+      return;
+
     // Increase mob health and make blights?
     if (event.getEntity().world.isRemote || !(event.getEntity() instanceof EntityLiving))
       return;
@@ -157,6 +160,9 @@ public class DifficultyHandler {
   }
 
   private boolean increaseEntityHealth(EntityLivingBase entityLiving) {
+
+    if (ConfigScalingHealth.DIFFICULTY_MAX <= 0)
+      return false;
 
     // If true, enables old behavior where health/damage subtract from difficulty as applied.
     // TODO: Should this be a config, or should old behavior just be removed?
