@@ -1,8 +1,5 @@
 package net.silentchaos512.scalinghealth.event;
 
-import java.util.List;
-import java.util.Random;
-
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityLivingBase;
@@ -35,13 +32,12 @@ import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.network.NetworkHandler;
 import net.silentchaos512.scalinghealth.network.message.MessageMarkBlight;
 import net.silentchaos512.scalinghealth.utils.EntityDifficultyChangeList.DifficultyChanges;
-import net.silentchaos512.scalinghealth.utils.EntityMatchList;
-import net.silentchaos512.scalinghealth.utils.EquipmentTierMap;
-import net.silentchaos512.scalinghealth.utils.MobPotionMap;
-import net.silentchaos512.scalinghealth.utils.ModifierHandler;
-import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
+import net.silentchaos512.scalinghealth.utils.*;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 import net.silentchaos512.scalinghealth.world.ScalingHealthSavedData;
+
+import java.util.List;
+import java.util.Random;
 
 public class DifficultyHandler {
 
@@ -172,6 +168,7 @@ public class DifficultyHandler {
     float difficulty = (float) ConfigScalingHealth.AREA_DIFFICULTY_MODE.getAreaDifficulty(world,
         entityLiving.getPosition());
     float originalDifficulty = difficulty;
+    float originalMaxHealth = entityLiving.getMaxHealth();
     Random rand = ScalingHealth.random;
     boolean makeBlight = false;
     boolean isHostile = entityLiving instanceof IMob;
@@ -194,7 +191,7 @@ public class DifficultyHandler {
         difficulty *= 3;
       }
     }
-    
+
     entityLiving.getEntityData().setShort(NBT_ENTITY_DIFFICULTY, (short) difficulty);
 
     float totalDifficulty = difficulty;
@@ -271,7 +268,9 @@ public class DifficultyHandler {
     ModifierHandler.addAttackDamage(entityLiving, genAddedDamage, 0);
 
     // Heal.
-    entityLiving.setHealth(entityLiving.getMaxHealth());
+    if (entityLiving.getMaxHealth() != originalMaxHealth) {
+      entityLiving.setHealth(entityLiving.getMaxHealth());
+    }
 
     if (ConfigScalingHealth.DEBUG_MODE && ConfigScalingHealth.DEBUG_LOG_SPAWNS && originalDifficulty > 0f) {
       BlockPos pos = entityLiving.getPosition();
