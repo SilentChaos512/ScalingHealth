@@ -20,7 +20,7 @@ import net.silentchaos512.lib.util.ChatHelper;
 import net.silentchaos512.lib.util.Color;
 import net.silentchaos512.lib.util.StackHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
+import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.lib.EnumModParticles;
 import net.silentchaos512.scalinghealth.network.NetworkHandler;
 import net.silentchaos512.scalinghealth.network.message.MessageDataSync;
@@ -48,7 +48,7 @@ public class ItemHeartContainer extends ItemSL {
 
   @Override
   public EnumRarity getRarity(ItemStack stack) {
-    
+
     return EnumRarity.RARE;
   }
 
@@ -60,8 +60,8 @@ public class ItemHeartContainer extends ItemSL {
     if (!world.isRemote) {
       PlayerData data = SHPlayerDataHandler.get(player);
 
-      boolean healthIncreaseAllowed = ConfigScalingHealth.HEARTS_INCREASE_HEALTH && data != null
-          && (ConfigScalingHealth.PLAYER_HEALTH_MAX == 0 || data.getMaxHealth() < ConfigScalingHealth.PLAYER_HEALTH_MAX);
+      boolean healthIncreaseAllowed = Config.HEARTS_INCREASE_HEALTH && data != null
+          && (Config.PLAYER_HEALTH_MAX == 0 || data.getMaxHealth() < Config.PLAYER_HEALTH_MAX);
       int levelRequirement = getLevelsRequiredToUse(player, stack, healthIncreaseAllowed);
 
       // Does player have enough XP?
@@ -73,9 +73,9 @@ public class ItemHeartContainer extends ItemSL {
 
       // Heal the player (this is separate from the "healing" of the newly added heart, if that's allowed).
       boolean consumed = false;
-      if (ConfigScalingHealth.HEARTS_HEALTH_RESTORED > 0 && player.getHealth() < player.getMaxHealth()) {
+      if (Config.HEARTS_HEALTH_RESTORED > 0 && player.getHealth() < player.getMaxHealth()) {
         float currentHealth = player.getHealth();
-        player.setHealth(currentHealth + ConfigScalingHealth.HEARTS_HEALTH_RESTORED);
+        player.setHealth(currentHealth + Config.HEARTS_HEALTH_RESTORED);
         consumed = true;
       }
 
@@ -120,7 +120,7 @@ public class ItemHeartContainer extends ItemSL {
 
   private int getLevelsRequiredToUse(EntityPlayer player, ItemStack stack, boolean healthIncreaseAllowed) {
 
-    return player.capabilities.isCreativeMode ? 0 : ConfigScalingHealth.HEART_XP_LEVEL_COST;
+    return player.capabilities.isCreativeMode ? 0 : Config.HEART_XP_LEVEL_COST;
   }
 
   private void consumeLevels(EntityPlayer player, int amount) {

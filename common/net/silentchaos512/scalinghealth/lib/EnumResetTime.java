@@ -1,13 +1,12 @@
 package net.silentchaos512.scalinghealth.lib;
 
 import java.util.Calendar;
-import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
 import net.minecraftforge.common.config.Configuration;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
+import net.silentchaos512.scalinghealth.config.Config;
 
 public enum EnumResetTime {
 
@@ -84,7 +83,7 @@ public enum EnumResetTime {
       validValues[i] = values()[i].name();
 
     //@formatter:off
-    String whichOne = category.equals(ConfigScalingHealth.CAT_DIFFICULTY) ? "difficulty" : "health";
+    String whichOne = category.equals(Config.CAT_DIFFICULTY) ? "difficulty" : "health";
     String str = c.getString("Reset Time", category,
         defaultValue.name(),
         "Allows players' " + whichOne + " to be reset at certain frequencies.\n"

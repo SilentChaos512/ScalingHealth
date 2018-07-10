@@ -6,16 +6,14 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
+import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.lib.EnumAreaDifficultyMode;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
-import net.silentchaos512.scalinghealth.world.ScalingHealthSavedData;
 
 public class DifficultyDisplayHandler extends Gui {
 
@@ -37,7 +35,7 @@ public class DifficultyDisplayHandler extends Gui {
   @SubscribeEvent
   public void onRenderOverlay(RenderGameOverlayEvent.Post event) {
 
-    if (event.getType() != ElementType.TEXT || ConfigScalingHealth.DIFFICULTY_MAX <= 0 || !ConfigScalingHealth.RENDER_DIFFICULTY_METER)
+    if (event.getType() != ElementType.TEXT || Config.DIFFICULTY_MAX <= 0 || !Config.RENDER_DIFFICULTY_METER)
       return;
 
     Minecraft mc = Minecraft.getMinecraft();
@@ -51,9 +49,9 @@ public class DifficultyDisplayHandler extends Gui {
       return;
 
     int difficulty = (int) data.getDifficulty();
-    int areaDifficulty = MathHelper.clamp((int) ConfigScalingHealth.AREA_DIFFICULTY_MODE.getAreaDifficulty(player.world, player.getPosition()), 0,
-        (int) ConfigScalingHealth.DIFFICULTY_MAX);
-    if (ConfigScalingHealth.AREA_DIFFICULTY_MODE == EnumAreaDifficultyMode.SERVER_WIDE) {
+    int areaDifficulty = MathHelper.clamp((int) Config.AREA_DIFFICULTY_MODE.getAreaDifficulty(player.world, player.getPosition()), 0,
+        (int) Config.DIFFICULTY_MAX);
+    if (Config.AREA_DIFFICULTY_MODE == EnumAreaDifficultyMode.SERVER_WIDE) {
       difficulty = areaDifficulty;
     }
     int timeSinceLastUpdate = ClientTickHandler.ticksInGame - lastUpdateTime;
@@ -68,7 +66,7 @@ public class DifficultyDisplayHandler extends Gui {
     }
 
     currentTime = ClientTickHandler.ticksInGame;
-    if (ConfigScalingHealth.RENDER_DIFFICULTY_METER_ALWAYS || currentTime - lastUpdateTime < ConfigScalingHealth.DIFFICULTY_METER_DISPLAY_TIME) {
+    if (Config.RENDER_DIFFICULTY_METER_ALWAYS || currentTime - lastUpdateTime < Config.DIFFICULTY_METER_DISPLAY_TIME) {
       GlStateManager.enableBlend();
 
       mc.renderEngine.bindTexture(TEXTURE);
@@ -76,10 +74,10 @@ public class DifficultyDisplayHandler extends Gui {
       GlStateManager.pushMatrix();
       // GlStateManager.scale(1f, 0.5f, 1f);
 
-      int posX = ConfigScalingHealth.DIFFICULTY_METER_POS_X; // 5;
+      int posX = Config.DIFFICULTY_METER_POS_X; // 5;
       if (posX < 0)
         posX = posX + width - 64;
-      int posY = ConfigScalingHealth.DIFFICULTY_METER_POS_Y; // height - 30;
+      int posY = Config.DIFFICULTY_METER_POS_Y; // height - 30;
       if (posY < 0)
         posY = posY + height - 12;
 
@@ -87,11 +85,11 @@ public class DifficultyDisplayHandler extends Gui {
       drawTexturedModalRect(posX, posY, 192, 0, 64, 12, 0xFFFFFF);
 
       // Area Difficulty
-      int barLength = (int) (60 * areaDifficulty / ConfigScalingHealth.DIFFICULTY_MAX);
+      int barLength = (int) (60 * areaDifficulty / Config.DIFFICULTY_MAX);
       drawTexturedModalRect(posX + 2, posY + 2, 194, 14, barLength, 6, 0xFFFFFF);
 
       // Difficulty
-      barLength = (int) (60 * difficulty / ConfigScalingHealth.DIFFICULTY_MAX);
+      barLength = (int) (60 * difficulty / Config.DIFFICULTY_MAX);
       drawTexturedModalRect(posX + 2, posY + 8, 194, 20, barLength, 2, 0xFFFFFF);
 
       // Text

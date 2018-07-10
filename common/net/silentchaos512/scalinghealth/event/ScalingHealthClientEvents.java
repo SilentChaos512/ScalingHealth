@@ -1,5 +1,6 @@
 package net.silentchaos512.scalinghealth.event;
 
+import net.silentchaos512.scalinghealth.config.Config;
 import org.lwjgl.opengl.GL11;
 
 import net.minecraft.client.Minecraft;
@@ -15,7 +16,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
 import net.silentchaos512.scalinghealth.entity.EntityBlightFire;
 import net.silentchaos512.scalinghealth.lib.EnumAreaDifficultyMode;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
@@ -29,7 +29,7 @@ public class ScalingHealthClientEvents {
     if (Minecraft.getMinecraft().world == null || event.getType() != ElementType.ALL)
       return;
 
-    if (!ConfigScalingHealth.DEBUG_MODE)
+    if (!Config.DEBUG_MODE)
       return;
 
     ScaledResolution res = event.getResolution();
@@ -63,7 +63,7 @@ public class ScalingHealthClientEvents {
     World world = Minecraft.getMinecraft().world;
     EntityPlayer player = Minecraft.getMinecraft().player;
     PlayerData data = SHPlayerDataHandler.get(player);
-    EnumAreaDifficultyMode areaMode = ConfigScalingHealth.AREA_DIFFICULTY_MODE;
+    EnumAreaDifficultyMode areaMode = Config.AREA_DIFFICULTY_MODE;
     if (data == null)
       return "Player data is null!";
 

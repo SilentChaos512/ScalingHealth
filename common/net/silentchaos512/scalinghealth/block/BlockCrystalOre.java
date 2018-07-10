@@ -13,7 +13,7 @@ import net.minecraft.world.IBlockAccess;
 import net.silentchaos512.lib.block.BlockSL;
 import net.silentchaos512.lib.registry.RecipeMaker;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
+import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.init.ModItems;
 
 public class BlockCrystalOre extends BlockSL {
@@ -66,7 +66,7 @@ public class BlockCrystalOre extends BlockSL {
   @Override
   public int quantityDropped(Random random) {
 
-    return ConfigScalingHealth.HEART_CRYSTAL_ORE_QUANTITY_DROPPED;
+    return Config.HEART_CRYSTAL_ORE_QUANTITY_DROPPED;
   }
 
   @Override

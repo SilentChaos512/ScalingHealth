@@ -9,10 +9,7 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 import net.minecraftforge.fml.relauncher.Side;
-import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
-import net.silentchaos512.scalinghealth.utils.ModifierHandler;
-import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
-import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
+import net.silentchaos512.scalinghealth.config.Config;
 
 public class PlayerBonusRegenHandler {
 
@@ -30,7 +27,7 @@ public class PlayerBonusRegenHandler {
   @SubscribeEvent
   public void onPlayerTick(PlayerTickEvent event) {
 
-    if (event.side == Side.CLIENT || !ConfigScalingHealth.ENABLE_BONUS_HEALTH_REGEN)
+    if (event.side == Side.CLIENT || !Config.ENABLE_BONUS_HEALTH_REGEN)
       return;
 
     EntityPlayer player = event.player;
@@ -38,19 +35,19 @@ public class PlayerBonusRegenHandler {
 
     // Add player timer if needed.
     if (!timers.containsKey(name))
-      timers.put(name, ConfigScalingHealth.BONUS_HEALTH_REGEN_INITIAL_DELAY);
+      timers.put(name, Config.BONUS_HEALTH_REGEN_INITIAL_DELAY);
 
     int foodLevel = player.getFoodStats().getFoodLevel();
-    boolean foodLevelOk = foodLevel >= ConfigScalingHealth.BONUS_HEALTH_REGEN_MIN_FOOD
-        && foodLevel <= ConfigScalingHealth.BONUS_HEALTH_REGEN_MAX_FOOD;
+    boolean foodLevelOk = foodLevel >= Config.BONUS_HEALTH_REGEN_MIN_FOOD
+        && foodLevel <= Config.BONUS_HEALTH_REGEN_MAX_FOOD;
 
     if (player.getHealth() < player.getMaxHealth() && foodLevelOk) {
       // Tick timer, heal player and reset on 0.
       int timer = timers.get(name);
       if (--timer <= 0) {
         player.heal(1f);
-        player.addExhaustion(ConfigScalingHealth.BONUS_HEALTH_REGEN_EXHAUSTION);
-        timer = ConfigScalingHealth.BONUS_HEALTH_REGEN_DELAY;
+        player.addExhaustion(Config.BONUS_HEALTH_REGEN_EXHAUSTION);
+        timer = Config.BONUS_HEALTH_REGEN_DELAY;
       }
       timers.put(name, timer);
     }
@@ -62,6 +59,6 @@ public class PlayerBonusRegenHandler {
     EntityLivingBase entityLiving = event.getEntityLiving();
     if (entityLiving.world.isRemote || !(entityLiving instanceof EntityPlayer))
       return;
-    timers.put(entityLiving.getName(), ConfigScalingHealth.BONUS_HEALTH_REGEN_INITIAL_DELAY);
+    timers.put(entityLiving.getName(), Config.BONUS_HEALTH_REGEN_INITIAL_DELAY);
   }
 }

@@ -22,7 +22,7 @@ import net.silentchaos512.lib.util.Color;
 import net.silentchaos512.lib.util.ItemHelper;
 import net.silentchaos512.lib.util.StackHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
+import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.lib.EnumModParticles;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
@@ -57,8 +57,8 @@ public class ItemDifficultyChanger extends ItemSL {
 
     String amountStr = String.format("%d",
         stack.getItemDamage() == Type.ENCHANTED.ordinal()
-            ? (int) ConfigScalingHealth.ENCHANTED_HEART_DIFFICULTY_CHANGE
-            : (int) ConfigScalingHealth.CURSED_HEART_DIFFICULTY_CHANGE);
+            ? (int) Config.ENCHANTED_HEART_DIFFICULTY_CHANGE
+            : (int) Config.CURSED_HEART_DIFFICULTY_CHANGE);
     if (amountStr.matches("^\\d+")) {
       amountStr = "+" + amountStr;
     }
@@ -102,7 +102,7 @@ public class ItemDifficultyChanger extends ItemSL {
       // Enchanted Heart
       case ENCHANTED:
         // Lower difficulty, consume 1 from stack.
-        data.incrementDifficulty(ConfigScalingHealth.ENCHANTED_HEART_DIFFICULTY_CHANGE);
+        data.incrementDifficulty(Config.ENCHANTED_HEART_DIFFICULTY_CHANGE);
         StackHelper.shrink(stack, 1);
 
         // Particles and sound effect!
@@ -121,7 +121,7 @@ public class ItemDifficultyChanger extends ItemSL {
       // Cursed Heart
       case CURSED:
         // Raise difficulty, consume 1 from stack.
-        data.incrementDifficulty(ConfigScalingHealth.CURSED_HEART_DIFFICULTY_CHANGE);
+        data.incrementDifficulty(Config.CURSED_HEART_DIFFICULTY_CHANGE);
         StackHelper.shrink(stack, 1);
 
         // Particles and sound effect!

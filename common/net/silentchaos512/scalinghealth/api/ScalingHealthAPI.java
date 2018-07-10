@@ -9,7 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
+import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.event.DifficultyHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
@@ -23,17 +23,17 @@ public class ScalingHealthAPI {
 
   /**
    * Gets the area difficulty for the given position.
-   * 
+   *
    * @return The area difficulty.
    */
   public static double getAreaDifficulty(World world, BlockPos pos) {
 
-    return ConfigScalingHealth.AREA_DIFFICULTY_MODE.getAreaDifficulty(world, pos);
+    return Config.AREA_DIFFICULTY_MODE.getAreaDifficulty(world, pos);
   }
 
   /**
    * Gets the player difficulty for the given player.
-   * 
+   *
    * @return The player's difficulty, or Double.NaN if the data can't be obtained for some reason.
    */
   public static double getPlayerDifficulty(@Nonnull EntityPlayer player) {
@@ -82,7 +82,7 @@ public class ScalingHealthAPI {
   /**
    * Adds equipment that blights can randomly spawn with. The tier must be between 0 and 4, inclusive. Default armor
    * items (from tier 0 to 4) are leather, gold, chainmail, iron, and diamond.
-   * 
+   *
    * @param producer
    *          The weapon/armor/whatever producer.
    * @param slot
@@ -121,7 +121,7 @@ public class ScalingHealthAPI {
   /**
    * Adds equipment that blights can randomly spawn with. The tier must be between 0 and 4, inclusive. Default armor
    * items (from tier 0 to 4) are leather, gold, chainmail, iron, and diamond.
-   * 
+   *
    * @param stack
    *          The weapon/armor/whatever.
    * @param slot
@@ -138,7 +138,7 @@ public class ScalingHealthAPI {
 
   /**
    * Adds a potion effect that any mob can spawn with.
-   * 
+   *
    * @param potion
    *          The potion.
    * @param cost

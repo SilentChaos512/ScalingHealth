@@ -3,7 +3,7 @@ package net.silentchaos512.scalinghealth.lib.module;
 import java.util.Calendar;
 
 import net.minecraftforge.common.config.Configuration;
-import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
+import net.silentchaos512.scalinghealth.config.Config;
 
 public class ModuleAprilTricks {
 
@@ -43,7 +43,7 @@ public class ModuleAprilTricks {
 
   public void loadConfig(Configuration c) {
 
-    String cat = ConfigScalingHealth.CAT_HOLIDAYS + c.CATEGORY_SPLITTER + "april_trickery";
+    String cat = Config.CAT_HOLIDAYS + c.CATEGORY_SPLITTER + "april_trickery";
     c.setCategoryComment(cat, "April Fools event options.");
     moduleEnabled = c.getBoolean("Enabled", cat, true,
         "May cause silly things to happen on certain day(s) in April.");

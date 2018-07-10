@@ -6,7 +6,7 @@ import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
+import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 import net.silentchaos512.wit.api.WitEntityInfoEvent;
@@ -16,7 +16,7 @@ public class WitEventHandler {
   @SubscribeEvent
   public void onWitEntityInfo(WitEntityInfoEvent event) {
 
-    if (!ConfigScalingHealth.DEBUG_MODE)
+    if (!Config.DEBUG_MODE)
       return;
 
     EntityLivingBase entity = event.entityLiving;

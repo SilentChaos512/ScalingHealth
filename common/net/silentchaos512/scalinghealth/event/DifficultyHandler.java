@@ -28,7 +28,7 @@ import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.silentchaos512.lib.util.StackHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.api.event.BlightSpawnEvent;
-import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
+import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.network.NetworkHandler;
 import net.silentchaos512.scalinghealth.network.message.MessageMarkBlight;
 import net.silentchaos512.scalinghealth.utils.EntityDifficultyChangeList.DifficultyChanges;
@@ -61,8 +61,8 @@ public class DifficultyHandler {
 
     potionMap.clear();
 
-    String[] lines = ConfigScalingHealth.INSTANCE.getConfiguration().getStringList("Mob Potions",
-        ConfigScalingHealth.CAT_MOB_POTION, POTION_DEFAULTS,
+    String[] lines = Config.INSTANCE.getConfiguration().getStringList("Mob Potions",
+        Config.CAT_MOB_POTION, POTION_DEFAULTS,
         "The potion effects that mobs can spawn with. You can add effects from other mods if you"
             + " want to, or remove existing ones. Each line has 3 values separated by commas: the"
             + " potion ID, the minimum difficulty (higher = less common), and the level (1 = level I,"
@@ -112,7 +112,7 @@ public class DifficultyHandler {
   @SubscribeEvent
   public void onMobSpawn(LivingUpdateEvent event) {
 
-    if (ConfigScalingHealth.DIFFICULTY_MAX <= 0)
+    if (Config.DIFFICULTY_MAX <= 0)
       return;
 
     // Increase mob health and make blights?
@@ -140,13 +140,13 @@ public class DifficultyHandler {
 
     // Killed by player?
     if (source.getTrueSource() instanceof EntityPlayer) {
-      DifficultyChanges changes = ConfigScalingHealth.DIFFICULTY_PER_KILL_BY_MOB.get(killed);
+      DifficultyChanges changes = Config.DIFFICULTY_PER_KILL_BY_MOB.get(killed);
       EntityPlayer player = (EntityPlayer) source.getTrueSource();
       PlayerData data = SHPlayerDataHandler.get(player);
       if (data != null) {
         boolean isBlight = BlightHandler.isBlight(killed);
         float amount = isBlight ? changes.onBlightKill : changes.onStandardKill;
-        if (ConfigScalingHealth.DEBUG_MODE) {
+        if (Config.DEBUG_MODE) {
           ScalingHealth.logHelper.info("Killed " + (isBlight ? "Blight " : "") + killed.getName()
               + ": difficulty " + (amount > 0 ? "+" : "") + amount);
         }
@@ -157,7 +157,7 @@ public class DifficultyHandler {
 
   private boolean increaseEntityHealth(EntityLivingBase entityLiving) {
 
-    if (ConfigScalingHealth.DIFFICULTY_MAX <= 0)
+    if (Config.DIFFICULTY_MAX <= 0)
       return false;
 
     // If true, enables old behavior where health/damage subtract from difficulty as applied.
@@ -165,7 +165,7 @@ public class DifficultyHandler {
     final boolean statsTakeDifficulty = false;
 
     World world = entityLiving.world;
-    float difficulty = (float) ConfigScalingHealth.AREA_DIFFICULTY_MODE.getAreaDifficulty(world,
+    float difficulty = (float) Config.AREA_DIFFICULTY_MODE.getAreaDifficulty(world,
         entityLiving.getPosition());
     float originalDifficulty = difficulty;
     float originalMaxHealth = entityLiving.getMaxHealth();
@@ -174,18 +174,18 @@ public class DifficultyHandler {
     boolean isHostile = entityLiving instanceof IMob;
 
     // Lunar phase multipliers?
-    if (ConfigScalingHealth.DIFFICULTY_LUNAR_MULTIPLIERS_ENABLED
+    if (Config.DIFFICULTY_LUNAR_MULTIPLIERS_ENABLED
         && world.getWorldTime() % 24000 > 12000) {
       int moonPhase = world.provider.getMoonPhase(world.getWorldTime()) % 8;
-      float multi = ConfigScalingHealth.DIFFICULTY_LUNAR_MULTIPLIERS[moonPhase];
+      float multi = Config.DIFFICULTY_LUNAR_MULTIPLIERS[moonPhase];
       difficulty *= multi;
     }
 
     // Make blight?
     if (!entityBlacklistedFromBecomingBlight(entityLiving)) {
-      float chance = (float) (difficulty / ConfigScalingHealth.DIFFICULTY_MAX
-          * ConfigScalingHealth.BLIGHT_CHANCE_MULTIPLIER);
-      if ((ConfigScalingHealth.BLIGHT_ALWAYS && ConfigScalingHealth.BLIGHT_ALL_MATCH_LIST.matches(entityLiving))
+      float chance = (float) (difficulty / Config.DIFFICULTY_MAX
+          * Config.BLIGHT_CHANCE_MULTIPLIER);
+      if ((Config.BLIGHT_ALWAYS && Config.BLIGHT_ALL_MATCH_LIST.matches(entityLiving))
           || rand.nextFloat() < chance) {
         makeBlight = true;
         difficulty *= 3;
@@ -200,8 +200,8 @@ public class DifficultyHandler {
     float genAddedDamage = 0;
     float baseMaxHealth = (float) entityLiving
         .getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue();
-    float healthMultiplier = isHostile ? ConfigScalingHealth.DIFFICULTY_GENERIC_HEALTH_MULTIPLIER
-        : ConfigScalingHealth.DIFFICULTY_PEACEFUL_HEALTH_MULTIPLIER;
+    float healthMultiplier = isHostile ? Config.DIFFICULTY_GENERIC_HEALTH_MULTIPLIER
+        : Config.DIFFICULTY_PEACEFUL_HEALTH_MULTIPLIER;
 
     genAddedHealth *= healthMultiplier;
 
@@ -218,20 +218,20 @@ public class DifficultyHandler {
     // Increase attack damage.
     if (difficulty > 0) {
       float diffIncrease = difficulty * rand.nextFloat();
-      genAddedDamage = diffIncrease * ConfigScalingHealth.DIFFICULTY_DAMAGE_MULTIPLIER;
+      genAddedDamage = diffIncrease * Config.DIFFICULTY_DAMAGE_MULTIPLIER;
       // Clamp the value so it doesn't go over the maximum config.
-      if (ConfigScalingHealth.DIFFICULTY_DAMAGE_MAX_BOOST > 0f) {
+      if (Config.DIFFICULTY_DAMAGE_MAX_BOOST > 0f) {
         genAddedDamage = MathHelper.clamp(genAddedDamage, 0f,
-            ConfigScalingHealth.DIFFICULTY_DAMAGE_MAX_BOOST);
+            Config.DIFFICULTY_DAMAGE_MAX_BOOST);
       }
       // Decrease difficulty based on the damage actually added, instead of diffIncrease.
       if (statsTakeDifficulty)
-        difficulty -= genAddedDamage / ConfigScalingHealth.DIFFICULTY_DAMAGE_MULTIPLIER;
+        difficulty -= genAddedDamage / Config.DIFFICULTY_DAMAGE_MULTIPLIER;
     }
 
     // Random potion effect
-    float potionChance = isHostile ? ConfigScalingHealth.POTION_CHANCE_HOSTILE
-        : ConfigScalingHealth.POTION_CHANCE_PASSIVE;
+    float potionChance = isHostile ? Config.POTION_CHANCE_HOSTILE
+        : Config.POTION_CHANCE_PASSIVE;
     if (difficulty > 0 && rand.nextFloat() < potionChance) {
       MobPotionMap.PotionEntry pot = potionMap.getRandom(rand, (int) difficulty);
       if (pot != null) {
@@ -244,7 +244,7 @@ public class DifficultyHandler {
     // Apply extra health and damage.
     float healthMulti = 1f;
     float healthScaleDiff = Math.max(0, baseMaxHealth - 20f);
-    switch (ConfigScalingHealth.MOB_HEALTH_SCALING_MODE) {
+    switch (Config.MOB_HEALTH_SCALING_MODE) {
       case ADD:
         ModifierHandler.setMaxHealth(entityLiving, genAddedHealth + baseMaxHealth, 0);
         break;
@@ -262,7 +262,7 @@ public class DifficultyHandler {
         break;
       default:
         ScalingHealth.logHelper.severe("Unknown mob health scaling mode: "
-            + ConfigScalingHealth.MOB_HEALTH_SCALING_MODE.name());
+            + Config.MOB_HEALTH_SCALING_MODE.name());
         break;
     }
     ModifierHandler.addAttackDamage(entityLiving, genAddedDamage, 0);
@@ -272,7 +272,7 @@ public class DifficultyHandler {
       entityLiving.setHealth(entityLiving.getMaxHealth());
     }
 
-    if (ConfigScalingHealth.DEBUG_MODE && ConfigScalingHealth.DEBUG_LOG_SPAWNS && originalDifficulty > 0f) {
+    if (Config.DEBUG_MODE && Config.DEBUG_LOG_SPAWNS && originalDifficulty > 0f) {
       BlockPos pos = entityLiving.getPosition();
       String line = "Spawn debug: %s (%d, %d, %d): Difficulty=%.2f, Health +%.2f, Damage +%.2f";
       line = String.format(line, entityLiving.getName(), pos.getX(), pos.getY(), pos.getZ(),
@@ -312,16 +312,16 @@ public class DifficultyHandler {
 
       // Select a tier (0 to 4)
       final int highestTier = 4;
-      final int commonTier = ConfigScalingHealth.BLIGHT_EQUIPMENT_HIGHEST_COMMON_TIER;
+      final int commonTier = Config.BLIGHT_EQUIPMENT_HIGHEST_COMMON_TIER;
       int tier = rand.nextInt(1 + commonTier);
       for (int j = 0; j < highestTier - commonTier; ++j) {
-        if (rand.nextFloat() < ConfigScalingHealth.BLIGHT_EQUIPMENT_TIER_UP_CHANCE) {
+        if (rand.nextFloat() < Config.BLIGHT_EQUIPMENT_TIER_UP_CHANCE) {
           ++tier;
         }
       }
       tier = MathHelper.clamp(tier, 0, highestTier);
 
-      float pieceChance = ConfigScalingHealth.BLIGHT_EQUIPMENT_ARMOR_PIECE_CHANCE;
+      float pieceChance = Config.BLIGHT_EQUIPMENT_ARMOR_PIECE_CHANCE;
 
       // Armor slots
       for (EntityEquipmentSlot slot : ORDERED_SLOTS) {
@@ -339,7 +339,7 @@ public class DifficultyHandler {
       }
 
       // Hand slots
-      pieceChance = ConfigScalingHealth.BLIGHT_EQUIPMENT_HAND_PIECE_CHANCE;
+      pieceChance = Config.BLIGHT_EQUIPMENT_HAND_PIECE_CHANCE;
       if (rand.nextFloat() > pieceChance) {
         // Main hand
         ItemStack oldEquipment = entity.getHeldItemMainhand();
@@ -374,7 +374,7 @@ public class DifficultyHandler {
     // Special Effects
     // ===============
 
-    if (ConfigScalingHealth.BLIGHT_SUPERCHARGE_CREEPERS && entityLiving instanceof EntityCreeper) {
+    if (Config.BLIGHT_SUPERCHARGE_CREEPERS && entityLiving instanceof EntityCreeper) {
       ((EntityCreeper) entityLiving)
           .onStruckByLightning(new EntityLightningBolt(entityLiving.world,
               entityLiving.posX, entityLiving.posY, entityLiving.posZ, true));
@@ -400,13 +400,13 @@ public class DifficultyHandler {
     boolean isHostile = entityLiving instanceof IMob;
     boolean isPassive = !isHostile;
 
-    if ((!ConfigScalingHealth.ALLOW_HOSTILE_EXTRA_HEALTH && isHostile)
-        || (!ConfigScalingHealth.ALLOW_PEACEFUL_EXTRA_HEALTH && isPassive)
-        || (!ConfigScalingHealth.ALLOW_BOSS_EXTRA_HEALTH && isBoss))
+    if ((!Config.ALLOW_HOSTILE_EXTRA_HEALTH && isHostile)
+        || (!Config.ALLOW_PEACEFUL_EXTRA_HEALTH && isPassive)
+        || (!Config.ALLOW_BOSS_EXTRA_HEALTH && isBoss))
       return true;
 
-    EntityMatchList blacklist = ConfigScalingHealth.MOB_HEALTH_BLACKLIST;
-    List<Integer> dimBlacklist = ConfigScalingHealth.MOB_HEALTH_DIMENSION_BLACKLIST;
+    EntityMatchList blacklist = Config.MOB_HEALTH_BLACKLIST;
+    List<Integer> dimBlacklist = Config.MOB_HEALTH_DIMENSION_BLACKLIST;
 
     if (blacklist == null || dimBlacklist == null)
       return false;
@@ -434,7 +434,7 @@ public class DifficultyHandler {
     if (entityLiving == null)
       return true;
 
-    EntityMatchList blacklist = ConfigScalingHealth.BLIGHT_BLACKLIST;
+    EntityMatchList blacklist = Config.BLIGHT_BLACKLIST;
     boolean isBoss = !entityLiving.isNonBoss();
     boolean isHostile = entityLiving instanceof IMob;
     boolean isPassive = !isHostile;
@@ -443,9 +443,9 @@ public class DifficultyHandler {
       return false;
 
     return blacklist.contains(entityLiving)
-        || (isHostile && ConfigScalingHealth.BLIGHT_BLACKLIST_ALL_HOSTILES)
-        || (isPassive && ConfigScalingHealth.BLIGHT_BLACKLIST_ALL_PASSIVES)
-        || (isBoss && ConfigScalingHealth.BLIGHT_BLACKLIST_ALL_BOSSES);
+        || (isHostile && Config.BLIGHT_BLACKLIST_ALL_HOSTILES)
+        || (isPassive && Config.BLIGHT_BLACKLIST_ALL_PASSIVES)
+        || (isBoss && Config.BLIGHT_BLACKLIST_ALL_BOSSES);
   }
 
   @SubscribeEvent
@@ -453,7 +453,7 @@ public class DifficultyHandler {
 
     if (event.world.getTotalWorldTime() % 20 == 0) {
       ScalingHealthSavedData data = ScalingHealthSavedData.get(event.world);
-      data.difficulty += ConfigScalingHealth.DIFFICULTY_PER_SECOND;
+      data.difficulty += Config.DIFFICULTY_PER_SECOND;
       data.markDirty();
     }
   }

@@ -1,14 +1,5 @@
 package net.silentchaos512.scalinghealth.utils;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.annotation.Nullable;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -20,7 +11,7 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
+import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.lib.EnumAreaDifficultyMode;
 import net.silentchaos512.scalinghealth.network.NetworkHandler;
 import net.silentchaos512.scalinghealth.network.message.MessageDataSync;
@@ -28,15 +19,20 @@ import net.silentchaos512.scalinghealth.network.message.MessageWorldDataSync;
 import net.silentchaos512.scalinghealth.scoreboard.SHScoreCriteria;
 import net.silentchaos512.scalinghealth.world.ScalingHealthSavedData;
 
+import javax.annotation.Nullable;
+import java.lang.ref.WeakReference;
+import java.util.*;
+
 public class SHPlayerDataHandler {
 
   public static final String NBT_ROOT = ScalingHealth.MOD_ID_LOWER + "_data";
 
-  private static Map<Integer, PlayerData> playerData = new HashMap();
+  private static Map<Integer, PlayerData> playerData = new HashMap<>();
 
-  public static @Nullable PlayerData get(EntityPlayer player) {
+  @Nullable
+  public static PlayerData get(EntityPlayer player) {
 
-    if (player instanceof FakePlayer && !ConfigScalingHealth.FAKE_PLAYERS_HAVE_DIFFICULTY) {
+    if (player instanceof FakePlayer && !Config.FAKE_PLAYERS_HAVE_DIFFICULTY) {
       return null;
     }
 
@@ -59,7 +55,7 @@ public class SHPlayerDataHandler {
 
   public static void cleanup() {
 
-    List<Integer> remove = new ArrayList();
+    List<Integer> remove = new ArrayList<>();
 
     for (int i : playerData.keySet()) {
       PlayerData d = playerData.get(i);
@@ -112,8 +108,8 @@ public class SHPlayerDataHandler {
 
         // Get data from nearby players.
         if (!player.world.isRemote
-            && player.world.getTotalWorldTime() % 5 * ConfigScalingHealth.PACKET_DELAY == 0) {
-          int radius = ConfigScalingHealth.DIFFICULTY_SEARCH_RADIUS;
+            && player.world.getTotalWorldTime() % 5 * Config.PACKET_DELAY == 0) {
+          int radius = Config.DIFFICULTY_SEARCH_RADIUS;
           int radiusSquared = radius <= 0 ? Integer.MAX_VALUE : radius * radius;
           for (EntityPlayer p : player.world.getPlayers(EntityPlayer.class,
               p -> !p.equals(player) && p.getDistanceSq(player.getPosition()) < radiusSquared)) {
@@ -133,7 +129,7 @@ public class SHPlayerDataHandler {
         MessageDataSync message = new MessageDataSync(get(event.player), event.player);
         NetworkHandler.INSTANCE.sendTo(message, playerMP);
 
-        if (ConfigScalingHealth.AREA_DIFFICULTY_MODE == EnumAreaDifficultyMode.SERVER_WIDE) {
+        if (Config.AREA_DIFFICULTY_MODE == EnumAreaDifficultyMode.SERVER_WIDE) {
           MessageWorldDataSync message2 = new MessageWorldDataSync(
               ScalingHealthSavedData.get(event.player.world));
           NetworkHandler.INSTANCE.sendTo(message2, playerMP);
@@ -151,7 +147,7 @@ public class SHPlayerDataHandler {
 
     double difficulty = 0.0D;
     float health = 20;
-    float maxHealth = ConfigScalingHealth.PLAYER_STARTING_HEALTH;
+    float maxHealth = Config.PLAYER_STARTING_HEALTH;
     Calendar lastTimePlayed = Calendar.getInstance();
 
     public WeakReference<EntityPlayer> playerWR;
@@ -178,13 +174,13 @@ public class SHPlayerDataHandler {
       EntityPlayer player = playerWR.get();
 
       // Player exempt from difficulty?
-      if (ConfigScalingHealth.DIFFICULTY_EXEMPT_PLAYERS.contains(player)) {
+      if (Config.DIFFICULTY_EXEMPT_PLAYERS.contains(player)) {
         difficulty = 0;
       }
       // Non-exempt, just clamp between min and max configs.
       else {
-        difficulty = MathHelper.clamp(value, ConfigScalingHealth.DIFFICULTY_MIN,
-            ConfigScalingHealth.DIFFICULTY_MAX);
+        difficulty = MathHelper.clamp(value, Config.DIFFICULTY_MIN,
+            Config.DIFFICULTY_MAX);
       }
 
       // Update scoreboard
@@ -207,8 +203,8 @@ public class SHPlayerDataHandler {
           return;
         }
         // Multiplier for this dimension?
-        if (ConfigScalingHealth.DIFFICULTY_DIMENSION_MULTIPLIER.containsKey(player.dimension)) {
-          amount *= ConfigScalingHealth.DIFFICULTY_DIMENSION_MULTIPLIER.get(player.dimension);
+        if (Config.DIFFICULTY_DIMENSION_MULTIPLIER.containsKey(player.dimension)) {
+          amount *= Config.DIFFICULTY_DIMENSION_MULTIPLIER.get(player.dimension);
         }
       }
 
@@ -231,16 +227,16 @@ public class SHPlayerDataHandler {
     public float getMaxHealth() {
 
       if (maxHealth < 2)
-        maxHealth = ConfigScalingHealth.PLAYER_STARTING_HEALTH;
+        maxHealth = Config.PLAYER_STARTING_HEALTH;
       return maxHealth;
     }
 
     public void setMaxHealth(float value) {
 
-      if (!ConfigScalingHealth.ALLOW_PLAYER_MODIFIED_HEALTH)
+      if (!Config.ALLOW_PLAYER_MODIFIED_HEALTH)
         return;
 
-      int configMax = ConfigScalingHealth.PLAYER_HEALTH_MAX;
+      int configMax = Config.PLAYER_HEALTH_MAX;
       configMax = configMax <= 0 ? Integer.MAX_VALUE : configMax;
 
       maxHealth = MathHelper.clamp(value, 2, configMax);
@@ -277,11 +273,11 @@ public class SHPlayerDataHandler {
 
         // Increase player difficulty.
         if (player.world.getTotalWorldTime() % 20 == 0) {
-          float amount = ConfigScalingHealth.DIFFICULTY_PER_SECOND;
+          float amount = Config.DIFFICULTY_PER_SECOND;
 
           // Idle multiplier
           if (lastPosX == (int) player.posX && lastPosZ == (int) player.posZ)
-            amount *= ConfigScalingHealth.DIFFICULTY_IDLE_MULTI;
+            amount *= Config.DIFFICULTY_IDLE_MULTI;
 
           // TODO: Multiplier for other dimensions?
 
@@ -293,7 +289,7 @@ public class SHPlayerDataHandler {
         }
         health = player.getHealth();
         // Sync with client?
-        if (player.world.getTotalWorldTime() % ConfigScalingHealth.PACKET_DELAY == 0) {
+        if (player.world.getTotalWorldTime() % Config.PACKET_DELAY == 0) {
           save();
           sendUpdateMessage();
         }
@@ -309,7 +305,7 @@ public class SHPlayerDataHandler {
         MessageDataSync message = new MessageDataSync(get(player), player);
         NetworkHandler.INSTANCE.sendTo(message, playerMP);
 
-        if (ConfigScalingHealth.AREA_DIFFICULTY_MODE == EnumAreaDifficultyMode.SERVER_WIDE) {
+        if (Config.AREA_DIFFICULTY_MODE == EnumAreaDifficultyMode.SERVER_WIDE) {
           MessageWorldDataSync message2 = new MessageWorldDataSync(
               ScalingHealthSavedData.get(player.world));
           NetworkHandler.INSTANCE.sendTo(message2, playerMP);

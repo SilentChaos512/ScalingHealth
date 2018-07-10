@@ -9,7 +9,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.gen.feature.WorldGenMinable;
 import net.silentchaos512.lib.world.WorldGeneratorSL;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
+import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.init.ModBlocks;
 
 public class SHWorldGenerator extends WorldGeneratorSL {
@@ -32,7 +32,7 @@ public class SHWorldGenerator extends WorldGeneratorSL {
     state = block.getDefaultState();
 
     // Vein count. Also consider bonus veins determined by distance from spawn.
-    float trueVeinCount = ConfigScalingHealth.HEART_CRYSTAL_ORE_VEIN_COUNT;
+    float trueVeinCount = Config.HEART_CRYSTAL_ORE_VEIN_COUNT;
     int spawnX = world.getSpawnPoint().getX() / 16;
     int spawnZ = world.getSpawnPoint().getZ() / 16;
     int chunkX = posX / 16;
@@ -40,16 +40,16 @@ public class SHWorldGenerator extends WorldGeneratorSL {
     int deltaX = chunkX - spawnX;
     int deltaZ = chunkZ - spawnZ;
     float distance = (float) Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
-    trueVeinCount += Math.min(distance * ConfigScalingHealth.HEART_CRYSTAL_ORE_EXTRA_VEIN_RATE,
-        ConfigScalingHealth.HEART_CRYSTAL_ORE_EXTRA_VEIN_CAP);
+    trueVeinCount += Math.min(distance * Config.HEART_CRYSTAL_ORE_EXTRA_VEIN_RATE,
+        Config.HEART_CRYSTAL_ORE_EXTRA_VEIN_CAP);
 
     veinCount = (int) trueVeinCount;
-    if (random.nextFloat() < ConfigScalingHealth.HEART_CRYSTAL_ORE_VEIN_COUNT - veinCount)
+    if (random.nextFloat() < Config.HEART_CRYSTAL_ORE_VEIN_COUNT - veinCount)
       ++veinCount;
 
-    veinSize = ConfigScalingHealth.HEART_CRYSTAL_ORE_VEIN_SIZE;
-    minHeight = ConfigScalingHealth.HEART_CRYSTAL_ORE_MIN_HEIGHT;
-    maxHeight = ConfigScalingHealth.HEART_CRYSTAL_ORE_MAX_HEIGHT;
+    veinSize = Config.HEART_CRYSTAL_ORE_VEIN_SIZE;
+    minHeight = Config.HEART_CRYSTAL_ORE_MIN_HEIGHT;
+    maxHeight = Config.HEART_CRYSTAL_ORE_MAX_HEIGHT;
 
     for (i = 0; i < veinCount; ++i) {
       x = posX + random.nextInt(16);

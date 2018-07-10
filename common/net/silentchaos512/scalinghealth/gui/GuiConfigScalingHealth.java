@@ -1,18 +1,16 @@
 package net.silentchaos512.scalinghealth.gui;
 
-import com.typesafe.config.Config;
-
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraftforge.fml.client.config.GuiConfig;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
+import net.silentchaos512.scalinghealth.config.Config;
 
 public class GuiConfigScalingHealth extends GuiConfig {
 
   public GuiConfigScalingHealth(GuiScreen parent) {
 
-    super(parent, ConfigScalingHealth.INSTANCE.getConfigElements(), ScalingHealth.MOD_ID_LOWER,
+    super(parent, Config.INSTANCE.getConfigElements(), ScalingHealth.MOD_ID_LOWER,
         false, false, "Scaling Health Config");
   }
 

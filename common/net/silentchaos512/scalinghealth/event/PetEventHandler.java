@@ -4,7 +4,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
+import net.silentchaos512.scalinghealth.config.Config;
 
 public class PetEventHandler {
 
@@ -13,7 +13,7 @@ public class PetEventHandler {
   @SubscribeEvent
   public void onLivingUpdate(LivingUpdateEvent event) {
 
-    final int regenDelay = ConfigScalingHealth.PET_REGEN_DELAY;
+    final int regenDelay = Config.PET_REGEN_DELAY;
     if (regenDelay <= 0) {
       return;
     }

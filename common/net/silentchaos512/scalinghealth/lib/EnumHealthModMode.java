@@ -1,7 +1,7 @@
 package net.silentchaos512.scalinghealth.lib;
 
 import net.minecraftforge.common.config.Configuration;
-import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
+import net.silentchaos512.scalinghealth.config.Config;
 
 public enum EnumHealthModMode {
 
@@ -21,7 +21,7 @@ public enum EnumHealthModMode {
       validValues[i] = values()[i].name();
 
     //@formatter:off
-    String str = c.getString("Scaling Mode", ConfigScalingHealth.CAT_MOB_HEALTH,
+    String str = c.getString("Scaling Mode", Config.CAT_MOB_HEALTH,
         defaultValue.name(),
         "Describes how extra mob health is applied. This will not change the health of mobs that already exist!\n"
         + "  ADD - Adds a value based on difficulty to the mob's health, ignoring the mob's default health.\n"

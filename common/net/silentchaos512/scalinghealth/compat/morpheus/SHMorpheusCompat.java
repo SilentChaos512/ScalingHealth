@@ -3,14 +3,12 @@ package net.silentchaos512.scalinghealth.compat.morpheus;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.quetzi.morpheus.Morpheus;
 import net.quetzi.morpheus.MorpheusRegistry;
 import net.quetzi.morpheus.api.INewDayHandler;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
+import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 import net.silentchaos512.scalinghealth.world.ScalingHealthSavedData;
@@ -48,13 +46,13 @@ public class SHMorpheusCompat {
       for (EntityPlayer player : world.getPlayers(EntityPlayer.class, e -> true)) {
         PlayerData data = SHPlayerDataHandler.get(player);
         if (data != null) {
-          data.incrementDifficulty(ConfigScalingHealth.DIFFICULTY_FOR_SLEEPING, false);
+          data.incrementDifficulty(Config.DIFFICULTY_FOR_SLEEPING, false);
         }
       }
 
       ScalingHealthSavedData data = ScalingHealthSavedData.get(world);
       if (data != null) {
-        data.difficulty += ConfigScalingHealth.DIFFICULTY_FOR_SLEEPING;
+        data.difficulty += Config.DIFFICULTY_FOR_SLEEPING;
       }
     }
   }

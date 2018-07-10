@@ -20,7 +20,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.silentchaos512.lib.command.CommandBaseSL;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.config.ConfigScalingHealth;
+import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 import net.silentchaos512.scalinghealth.world.ScalingHealthSavedData;
@@ -95,14 +95,14 @@ public class CommandScalingHealth extends CommandBaseSL {
         // Report difficulty
         double current = data.getDifficulty();
         String strCurrent = String.format(NUMFORMAT, current);
-        String strMax = String.format(NUMFORMAT, ConfigScalingHealth.DIFFICULTY_MAX);
+        String strMax = String.format(NUMFORMAT, Config.DIFFICULTY_MAX);
         tell(sender, "showDifficulty", true, player.getName(), strCurrent, strMax);
       } else {
         // Try set difficulty
         double current = data.getDifficulty();
         double toSet = getValueToSet(subCommand, value, current);
-        double min = getMinValue(subCommand, current, ConfigScalingHealth.DIFFICULTY_MIN, ConfigScalingHealth.DIFFICULTY_MAX);
-        double max = getMaxValue(subCommand, current, ConfigScalingHealth.DIFFICULTY_MIN, ConfigScalingHealth.DIFFICULTY_MAX);
+        double min = getMinValue(subCommand, current, Config.DIFFICULTY_MIN, Config.DIFFICULTY_MAX);
+        double max = getMaxValue(subCommand, current, Config.DIFFICULTY_MIN, Config.DIFFICULTY_MAX);
 
         // Bounds check
         if (!checkBounds(subCommand, value, toSet, current, min, max)) {
@@ -129,14 +129,14 @@ public class CommandScalingHealth extends CommandBaseSL {
       // Report difficulty
       double current = data.difficulty;
       String strCurrent = String.format(NUMFORMAT, current);
-      String strMax = String.format(NUMFORMAT, ConfigScalingHealth.DIFFICULTY_MAX);
+      String strMax = String.format(NUMFORMAT, Config.DIFFICULTY_MAX);
       tell(sender, "showWorldDifficulty", true, strCurrent, strMax);
     } else {
       // Try set difficulty
       double current = data.difficulty;
       double toSet = getValueToSet(subCommand, value, current);
-      double min = getMinValue(subCommand, current, ConfigScalingHealth.DIFFICULTY_MIN, ConfigScalingHealth.DIFFICULTY_MAX);
-      double max = getMaxValue(subCommand, current, ConfigScalingHealth.DIFFICULTY_MIN, ConfigScalingHealth.DIFFICULTY_MAX);
+      double min = getMinValue(subCommand, current, Config.DIFFICULTY_MIN, Config.DIFFICULTY_MAX);
+      double max = getMaxValue(subCommand, current, Config.DIFFICULTY_MIN, Config.DIFFICULTY_MAX);
 
       // Bounds check
       if (!checkBounds(subCommand, value, toSet, current, min, max)) {
@@ -168,7 +168,7 @@ public class CommandScalingHealth extends CommandBaseSL {
         // Report health.
         float current = player.getHealth();
         float max = player.getMaxHealth();
-        float modValue = data.getMaxHealth() - ConfigScalingHealth.PLAYER_STARTING_HEALTH;
+        float modValue = data.getMaxHealth() - Config.PLAYER_STARTING_HEALTH;
         String strCurrent = String.format(NUMFORMAT, current);
         String strMax = String.format(NUMFORMAT, max);
         String strMod = (modValue >= 0f ? "+" : "") + modValue;
@@ -177,7 +177,7 @@ public class CommandScalingHealth extends CommandBaseSL {
         // Try set health.
         double current = data.getMaxHealth();
         double toSet = getValueToSet(subCommand, value, current);
-        double hardMax = ConfigScalingHealth.PLAYER_HEALTH_MAX;
+        double hardMax = Config.PLAYER_HEALTH_MAX;
         hardMax = (int) (hardMax <= 0 ? SharedMonsterAttributes.MAX_HEALTH.clampValue(Integer.MAX_VALUE) : hardMax);
         double min = getMinValue(subCommand, current, 2, hardMax);
         double max = getMaxValue(subCommand, current, 2, hardMax);
@@ -202,7 +202,7 @@ public class CommandScalingHealth extends CommandBaseSL {
 
   /**
    * Gets the actual value to set, based on subCommand. Does not check that the value is valid.
-   * 
+   *
    * @param subCommand
    *          The subcommand (most likely SET/ADD/SUB)
    * @param current
@@ -223,7 +223,7 @@ public class CommandScalingHealth extends CommandBaseSL {
 
   /**
    * Gets the minimum value the player could enter, based on subCommand.
-   * 
+   *
    * @param subCommand
    *          The subcommand (most likely SET/ADD/SUB)
    * @param current
@@ -246,7 +246,7 @@ public class CommandScalingHealth extends CommandBaseSL {
 
   /**
    * Gets the maximum value the player could enter, based on subCommand.
-   * 
+   *
    * @param subCommand
    *          The subcommand (most likely SET/ADD/SUB)
    * @param current
