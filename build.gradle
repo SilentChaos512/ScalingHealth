@@ -68,7 +68,7 @@ minecraft {
     mappings = project.mcp_mappings
 
     replace "BUILD_NUM = 0", "BUILD_NUM = " + build_num
-    replaceIn "SilentGear.java"
+    replaceIn "${project.archivesBaseName}.java"
 
     if (project.hasProperty('coreplugin')) {
         clientJvmArgs += '-Dfml.coreMods.load=' + project.coreplugin
