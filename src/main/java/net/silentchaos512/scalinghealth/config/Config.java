@@ -1,7 +1,11 @@
 package net.silentchaos512.scalinghealth.config;
 
 import gnu.trove.map.hash.THashMap;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.RangedAttribute;
 import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.silentchaos512.lib.config.AdaptiveConfig;
 import net.silentchaos512.lib.config.ConfigMultiValueLineParser;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -16,6 +20,7 @@ import net.silentchaos512.scalinghealth.utils.EntityMatchList;
 import net.silentchaos512.scalinghealth.utils.PlayerMatchList;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -219,6 +224,15 @@ public class Config extends AdaptiveConfig {
             ConfigMultiValueLineParser parser;
 
             //@formatter:off
+
+            final int maxHealthCap = loadInt("Max Health Cap", CAT_MAIN, 2048, "Max health cap is changed to this (vanilla is 1024)");
+            try {
+                ScalingHealth.logHelper.info("Trying to change max health cap to {}", maxHealthCap);
+                Field field = ReflectionHelper.findField(RangedAttribute.class, "maximumValue", "field_111118_b");
+                field.setDouble(SharedMonsterAttributes.MAX_HEALTH, maxHealthCap);
+            } catch (Exception ex) {
+                ScalingHealth.logHelper.warn(ex, "Failed to change max health cap");
+            }
 
             DEBUG_MODE = loadBoolean("Debug Mode", CAT_MAIN,
                     DEBUG_MODE,

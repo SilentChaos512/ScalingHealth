@@ -5,7 +5,7 @@
 # Blocks #
 ##########
 
-tile.scalinghealth:CrystalOre.name=Mena de corazón rojo
+tile.scalinghealth.crystalore.name=Mena de corazón rojo
 
 
 
@@ -13,8 +13,8 @@ tile.scalinghealth:CrystalOre.name=Mena de corazón rojo
 # Items #
 #########
 
-item.scalinghealth:CrystalShard.name=Fragmento de corazón rojo
-item.scalinghealth:HeartContainer.name=Corazón rojo
+item.scalinghealth.crystalshard.name=Fragmento de corazón rojo
+item.scalinghealth.heartcontainer.name=Corazón rojo
 
 
 

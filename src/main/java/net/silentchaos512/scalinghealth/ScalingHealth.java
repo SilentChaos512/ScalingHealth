@@ -1,5 +1,7 @@
 package net.silentchaos512.scalinghealth;
 
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.Mod;
@@ -12,6 +14,7 @@ import net.silentchaos512.lib.registry.SRegistry;
 import net.silentchaos512.lib.util.LocalizationHelper;
 import net.silentchaos512.lib.util.LogHelper;
 import net.silentchaos512.scalinghealth.command.CommandScalingHealth;
+import net.silentchaos512.scalinghealth.init.ModItems;
 import net.silentchaos512.scalinghealth.proxy.ScalingHealthCommonProxy;
 
 import java.util.Random;
@@ -27,8 +30,8 @@ public class ScalingHealth {
     public static final String MOD_ID_OLD = "ScalingHealth";
     public static final String MOD_ID_LOWER = "scalinghealth";
     public static final String MOD_NAME = "Scaling Health";
-    public static final String VERSION = "1.3.19";
-    public static final String VERSION_SILENTLIB = "SL_VERSION";
+    public static final String VERSION = "1.3.20";
+    public static final String VERSION_SILENTLIB = "2.3.6";
     public static final int BUILD_NUM = 0;
     public static final String DEPENDENCIES = "required-after:silentlib@[" + VERSION_SILENTLIB + ",);after:morpheus";
     public static final String ACCEPTED_MC_VERSIONS = "[1.12,1.12.2]";
@@ -42,6 +45,8 @@ public class ScalingHealth {
 
     public static SRegistry registry = new SRegistry(MOD_ID_LOWER, logHelper);
 
+    public static CreativeTabs creativeTab = registry.makeCreativeTab(MOD_ID_LOWER, () -> new ItemStack(ModItems.heart));
+
     @Instance(MOD_ID_LOWER)
     public static ScalingHealth instance;
 
@@ -53,6 +58,8 @@ public class ScalingHealth {
         registry.setMod(this);
         localizationHelper = new LocalizationHelper(MOD_ID_LOWER).setReplaceAmpersand(true);
         SilentLib.instance.registerLocalizationHelperForMod(MOD_ID_LOWER, localizationHelper);
+
+        registry.recipes.setJsonHellMode(0 == getBuildNumber());
 
         proxy.preInit(registry, event);
     }

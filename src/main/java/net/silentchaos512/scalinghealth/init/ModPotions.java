@@ -7,11 +7,10 @@ import net.silentchaos512.scalinghealth.potion.PotionBandaged;
 
 public class ModPotions implements IRegistrationHandler<Potion> {
 
-  public static PotionBandaged bandaged = new PotionBandaged();
+    public static PotionBandaged bandaged = new PotionBandaged();
 
-  @Override
-  public void registerAll(SRegistry reg) {
-
-    reg.registerPotion(bandaged);
-  }
+    @Override
+    public void registerAll(SRegistry reg) {
+        reg.registerPotion(bandaged);
+    }
 }

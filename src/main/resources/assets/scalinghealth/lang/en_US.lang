@@ -2,7 +2,7 @@
 # Blocks #
 ##########
 
-tile.scalinghealth:CrystalOre.name=Heart Crystal Ore
+tile.scalinghealth.crystalore.name=Heart Crystal Ore
 
 
 
@@ -10,18 +10,18 @@ tile.scalinghealth:CrystalOre.name=Heart Crystal Ore
 # Items #
 #########
 
-item.scalinghealth:CrystalShard.name=Heart Crystal Shard
-item.scalinghealth:DifficultyChanger0.name=Enchanted Heart
-item.scalinghealth:DifficultyChanger1.name=Cursed Heart
-item.scalinghealth:DifficultyChanger.effectDesc=Difficulty %s
-item.scalinghealth:HeartContainer.name=Heart Container
-item.scalinghealth:HeartContainer.desc1=Increases maximum health
-item.scalinghealth:HeartContainer.notEnoughXP=You need %d XP levels to use this
-item.scalinghealth:HeartDust.name=Heart Dust
-item.scalinghealth:HealingItem0.name=Bandages
-item.scalinghealth:HealingItem1.name=Medkit
-item.scalinghealth:HealingItem.healingValue=Restores %d%% of your health over %d seconds.
-item.scalinghealth:HealingItem.howToUse=Use for %d seconds to apply.
+item.scalinghealth.crystalshard.name=Heart Crystal Shard
+item.scalinghealth.difficultychanger0.name=Enchanted Heart
+item.scalinghealth.difficultychanger1.name=Cursed Heart
+item.scalinghealth.difficultychanger.effectDesc=Difficulty %s
+item.scalinghealth.heartcontainer.name=Heart Container
+item.scalinghealth.heartcontainer.desc1=Increases maximum health
+item.scalinghealth.heartcontainer.notEnoughXP=You need %d XP levels to use this
+item.scalinghealth.heartdust.name=Heart Dust
+item.scalinghealth.healingitem0.name=Bandages
+item.scalinghealth.healingitem1.name=Medkit
+item.scalinghealth.healingitem.healingValue=Restores %d%% of your health over %d seconds.
+item.scalinghealth.healingitem.howToUse=Use for %d seconds to apply.
 
 
 ###########

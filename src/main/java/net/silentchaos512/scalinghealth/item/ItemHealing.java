@@ -3,6 +3,9 @@ package net.silentchaos512.scalinghealth.item;
 import java.util.List;
 
 import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.client.renderer.ItemMeshDefinition;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -19,9 +22,13 @@ import net.minecraft.potion.PotionUtils;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraftforge.client.model.ModelLoader;
 import net.silentchaos512.lib.item.ItemSL;
+import net.silentchaos512.lib.registry.ICustomMesh;
+import net.silentchaos512.lib.registry.ICustomModel;
 import net.silentchaos512.lib.registry.RecipeMaker;
 import net.silentchaos512.lib.util.ItemHelper;
 import net.silentchaos512.lib.util.LocalizationHelper;
@@ -30,123 +37,106 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.init.ModItems;
 import net.silentchaos512.scalinghealth.init.ModPotions;
 
-public class ItemHealing extends ItemSL {
+import javax.annotation.Nullable;
 
-  public static enum Type {
+public class ItemHealing extends Item implements ICustomMesh, ICustomModel {
 
-    BANDAGE(0.3f, 1), MEDKIT(0.7f, 4);
+    public enum Type {
+        BANDAGE(0.3f, 1), MEDKIT(0.7f, 4);
 
-    public final float healPercentage;
-    public final int effectDuration;
-    public final int amplifier;
+        public final float healPercentage;
+        public final int effectDuration;
+        public final int amplifier;
 
-    Type(float healPercentage, int speed) {
+        Type(float healPercentage, int speed) {
+            this.healPercentage = healPercentage;
+            this.effectDuration = (int) (healPercentage * 100 * 20 * 2 / speed);
+            this.amplifier = speed - 1;
+        }
 
-      this.healPercentage = healPercentage;
-      this.effectDuration = (int) (healPercentage * 100 * 20 * 2 / speed);
-      this.amplifier = speed - 1;
+        public static Type clampMeta(int unclampedMetadata) {
+            return values()[MathHelper.clamp(unclampedMetadata, 0, values().length - 1)];
+        }
     }
-  }
+    public static final int USE_TIME = 5 * 20;
 
-  public static final int USE_TIME = 5 * 20;
-
-  public ItemHealing() {
-
-    super(Type.values().length, ScalingHealth.MOD_ID_LOWER, "HealingItem");
-    setMaxStackSize(4);
-    setHasSubtypes(true);
-    setCreativeTab(CreativeTabs.COMBAT);
-  }
-
-  @Override
-  public void addRecipes(RecipeMaker recipes) {
-
-    ItemStack bandages = new ItemStack(this, 1, Type.BANDAGE.ordinal());
-    ItemStack medkit = new ItemStack(this, 2, Type.MEDKIT.ordinal());
-    ItemStack heartDust = new ItemStack(ModItems.heartDust);
-    ItemStack potion = new ItemStack(Items.POTIONITEM);
-    PotionUtils.addPotionToItemStack(potion, PotionTypes.STRONG_HEALING);
-    recipes.addShapedOre("bandages", bandages, "ppp", "ddd", 'p', "paper", 'd', heartDust);
-    recipes.addShapedOre("medkit", medkit, "did", "bpb", "ttt", 'd', heartDust, 'i', "ingotIron",
-        'b', bandages, 'p', potion, 't', new ItemStack(Blocks.STAINED_HARDENED_CLAY));
-  }
-
-  @Override
-  public EnumAction getItemUseAction(ItemStack stack) {
-
-    return EnumAction.BOW;
-  }
-
-  @Override
-  public int getMaxItemUseDuration(ItemStack stack) {
-
-    return USE_TIME;
-  }
-
-  @Override
-  protected ActionResult<ItemStack> clOnItemRightClick(World world, EntityPlayer player,
-      EnumHand hand) {
-
-    ItemStack stack = player.getHeldItem(hand);
-    if (player.getHealth() < player.getMaxHealth() && !player.isPotionActive(ModPotions.bandaged)) {
-      player.setActiveHand(hand);
-      return new ActionResult(EnumActionResult.SUCCESS, stack);
-    }
-    return new ActionResult<ItemStack>(EnumActionResult.FAIL, stack);
-  }
-
-  @Override
-  public ItemStack onItemUseFinish(ItemStack stack, World world, EntityLivingBase entityLiving) {
-
-    if (!world.isRemote) {
-      Type healingType = Type.values()[MathHelper.clamp(stack.getItemDamage(), 0,
-          Type.values().length - 1)];
-      entityLiving.addPotionEffect(new PotionEffect(ModPotions.bandaged, healingType.effectDuration,
-          healingType.amplifier, false, false));
-      StackHelper.shrink(stack, 1);
-
-      if (entityLiving instanceof EntityPlayerMP) {
-        CriteriaTriggers.CONSUME_ITEM.trigger((EntityPlayerMP) entityLiving, stack);
-      }
-    }
-    return stack;
-  }
-
-  @Override
-  public void onUsingTick(ItemStack stack, EntityLivingBase player, int count) {
-
-    if (count % 10 == 0) {
-      if (stack.getItemDamage() == Type.MEDKIT.ordinal()
-          && ScalingHealth.random.nextFloat() < 0.3f) {
-        player.playSound(SoundEvents.ENTITY_GENERIC_DRINK, 0.5f,
-            (float) (0.9f + 0.025f * ScalingHealth.random.nextGaussian()));
-      } else {
-        player.playSound(SoundEvents.ITEM_ARMOR_EQUIP_LEATHER, 1.25f,
-            (float) (1.1f + 0.05f * ScalingHealth.random.nextGaussian()));
-      }
-    }
-  }
-
-  @Override
-  protected void clGetSubItems(Item item, CreativeTabs tab, List<ItemStack> list) {
-
-    if (!ItemHelper.isInCreativeTab(item, tab)) {
-      return;
+    public ItemHealing() {
+        setMaxStackSize(4);
+        setHasSubtypes(true);
     }
 
-    for (Type type : Type.values()) {
-      list.add(new ItemStack(item, 1, type.ordinal()));
+    @Override
+    public EnumAction getItemUseAction(ItemStack stack) {
+        return EnumAction.BOW;
     }
-  }
 
-  @Override
-  public void clAddInformation(ItemStack stack, World world, List<String> list, boolean advanced) {
+    @Override
+    public int getMaxItemUseDuration(ItemStack stack) {
+        return USE_TIME;
+    }
 
-    LocalizationHelper loc = ScalingHealth.localizationHelper;
-    Type healingType = Type.values()[MathHelper.clamp(stack.getItemDamage(), 0,
-        Type.values().length - 1)];
-    list.add(loc.getItemSubText("HealingItem", "healingValue",
-        (int) (healingType.healPercentage * 100), healingType.effectDuration / 20));
-    list.add(loc.getItemSubText("HealingItem", "howToUse", USE_TIME / 20));
-  }
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer player, EnumHand hand) {
+        ItemStack stack = player.getHeldItem(hand);
+        if (player.getHealth() < player.getMaxHealth() && !player.isPotionActive(ModPotions.bandaged)) {
+            player.setActiveHand(hand);
+            return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+        }
+        return new ActionResult<>(EnumActionResult.FAIL, stack);
+    }
+
+    @Override
+    public ItemStack onItemUseFinish(ItemStack stack, World world, EntityLivingBase entityLiving) {
+        if (!world.isRemote) {
+            Type healingType = Type.clampMeta(stack.getItemDamage());
+            entityLiving.addPotionEffect(new PotionEffect(ModPotions.bandaged, healingType.effectDuration,
+                    healingType.amplifier, false, false));
+            stack.shrink(1);
+        }
+        return stack;
+    }
+
+    @Override
+    public void onUsingTick(ItemStack stack, EntityLivingBase player, int count) {
+        if (count % 10 == 0) {
+            player.playSound(SoundEvents.ITEM_ARMOR_EQUIP_LEATHER,
+                    1.25f, (float) (1.1f + 0.05f * ScalingHealth.random.nextGaussian()));
+        }
+    }
+
+    @Override
+    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> list) {
+        if (!isInCreativeTab(tab)) return;
+        for (Type type : Type.values()) {
+            list.add(new ItemStack(this, 1, type.ordinal()));
+        }
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> list, ITooltipFlag flagIn) {
+        LocalizationHelper loc = ScalingHealth.localizationHelper;
+        Type healingType = Type.clampMeta(stack.getItemDamage());
+
+        list.add(loc.getSubText(this, "healingValue", (int) (healingType.healPercentage * 100), healingType.effectDuration / 20));
+        list.add(loc.getSubText(this, "howToUse", USE_TIME / 20));
+    }
+
+    @Override
+    public String getUnlocalizedName(ItemStack stack) {
+        return super.getUnlocalizedName() + stack.getItemDamage();
+    }
+
+    private static final ModelResourceLocation MODEL_0 = new ModelResourceLocation("scalinghealth:healingitem0", "inventory");
+    private static final ModelResourceLocation MODEL_1 = new ModelResourceLocation("scalinghealth:healingitem1", "inventory");
+
+    @Override
+    public ItemMeshDefinition getCustomMesh() {
+        return stack -> stack.getItemDamage() == 0 ? MODEL_0 : MODEL_1;
+    }
+
+    @Override
+    public void registerModels() {
+        ModelLoader.setCustomModelResourceLocation(this, 0, MODEL_0);
+        ModelLoader.setCustomModelResourceLocation(this, 1, MODEL_1);
+    }
 }
