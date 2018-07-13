@@ -1,7 +1,11 @@
+1.3.21
+Fixed: Medkit recipe missing (changed it slightly because JSON)
+
 1.3.20
 Refactoring stuff to prepare for 1.13.
 Changed: Max health cap is now changed in main.cfg.
 Changed: No longer a coremod, found a better solution.
+Changed: Switched to JSON recipes
 
 1.3.19
 Fixed (maybe): More unkillable mobs (#117)

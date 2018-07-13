@@ -1,0 +1,32 @@
+{
+  "result": {
+    "item": "scalinghealth:healingitem",
+    "data": 1
+  },
+  "pattern": [
+    "did",
+    "bpb",
+    "ttt"
+  ],
+  "type": "forge:ore_shaped",
+  "key": {
+    "i": {
+      "ore": "ingotIron",
+      "type": "forge:ore_dict"
+    },
+    "d": {
+      "item": "scalinghealth:heartdust"
+    },
+    "b": {
+      "item": "scalinghealth:healingitem",
+      "data": 0
+    },
+    "p": {
+      "item": "minecraft:speckled_melon"
+    },
+    "t": {
+      "item": "minecraft:stained_hardened_clay",
+      "data": 0
+    }
+  }
+}
