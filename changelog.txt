@@ -1,4 +1,5 @@
 1.3.21
+Added: Config to set difficulty level with Game Stages. You can set a specific difficulty level for any number of stages, and the largest is chosen. Overrides any other changes to difficulty.
 Fixed: Medkit recipe missing (changed it slightly because JSON)
 
 1.3.20

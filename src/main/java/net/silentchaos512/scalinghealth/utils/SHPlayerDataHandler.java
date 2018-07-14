@@ -24,11 +24,13 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.compat.gamestages.SHGameStagesCompat;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.lib.EnumAreaDifficultyMode;
 import net.silentchaos512.scalinghealth.network.NetworkHandler;
@@ -304,6 +306,10 @@ public class SHPlayerDataHandler {
           lastPosX = (int) player.posX;
           lastPosY = (int) player.posY;
           lastPosZ = (int) player.posZ;
+
+          if (!Config.DIFFICULTY_BY_GAME_STAGES.isEmpty() && Loader.isModLoaded("gamestages")) {
+            setDifficulty(SHGameStagesCompat.getDifficultyFromStages(player));
+          }
         }
         health = player.getHealth();
         // Sync with client?

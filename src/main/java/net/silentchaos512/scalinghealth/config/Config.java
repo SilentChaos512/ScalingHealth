@@ -39,6 +39,7 @@ import net.silentchaos512.scalinghealth.utils.PlayerMatchList;
 import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -181,6 +182,7 @@ public class Config extends AdaptiveConfig {
     public static float[] DIFFICULTY_LUNAR_MULTIPLIERS = new float[8];
     static final String[] DEFAULT_DIFFICULTY_LUNAR_MULTIPLIERS = new String[]{"1.5", "1.3", "1.2",
             "1.0", "0.8", "1.0", "1.2", "1.3"};
+    public static final Map<String, Integer> DIFFICULTY_BY_GAME_STAGES = new HashMap<>();
 
     // Network
     public static int PACKET_DELAY = 20;
@@ -635,6 +637,16 @@ public class Config extends AdaptiveConfig {
             if (lunarPhaseIndex != 8) {
                 ScalingHealth.logHelper.warning("Config \"Lunar Phase Multipliers\" has the wrong number"
                         + " of values. Needs 8, has " + lunarPhaseIndex);
+            }
+            DIFFICULTY_BY_GAME_STAGES.clear();
+            parser = new ConfigMultiValueLineParser("Game Stages", ScalingHealth.logHelper, "\\s+", String.class, Integer.class);
+            for (String str : config.getStringList("Game Stages", CAT_DIFFICULTY, new String[0],
+                    "Allows difficulty to be set via Game Stages. Each line should consist of the stage key, followed" +
+                            " by a space and the difficulty value (integers only). Example: \"my_stage_key 100\"")) {
+                Object[] values = parser.parse(str);
+                if (values != null) {
+                    DIFFICULTY_BY_GAME_STAGES.put((String) values[0], (Integer) values[1]);
+                }
             }
             AREA_DIFFICULTY_MODE = EnumAreaDifficultyMode.loadFromConfig(config, AREA_DIFFICULTY_MODE);
             DIFFFICULTY_RESET_TIME = EnumResetTime.loadFromConfig(config, DIFFFICULTY_RESET_TIME, CAT_DIFFICULTY);

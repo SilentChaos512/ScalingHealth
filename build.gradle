@@ -138,6 +138,9 @@ repositories {
         name = "ModMaven"
         url = "modmaven.k-4u.nl"
     }
+    repositories {
+        maven { url 'https://maven.mcmoddev.com' }
+    }
 }
 
 dependencies {
@@ -157,6 +160,10 @@ dependencies {
     if (project.hasProperty('sl_version')) {
         compileOnly "com.github.SilentChaos512:SilentLib:${project.sl_version}"
     }
+
+    // Game Stages
+    compile "net.darkhax.gamestages:GameStages-${project.mc_version}:${project.gamestages_version}"
+    runtime "net.darkhax.bookshelf:Bookshelf-1.12.2:2.3.552"
 }
 
 processResources {
