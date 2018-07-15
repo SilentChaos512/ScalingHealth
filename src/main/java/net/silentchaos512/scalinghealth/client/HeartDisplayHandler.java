@@ -178,10 +178,10 @@ public class HeartDisplayHandler extends Gui {
 //                    absorbRemaining -= 2f;
 //                }
 //            } else {
-//                if (i * 2 + 1 < health)
-//                    drawTexturedModalRect(x, y, MARGIN + 36, TOP, 9, 9);
-//                else if (i * 2 + 1 == health)
-//                    drawTexturedModalRect(x, y, MARGIN + 45, TOP, 9, 9);
+                if (i * 2 + 1 < health)
+                    drawTexturedModalRect(x, y, MARGIN + 36, TOP, 9, 9);
+                else if (i * 2 + 1 == health)
+                    drawTexturedModalRect(x, y, MARGIN + 45, TOP, 9, 9);
 //            }
         }
 
@@ -233,9 +233,17 @@ public class HeartDisplayHandler extends Gui {
         // Absorption hearts override
         int absorbCeil = (int) Math.ceil(absorb);
         rowCount = (int) Math.ceil(absorb / 20);
-        ScalingHealth.logHelper.debug(rowCount);
-        for (int i = Math.max(0, rowCount - 1); i < rowCount; ++i) {
-            int renderHearts = Math.min(absorbCeil / 2, 10);
+        ScalingHealth.logHelper.debug(absorb, rowCount);
+
+        // Dark underlay for first row
+        for (int i = 0; i < 10 && i < absorb / 2; ++i) {
+            int y = top - 10 + (i == regen - 10 ? -2 : 0);
+            drawTexturedModalRect(left + 8 * i, y, 17, 45, 9, 9, 0xFFFFFF);
+        }
+
+        // Draw the top two absorption rows
+        for (int i = Math.max(0, rowCount - 2); i < rowCount; ++i) {
+            int renderHearts = Math.min((absorbCeil - 20 * i) / 2, 10);
             int rowColor = getColorForRow(i);
             boolean anythingDrawn;
 
@@ -264,9 +272,10 @@ public class HeartDisplayHandler extends Gui {
 //            }
         }
 
+        // Golden hearts in center
         for (int i = 0; i < 10 && i < absorb / 2; ++i) {
             int y = top - 10 + (i == regen - 10 ? -2 : 0);
-            drawTexturedModalRect(left + 8 * i, y, 17, 36, 9, 9, 0xAAFFFFFF);
+            drawTexturedModalRect(left + 8 * i, y, 17, 36, 9, 9, 0xFFFFFF);
         }
 
         GlStateManager.disableBlend();

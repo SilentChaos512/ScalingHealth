@@ -127,9 +127,6 @@ build.dependsOn incrementBuild
 repositories {
     jcenter()
     mavenCentral()
-    maven { // Jitpack
-        url 'https://jitpack.io'
-    }
     maven { // JEI
         name = "Progwml6 maven"
         url = "http://dvs1.progwml6.com/files/maven"
@@ -140,6 +137,9 @@ repositories {
     }
     repositories {
         maven { url 'https://maven.mcmoddev.com' }
+    }
+    maven { // Jitpack
+        url 'https://jitpack.io'
     }
 }
 
