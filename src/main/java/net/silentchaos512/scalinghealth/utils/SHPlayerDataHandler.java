@@ -310,6 +310,19 @@ public class SHPlayerDataHandler {
           if (!Config.DIFFICULTY_BY_GAME_STAGES.isEmpty() && Loader.isModLoaded("gamestages")) {
             setDifficulty(SHGameStagesCompat.getDifficultyFromStages(player));
           }
+
+          // Health by XP?
+          if (!Config.PLAYER_HEALTH_BY_XP.isEmpty()) {
+            int highestLevel = 0;
+            for (int key : Config.PLAYER_HEALTH_BY_XP.keySet())
+              if (key > highestLevel && key <= player.experienceLevel)
+                highestLevel = key;
+
+            if (Config.PLAYER_HEALTH_BY_XP.containsKey(highestLevel))
+              setMaxHealth(Config.PLAYER_HEALTH_BY_XP.get(highestLevel));
+            else
+              setMaxHealth(Config.PLAYER_STARTING_HEALTH);
+          }
         }
         health = player.getHealth();
         // Sync with client?

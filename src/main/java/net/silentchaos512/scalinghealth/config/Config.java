@@ -87,6 +87,7 @@ public class Config extends AdaptiveConfig {
     public static int PLAYER_HEALTH_MAX = 0;
     public static int PLAYER_HEALTH_LOST_ON_DEATH = 0;
     public static EnumResetTime PLAYER_HEALTH_RESET_TIME = EnumResetTime.NONE;
+    public static Map<Integer, Integer> PLAYER_HEALTH_BY_XP = new HashMap<>();
     // Regen
     public static boolean ENABLE_BONUS_HEALTH_REGEN = true;
     public static int BONUS_HEALTH_REGEN_MIN_FOOD = 10;
@@ -306,6 +307,20 @@ public class Config extends AdaptiveConfig {
                     PLAYER_HEALTH_LOST_ON_DEATH, Integer.MIN_VALUE, Integer.MAX_VALUE,
                     "The amount of health (in half hearts) the player will lose each time they die.");
             PLAYER_HEALTH_RESET_TIME = EnumResetTime.loadFromConfig(config, PLAYER_HEALTH_RESET_TIME, CAT_PLAYER_HEALTH);
+
+            PLAYER_HEALTH_BY_XP.clear();
+            parser = new ConfigMultiValueLineParser("Set Health By XP", ScalingHealth.logHelper, "\\s+", Integer.class, Integer.class);
+            for (String str : config.getStringList("Set Health By XP", CAT_PLAYER_HEALTH, new String[0],
+                    "Allows the player's health to be set according to XP level. Each line will have the level, then" +
+                            " the max health after a space. For example, \"10 30\" would give the player 15 hearts (30" +
+                            " health) at level 10. The highest level the player has passed will be selected. This will" +
+                            " override any other changes to health (heart containers).")) {
+                Object[] array = parser.parse(str);
+                if (array != null) {
+                    PLAYER_HEALTH_BY_XP.put((int) array[0], (int) array[1]);
+                }
+            }
+
             // Regen
             ENABLE_BONUS_HEALTH_REGEN = loadBoolean("Enable Bonus Regen", CAT_PLAYER_REGEN,
                     ENABLE_BONUS_HEALTH_REGEN,
