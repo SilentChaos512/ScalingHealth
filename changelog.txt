@@ -1,5 +1,6 @@
 1.3.23
-Tweaked absorption display textures (#115)
+Changed: XP health bonuses can now be used with heart containers (#119)
+Changed: Tweaked absorption display textures (#115)
 Fixed: Armor bar being too high up when you have more than one row of absorption (#115)
 
 1.3.22

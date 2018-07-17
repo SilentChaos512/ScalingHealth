@@ -313,8 +313,10 @@ public class Config extends AdaptiveConfig {
             for (String str : config.getStringList("Set Health By XP", CAT_PLAYER_HEALTH, new String[0],
                     "Allows the player's health to be set according to XP level. Each line will have the level, then" +
                             " the max health after a space. For example, \"10 30\" would give the player 15 hearts (30" +
-                            " health) at level 10. The highest level the player has passed will be selected. This will" +
-                            " override any other changes to health (heart containers).")) {
+                            " health) at level 10. Note this is the \"target health\" for a player of this XP level." +
+                            " The actual bonus heart will be the value you enter minus starting health. The highest" +
+                            " level the player has passed will be selected. The health bonus will stack with heart" +
+                            " containers (just remember heart containers consume XP by default).")) {
                 Object[] array = parser.parse(str);
                 if (array != null) {
                     PLAYER_HEALTH_BY_XP.put((int) array[0], (int) array[1]);

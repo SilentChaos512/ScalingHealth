@@ -18,6 +18,7 @@
 
 package net.silentchaos512.scalinghealth.utils;
 
+import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
@@ -29,6 +30,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
+import net.silentchaos512.lib.util.ModifierHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.compat.gamestages.SHGameStagesCompat;
 import net.silentchaos512.scalinghealth.config.Config;
@@ -164,6 +166,8 @@ public class SHPlayerDataHandler {
     public static final String NBT_HEALTH = "health";
     public static final String NBT_MAX_HEALTH = "max_health";
     public static final String NBT_LAST_LOGIN = "last_login";
+
+    private static final UUID UUID_XP_HEALTH_BONUS = UUID.fromString("3d3cb1b5-03b0-496a-aaac-60bf63ba139b");
 
     double difficulty = 0.0D;
     float health = 20;
@@ -318,10 +322,12 @@ public class SHPlayerDataHandler {
               if (key > highestLevel && key <= player.experienceLevel)
                 highestLevel = key;
 
-            if (Config.PLAYER_HEALTH_BY_XP.containsKey(highestLevel))
-              setMaxHealth(Config.PLAYER_HEALTH_BY_XP.get(highestLevel));
-            else
-              setMaxHealth(Config.PLAYER_STARTING_HEALTH);
+            if (Config.PLAYER_HEALTH_BY_XP.containsKey(highestLevel)) {
+              float modAmount = Config.PLAYER_HEALTH_BY_XP.get(highestLevel) - Config.PLAYER_STARTING_HEALTH;
+              ModifierHelper.apply(player, SharedMonsterAttributes.MAX_HEALTH, UUID_XP_HEALTH_BONUS, "health_from_xp", modAmount, 0);
+            } else {
+              ModifierHelper.remove(player, SharedMonsterAttributes.MAX_HEALTH, UUID_XP_HEALTH_BONUS);
+            }
           }
         }
         health = player.getHealth();
