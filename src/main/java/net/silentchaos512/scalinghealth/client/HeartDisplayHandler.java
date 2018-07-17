@@ -124,7 +124,7 @@ public class HeartDisplayHandler extends Gui {
         float healthMax = Math.min((float) attrMaxHealth.getAttributeValue(), 20);
         float absorb = MathHelper.ceil(player.getAbsorptionAmount());
 
-        int healthRows = MathHelper.ceil((healthMax + absorb) / 2f / 10f);
+        int healthRows = absorb > 0 ? 2 : 1; // MathHelper.ceil((healthMax + absorb) / 2f / 10f);
         int rowHeight = Math.max(10 - (healthRows - 2), 3);
 
         rand.setSeed(updateCounter * 312871);
@@ -178,10 +178,10 @@ public class HeartDisplayHandler extends Gui {
 //                    absorbRemaining -= 2f;
 //                }
 //            } else {
-                if (i * 2 + 1 < health)
-                    drawTexturedModalRect(x, y, MARGIN + 36, TOP, 9, 9);
-                else if (i * 2 + 1 == health)
-                    drawTexturedModalRect(x, y, MARGIN + 45, TOP, 9, 9);
+            if (i * 2 + 1 < health)
+                drawTexturedModalRect(x, y, MARGIN + 36, TOP, 9, 9);
+            else if (i * 2 + 1 == health)
+                drawTexturedModalRect(x, y, MARGIN + 45, TOP, 9, 9);
 //            }
         }
 
@@ -202,8 +202,8 @@ public class HeartDisplayHandler extends Gui {
             int j;
             int y = 0;
             for (j = 0; j < renderHearts; ++j) {
-                y = 0 + (j == regen ? -2 : 0);
-                drawTexturedModalRect(left + 8 * j, top + y, 0, potionOffset, 9, 9, rowColor);
+                y = top + (j == regen ? -2 : 0);
+                drawTexturedModalRect(left + 8 * j, y, 0, potionOffset, 9, 9, rowColor);
             }
             anythingDrawn = j > 0;
 
@@ -226,14 +226,13 @@ public class HeartDisplayHandler extends Gui {
 
         // Shiny glint on top of the hearts, a single white pixel in the upper left <3
         for (int i = 0; i < 10 && i < health / 2; ++i) {
-            int y = 0 + (i == regen ? -2 : 0);
-            drawTexturedModalRect(left + 8 * i, top + y, 17, potionOffset, 9, 9, 0xAAFFFFFF);
+            int y = top + (i == regen ? -2 : 0);
+            drawTexturedModalRect(left + 8 * i, y, 17, potionOffset, 9, 9, 0xAAFFFFFF);
         }
 
         // Absorption hearts override
         int absorbCeil = (int) Math.ceil(absorb);
         rowCount = (int) Math.ceil(absorb / 20);
-        ScalingHealth.logHelper.debug(absorb, rowCount);
 
         // Dark underlay for first row
         for (int i = 0; i < 10 && i < absorb / 2; ++i) {
@@ -330,7 +329,7 @@ public class HeartDisplayHandler extends Gui {
         GlStateManager.color(1f, 1f, 1f, 1f);
     }
 
-    protected int getColorForRow(int row) {
+    private int getColorForRow(int row) {
 
         return Config.HEART_COLORS[row % Config.HEART_COLORS.length];
     }

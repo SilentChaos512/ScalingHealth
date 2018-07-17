@@ -1,3 +1,7 @@
+1.3.23
+Tweaked absorption display textures (#115)
+Fixed: Armor bar being too high up when you have more than one row of absorption (#115)
+
 1.3.22
 More work on absorption overlay (#115)
 Added: Config to set player max health based on their XP level (#119)
