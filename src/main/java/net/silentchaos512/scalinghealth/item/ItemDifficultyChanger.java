@@ -147,8 +147,8 @@ public class ItemDifficultyChanger extends Item implements ICustomMesh, ICustomM
     }
 
     @Override
-    public String getUnlocalizedName(ItemStack stack) {
-        return super.getUnlocalizedName() + stack.getItemDamage();
+    public String getTranslationKey(ItemStack stack) {
+        return super.getTranslationKey() + stack.getItemDamage();
     }
 
     private static final ModelResourceLocation MODEL_0 = new ModelResourceLocation("scalinghealth:difficultychanger0", "inventory");

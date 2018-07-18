@@ -128,8 +128,8 @@ public class ItemHealing extends Item implements ICustomMesh, ICustomModel {
     }
 
     @Override
-    public String getUnlocalizedName(ItemStack stack) {
-        return super.getUnlocalizedName() + stack.getItemDamage();
+    public String getTranslationKey(ItemStack stack) {
+        return super.getTranslationKey() + stack.getItemDamage();
     }
 
     private static final ModelResourceLocation MODEL_0 = new ModelResourceLocation("scalinghealth:healingitem0", "inventory");
