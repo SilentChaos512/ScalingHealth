@@ -1,11 +1,11 @@
-# Translate by: Dorzar / VeryHardChamp
-# Última actualización: 23/07/2017
+# Translate by: Allinxter_910
+# Última actualización: 20/07/2018
 
 ##########
 # Blocks #
 ##########
 
-tile.scalinghealth.crystalore.name=Mena de corazón rojo
+tile.scalinghealth:CrystalOre.name=Mena de Cristal de Corazón
 
 
 
@@ -13,8 +13,25 @@ tile.scalinghealth.crystalore.name=Mena de corazón rojo
 # Items #
 #########
 
-item.scalinghealth.crystalshard.name=Fragmento de corazón rojo
-item.scalinghealth.heartcontainer.name=Corazón rojo
+item.scalinghealth:CrystalShard.name=Trozo de Cristal de Corazón
+item.scalinghealth:DifficultyChanger0.name=Corazón encantando
+item.scalinghealth:DifficultyChanger1.name=Corazón maldito
+item.scalinghealth:DifficultyChanger.effectDesc=Dificultad %s
+item.scalinghealth:HeartContainer.name=Contenedor de Corazón
+item.scalinghealth:HeartContainer.desc1=Incrementa la salud máxima
+item.scalinghealth:HeartContainer.notEnoughXP=Necesitas %d niveles de XP para usar esto
+item.scalinghealth:HeartDust.name=Polvo de Corazón
+item.scalinghealth:HealingItem0.name=Vendaje
+item.scalinghealth:HealingItem1.name=Kit Médico
+item.scalinghealth:HealingItem.healingValue=Regenera %d%% de tu salud en %d segundos.
+item.scalinghealth:HealingItem.howToUse=Usa por %d para aplicar.
+
+
+###########
+# Potions #
+###########
+
+effect.scalinghealth:bandaged=Vendado
 
 
 
@@ -22,8 +39,8 @@ item.scalinghealth.heartcontainer.name=Corazón rojo
 # Blights #
 ###########
 
-blight.scalinghealth:name=%s raro
-blight.scalinghealth:killedByPlayer=¡%s raro ha sido asesinado por %s!
+blight.scalinghealth:name=%s Raro
+blight.scalinghealth:killedByPlayer=¡%s Raro fue asisesinado por %s!
 
 
 
@@ -31,8 +48,19 @@ blight.scalinghealth:killedByPlayer=¡%s raro ha sido asesinado por %s!
 # Commands #
 ############
 
-command.outOfBounds=Los valores deben estar entre %s y %s.
+command.outOfBounds=Los valores deben variar entre %s y %s.
 command.showDifficulty=Dificultad de %s: %s / %s
-command.setDifficulty=Dificultad del jugador %s cambiada a %s.
-command.showHealth=Vida de %s: %s / %s (%s)
-command.setHealth=Vida del jugador %s cambiada a %d.
+command.setDifficulty=La dificultad de %s fue cambiada a %s.
+command.showHealth=Salud de %s: %s / %s (%s)
+command.setHealth=La salud de %s fue cambiada a %d.
+command.showWorldDifficulty=Dificultad del mundo: %s / %s
+command.setWorldDifficulty=La dificultad del mundo fue cambiada a %s.
+
+
+
+########
+# Misc #
+########
+
+misc.scalinghealth:sleepWarning=[Scaling Health] Advertencia: ¡Dormir cambiará tu dificultad!
+misc.scalinghealth:difficultyMeterText=DIFICULTAD
