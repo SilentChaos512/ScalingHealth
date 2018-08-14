@@ -29,6 +29,6 @@ public class ModPotions implements IRegistrationHandler<Potion> {
 
     @Override
     public void registerAll(SRegistry reg) {
-        reg.registerPotion(bandaged);
+        reg.registerPotion(bandaged, "bandaged");
     }
 }

@@ -5,7 +5,7 @@
   "description": "Extra health for players and/or mobs!",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "TODO",
+  "url": "https://minecraft.curseforge.com/projects/scaling-health",
   "authors": [ "SilentChaos512" ],
   "credits": ""
 }
