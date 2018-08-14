@@ -1,6 +1,7 @@
 1.3.24
 Updated es_VE.lang (Allinxter_910)
 Added: pt_BR.lang (Diego Ramos)
+Added: Config to disable vanilla hearts row and use only custom hearts (#123)
 Changed: Cap on regen food values changed to Integer.MAX_VALUE (~2 billion) (#125)
 
 1.3.23

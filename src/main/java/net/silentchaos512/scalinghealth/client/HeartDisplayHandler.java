@@ -40,7 +40,6 @@ import java.awt.*;
 import java.util.Random;
 
 public class HeartDisplayHandler extends Gui {
-
     private static final float COLOR_CHANGE_PERIOD = 150;
 
     public enum TextStyle {
@@ -49,8 +48,7 @@ public class HeartDisplayHandler extends Gui {
         private static final String COMMENT = "Determines what the text next to your hearts will display. DISABLED will display nothing, ROWS will display the number of remaining rows that have health left, and HEALTH_AND_MAX will display your actual health and max health values.";
 
         public static TextStyle loadFromConfig(ConfigBase config) {
-            return config.loadEnum("Health Text Style", Config.CAT_CLIENT,
-                    TextStyle.class, ROWS, COMMENT);
+            return config.loadEnum("Health Text Style", Config.CAT_CLIENT, TextStyle.class, ROWS, COMMENT);
         }
     }
 
@@ -60,8 +58,7 @@ public class HeartDisplayHandler extends Gui {
         public static final String COMMENT = "Determines the color of the text next to your hearts. GREEN_TO_RED displays green at full health, and moves to red as you lose health. WHITE will just be good old fashioned white text. Set to PSYCHEDELIC if you want to taste the rainbow.";
 
         public static TextColor loadFromConfig(ConfigBase config) {
-            return config.loadEnum("Health Text Color", Config.CAT_CLIENT,
-                    TextColor.class, GREEN_TO_RED, COMMENT);
+            return config.loadEnum("Health Text Color", Config.CAT_CLIENT, TextColor.class, GREEN_TO_RED, COMMENT);
         }
     }
 
@@ -146,56 +143,22 @@ public class HeartDisplayHandler extends Gui {
             MARGIN += 36;
         else if (player.isPotionActive(MobEffects.WITHER))
             MARGIN += 72;
-        float absorbRemaining = absorb;
 
         // Draw vanilla hearts
-        for (int i = MathHelper.ceil((healthMax /*+ absorb*/) / 2f) - 1; i >= 0; --i) {
-            int row = MathHelper.ceil((i + 1) / 10f) - 1;
-            int x = left + i % 10 * 8;
-            int y = top - row * rowHeight;
-
-            if (health <= 4)
-                y += rand.nextInt(2);
-            if (i == regen)
-                y -= 2;
-
-            drawTexturedModalRect(x, y, BACKGROUND, TOP, 9, 9);
-
-            if (highlight) {
-                if (i * 2 + 1 < healthLast)
-                    drawTexturedModalRect(x, y, MARGIN + 54, TOP, 9, 9);
-                else if (i * 2 + 1 == healthLast)
-                    drawTexturedModalRect(x, y, MARGIN + 63, TOP, 9, 9);
-            }
-
-//            if (absorbRemaining > 0f) {
-//                if (absorbRemaining == absorb && absorb % 2f == 1f) {
-//                    drawTexturedModalRect(x, y, MARGIN + 153, TOP, 9, 9);
-//                    absorbRemaining -= 1f;
-//                } else {
-//                    if (i * 2 + 1 < health)
-//                        drawTexturedModalRect(x, y, MARGIN + 144, TOP, 9, 9);
-//                    absorbRemaining -= 2f;
-//                }
-//            } else {
-            if (i * 2 + 1 < health)
-                drawTexturedModalRect(x, y, MARGIN + 36, TOP, 9, 9);
-            else if (i * 2 + 1 == health)
-                drawTexturedModalRect(x, y, MARGIN + 45, TOP, 9, 9);
-//            }
-        }
+        drawVanillaHearts(health, highlight, healthLast, healthMax, rowHeight, left, top, regen, TOP, BACKGROUND, MARGIN);
 
         int potionOffset = player.isPotionActive(MobEffects.WITHER) ? 18
                 : (player.isPotionActive(MobEffects.POISON) ? 9 : 0) + (hardcoreMode ? 27 : 0);
 
         // Draw extra hearts (only top 2 rows)
         mc.renderEngine.bindTexture(TEXTURE);
-
         health = MathHelper.ceil(player.getHealth());
-        int rowCount = health / 20;
-        for (int i = Math.max(0, rowCount - 2); i < rowCount; ++i) {
-            int renderHearts = Math.min((health - 20 * (i + 1)) / 2, 10);
-            int rowColor = getColorForRow(i);
+        int rowCount = getCustomHeartRowCount(health);
+
+        for (int row = Math.max(0, rowCount - 2); row < rowCount; ++row) {
+            int actualRow = row + (Config.REPLACE_VANILLA_HEARTS_WITH_CUSTOM ? 0 : 1);
+            int renderHearts = Math.min((health - 20 * actualRow) / 2, 10);
+            int rowColor = getColorForRow(row);
             boolean anythingDrawn;
 
             // Draw the hearts
@@ -214,13 +177,12 @@ public class HeartDisplayHandler extends Gui {
             }
 
             // Outline for last heart, to make seeing max health a little easier.
-            if (Config.LAST_HEART_OUTLINE_ENABLED && anythingDrawn && i == MathHelper.ceil(player.getMaxHealth() / 20) - 2) {
+            if (Config.LAST_HEART_OUTLINE_ENABLED && anythingDrawn && row == MathHelper.ceil(player.getMaxHealth() / 20) - 2) {
                 j = (int) ((player.getMaxHealth() % 20) / 2) - 1;
                 if (j < 0) {
                     j += 10;
                 }
-                drawTexturedModalRect(left + 8 * j, top + y, 17, 9, 9, 9,
-                        Config.LAST_HEART_OUTLINE_COLOR);
+                drawTexturedModalRect(left + 8 * j, top + y, 17, 9, 9, 9, Config.LAST_HEART_OUTLINE_COLOR);
             }
         }
 
@@ -279,6 +241,48 @@ public class HeartDisplayHandler extends Gui {
 
         GlStateManager.disableBlend();
         mc.renderEngine.bindTexture(Gui.ICONS);
+    }
+
+    private int getCustomHeartRowCount(int health) {
+        return Config.REPLACE_VANILLA_HEARTS_WITH_CUSTOM ? MathHelper.ceil(health / 20f) : health / 20;
+    }
+
+    private void drawVanillaHearts(int health, boolean highlight, int healthLast, float healthMax, int rowHeight, int left, int top, int regen, int TOP, int BACKGROUND, int MARGIN) {
+        for (int i = MathHelper.ceil((healthMax /*+ absorb*/) / 2f) - 1; i >= 0; --i) {
+            int row = MathHelper.ceil((i + 1) / 10f) - 1;
+            int x = left + i % 10 * 8;
+            int y = top - row * rowHeight;
+
+            if (health <= 4)
+                y += rand.nextInt(2);
+            if (i == regen)
+                y -= 2;
+
+            drawTexturedModalRect(x, y, BACKGROUND, TOP, 9, 9);
+
+            if (highlight) {
+                if (i * 2 + 1 < healthLast)
+                    drawTexturedModalRect(x, y, MARGIN + 54, TOP, 9, 9);
+                else if (i * 2 + 1 == healthLast)
+                    drawTexturedModalRect(x, y, MARGIN + 63, TOP, 9, 9);
+            }
+
+//            if (absorbRemaining > 0f) {
+//                if (absorbRemaining == absorb && absorb % 2f == 1f) {
+//                    drawTexturedModalRect(x, y, MARGIN + 153, TOP, 9, 9);
+//                    absorbRemaining -= 1f;
+//                } else {
+//                    if (i * 2 + 1 < health)
+//                        drawTexturedModalRect(x, y, MARGIN + 144, TOP, 9, 9);
+//                    absorbRemaining -= 2f;
+//                }
+//            } else {
+            if (i * 2 + 1 < health)
+                drawTexturedModalRect(x, y, MARGIN + 36, TOP, 9, 9);
+            else if (i * 2 + 1 == health)
+                drawTexturedModalRect(x, y, MARGIN + 45, TOP, 9, 9);
+//            }
+        }
     }
 
     private void renderHealthText(RenderGameOverlayEvent event, EntityPlayer player, TextStyle style, TextColor styleColor) {

@@ -21,10 +21,13 @@ package net.silentchaos512.scalinghealth.config;
 import gnu.trove.map.hash.THashMap;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.RangedAttribute;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.silentchaos512.lib.config.AdaptiveConfig;
 import net.silentchaos512.lib.config.ConfigMultiValueLineParser;
+import net.silentchaos512.lib.event.Greetings;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.client.HeartDisplayHandler;
 import net.silentchaos512.scalinghealth.event.DamageScaling;
@@ -53,6 +56,7 @@ public class Config extends AdaptiveConfig {
 
     // Client
     public static boolean CHANGE_HEART_RENDERING = true;
+    public static boolean REPLACE_VANILLA_HEARTS_WITH_CUSTOM = true;
     public static HeartDisplayHandler.TextStyle HEART_DISPLAY_TEXT_STYLE;
     public static HeartDisplayHandler.TextColor HEART_DISPLAY_TEXT_COLOR;
     public static boolean RENDER_DIFFICULTY_METER = true;
@@ -180,8 +184,8 @@ public class Config extends AdaptiveConfig {
     public static EnumResetTime DIFFFICULTY_RESET_TIME = EnumResetTime.NONE;
     public static boolean DIFFICULTY_LUNAR_MULTIPLIERS_ENABLED = false;
     public static float[] DIFFICULTY_LUNAR_MULTIPLIERS = new float[8];
-    static final String[] DEFAULT_DIFFICULTY_LUNAR_MULTIPLIERS = new String[]{"1.5", "1.3", "1.2",
-            "1.0", "0.8", "1.0", "1.2", "1.3"};
+    private static final String[] DEFAULT_DIFFICULTY_LUNAR_MULTIPLIERS = new String[]{
+            "1.5", "1.3", "1.2", "1.0", "0.8", "1.0", "1.2", "1.3"};
     public static final Map<String, Integer> DIFFICULTY_BY_GAME_STAGES = new HashMap<>();
 
     // Network
@@ -224,13 +228,11 @@ public class Config extends AdaptiveConfig {
     public static final Config INSTANCE = new Config();
 
     public Config() {
-
         super(ScalingHealth.MOD_ID_LOWER, true, ScalingHealth.BUILD_NUM);
     }
 
     @Override
     public void init(File file) {
-
         // Re-route to different location.
         String path = file.getPath().replaceFirst("\\.cfg$", "/main.cfg");
         super.init(new File(path));
@@ -238,12 +240,10 @@ public class Config extends AdaptiveConfig {
 
     @Override
     public void load() {
-
         try {
             ConfigMultiValueLineParser parser;
 
-            //@formatter:off
-
+            // Change entity max health cap with reflection
             final int maxHealthCap = loadInt("Max Health Cap", CAT_MAIN, 2048, "Max health cap is changed to this (vanilla is 1024)");
             try {
                 ScalingHealth.logHelper.info("Trying to change max health cap to {}", maxHealthCap);
@@ -278,6 +278,9 @@ public class Config extends AdaptiveConfig {
             CHANGE_HEART_RENDERING = loadBoolean("Custom Heart Rendering", CAT_CLIENT,
                     CHANGE_HEART_RENDERING,
                     "Replace vanilla heart rendering.");
+            REPLACE_VANILLA_HEARTS_WITH_CUSTOM = loadBoolean("Replace Vanilla Heart Row With Custom", CAT_CLIENT,
+                    true, "If true, replaces the vanilla hearts with Scaling Health's hearts. Otherwise, regular" +
+                            " vanilla hearts are rendered first, then custom hearts are used for extra hearts.");
             HEART_DISPLAY_TEXT_STYLE = HeartDisplayHandler.TextStyle.loadFromConfig(this);
             HEART_DISPLAY_TEXT_COLOR = HeartDisplayHandler.TextColor.loadFromConfig(this);
             LAST_HEART_OUTLINE_ENABLED = loadBoolean("Last Heart Outline Enabled", CAT_CLIENT,
@@ -707,16 +710,14 @@ public class Config extends AdaptiveConfig {
                     "Override the Morpheus new day handler to fire sleep events. Without this, difficulty will not increase when sleeping.");
 
             ModuleAprilTricks.instance.loadConfig(config);
-
-            //@formatter:on
         } catch (Exception ex) {
-            ScalingHealth.logHelper.severe("Could not load configuration file!");
+            ScalingHealth.logHelper.fatal("Could not load configuration file!");
+            Greetings.addMessage(ScalingHealth.MOD_NAME, TextFormatting.RED, () -> new TextComponentString(TextFormatting.RED + "Could not load configuration file! The mod will not work correctly. See log for details."));
             ex.printStackTrace();
         }
     }
 
     private static void loadHeartColors(Configuration c) {
-
         // Get hex strings for default colors.
         String[] defaults = new String[HEART_COLORS.length];
         for (int i = 0; i < defaults.length; ++i)
@@ -732,14 +733,12 @@ public class Config extends AdaptiveConfig {
             for (int i = 0; i < HEART_COLORS.length; ++i)
                 HEART_COLORS[i] = Integer.decode("0x" + list[i]);
         } catch (NumberFormatException ex) {
-            ScalingHealth.logHelper.warning(
-                    "Failed to load heart colors because a value could not be parsed. Make sure all values are valid hexadecimal integers. Try using an online HTML color picker if you are having problems.");
+            ScalingHealth.logHelper.warn("Failed to load heart colors because a value could not be parsed. Make sure all values are valid hexadecimal integers. Try using an online HTML color picker if you are having problems.");
             ex.printStackTrace();
         }
     }
 
     public boolean canParseInt(String str) {
-
         try {
             Integer.parseInt(str);
             return true;
@@ -749,7 +748,6 @@ public class Config extends AdaptiveConfig {
     }
 
     public boolean canParseFloat(String str) {
-
         try {
             Float.parseFloat(str);
             return true;
@@ -759,7 +757,6 @@ public class Config extends AdaptiveConfig {
     }
 
     public float tryParseFloat(String str) {
-
         try {
             return Float.parseFloat(str);
         } catch (NumberFormatException ex) {
