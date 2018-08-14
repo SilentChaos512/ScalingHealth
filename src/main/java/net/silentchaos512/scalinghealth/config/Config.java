@@ -45,7 +45,6 @@ import java.util.Map;
 
 // TODO: Major cleanup needed!
 public class Config extends AdaptiveConfig {
-
     // Debug TODO: Add a debug category to config
     public static boolean DEBUG_MODE = false;
     // FIXME: These are not loaded yet!
@@ -328,10 +327,10 @@ public class Config extends AdaptiveConfig {
                     ENABLE_BONUS_HEALTH_REGEN,
                     "Bonus health regen will be enabled. Vanilla regen is not changed in any way, this just adds extra healing!");
             BONUS_HEALTH_REGEN_MIN_FOOD = loadInt("Food Min", CAT_PLAYER_REGEN,
-                    BONUS_HEALTH_REGEN_MIN_FOOD, 0, 20,
+                    BONUS_HEALTH_REGEN_MIN_FOOD, 0, Integer.MAX_VALUE,
                     "The minimum food level at which bonus regen will be active.");
             BONUS_HEALTH_REGEN_MAX_FOOD = loadInt("Food Max", CAT_PLAYER_REGEN,
-                    BONUS_HEALTH_REGEN_MAX_FOOD, 0, 20,
+                    BONUS_HEALTH_REGEN_MAX_FOOD, 0, Integer.MAX_VALUE,
                     "The maximum food level at which bonus regen will be active.");
             BONUS_HEALTH_REGEN_INITIAL_DELAY = loadInt("Delay (Initial)", CAT_PLAYER_REGEN,
                     BONUS_HEALTH_REGEN_INITIAL_DELAY, 0, Integer.MAX_VALUE,
