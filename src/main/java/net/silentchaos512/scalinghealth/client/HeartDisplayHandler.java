@@ -163,7 +163,7 @@ public class HeartDisplayHandler extends Gui {
 
             // Draw the hearts
             int j;
-            int y = 0;
+            int y;
             for (j = 0; j < renderHearts; ++j) {
                 y = top + (j == regen ? -2 : 0);
                 drawTexturedModalRect(left + 8 * j, y, 0, potionOffset, 9, 9, rowColor);
@@ -177,17 +177,17 @@ public class HeartDisplayHandler extends Gui {
             }
 
             // Outline for last heart, to make seeing max health a little easier.
-            if (Config.LAST_HEART_OUTLINE_ENABLED && anythingDrawn && row == MathHelper.ceil(player.getMaxHealth() / 20) - 2) {
-                j = (int) ((player.getMaxHealth() % 20) / 2) - 1;
-                if (j < 0) {
-                    j += 10;
-                }
-                drawTexturedModalRect(left + 8 * j, top + y, 17, 9, 9, 9, Config.LAST_HEART_OUTLINE_COLOR);
+            if (Config.LAST_HEART_OUTLINE_ENABLED && anythingDrawn && row == rowCount - 1) {
+                // Get position of last partial/full heart
+                j = (int) (Math.ceil(player.getMaxHealth() % 20f / 2f)) - 1;
+                if (j < 0) j += 10;
+                y = top + (j == regen ? -2 : 0);
+                drawTexturedModalRect(left + 8 * j, y, 17, 9, 9, 9, Config.LAST_HEART_OUTLINE_COLOR);
             }
         }
 
         // Shiny glint on top of the hearts, a single white pixel in the upper left <3
-        for (int i = 0; i < 10 && i < health / 2; ++i) {
+        for (int i = 0; i < 10 && i < Math.ceil(health / 2f); ++i) {
             int y = top + (i == regen ? -2 : 0);
             drawTexturedModalRect(left + 8 * i, y, 17, potionOffset, 9, 9, 0xAAFFFFFF);
         }

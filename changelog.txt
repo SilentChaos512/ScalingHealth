@@ -1,5 +1,6 @@
 1.3.25
-Fixed: Some items missing models
+Fixed: Some items missing models (#128)
+Fixed: Last heart outline missing or in wrong position (#129)
 Fixed: Some issues with localizations
 
 1.3.24
