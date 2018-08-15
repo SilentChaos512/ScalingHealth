@@ -18,8 +18,6 @@
 
 package net.silentchaos512.scalinghealth.item;
 
-import net.minecraft.client.renderer.ItemMeshDefinition;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
@@ -29,14 +27,9 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.*;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoader;
-import net.silentchaos512.lib.registry.ICustomMesh;
 import net.silentchaos512.lib.registry.ICustomModel;
 import net.silentchaos512.lib.util.LocalizationHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -44,9 +37,9 @@ import net.silentchaos512.scalinghealth.init.ModPotions;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Locale;
 
-public class ItemHealing extends Item implements ICustomMesh, ICustomModel {
-
+public class ItemHealing extends Item implements ICustomModel {
     public enum Type {
         BANDAGE(0.3f, 1), MEDKIT(0.7f, 4);
 
@@ -62,6 +55,14 @@ public class ItemHealing extends Item implements ICustomMesh, ICustomModel {
 
         public static Type clampMeta(int unclampedMetadata) {
             return values()[MathHelper.clamp(unclampedMetadata, 0, values().length - 1)];
+        }
+
+        public String getItemName() {
+            return name().toLowerCase(Locale.ROOT);
+        }
+
+        public int getItemDamage() {
+            return ordinal();
         }
     }
     public static final int USE_TIME = 5 * 20;
@@ -132,17 +133,9 @@ public class ItemHealing extends Item implements ICustomMesh, ICustomModel {
         return super.getTranslationKey() + stack.getItemDamage();
     }
 
-    private static final ModelResourceLocation MODEL_0 = new ModelResourceLocation("scalinghealth:healingitem0", "inventory");
-    private static final ModelResourceLocation MODEL_1 = new ModelResourceLocation("scalinghealth:healingitem1", "inventory");
-
-    @Override
-    public ItemMeshDefinition getCustomMesh() {
-        return stack -> stack.getItemDamage() == 0 ? MODEL_0 : MODEL_1;
-    }
-
     @Override
     public void registerModels() {
-        ModelLoader.setCustomModelResourceLocation(this, 0, MODEL_0);
-        ModelLoader.setCustomModelResourceLocation(this, 1, MODEL_1);
+        for (Type type : Type.values())
+            ScalingHealth.registry.setModel(this, type.getItemDamage(), type.getItemName());
     }
 }

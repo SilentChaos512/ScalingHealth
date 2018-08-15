@@ -18,8 +18,6 @@
 
 package net.silentchaos512.scalinghealth.item;
 
-import net.minecraft.client.renderer.ItemMeshDefinition;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -30,8 +28,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.client.model.ModelLoader;
-import net.silentchaos512.lib.registry.ICustomMesh;
 import net.silentchaos512.lib.registry.ICustomModel;
 import net.silentchaos512.lib.util.Color;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -40,17 +36,25 @@ import net.silentchaos512.scalinghealth.lib.EnumModParticles;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
+import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Locale;
 
-public class ItemDifficultyChanger extends Item implements ICustomMesh, ICustomModel {
+public class ItemDifficultyChanger extends Item implements ICustomModel {
 
     enum Type {
-        ENCHANTED, CURSED, UNKNOWN; // down (0), up (1)
+        ENCHANTED, CURSED; // down (0), up (1)
 
         static Type getByMeta(int meta) {
-            if (meta < 0 || meta >= values().length)
-                return UNKNOWN;
-            return values()[meta];
+            return values()[meta & 1];
+        }
+
+        public String getItemName() {
+            return name().toLowerCase(Locale.ROOT) + "_heart";
+        }
+
+        public int getItemDamage() {
+            return ordinal();
         }
     }
 
@@ -59,7 +63,7 @@ public class ItemDifficultyChanger extends Item implements ICustomMesh, ICustomM
     }
 
     @Override
-    public void addInformation(ItemStack stack, World world, List<String> list, ITooltipFlag flag) {
+    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag flag) {
         if (stack.getItemDamage() > 1) {
             return;
         }
@@ -84,9 +88,8 @@ public class ItemDifficultyChanger extends Item implements ICustomMesh, ICustomM
     @Override
     public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> list) {
         if (!isInCreativeTab(tab)) return;
-
-        list.add(new ItemStack(this, 1, 0));
-        list.add(new ItemStack(this, 1, 1));
+        for (Type type : Type.values())
+            list.add(new ItemStack(this, 1, type.getItemDamage()));
     }
 
     @Override
@@ -151,17 +154,9 @@ public class ItemDifficultyChanger extends Item implements ICustomMesh, ICustomM
         return super.getTranslationKey() + stack.getItemDamage();
     }
 
-    private static final ModelResourceLocation MODEL_0 = new ModelResourceLocation("scalinghealth:difficultychanger0", "inventory");
-    private static final ModelResourceLocation MODEL_1 = new ModelResourceLocation("scalinghealth:difficultychanger1", "inventory");
-
-    @Override
-    public ItemMeshDefinition getCustomMesh() {
-        return stack -> stack.getItemDamage() == 0 ? MODEL_0 : MODEL_1;
-    }
-
     @Override
     public void registerModels() {
-        ModelLoader.setCustomModelResourceLocation(this, 0, MODEL_0);
-        ModelLoader.setCustomModelResourceLocation(this, 1, MODEL_1);
+        for (Type type : Type.values())
+            ScalingHealth.registry.setModel(this, type.getItemDamage(), type.getItemName());
     }
 }
