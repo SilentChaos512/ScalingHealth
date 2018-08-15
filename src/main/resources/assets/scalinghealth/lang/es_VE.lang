@@ -5,7 +5,7 @@
 # Blocks #
 ##########
 
-tile.scalinghealth:CrystalOre.name=Mena de Cristal de Corazón
+tile.scalinghealth.crystalore.name=Mena de Cristal de Corazón
 
 
 
@@ -13,25 +13,25 @@ tile.scalinghealth:CrystalOre.name=Mena de Cristal de Corazón
 # Items #
 #########
 
-item.scalinghealth:CrystalShard.name=Trozo de Cristal de Corazón
-item.scalinghealth:DifficultyChanger0.name=Corazón encantando
-item.scalinghealth:DifficultyChanger1.name=Corazón maldito
-item.scalinghealth:DifficultyChanger.effectDesc=Dificultad %s
-item.scalinghealth:HeartContainer.name=Contenedor de Corazón
-item.scalinghealth:HeartContainer.desc1=Incrementa la salud máxima
-item.scalinghealth:HeartContainer.notEnoughXP=Necesitas %d niveles de XP para usar esto
-item.scalinghealth:HeartDust.name=Polvo de Corazón
-item.scalinghealth:HealingItem0.name=Vendaje
-item.scalinghealth:HealingItem1.name=Kit Médico
-item.scalinghealth:HealingItem.healingValue=Regenera %d%% de tu salud en %d segundos.
-item.scalinghealth:HealingItem.howToUse=Usa por %d para aplicar.
+item.scalinghealth.crystalshard.name=Trozo de Cristal de Corazón
+item.scalinghealth.enchanted_heart.name=Corazón encantando
+item.scalinghealth.cursed_heart.name=Corazón maldito
+item.scalinghealth.difficultychanger.effectDesc=Dificultad %s
+item.scalinghealth.heartcontainer.name=Contenedor de Corazón
+item.scalinghealth.heartcontainer.desc=Incrementa la salud máxima
+item.scalinghealth.heartcontainer.notEnoughXP=Necesitas %d niveles de XP para usar esto
+item.scalinghealth.heartdust.name=Polvo de Corazón
+item.scalinghealth.bandage.name=Vendaje
+item.scalinghealth.medkit.name=Kit Médico
+item.scalinghealth.healingitem.healingValue=Regenera %d%% de tu salud en %d segundos.
+item.scalinghealth.healingitem.howToUse=Usa por %d para aplicar.
 
 
 ###########
 # Potions #
 ###########
 
-effect.scalinghealth:bandaged=Vendado
+effect.scalinghealth.bandaged=Vendado
 
 
 
@@ -39,8 +39,8 @@ effect.scalinghealth:bandaged=Vendado
 # Blights #
 ###########
 
-blight.scalinghealth:name=%s Raro
-blight.scalinghealth:killedByPlayer=¡%s Raro fue asisesinado por %s!
+blight.scalinghealth.name=%s Raro
+blight.scalinghealth.killedByPlayer=¡%s Raro fue asisesinado por %s!
 
 
 
@@ -48,13 +48,13 @@ blight.scalinghealth:killedByPlayer=¡%s Raro fue asisesinado por %s!
 # Commands #
 ############
 
-command.outOfBounds=Los valores deben variar entre %s y %s.
-command.showDifficulty=Dificultad de %s: %s / %s
-command.setDifficulty=La dificultad de %s fue cambiada a %s.
-command.showHealth=Salud de %s: %s / %s (%s)
-command.setHealth=La salud de %s fue cambiada a %d.
-command.showWorldDifficulty=Dificultad del mundo: %s / %s
-command.setWorldDifficulty=La dificultad del mundo fue cambiada a %s.
+command.scalinghealth.outOfBounds=Los valores deben variar entre %s y %s.
+command.scalinghealth.showDifficulty=Dificultad de %s: %s / %s
+command.scalinghealth.setDifficulty=La dificultad de %s fue cambiada a %s.
+command.scalinghealth.showHealth=Salud de %s: %s / %s (%s)
+command.scalinghealth.setHealth=La salud de %s fue cambiada a %d.
+command.scalinghealth.showWorldDifficulty=Dificultad del mundo: %s / %s
+command.scalinghealth.setWorldDifficulty=La dificultad del mundo fue cambiada a %s.
 
 
 
@@ -62,5 +62,5 @@ command.setWorldDifficulty=La dificultad del mundo fue cambiada a %s.
 # Misc #
 ########
 
-misc.scalinghealth:sleepWarning=[Scaling Health] Advertencia: ¡Dormir cambiará tu dificultad!
-misc.scalinghealth:difficultyMeterText=DIFICULTAD
+misc.scalinghealth.sleepWarning=[Scaling Health] Advertencia: ¡Dormir cambiará tu dificultad!
+misc.scalinghealth.difficultyMeterText=DIFICULTAD

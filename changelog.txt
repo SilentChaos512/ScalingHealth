@@ -1,3 +1,7 @@
+1.3.25
+Fixed: Some items missing models
+Fixed: Some issues with localizations
+
 1.3.24
 Updated es_VE.lang (Allinxter_910)
 Added: pt_BR.lang (Diego Ramos)

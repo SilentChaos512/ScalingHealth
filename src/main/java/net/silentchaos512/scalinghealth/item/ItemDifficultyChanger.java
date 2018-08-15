@@ -41,7 +41,6 @@ import java.util.List;
 import java.util.Locale;
 
 public class ItemDifficultyChanger extends Item implements ICustomModel {
-
     enum Type {
         ENCHANTED, CURSED; // down (0), up (1)
 
@@ -64,19 +63,15 @@ public class ItemDifficultyChanger extends Item implements ICustomModel {
 
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag flag) {
-        if (stack.getItemDamage() > 1) {
-            return;
-        }
+        if (stack.getItemDamage() > 1) return;
 
-        String amountStr = String.format("%d",
-                stack.getItemDamage() == Type.ENCHANTED.ordinal()
-                        ? (int) Config.ENCHANTED_HEART_DIFFICULTY_CHANGE
-                        : (int) Config.CURSED_HEART_DIFFICULTY_CHANGE);
-        if (amountStr.matches("^\\d+")) {
+        String amountStr = String.format("%d", stack.getItemDamage() == Type.ENCHANTED.ordinal()
+                ? (int) Config.ENCHANTED_HEART_DIFFICULTY_CHANGE
+                : (int) Config.CURSED_HEART_DIFFICULTY_CHANGE);
+        if (amountStr.matches("^\\d+"))
             amountStr = "+" + amountStr;
-        }
 
-        String line = ScalingHealth.localizationHelper.getSubText(this, "effectDesc", amountStr);
+        String line = ScalingHealth.i18n.itemSubText("difficultychanger", "effectDesc", amountStr);
         list.add(TextFormatting.WHITE + line);
     }
 
@@ -151,7 +146,7 @@ public class ItemDifficultyChanger extends Item implements ICustomModel {
 
     @Override
     public String getTranslationKey(ItemStack stack) {
-        return super.getTranslationKey() + stack.getItemDamage();
+        return ScalingHealth.i18n.getKey("item", Type.getByMeta(stack.getItemDamage()).getItemName());
     }
 
     @Override

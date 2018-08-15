@@ -323,7 +323,7 @@ public class CommandScalingHealth extends CommandBaseSL {
   private void tell(ICommandSender sender, TextFormatting format, String key, boolean fromLocalizationFile, Object... args) {
 
     String value = fromLocalizationFile
-        ? ScalingHealth.localizationHelper.getLocalizedString("command." + key, args)
+        ? ScalingHealth.i18n.translate("command", key, args)
         : key;
     sender.sendMessage(new TextComponentString(format + value));
   }

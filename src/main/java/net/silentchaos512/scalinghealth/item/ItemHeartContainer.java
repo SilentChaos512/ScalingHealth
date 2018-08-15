@@ -29,7 +29,6 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
-import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.silentchaos512.lib.util.ChatHelper;
 import net.silentchaos512.lib.util.Color;
@@ -41,18 +40,14 @@ import net.silentchaos512.scalinghealth.network.message.MessageDataSync;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class ItemHeartContainer extends Item {
 
     @Override
-    public void addInformation(ItemStack stack, World world, List<String> list, ITooltipFlag flag) {
-        List<String> lines = ScalingHealth.localizationHelper.getDescriptionLines(this);
-        if (lines.size() > 0) {
-            String line = lines.get(0);
-            lines.set(0, TextFormatting.WHITE + line);
-            list.addAll(lines);
-        }
+    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag flag) {
+        list.add(ScalingHealth.i18n.subText(this, "desc"));
     }
 
     @Override
@@ -73,8 +68,7 @@ public class ItemHeartContainer extends Item {
 
             // Does player have enough XP?
             if (player.experienceLevel < levelRequirement) {
-                String message = ScalingHealth.localizationHelper.getSubText(this, "notEnoughXP", levelRequirement);
-                ChatHelper.sendStatusMessage(player, message, true);
+                ChatHelper.translateStatus(player, ScalingHealth.i18n.getKey(this, "notEnoughXP"), true, levelRequirement);
                 return new ActionResult<>(EnumActionResult.PASS, stack);
             }
 

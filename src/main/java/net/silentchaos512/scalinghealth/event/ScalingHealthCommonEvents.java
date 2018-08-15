@@ -246,19 +246,13 @@ public class ScalingHealthCommonEvents {
   @SubscribeEvent
   public void onPlayerSleepInBed(PlayerSleepInBedEvent event) {
 
-    if (!event.getEntityPlayer().world.isRemote && event.getResultStatus() == SleepResult.OK
-        && Config.WARN_WHEN_SLEEPING
-        && Config.DIFFICULTY_FOR_SLEEPING > 0f) {
-      ChatHelper.sendStatusMessage(event.getEntityPlayer(),
-          TextFormatting.RED + ScalingHealth.localizationHelper.getMiscText("sleepWarning"), false);
+    if (!event.getEntityPlayer().world.isRemote && event.getResultStatus() == SleepResult.OK && Config.WARN_WHEN_SLEEPING && Config.DIFFICULTY_FOR_SLEEPING > 0f) {
+      ChatHelper.translate(event.getEntityPlayer(), ScalingHealth.i18n.getKey("misc", "sleepWarning"));
     }
   }
 
   @SubscribeEvent
   public void onPlayerWakeUp(PlayerWakeUpEvent event) {
-
-    ScalingHealth.logHelper.debug(event.getEntityPlayer().world.isRemote, event.updateWorld(),
-        event.shouldSetSpawn());
     if (!event.getEntityPlayer().world.isRemote && !event.updateWorld()) {
       EntityPlayer player = event.getEntityPlayer();
       PlayerData data = SHPlayerDataHandler.get(player);

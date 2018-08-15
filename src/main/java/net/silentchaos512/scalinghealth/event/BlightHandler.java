@@ -25,6 +25,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.Item;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -33,7 +35,6 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.silentchaos512.lib.util.ChatHelper;
-import net.silentchaos512.lib.util.LocalizationHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.entity.EntityBlightFire;
@@ -46,10 +47,8 @@ import java.util.List;
 public final class BlightHandler {
     public static final BlightHandler INSTANCE = new BlightHandler();
 
-    public static final String NBT_BLIGHT = ScalingHealth.MOD_ID_OLD + ".IsBlight";
-
-    public static final int UPDATE_DELAY = 200;
-    public static final int UPDATE_DELAY_SALT = 5 + ScalingHealth.random.nextInt(10);
+    private static final String NBT_BLIGHT = ScalingHealth.MOD_ID_OLD + ".IsBlight";
+    private static final int UPDATE_DELAY = 200;
 
     private BlightHandler() {
     }
@@ -67,7 +66,7 @@ public final class BlightHandler {
             entityLiving.getEntityData().setBoolean(NBT_BLIGHT, true);
     }
 
-    public static void spawnBlightFire(EntityLivingBase blight) {
+    static void spawnBlightFire(EntityLivingBase blight) {
         if (blight.world.isRemote)
             return;
 
@@ -78,7 +77,7 @@ public final class BlightHandler {
             fire.startRiding(blight);
     }
 
-    public static EntityBlightFire getBlightFire(EntityLivingBase blight) {
+    private static EntityBlightFire getBlightFire(EntityLivingBase blight) {
         World world = blight.world;
         List<EntityBlightFire> fireList = world.getEntities(EntityBlightFire.class, e -> true);
 
@@ -89,7 +88,7 @@ public final class BlightHandler {
         return null;
     }
 
-    public static void applyBlightPotionEffects(EntityLivingBase entityLiving) {
+    static void applyBlightPotionEffects(EntityLivingBase entityLiving) {
         int duration = Config.BLIGHT_POTION_DURATION;
         if (duration < 0) {
             duration = Integer.MAX_VALUE;
@@ -126,8 +125,6 @@ public final class BlightHandler {
         if (event.getSource() == null || !isBlight(event.getEntityLiving()) || event.getEntity().world.isRemote)
             return;
 
-        LocalizationHelper loc = ScalingHealth.localizationHelper;
-
         Entity entitySource = event.getSource().getTrueSource();
         boolean isTamedAnimal = entitySource instanceof EntityTameable && ((EntityTameable) entitySource).isTamed();
         if (entitySource instanceof EntityPlayer || isTamedAnimal) {
@@ -143,11 +140,10 @@ public final class BlightHandler {
             }
 
             // Tell all players that the blight was killed.
-            if (Config.BLIGHT_NOTIFY_PLAYERS_ON_DEATH) {
-                String message = loc.getLocalizedString("blight", "killedByPlayer", blight.getName(), actualKiller.getName());
-                ScalingHealth.logHelper.info("{}", message);
+            if (Config.BLIGHT_NOTIFY_PLAYERS_ON_DEATH && player != null) {
+                ScalingHealth.logHelper.info("Blight {} was killed by {}", blight.getName(), actualKiller.getName());
                 for (EntityPlayer p : player.world.getPlayers(EntityPlayer.class, e -> true))
-                    ChatHelper.sendMessage(p, message);
+                    ChatHelper.translate(p, ScalingHealth.i18n.getKey("blight", "killedByPlayer"), blight.getName(), actualKiller.getName());
             }
 
             // Drop hearts!
@@ -166,22 +162,26 @@ public final class BlightHandler {
 
             // Tell all players that the blight died.
             if (Config.BLIGHT_NOTIFY_PLAYERS_ON_DEATH) {
-                String message = event.getSource().getDeathMessage(blight).getFormattedText();
-                String blightName = loc.getLocalizedString("blight", "name", blight.getName());
-                message = message.replaceFirst(blight.getName(), blightName);
-
-                if (message.contains("drowned")) {
-                    if (message.startsWith("Blight Squid"))
-                        message += "... again";
-                    else
-                        message += "... gg";
-                } else if (message.contains("suffocated in a wall")) {
-                    message += " *slow clap*";
+                ITextComponent deathMessage = event.getSource().getDeathMessage(blight);
+                if (deathMessage instanceof TextComponentTranslation) {
+                    // Assuming arguments are the same as in DamageSource#getDeathMessage
+                    // May fail with some modded damage sources, but should be fine in most cases
+                    TextComponentTranslation original = (TextComponentTranslation) deathMessage;
+                    TextComponentTranslation newMessage = new TextComponentTranslation(original.getKey(), blight);
+                    ScalingHealth.logHelper.info("Blight {} has died", blight.getName());
+                    for (EntityPlayer p : blight.world.getPlayers(EntityPlayer.class, e -> true))
+                        ChatHelper.sendMessage(p, newMessage);
                 }
 
-                ScalingHealth.logHelper.info("{}", message);
-                for (EntityPlayer p : blight.world.getPlayers(EntityPlayer.class, e -> true))
-                    ChatHelper.sendMessage(p, message);
+                // FIXME
+//                if (message.contains("drowned")) {
+//                    if (message.startsWith("Blight Squid"))
+//                        message += "... again";
+//                    else
+//                        message += "... gg";
+//                } else if (message.contains("suffocated in a wall")) {
+//                    message += " *slow clap*";
+//                }
             }
         }
     }

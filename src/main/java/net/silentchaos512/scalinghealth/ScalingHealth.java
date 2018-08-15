@@ -1,5 +1,6 @@
 package net.silentchaos512.scalinghealth;
 
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
@@ -9,9 +10,9 @@ import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.*;
-import net.silentchaos512.lib.SilentLib;
+import net.silentchaos512.lib.base.IModBase;
 import net.silentchaos512.lib.registry.SRegistry;
-import net.silentchaos512.lib.util.LocalizationHelper;
+import net.silentchaos512.lib.util.I18nHelper;
 import net.silentchaos512.lib.util.LogHelper;
 import net.silentchaos512.scalinghealth.command.CommandScalingHealth;
 import net.silentchaos512.scalinghealth.init.ModItems;
@@ -25,8 +26,8 @@ import java.util.Random;
         dependencies = ScalingHealth.DEPENDENCIES,
         acceptedMinecraftVersions = ScalingHealth.ACCEPTED_MC_VERSIONS,
         guiFactory = "net.silentchaos512.scalinghealth.gui.GuiFactoryScalingHealth")
-public class ScalingHealth {
-
+@MethodsReturnNonnullByDefault
+public class ScalingHealth implements IModBase {
     public static final String MOD_ID_OLD = "ScalingHealth";
     public static final String MOD_ID_LOWER = "scalinghealth";
     public static final String MOD_NAME = "Scaling Health";
@@ -39,10 +40,9 @@ public class ScalingHealth {
 
     public static final String GAME_RULE_DIFFICULTY = "ScalingHealthDifficulty";
 
-    public static Random random = new Random();
-    public static LogHelper logHelper = new LogHelper(MOD_NAME, BUILD_NUM);
-    @Deprecated
-    public static LocalizationHelper localizationHelper;
+    public static final Random random = new Random();
+    public static final LogHelper logHelper = new LogHelper(MOD_NAME, BUILD_NUM);
+    public static final I18nHelper i18n = new I18nHelper(MOD_ID_LOWER, logHelper, true);
 
     public static SRegistry registry = new SRegistry();
 
@@ -57,11 +57,7 @@ public class ScalingHealth {
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         registry.setMod(this);
-        localizationHelper = new LocalizationHelper(MOD_ID_LOWER).setReplaceAmpersand(true);
-        SilentLib.instance.registerLocalizationHelperForMod(MOD_ID_LOWER, localizationHelper);
-
-        registry.recipes.setJsonHellMode(0 == getBuildNumber());
-
+        registry.recipes.setJsonHellMode(isDevBuild());
         proxy.preInit(registry, event);
     }
 
@@ -88,7 +84,23 @@ public class ScalingHealth {
         }
     }
 
-    public int getBuildNumber() {
+    @Override
+    public String getModId() {
+        return MOD_ID_LOWER;
+    }
+
+    @Override
+    public String getModName() {
+        return MOD_NAME;
+    }
+
+    @Override
+    public String getVersion() {
+        return VERSION;
+    }
+
+    @Override
+    public int getBuildNum() {
         return BUILD_NUM;
     }
 }

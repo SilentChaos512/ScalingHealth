@@ -27,11 +27,13 @@ import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.*;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.silentchaos512.lib.registry.ICustomModel;
-import net.silentchaos512.lib.util.LocalizationHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.init.ModPotions;
 
@@ -65,7 +67,8 @@ public class ItemHealing extends Item implements ICustomModel {
             return ordinal();
         }
     }
-    public static final int USE_TIME = 5 * 20;
+
+    private static final int USE_TIME = 5 * 20;
 
     public ItemHealing() {
         setMaxStackSize(4);
@@ -121,16 +124,15 @@ public class ItemHealing extends Item implements ICustomModel {
 
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> list, ITooltipFlag flagIn) {
-        LocalizationHelper loc = ScalingHealth.localizationHelper;
         Type healingType = Type.clampMeta(stack.getItemDamage());
-
-        list.add(loc.getSubText(this, "healingValue", (int) (healingType.healPercentage * 100), healingType.effectDuration / 20));
-        list.add(loc.getSubText(this, "howToUse", USE_TIME / 20));
+        list.add(ScalingHealth.i18n.itemSubText("healingitem", "healingValue",
+                (int) (healingType.healPercentage * 100), healingType.effectDuration / 20));
+        list.add(ScalingHealth.i18n.itemSubText("healingitem", "howToUse", USE_TIME / 20));
     }
 
     @Override
     public String getTranslationKey(ItemStack stack) {
-        return super.getTranslationKey() + stack.getItemDamage();
+        return ScalingHealth.i18n.getKey("item", Type.clampMeta(stack.getItemDamage()).getItemName());
     }
 
     @Override

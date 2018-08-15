@@ -64,14 +64,14 @@ public class DifficultyHandler {
   public static DifficultyHandler INSTANCE = new DifficultyHandler();
 
   public static int POTION_APPLY_TIME = 10 * 1200;
-  static final String[] POTION_DEFAULTS = { //@formatter:off
+  static final String[] POTION_DEFAULTS = {
       "minecraft:strength,30,1",
       "minecraft:speed,10,1",
       "minecraft:speed,50,2",
       "minecraft:fire_resistance,10,1",
       "minecraft:invisibility,25,1",
       "minecraft:resistance,30,1"
-  }; //@formatter:on
+  };
 
   public MobPotionMap potionMap = new MobPotionMap();
 
@@ -139,11 +139,8 @@ public class DifficultyHandler {
 
     EntityLiving entityLiving = (EntityLiving) event.getEntity();
 
-    //@formatter:off
-    if (!canIncreaseEntityHealth(entityLiving)
-        || entityBlacklistedFromHealthIncrease(entityLiving))
+    if (!canIncreaseEntityHealth(entityLiving) || entityBlacklistedFromHealthIncrease(entityLiving))
       return;
-    //@formatter:on
 
     boolean makeBlight = increaseEntityHealth(entityLiving);
     if (makeBlight)
@@ -201,10 +198,8 @@ public class DifficultyHandler {
 
     // Make blight?
     if (!entityBlacklistedFromBecomingBlight(entityLiving)) {
-      float chance = (float) (difficulty / Config.DIFFICULTY_MAX
-          * Config.BLIGHT_CHANCE_MULTIPLIER);
-      if ((Config.BLIGHT_ALWAYS && Config.BLIGHT_ALL_MATCH_LIST.matches(entityLiving))
-          || rand.nextFloat() < chance) {
+      float chance = difficulty / Config.DIFFICULTY_MAX * Config.BLIGHT_CHANCE_MULTIPLIER;
+      if ((Config.BLIGHT_ALWAYS && Config.BLIGHT_ALL_MATCH_LIST.matches(entityLiving)) || rand.nextFloat() < chance) {
         makeBlight = true;
         difficulty *= Config.BLIGHT_DIFFICULTY_MULTIPLIER;
       }
@@ -303,7 +298,7 @@ public class DifficultyHandler {
 
   private void makeEntityBlight(EntityLiving entityLiving, Random rand) {
 
-    BlightSpawnEvent event = new BlightSpawnEvent.Pre((EntityLiving) entityLiving,
+    BlightSpawnEvent event = new BlightSpawnEvent.Pre(entityLiving,
         entityLiving.world, (float) entityLiving.posX, (float) entityLiving.posY,
         (float) entityLiving.posZ);
     if (MinecraftForge.EVENT_BUS.post(event)) {
@@ -311,7 +306,6 @@ public class DifficultyHandler {
       return;
     }
 
-    //@formatter:off
     BlightHandler.markBlight(entityLiving);
     BlightHandler.spawnBlightFire(entityLiving);
 
@@ -325,57 +319,53 @@ public class DifficultyHandler {
     // Random Equipment
     // ================
 
-    if (entityLiving instanceof EntityLiving) {
-      EntityLiving entity = (EntityLiving) entityLiving;
+    // Select a tier (0 to 4)
+    final int highestTier = 4;
+    final int commonTier = Config.BLIGHT_EQUIPMENT_HIGHEST_COMMON_TIER;
+    int tier = rand.nextInt(1 + commonTier);
+    for (int j = 0; j < highestTier - commonTier; ++j) {
+      if (rand.nextFloat() < Config.BLIGHT_EQUIPMENT_TIER_UP_CHANCE) {
+        ++tier;
+      }
+    }
+    tier = MathHelper.clamp(tier, 0, highestTier);
 
-      // Select a tier (0 to 4)
-      final int highestTier = 4;
-      final int commonTier = Config.BLIGHT_EQUIPMENT_HIGHEST_COMMON_TIER;
-      int tier = rand.nextInt(1 + commonTier);
-      for (int j = 0; j < highestTier - commonTier; ++j) {
-        if (rand.nextFloat() < Config.BLIGHT_EQUIPMENT_TIER_UP_CHANCE) {
-          ++tier;
+    float pieceChance = Config.BLIGHT_EQUIPMENT_ARMOR_PIECE_CHANCE;
+
+    // Armor slots
+    for (EntityEquipmentSlot slot : ORDERED_SLOTS) {
+      ItemStack oldEquipment = entityLiving.getItemStackFromSlot(slot);
+
+      if (slot != EntityEquipmentSlot.HEAD && rand.nextFloat() > pieceChance)
+        break;
+
+      if (StackHelper.isEmpty(oldEquipment)) {
+        ItemStack newEquipment = selectEquipmentForSlot(slot, tier);
+        if (StackHelper.isValid(newEquipment)) {
+          entityLiving.setItemStackToSlot(slot, newEquipment);
         }
       }
-      tier = MathHelper.clamp(tier, 0, highestTier);
+    }
 
-      float pieceChance = Config.BLIGHT_EQUIPMENT_ARMOR_PIECE_CHANCE;
-
-      // Armor slots
-      for (EntityEquipmentSlot slot : ORDERED_SLOTS) {
-        ItemStack oldEquipment = entity.getItemStackFromSlot(slot);
-
-        if (slot != EntityEquipmentSlot.HEAD && rand.nextFloat() > pieceChance)
-          break;
-
-        if (StackHelper.isEmpty(oldEquipment)) {
-          ItemStack newEquipment = selectEquipmentForSlot(slot, tier);
-          if (StackHelper.isValid(newEquipment)) {
-            entity.setItemStackToSlot(slot, newEquipment);
-          }
+    // Hand slots
+    pieceChance = Config.BLIGHT_EQUIPMENT_HAND_PIECE_CHANCE;
+    if (rand.nextFloat() > pieceChance) {
+      // Main hand
+      ItemStack oldEquipment = entityLiving.getHeldItemMainhand();
+      if (StackHelper.isEmpty(oldEquipment)) {
+        ItemStack newEquipment = selectEquipmentForSlot(EntityEquipmentSlot.MAINHAND, tier);
+        if (StackHelper.isValid(newEquipment)) {
+          entityLiving.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, newEquipment);
         }
       }
 
-      // Hand slots
-      pieceChance = Config.BLIGHT_EQUIPMENT_HAND_PIECE_CHANCE;
+      // Off hand (only if we tried to do main hand)
       if (rand.nextFloat() > pieceChance) {
-        // Main hand
-        ItemStack oldEquipment = entity.getHeldItemMainhand();
+        oldEquipment = entityLiving.getHeldItemOffhand();
         if (StackHelper.isEmpty(oldEquipment)) {
-          ItemStack newEquipment = selectEquipmentForSlot(EntityEquipmentSlot.MAINHAND, tier);
+          ItemStack newEquipment = selectEquipmentForSlot(EntityEquipmentSlot.OFFHAND, tier);
           if (StackHelper.isValid(newEquipment)) {
-            entity.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, newEquipment);
-          }
-        }
-
-        // Off hand (only if we tried to do main hand)
-        if (rand.nextFloat() > pieceChance) {
-          oldEquipment = entity.getHeldItemOffhand();
-          if (StackHelper.isEmpty(oldEquipment)) {
-            ItemStack newEquipment = selectEquipmentForSlot(EntityEquipmentSlot.OFFHAND, tier);
-            if (StackHelper.isValid(newEquipment)) {
-              entity.setItemStackToSlot(EntityEquipmentSlot.OFFHAND, newEquipment);
-            }
+            entityLiving.setItemStackToSlot(EntityEquipmentSlot.OFFHAND, newEquipment);
           }
         }
       }
@@ -393,7 +383,7 @@ public class DifficultyHandler {
     // ===============
 
     if (Config.BLIGHT_SUPERCHARGE_CREEPERS && entityLiving instanceof EntityCreeper) {
-      ((EntityCreeper) entityLiving)
+      entityLiving
           .onStruckByLightning(new EntityLightningBolt(entityLiving.world,
               entityLiving.posX, entityLiving.posY, entityLiving.posZ, true));
     }
@@ -403,10 +393,8 @@ public class DifficultyHandler {
     NetworkHandler.INSTANCE.sendToAllAround(message, new TargetPoint(entityLiving.dimension,
         entityLiving.posX, entityLiving.posY, entityLiving.posZ, 128));
 
-    MinecraftForge.EVENT_BUS.post(new BlightSpawnEvent.Post((EntityLiving) entityLiving, entityLiving.world, (float) entityLiving.posX, (float) entityLiving.posY,
+    MinecraftForge.EVENT_BUS.post(new BlightSpawnEvent.Post(entityLiving, entityLiving.world, (float) entityLiving.posX, (float) entityLiving.posY,
         (float) entityLiving.posZ));
-
-    // @formatter:on
   }
 
   private boolean entityBlacklistedFromHealthIncrease(EntityLivingBase entityLiving) {
