@@ -40,31 +40,34 @@ import java.awt.*;
 import java.util.Random;
 
 public class HeartDisplayHandler extends Gui {
-    private static final float COLOR_CHANGE_PERIOD = 150;
-
     public enum TextStyle {
         DISABLED, ROWS, HEALTH_AND_MAX;
+
 
         private static final String COMMENT = "Determines what the text next to your hearts will display. DISABLED will display nothing, ROWS will display the number of remaining rows that have health left, and HEALTH_AND_MAX will display your actual health and max health values.";
 
         public static TextStyle loadFromConfig(ConfigBase config) {
             return config.loadEnum("Health Text Style", Config.CAT_CLIENT, TextStyle.class, ROWS, COMMENT);
         }
+
     }
 
     public enum TextColor {
         GREEN_TO_RED, WHITE, PSYCHEDELIC;
+
 
         public static final String COMMENT = "Determines the color of the text next to your hearts. GREEN_TO_RED displays green at full health, and moves to red as you lose health. WHITE will just be good old fashioned white text. Set to PSYCHEDELIC if you want to taste the rainbow.";
 
         public static TextColor loadFromConfig(ConfigBase config) {
             return config.loadEnum("Health Text Color", Config.CAT_CLIENT, TextColor.class, GREEN_TO_RED, COMMENT);
         }
+
     }
 
-    public static final ResourceLocation TEXTURE = new ResourceLocation(ScalingHealth.MOD_ID_LOWER, "textures/gui/hud.png");
-
     public static final HeartDisplayHandler INSTANCE = new HeartDisplayHandler();
+
+    private static final float COLOR_CHANGE_PERIOD = 150;
+    private static final ResourceLocation TEXTURE = new ResourceLocation(ScalingHealth.MOD_ID_LOWER, "textures/gui/hud.png");
 
     private long lastSystemTime = 0;
     private int playerHealth = 0;
@@ -139,16 +142,17 @@ public class HeartDisplayHandler extends Gui {
         final int TOP = 9 * (hardcoreMode ? 5 : 0);
         final int BACKGROUND = (highlight ? 25 : 16);
         int MARGIN = 16;
-        if (player.isPotionActive(MobEffects.POISON))
-            MARGIN += 36;
-        else if (player.isPotionActive(MobEffects.WITHER))
-            MARGIN += 72;
+//        if (player.isPotionActive(MobEffects.POISON))
+//            MARGIN += 36;
+//        else if (player.isPotionActive(MobEffects.WITHER))
+//            MARGIN += 72;
 
         // Draw vanilla hearts
         drawVanillaHearts(health, highlight, healthLast, healthMax, rowHeight, left, top, regen, TOP, BACKGROUND, MARGIN);
 
-        int potionOffset = player.isPotionActive(MobEffects.WITHER) ? 18
-                : (player.isPotionActive(MobEffects.POISON) ? 9 : 0) + (hardcoreMode ? 27 : 0);
+//        int potionOffset = player.isPotionActive(MobEffects.WITHER) ? 18
+//                : (player.isPotionActive(MobEffects.POISON) ? 9 : 0) + (hardcoreMode ? 27 : 0);
+        int potionOffset = hardcoreMode ? 27 : 0;
 
         // Draw extra hearts (only top 2 rows)
         mc.renderEngine.bindTexture(TEXTURE);
@@ -186,9 +190,14 @@ public class HeartDisplayHandler extends Gui {
             }
         }
 
-        // Shiny glint on top of the hearts, a single white pixel in the upper left <3
         for (int i = 0; i < 10 && i < Math.ceil(health / 2f); ++i) {
             int y = top + (i == regen ? -2 : 0);
+            // Effect hearts (poison, wither)
+            if (showEffectHearts(player)) {
+                int color = effectHeartColor(player);
+                drawTexturedModalRect(left + 8 * i, y, 0, 54, 9, 9, color);
+            }
+            // Shiny glint on top of the hearts, a single white pixel in the upper left <3
             drawTexturedModalRect(left + 8 * i, y, 17, potionOffset, 9, 9, 0xAAFFFFFF);
         }
 
@@ -321,7 +330,6 @@ public class HeartDisplayHandler extends Gui {
     }
 
     private void drawTexturedModalRect(int x, int y, int textureX, int textureY, int width, int height, int color) {
-
         float a = ((color >> 24) & 255) / 255f;
         if (a <= 0f)
             a = 1f;
@@ -334,7 +342,18 @@ public class HeartDisplayHandler extends Gui {
     }
 
     private int getColorForRow(int row) {
-
         return Config.HEART_COLORS[row % Config.HEART_COLORS.length];
+    }
+
+    private boolean showEffectHearts(EntityPlayer player) {
+        return player.isPotionActive(MobEffects.POISON) || player.isPotionActive(MobEffects.WITHER);
+    }
+
+    private int effectHeartColor(EntityPlayer player) {
+        if (player.isPotionActive(MobEffects.WITHER))
+            return MobEffects.WITHER.getLiquidColor();
+        if (player.isPotionActive(MobEffects.POISON))
+            return MobEffects.POISON.getLiquidColor();
+        return 0xFFFFFF;
     }
 }

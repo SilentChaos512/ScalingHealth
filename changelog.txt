@@ -1,4 +1,5 @@
 1.3.25
+Changed: The way hearts render when poisoned/withered
 Fixed: Some items missing models (#128)
 Fixed: Last heart outline missing or in wrong position (#129)
 Fixed: Some issues with localizations
