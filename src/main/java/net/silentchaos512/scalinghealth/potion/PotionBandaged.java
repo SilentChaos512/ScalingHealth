@@ -23,7 +23,6 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
-import net.minecraft.util.ResourceLocation;
 import net.silentchaos512.lib.util.EntityHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 
@@ -42,7 +41,6 @@ public class PotionBandaged extends Potion {
     setBeneficial();
     registerPotionAttributeModifier(SharedMonsterAttributes.MOVEMENT_SPEED,
         "732486d8-f730-41a2-868f-eb988738986f", -0.25, 2);
-    setRegistryName(new ResourceLocation(name));
   }
 
   @Override

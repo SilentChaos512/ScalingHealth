@@ -42,7 +42,6 @@ import net.silentchaos512.scalinghealth.init.ModEntities;
 import net.silentchaos512.scalinghealth.lib.EnumModParticles;
 
 public class ScalingHealthClientProxy extends ScalingHealthCommonProxy {
-
     @Override
     public void preInit(SRegistry registry, FMLPreInitializationEvent event) {
         super.preInit(registry, event);

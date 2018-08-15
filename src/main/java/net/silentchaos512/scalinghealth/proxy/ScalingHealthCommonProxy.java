@@ -45,17 +45,17 @@ import net.silentchaos512.scalinghealth.network.message.MessagePlaySound;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.world.SHWorldGenerator;
 
-public class ScalingHealthCommonProxy implements IProxy {
+import java.util.function.Consumer;
 
+public class ScalingHealthCommonProxy implements IProxy {
     @Override
     public void preInit(SRegistry registry, FMLPreInitializationEvent event) {
         Config.INSTANCE.init(event.getSuggestedConfigurationFile());
 
-        // FIXME: Old registration handler style!
-        registry.addRegistrationHandler(new ModPotions(), Potion.class);
-        registry.addRegistrationHandler(new ModBlocks(), Block.class);
-        registry.addRegistrationHandler(new ModItems(), Item.class);
-        registry.addRegistrationHandler(new ModSounds(), SoundEvent.class);
+        registry.addRegistrationHandler((Consumer<SRegistry>) ModPotions::registerAll, Potion.class);
+        registry.addRegistrationHandler((Consumer<SRegistry>) ModBlocks::registerAll, Block.class);
+        registry.addRegistrationHandler((Consumer<SRegistry>) ModItems::registerAll, Item.class);
+        registry.addRegistrationHandler((Consumer<SRegistry>) ModSounds::registerAll, SoundEvent.class);
         ModLootStuff.registerAll(registry);
 
         GameRegistry.registerWorldGenerator(new SHWorldGenerator(true), 0);
