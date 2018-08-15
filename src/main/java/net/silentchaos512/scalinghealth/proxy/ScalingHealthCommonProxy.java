@@ -39,6 +39,7 @@ import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.event.*;
 import net.silentchaos512.scalinghealth.init.*;
 import net.silentchaos512.scalinghealth.lib.EnumModParticles;
+import net.silentchaos512.scalinghealth.loot.ModLootStuff;
 import net.silentchaos512.scalinghealth.network.NetworkHandler;
 import net.silentchaos512.scalinghealth.network.message.MessagePlaySound;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
@@ -50,10 +51,12 @@ public class ScalingHealthCommonProxy implements IProxy {
     public void preInit(SRegistry registry, FMLPreInitializationEvent event) {
         Config.INSTANCE.init(event.getSuggestedConfigurationFile());
 
+        // FIXME: Old registration handler style!
         registry.addRegistrationHandler(new ModPotions(), Potion.class);
         registry.addRegistrationHandler(new ModBlocks(), Block.class);
         registry.addRegistrationHandler(new ModItems(), Item.class);
         registry.addRegistrationHandler(new ModSounds(), SoundEvent.class);
+        ModLootStuff.registerAll(registry);
 
         GameRegistry.registerWorldGenerator(new SHWorldGenerator(true), 0);
 

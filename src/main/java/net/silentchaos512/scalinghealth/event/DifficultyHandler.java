@@ -206,7 +206,7 @@ public class DifficultyHandler {
       if ((Config.BLIGHT_ALWAYS && Config.BLIGHT_ALL_MATCH_LIST.matches(entityLiving))
           || rand.nextFloat() < chance) {
         makeBlight = true;
-        difficulty *= 3;
+        difficulty *= Config.BLIGHT_DIFFICULTY_MULTIPLIER;
       }
     }
 

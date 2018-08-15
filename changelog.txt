@@ -2,7 +2,9 @@
 Updated es_VE.lang (Allinxter_910)
 Added: pt_BR.lang (Diego Ramos)
 Added: Config to disable vanilla hearts row and use only custom hearts (#123)
-Changed: Cap on regen food values changed to Integer.MAX_VALUE (~2 billion) (#125)
+Added: Entity properties for loot tables, scalinghealth:is_blight and scalinghealth:difficulty. See wiki for details (#106)
+Added: Config to control blight difficulty multiplier (finally)
+Changed: Cap on regen food values removed (#125)
 
 1.3.23
 Changed: XP health bonuses can now be used with heart containers (#119)

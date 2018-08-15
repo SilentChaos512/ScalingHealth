@@ -122,6 +122,7 @@ public class Config extends AdaptiveConfig {
     // Blights
     public static boolean BLIGHT_ALWAYS = false;
     public static float BLIGHT_CHANCE_MULTIPLIER = 0.0625F;
+    public static float BLIGHT_DIFFICULTY_MULTIPLIER = 3f;
     public static int BLIGHT_AMP_SPEED = 4;
     public static int BLIGHT_AMP_STRENGTH = 1;
     public static int BLIGHT_POTION_DURATION;
@@ -423,6 +424,10 @@ public class Config extends AdaptiveConfig {
                     BLIGHT_CHANCE_MULTIPLIER, 0f, Float.MAX_VALUE,
                     "Determines the chance of a mob spawning as a blight. Formula is "
                             + "blightChanceMulti * currentDifficulty / maxDifficulty");
+            BLIGHT_DIFFICULTY_MULTIPLIER = config.getFloat("Blight Difficulty Multiplier", CAT_MOB_BLIGHT,
+                    BLIGHT_DIFFICULTY_MULTIPLIER, 1f, Float.MAX_VALUE,
+                    "When an entity spawns as a blight, their calculated difficulty is multiplied by this. Higher" +
+                            " numbers mean more health and damage.");
             BLIGHT_AMP_SPEED = loadInt("Amplifier Speed", CAT_MOB_BLIGHT,
                     BLIGHT_AMP_SPEED, -1, 99,
                     "The amplifier level on the speed potion effect applied to blights.");
@@ -712,7 +717,7 @@ public class Config extends AdaptiveConfig {
             ModuleAprilTricks.instance.loadConfig(config);
         } catch (Exception ex) {
             ScalingHealth.logHelper.fatal("Could not load configuration file!");
-            Greetings.addMessage(ScalingHealth.MOD_NAME, TextFormatting.RED, () -> new TextComponentString(TextFormatting.RED + "Could not load configuration file! The mod will not work correctly. See log for details."));
+            Greetings.addMessage(() -> new TextComponentString(TextFormatting.RED + "[Scaling Health] Could not load configuration file! The mod will not work correctly. See log for details."));
             ex.printStackTrace();
         }
     }
