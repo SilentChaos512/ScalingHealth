@@ -85,34 +85,33 @@ public class ScalingHealthClientEvents {
     if (data == null)
       return "Player data is null!";
 
-    String ret = "";
+    StringBuilder ret = new StringBuilder();
 
-    ret += String.format("Area Difficulty = %.4f (%s)\n",
-        areaMode.getAreaDifficulty(world, player.getPosition()), areaMode.name());
-    ret += String.format("Player Difficulty = %.4f\n", data.getDifficulty());
-    ret += "Player Health = " + player.getHealth() + " / " + player.getMaxHealth() + "\n";
+    ret.append(String.format("Area Difficulty = %.4f (%s)\n",
+            areaMode.getAreaDifficulty(world, player.getPosition()), areaMode.name()));
+    ret.append(String.format("Player Difficulty = %.4f\n", data.getDifficulty()));
+    ret.append("Player Health = ").append(player.getHealth()).append(" / ").append(player.getMaxHealth()).append("\n");
 
     // Display all health attribute modifiers.
     IAttributeInstance attr = player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
     if (attr.getModifiers().size() > 0) {
       for (AttributeModifier mod : attr.getModifiers()) {
-        ret += "         " + mod.toString() + "\n";
+        ret.append("         ").append(mod.toString()).append("\n");
       }
     } else {
-      ret += "        No modifiers! That should not happen.\n";
+      ret.append("        No modifiers! That should not happen.\n");
     }
 
     int regenTimer = PlayerBonusRegenHandler.INSTANCE.getTimerForPlayer(player);
-    ret += String.format("Regen Timer = %d (%ds)", regenTimer, regenTimer / 20) + "\n";
-    ret += String.format("Food = %d (%.2f)", player.getFoodStats().getFoodLevel(),
-        player.getFoodStats().getSaturationLevel()) + "\n";
+    ret.append(String.format("Regen Timer = %d (%ds)", regenTimer, regenTimer / 20)).append("\n");
+    ret.append(String.format("Food = %d (%.2f)", player.getFoodStats().getFoodLevel(),
+            player.getFoodStats().getSaturationLevel())).append("\n");
 
     // Blight count
-    int blightCount = world.getEntities(EntityLivingBase.class, e -> BlightHandler.isBlight(e))
-        .size();
+    int blightCount = world.getEntities(EntityLivingBase.class, BlightHandler::isBlight).size();
     int blightFires = world.getEntities(EntityBlightFire.class, e -> true).size();
-    ret += String.format("Blights (Fires) = %d (%d)", blightCount, blightFires);
+    ret.append(String.format("Blights (Fires) = %d (%d)", blightCount, blightFires));
 
-    return ret;
+    return ret.toString();
   }
 }

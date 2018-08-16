@@ -173,6 +173,7 @@ public class ScalingHealthCommonEvents {
     if (event.player instanceof EntityPlayerMP) {
       EntityPlayerMP player = (EntityPlayerMP) event.player;
       PlayerData data = SHPlayerDataHandler.get(player);
+      if (data == null) return;
 
       // Lose health on death?
       if (Config.PLAYER_HEALTH_LOST_ON_DEATH > 0 && !event.isEndConquered()) {
@@ -215,15 +216,13 @@ public class ScalingHealthCommonEvents {
       Calendar lastTimePlayed = data.getLastTimePlayed();
 
       if (Config.DIFFFICULTY_RESET_TIME.shouldReset(today, lastTimePlayed)) {
-        ScalingHealth.logHelper.info(String.format("Reset player %s's difficulty to %d",
-            player.getName(), (int) Config.DIFFICULTY_DEFAULT));
+        ScalingHealth.logHelper.info("Reset player {}'s difficulty to {}", player.getName(), (int) Config.DIFFICULTY_DEFAULT);
         ChatHelper.sendMessage(player, "[Scaling Health] Your difficulty has been reset.");
         data.setDifficulty(Config.DIFFICULTY_DEFAULT);
       }
       if (Config.PLAYER_HEALTH_RESET_TIME.shouldReset(today, lastTimePlayed)) {
         data.setMaxHealth(Config.PLAYER_STARTING_HEALTH);
-        ScalingHealth.logHelper.info(String.format("Reset player %s's health to %d",
-            player.getName(), (int) Config.PLAYER_STARTING_HEALTH));
+        ScalingHealth.logHelper.info("Reset player {}'s health to {}", player.getName(), Config.PLAYER_STARTING_HEALTH);
         ChatHelper.sendMessage(player, "[Scaling Health] Your health has been reset.");
       }
 
@@ -231,7 +230,6 @@ public class ScalingHealthCommonEvents {
 
       // Apply health modifier
       if (Config.ALLOW_PLAYER_MODIFIED_HEALTH) {
-        float health = player.getHealth();
         float maxHealth = data.getMaxHealth();
         ModifierHandler.setMaxHealth(player, maxHealth, 0);
       }

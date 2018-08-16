@@ -659,7 +659,7 @@ public class Config extends AdaptiveConfig {
                 ++lunarPhaseIndex;
             }
             if (lunarPhaseIndex != 8) {
-                ScalingHealth.logHelper.warning("Config \"Lunar Phase Multipliers\" has the wrong number"
+                ScalingHealth.logHelper.warn("Config \"Lunar Phase Multipliers\" has the wrong number"
                         + " of values. Needs 8, has " + lunarPhaseIndex);
             }
             DIFFICULTY_BY_GAME_STAGES.clear();

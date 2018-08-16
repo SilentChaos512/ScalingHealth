@@ -31,7 +31,7 @@ import java.util.List;
 
 public class PotionBandaged extends Potion {
 
-  static final float BASE_HEAL_RATE = 0.005f;
+  private static final float BASE_HEAL_RATE = 0.005f;
 
   public PotionBandaged() {
 

@@ -182,7 +182,7 @@ public class SHPlayerDataHandler {
 
     public PlayerData(EntityPlayer player) {
 
-      playerWR = new WeakReference<EntityPlayer>(player);
+      playerWR = new WeakReference<>(player);
       client = player.world.isRemote;
 
       load();
@@ -406,7 +406,7 @@ public class SHPlayerDataHandler {
           int date = Integer.parseInt(dateParts[2]);
           lastTimePlayed.set(year, month, date);
         } catch (NumberFormatException ex) {
-          ScalingHealth.logHelper.warning("Could not parse player's last login time.");
+          ScalingHealth.logHelper.warn("Could not parse player's last login time.");
           ex.printStackTrace();
         }
       }

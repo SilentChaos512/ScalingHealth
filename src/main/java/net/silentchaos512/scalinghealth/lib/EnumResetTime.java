@@ -56,7 +56,7 @@ public enum EnumResetTime {
         Calendar nextReset = getNextResetDay(lastTimePlayed);
         return !today.before(nextReset);
       default:
-        ScalingHealth.logHelper.warning("Unknown EnumResetTime: " + this);
+        ScalingHealth.logHelper.warn("Unknown EnumResetTime: " + this);
         return false;
     }
   }

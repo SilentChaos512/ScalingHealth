@@ -82,8 +82,8 @@ public class SHMorpheusCompat {
       parent = MorpheusRegistry.registry.get(0);
 
     INewDayHandler newHandler = new NewDayHandler(parent);
-    ScalingHealth.logHelper.info("Replacing Morpheus new day handler for dimension 0!");
-    ScalingHealth.logHelper.info("Parent handler: " + parent);
+    ScalingHealth.logHelper.info("Replacing Morpheus new day handler for dimension {}!", 0);
+    ScalingHealth.logHelper.info("Parent handler: {}", parent);
     Morpheus.register.registerHandler(newHandler, 0);
   }
 }

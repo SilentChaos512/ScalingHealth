@@ -351,9 +351,9 @@ public class HeartDisplayHandler extends Gui {
 
     private int effectHeartColor(EntityPlayer player) {
         if (player.isPotionActive(MobEffects.WITHER))
-            return MobEffects.WITHER.getLiquidColor();
+            return 0x663E47;
         if (player.isPotionActive(MobEffects.POISON))
-            return MobEffects.POISON.getLiquidColor();
+            return 0x4E9331;
         return 0xFFFFFF;
     }
 }

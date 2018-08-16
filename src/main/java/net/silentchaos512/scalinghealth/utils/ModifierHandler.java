@@ -55,7 +55,7 @@ public class ModifierHandler {
 
     public static void setMaxHealth(EntityLivingBase entity, double amount, int op) {
         if (amount <= 0) {
-            ScalingHealth.logHelper.warning("ModifierHandler.setMaxHealth: amount <= 0!");
+            ScalingHealth.logHelper.warn("ModifierHandler.setMaxHealth: amount <= 0!");
             return;
         }
 

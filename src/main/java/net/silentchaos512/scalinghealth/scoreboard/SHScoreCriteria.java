@@ -27,16 +27,13 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 
 public class SHScoreCriteria {
 
-  public static IScoreCriteria difficulty = new ScoreCriteria(
-      ScalingHealth.RESOURCE_PREFIX + "difficulty");
+    public static IScoreCriteria difficulty = new ScoreCriteria(ScalingHealth.RESOURCE_PREFIX + "difficulty");
 
-  public static void updateScore(EntityPlayer player, int amount) {
+    public static void updateScore(EntityPlayer player, int amount) {
 
-    for (ScoreObjective scoreobjective : player.getWorldScoreboard()
-        .getObjectivesFromCriteria(SHScoreCriteria.difficulty)) {
-      Score score = player.getWorldScoreboard().getOrCreateScore(player.getName(),
-          scoreobjective);
-      score.setScorePoints(amount);
+        for (ScoreObjective scoreobjective : player.getWorldScoreboard().getObjectivesFromCriteria(SHScoreCriteria.difficulty)) {
+            Score score = player.getWorldScoreboard().getOrCreateScore(player.getName(), scoreobjective);
+            score.setScorePoints(amount);
+        }
     }
-  }
 }

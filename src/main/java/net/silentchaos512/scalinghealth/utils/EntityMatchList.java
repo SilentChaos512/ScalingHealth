@@ -24,6 +24,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.Configuration;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 // TODO: Move to Silent Lib
@@ -46,7 +47,7 @@ public class EntityMatchList {
   public boolean matches(Entity entity) {
 
     boolean contains = this.contains(entity);
-    return this.whitelist ? contains : !contains;
+    return this.whitelist == contains;
   }
 
   @Deprecated
@@ -69,8 +70,7 @@ public class EntityMatchList {
   public void loadConfig(Configuration config, String name, String category, String[] defaults, boolean defaultWhitelist, String comment) {
 
     this.clear();
-    for (String str : config.getStringList(name + " List", category, defaults, comment))
-      list.add(str);
+    Collections.addAll(list, config.getStringList(name + " List", category, defaults, comment));
 
     this.whitelist = config.getBoolean(name + " IsWhitelist", category, defaultWhitelist,
         "If true, the list is a whitelist. Otherwise it is a blacklist.");

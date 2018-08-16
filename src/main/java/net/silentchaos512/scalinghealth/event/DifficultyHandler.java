@@ -63,8 +63,8 @@ public class DifficultyHandler {
 
   public static DifficultyHandler INSTANCE = new DifficultyHandler();
 
-  public static int POTION_APPLY_TIME = 10 * 1200;
-  static final String[] POTION_DEFAULTS = {
+  private static int POTION_APPLY_TIME = 10 * 1200;
+  private static final String[] POTION_DEFAULTS = {
       "minecraft:strength,30,1",
       "minecraft:speed,10,1",
       "minecraft:speed,50,2",
@@ -91,15 +91,15 @@ public class DifficultyHandler {
       if (params.length >= 3) {
         // Ignore extra parameters
         if (params.length > 3) {
-          ScalingHealth.logHelper.warning("Mob potion effects: extra parameters in line: " + line
+          ScalingHealth.logHelper.warn("Mob potion effects: extra parameters in line: " + line
               + ". Ignoring extra parameters and processing the first 3.");
         }
 
         // Parse parameters.
         int index = -1;
         String id = "null";
-        Potion potion = null;
-        int minDiff = 0, level = 0;
+        Potion potion;
+        int minDiff, level;
         try {
           id = params[++index];
           potion = Potion.REGISTRY.getObject(new ResourceLocation(id));
@@ -108,12 +108,12 @@ public class DifficultyHandler {
           minDiff = Integer.parseInt(params[++index]);
           level = Integer.parseInt(params[++index]);
         } catch (NumberFormatException ex) {
-          ScalingHealth.logHelper.warning("Mob potion effects: could not parse parameter " + index
+          ScalingHealth.logHelper.warn("Mob potion effects: could not parse parameter " + index
               + " as integer. Ignoring entire line: " + line);
           continue;
         } catch (NullPointerException ex) {
           ScalingHealth.logHelper
-              .warning("Mob potion effects: potion \"" + id + "\" does not exist.");
+              .warn("Mob potion effects: potion \"" + id + "\" does not exist.");
           continue;
         }
 
@@ -121,7 +121,7 @@ public class DifficultyHandler {
         potionMap.put(potion, minDiff, level - 1);
       } else {
         ScalingHealth.logHelper
-            .warning("Mob potion effects: malformed line (need 3 comma-separated values): " + line
+            .warn("Mob potion effects: malformed line (need 3 comma-separated values): " + line
                 + "Ignoring entire line.");
       }
     }
@@ -255,7 +255,7 @@ public class DifficultyHandler {
     }
 
     // Apply extra health and damage.
-    float healthMulti = 1f;
+    float healthMulti;
     float healthScaleDiff = Math.max(0, baseMaxHealth - 20f);
     switch (Config.MOB_HEALTH_SCALING_MODE) {
       case ADD:
@@ -274,7 +274,7 @@ public class DifficultyHandler {
         ModifierHandler.setMaxHealth(entityLiving, healthMulti + baseMaxHealth, 1);
         break;
       default:
-        ScalingHealth.logHelper.severe("Unknown mob health scaling mode: "
+        ScalingHealth.logHelper.fatal("Unknown mob health scaling mode: "
             + Config.MOB_HEALTH_SCALING_MODE.name());
         break;
     }
