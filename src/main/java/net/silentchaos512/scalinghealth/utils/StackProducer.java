@@ -1,7 +1,6 @@
 package net.silentchaos512.scalinghealth.utils;
 
 import net.minecraft.item.ItemStack;
-import net.silentchaos512.lib.util.StackHelper;
 
 import java.util.Random;
 import java.util.function.Supplier;
@@ -20,7 +19,7 @@ public class StackProducer {
 
   protected StackProducer() {
 
-    this(StackHelper.empty());
+    this(ItemStack.EMPTY);
   }
 
   public StackProducer(ItemStack stack) {

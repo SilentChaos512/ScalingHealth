@@ -43,7 +43,6 @@ import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
-import net.silentchaos512.lib.util.StackHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.api.event.BlightSpawnEvent;
 import net.silentchaos512.scalinghealth.config.Config;
@@ -339,9 +338,9 @@ public class DifficultyHandler {
       if (slot != EntityEquipmentSlot.HEAD && rand.nextFloat() > pieceChance)
         break;
 
-      if (StackHelper.isEmpty(oldEquipment)) {
+      if (oldEquipment.isEmpty()) {
         ItemStack newEquipment = selectEquipmentForSlot(slot, tier);
-        if (StackHelper.isValid(newEquipment)) {
+        if (!newEquipment.isEmpty()) {
           entityLiving.setItemStackToSlot(slot, newEquipment);
         }
       }
@@ -352,9 +351,9 @@ public class DifficultyHandler {
     if (rand.nextFloat() > pieceChance) {
       // Main hand
       ItemStack oldEquipment = entityLiving.getHeldItemMainhand();
-      if (StackHelper.isEmpty(oldEquipment)) {
+      if (oldEquipment.isEmpty()) {
         ItemStack newEquipment = selectEquipmentForSlot(EntityEquipmentSlot.MAINHAND, tier);
-        if (StackHelper.isValid(newEquipment)) {
+        if (!newEquipment.isEmpty()) {
           entityLiving.setItemStackToSlot(EntityEquipmentSlot.MAINHAND, newEquipment);
         }
       }
@@ -362,9 +361,9 @@ public class DifficultyHandler {
       // Off hand (only if we tried to do main hand)
       if (rand.nextFloat() > pieceChance) {
         oldEquipment = entityLiving.getHeldItemOffhand();
-        if (StackHelper.isEmpty(oldEquipment)) {
+        if (oldEquipment.isEmpty()) {
           ItemStack newEquipment = selectEquipmentForSlot(EntityEquipmentSlot.OFFHAND, tier);
-          if (StackHelper.isValid(newEquipment)) {
+          if (!newEquipment.isEmpty()) {
             entityLiving.setItemStackToSlot(EntityEquipmentSlot.OFFHAND, newEquipment);
           }
         }
@@ -374,7 +373,7 @@ public class DifficultyHandler {
     // Add random enchantments
     for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
       ItemStack stack = entityLiving.getItemStackFromSlot(slot);
-      if (StackHelper.isValid(stack) && !stack.isItemEnchanted())
+      if (!stack.isEmpty() && !stack.isItemEnchanted())
         EnchantmentHelper.addRandomEnchantment(rand, stack, 30, false);
     }
 
@@ -522,7 +521,7 @@ public class DifficultyHandler {
       case OFFHAND:
         return mapOffhands.getRandom(tier);
       default:
-        return StackHelper.empty();
+        return ItemStack.EMPTY;
     }
   }
 }

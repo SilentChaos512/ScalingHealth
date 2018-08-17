@@ -30,7 +30,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
-import net.silentchaos512.lib.util.ModifierHelper;
+import net.silentchaos512.lib.util.AttributeHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.compat.gamestages.SHGameStagesCompat;
 import net.silentchaos512.scalinghealth.config.Config;
@@ -324,9 +324,9 @@ public class SHPlayerDataHandler {
 
             if (Config.PLAYER_HEALTH_BY_XP.containsKey(highestLevel)) {
               float modAmount = Config.PLAYER_HEALTH_BY_XP.get(highestLevel) - Config.PLAYER_STARTING_HEALTH;
-              ModifierHelper.apply(player, SharedMonsterAttributes.MAX_HEALTH, UUID_XP_HEALTH_BONUS, "health_from_xp", modAmount, 0);
+              AttributeHelper.apply(player, SharedMonsterAttributes.MAX_HEALTH, UUID_XP_HEALTH_BONUS, "health_from_xp", modAmount, 0);
             } else {
-              ModifierHelper.remove(player, SharedMonsterAttributes.MAX_HEALTH, UUID_XP_HEALTH_BONUS);
+              AttributeHelper.remove(player, SharedMonsterAttributes.MAX_HEALTH, UUID_XP_HEALTH_BONUS);
             }
           }
         }

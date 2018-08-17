@@ -37,7 +37,6 @@ public class MessagePlaySound extends Message {
       EntityPlayer player = ScalingHealth.proxy.getClientPlayer();
       if (player != null) {
         SoundEvent sound = ForgeRegistries.SOUND_EVENTS.getValue(new ResourceLocation(soundId));
-        ScalingHealth.logHelper.debug(sound, soundId);
         if (sound != null) {
           player.playSound(sound, volume, pitch);
         }

@@ -20,7 +20,6 @@ package net.silentchaos512.scalinghealth.utils;
 
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
-import net.silentchaos512.lib.util.StackHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 
 import java.util.ArrayList;
@@ -69,7 +68,7 @@ public class EquipmentTierMap {
 
     List<StackProducer> list = sets.get(tier);
     if (list.isEmpty()) {
-      return StackHelper.empty();
+      return ItemStack.EMPTY;
     }
 
     Random rand = ScalingHealth.random;
@@ -84,7 +83,7 @@ public class EquipmentTierMap {
 
     List<StackProducer> list = sets.get(tier);
     if (list.isEmpty()) {
-      return StackHelper.empty();
+      return ItemStack.EMPTY;
     }
     if (index < 0 || index >= list.size()) {
       throw new IllegalArgumentException("index must be between 0 and " + list.size());

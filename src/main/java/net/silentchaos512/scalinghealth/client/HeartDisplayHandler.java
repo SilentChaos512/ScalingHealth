@@ -43,7 +43,6 @@ public class HeartDisplayHandler extends Gui {
     public enum TextStyle {
         DISABLED, ROWS, HEALTH_AND_MAX;
 
-
         private static final String COMMENT = "Determines what the text next to your hearts will display. DISABLED will display nothing, ROWS will display the number of remaining rows that have health left, and HEALTH_AND_MAX will display your actual health and max health values.";
 
         public static TextStyle loadFromConfig(ConfigBase config) {
@@ -54,7 +53,6 @@ public class HeartDisplayHandler extends Gui {
 
     public enum TextColor {
         GREEN_TO_RED, WHITE, PSYCHEDELIC;
-
 
         public static final String COMMENT = "Determines the color of the text next to your hearts. GREEN_TO_RED displays green at full health, and moves to red as you lose health. WHITE will just be good old fashioned white text. Set to PSYCHEDELIC if you want to taste the rainbow.";
 

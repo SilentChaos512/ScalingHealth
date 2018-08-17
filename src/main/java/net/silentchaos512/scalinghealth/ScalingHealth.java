@@ -31,8 +31,8 @@ public class ScalingHealth implements IModBase {
     public static final String MOD_ID_OLD = "ScalingHealth";
     public static final String MOD_ID_LOWER = "scalinghealth";
     public static final String MOD_NAME = "Scaling Health";
-    public static final String VERSION = "1.3.25";
-    public static final String VERSION_SILENTLIB = "2.3.18";
+    public static final String VERSION = "1.3.26";
+    public static final String VERSION_SILENTLIB = "3.0.0";
     public static final int BUILD_NUM = 0;
     public static final String DEPENDENCIES = "required-after:silentlib@[" + VERSION_SILENTLIB + ",);after:morpheus";
     public static final String ACCEPTED_MC_VERSIONS = "[1.12,1.12.2]";
@@ -57,7 +57,7 @@ public class ScalingHealth implements IModBase {
     @EventHandler
     public void preInit(FMLPreInitializationEvent event) {
         registry.setMod(this);
-        registry.recipes.setJsonHellMode(isDevBuild());
+        registry.getRecipeMaker().setJsonHellMode(isDevBuild());
         proxy.preInit(registry, event);
     }
 
