@@ -126,6 +126,8 @@ public class HeartDisplayHandler extends Gui {
         int rowHeight = Math.max(10 - (healthRows - 2), 3);
 
         rand.setSeed(updateCounter * 312871);
+        int[] lowHealthBob = new int[10];
+        for (int i = 0; i < lowHealthBob.length; ++i) lowHealthBob[i] = rand.nextInt(2);
 
         final int left = width / 2 - 91;
         final int top = height - GuiIngameForge.left_height;
@@ -146,7 +148,7 @@ public class HeartDisplayHandler extends Gui {
 //            MARGIN += 72;
 
         // Draw vanilla hearts
-        drawVanillaHearts(health, highlight, healthLast, healthMax, rowHeight, left, top, regen, TOP, BACKGROUND, MARGIN);
+        drawVanillaHearts(health, highlight, healthLast, healthMax, rowHeight, left, top, regen, lowHealthBob, TOP, BACKGROUND, MARGIN);
 
 //        int potionOffset = player.isPotionActive(MobEffects.WITHER) ? 18
 //                : (player.isPotionActive(MobEffects.POISON) ? 9 : 0) + (hardcoreMode ? 27 : 0);
@@ -168,13 +170,18 @@ public class HeartDisplayHandler extends Gui {
             int y;
             for (j = 0; j < renderHearts; ++j) {
                 y = top + (j == regen ? -2 : 0);
+                if (health <= 4)
+                    y += lowHealthBob[MathHelper.clamp(j, 0, lowHealthBob.length - 1)];
                 drawTexturedModalRect(left + 8 * j, y, 0, potionOffset, 9, 9, rowColor);
             }
             anythingDrawn = j > 0;
 
             // Half heart on the end?
             if (health % 2 == 1 && renderHearts < 10) {
-                drawTexturedModalRect(left + 8 * renderHearts, top, 9, potionOffset, 9, 9, rowColor);
+                y = top + (j == regen ? -2 : 0);
+                if (health <= 4)
+                    y += lowHealthBob[MathHelper.clamp(j, 0, lowHealthBob.length - 1)];
+                drawTexturedModalRect(left + 8 * renderHearts, y, 9, potionOffset, 9, 9, rowColor);
                 anythingDrawn = true;
             }
 
@@ -184,12 +191,16 @@ public class HeartDisplayHandler extends Gui {
                 j = (int) (Math.ceil(player.getMaxHealth() % 20f / 2f)) - 1;
                 if (j < 0) j += 10;
                 y = top + (j == regen ? -2 : 0);
+                if (health <= 4)
+                    y += lowHealthBob[MathHelper.clamp(j, 0, lowHealthBob.length - 1)];
                 drawTexturedModalRect(left + 8 * j, y, 17, 9, 9, 9, Config.LAST_HEART_OUTLINE_COLOR);
             }
         }
 
         for (int i = 0; i < 10 && i < Math.ceil(health / 2f); ++i) {
             int y = top + (i == regen ? -2 : 0);
+            if (health <= 4)
+                y += lowHealthBob[MathHelper.clamp(i, 0, lowHealthBob.length - 1)];
             // Effect hearts (poison, wither)
             if (showEffectHearts(player)) {
                 int color = effectHeartColor(player);
@@ -254,14 +265,14 @@ public class HeartDisplayHandler extends Gui {
         return Config.REPLACE_VANILLA_HEARTS_WITH_CUSTOM ? MathHelper.ceil(health / 20f) : health / 20;
     }
 
-    private void drawVanillaHearts(int health, boolean highlight, int healthLast, float healthMax, int rowHeight, int left, int top, int regen, int TOP, int BACKGROUND, int MARGIN) {
+    private void drawVanillaHearts(int health, boolean highlight, int healthLast, float healthMax, int rowHeight, int left, int top, int regen, int[] lowHealthBob, int TOP, int BACKGROUND, int MARGIN) {
         for (int i = MathHelper.ceil((healthMax /*+ absorb*/) / 2f) - 1; i >= 0; --i) {
             int row = MathHelper.ceil((i + 1) / 10f) - 1;
             int x = left + i % 10 * 8;
             int y = top - row * rowHeight;
 
             if (health <= 4)
-                y += rand.nextInt(2);
+                y += lowHealthBob[MathHelper.clamp(i, 0, lowHealthBob.length - 1)];
             if (i == regen)
                 y -= 2;
 
