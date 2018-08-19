@@ -28,6 +28,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.silentchaos512.lib.command.CommandBaseSL;
@@ -321,14 +322,14 @@ public class CommandScalingHealth extends CommandBaseSL {
   }
 
   private void tell(ICommandSender sender, TextFormatting format, String key, boolean fromLocalizationFile, Object... args) {
-
-    String value = fromLocalizationFile
-        ? ScalingHealth.i18n.translate("command", key, args)
-        : key;
-    sender.sendMessage(new TextComponentString(format + value));
+    key = "command." + ScalingHealth.MOD_ID_LOWER + "." + key;
+    if (fromLocalizationFile)
+      sender.sendMessage(new TextComponentString("" + format).appendSibling(new TextComponentTranslation(key, args)));
+    else
+      sender.sendMessage(new TextComponentString(format + String.format(key, args)));
   }
 
-  static enum SubCommand {
+  enum SubCommand {
 
     GET, SET, ADD, SUB;
 
