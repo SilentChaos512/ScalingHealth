@@ -158,6 +158,7 @@ public class HeartDisplayHandler extends Gui {
         mc.renderEngine.bindTexture(TEXTURE);
         health = MathHelper.ceil(player.getHealth());
         int rowCount = getCustomHeartRowCount(health);
+        int maxHealthRows = getCustomHeartRowCount((int) player.getMaxHealth());
 
         for (int row = Math.max(0, rowCount - 2); row < rowCount; ++row) {
             int actualRow = row + (Config.REPLACE_VANILLA_HEARTS_WITH_CUSTOM ? 0 : 1);
@@ -186,7 +187,7 @@ public class HeartDisplayHandler extends Gui {
             }
 
             // Outline for last heart, to make seeing max health a little easier.
-            if (Config.LAST_HEART_OUTLINE_ENABLED && anythingDrawn && row == rowCount - 1) {
+            if (Config.LAST_HEART_OUTLINE_ENABLED && anythingDrawn && row == maxHealthRows - 1) {
                 // Get position of last partial/full heart
                 j = (int) (Math.ceil(player.getMaxHealth() % 20f / 2f)) - 1;
                 if (j < 0) j += 10;
