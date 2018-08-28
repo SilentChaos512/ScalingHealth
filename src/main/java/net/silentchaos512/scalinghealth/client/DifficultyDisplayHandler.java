@@ -34,106 +34,102 @@ import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
 public class DifficultyDisplayHandler extends Gui {
+    public static final DifficultyDisplayHandler INSTANCE = new DifficultyDisplayHandler();
 
-  public static final DifficultyDisplayHandler INSTANCE = new DifficultyDisplayHandler();
+    private static final ResourceLocation TEXTURE = new ResourceLocation(ScalingHealth.MOD_ID_LOWER, "textures/gui/hud.png");
 
-  public static final ResourceLocation TEXTURE = new ResourceLocation(ScalingHealth.MOD_ID_LOWER, "textures/gui/hud.png");
+    private int lastDifficultyDisplayed = -100;
+    private int lastAreaDifficultyDisplayed = -100;
+    private int lastUpdateTime = Integer.MIN_VALUE;
 
-  int lastDifficultyDisplayed = -100;
-  int lastAreaDifficultyDisplayed = -100;
-  int lastUpdateTime = Integer.MIN_VALUE;
-  int currentTime = 0;
-
-  public void showBar() {
-
-    this.lastUpdateTime = Integer.MIN_VALUE;
-    this.lastDifficultyDisplayed = -100;
-  }
-
-  @SubscribeEvent
-  public void onRenderOverlay(RenderGameOverlayEvent.Post event) {
-
-    if (event.getType() != ElementType.TEXT || Config.DIFFICULTY_MAX <= 0 || !Config.RENDER_DIFFICULTY_METER)
-      return;
-
-    Minecraft mc = Minecraft.getMinecraft();
-    EntityPlayer player = mc.player;
-
-    int width = event.getResolution().getScaledWidth();
-    int height = event.getResolution().getScaledHeight();
-
-    PlayerData data = player != null ? SHPlayerDataHandler.get(player) : null;
-    if (data == null)
-      return;
-
-    int difficulty = (int) data.getDifficulty();
-    int areaDifficulty = MathHelper.clamp((int) Config.AREA_DIFFICULTY_MODE.getAreaDifficulty(player.world, player.getPosition()), 0,
-        (int) Config.DIFFICULTY_MAX);
-    if (Config.AREA_DIFFICULTY_MODE == EnumAreaDifficultyMode.SERVER_WIDE) {
-      difficulty = areaDifficulty;
-    }
-    int timeSinceLastUpdate = ClientTickHandler.ticksInGame - lastUpdateTime;
-
-    if (difficulty != lastDifficultyDisplayed) {
-      lastDifficultyDisplayed = difficulty;
-      lastUpdateTime = ClientTickHandler.ticksInGame;
-    }
-    if (areaDifficulty < lastAreaDifficultyDisplayed - 10 || areaDifficulty > lastAreaDifficultyDisplayed + 10 && timeSinceLastUpdate > 1200) {
-      lastAreaDifficultyDisplayed = areaDifficulty;
-      lastUpdateTime = ClientTickHandler.ticksInGame;
+    public void showBar() {
+        this.lastUpdateTime = Integer.MIN_VALUE;
+        this.lastDifficultyDisplayed = -100;
     }
 
-    currentTime = ClientTickHandler.ticksInGame;
-    if (Config.RENDER_DIFFICULTY_METER_ALWAYS || currentTime - lastUpdateTime < Config.DIFFICULTY_METER_DISPLAY_TIME) {
-      GlStateManager.enableBlend();
+    @SubscribeEvent
+    public void onRenderOverlay(RenderGameOverlayEvent.Post event) {
 
-      mc.renderEngine.bindTexture(TEXTURE);
+        if (event.getType() != ElementType.TEXT || Config.DIFFICULTY_MAX <= 0 || !Config.RENDER_DIFFICULTY_METER)
+            return;
 
-      GlStateManager.pushMatrix();
-      // GlStateManager.scale(1f, 0.5f, 1f);
+        Minecraft mc = Minecraft.getMinecraft();
+        EntityPlayer player = mc.player;
 
-      int posX = Config.DIFFICULTY_METER_POS_X; // 5;
-      if (posX < 0)
-        posX = posX + width - 64;
-      int posY = Config.DIFFICULTY_METER_POS_Y; // height - 30;
-      if (posY < 0)
-        posY = posY + height - 12;
+        int width = event.getResolution().getScaledWidth();
+        int height = event.getResolution().getScaledHeight();
 
-      // Frame
-      drawTexturedModalRect(posX, posY, 192, 0, 64, 12, 0xFFFFFF);
+        PlayerData data = player != null ? SHPlayerDataHandler.get(player) : null;
+        if (data == null)
+            return;
 
-      // Area Difficulty
-      int barLength = (int) (60 * areaDifficulty / Config.DIFFICULTY_MAX);
-      drawTexturedModalRect(posX + 2, posY + 2, 194, 14, barLength, 6, 0xFFFFFF);
+        int difficulty = (int) data.getDifficulty();
+        int areaDifficulty = MathHelper.clamp((int) Config.AREA_DIFFICULTY_MODE.getAreaDifficulty(player.world, player.getPosition()), 0,
+                (int) Config.DIFFICULTY_MAX);
+        if (Config.AREA_DIFFICULTY_MODE == EnumAreaDifficultyMode.SERVER_WIDE) {
+            difficulty = areaDifficulty;
+        }
+        int timeSinceLastUpdate = ClientTickHandler.ticksInGame - lastUpdateTime;
 
-      // Difficulty
-      barLength = (int) (60 * difficulty / Config.DIFFICULTY_MAX);
-      drawTexturedModalRect(posX + 2, posY + 8, 194, 20, barLength, 2, 0xFFFFFF);
+        if (difficulty != lastDifficultyDisplayed) {
+            lastDifficultyDisplayed = difficulty;
+            lastUpdateTime = ClientTickHandler.ticksInGame;
+        }
+        if (areaDifficulty < lastAreaDifficultyDisplayed - 10 || areaDifficulty > lastAreaDifficultyDisplayed + 10 && timeSinceLastUpdate > 1200) {
+            lastAreaDifficultyDisplayed = areaDifficulty;
+            lastUpdateTime = ClientTickHandler.ticksInGame;
+        }
 
-      // Text
-      float textScale = 0.6f;
-      GlStateManager.pushMatrix();
-      GlStateManager.scale(textScale, textScale, 1.0f);
-      String localizedString = ScalingHealth.i18n.miscText("difficultyMeterText");
-      mc.fontRenderer.drawStringWithShadow(localizedString, posX / textScale + 4, posY / textScale - 9, 0xFFFFFF);
-      // Text Difficulty
-      String str = String.format("%d", areaDifficulty);
-      int strWidth = mc.fontRenderer.getStringWidth(str);
-      mc.fontRenderer.drawStringWithShadow(str, posX / textScale + 104 - strWidth, posY / textScale - 9, 0xAAAAAA);
-      GlStateManager.popMatrix();
+        int currentTime = ClientTickHandler.ticksInGame;
+        if (Config.RENDER_DIFFICULTY_METER_ALWAYS || currentTime - lastUpdateTime < Config.DIFFICULTY_METER_DISPLAY_TIME) {
+            GlStateManager.enableBlend();
 
-      GlStateManager.popMatrix();
-      GlStateManager.disableBlend();
+            mc.renderEngine.bindTexture(TEXTURE);
+
+            GlStateManager.pushMatrix();
+            // GlStateManager.scale(1f, 0.5f, 1f);
+
+            int posX = Config.DIFFICULTY_METER_POS_X; // 5;
+            if (posX < 0)
+                posX = posX + width - 64;
+            int posY = Config.DIFFICULTY_METER_POS_Y; // height - 30;
+            if (posY < 0)
+                posY = posY + height - 12;
+
+            // Frame
+            drawTexturedModalRect(posX, posY, 192, 0, 64, 12, 0xFFFFFF);
+
+            // Area Difficulty
+            int barLength = (int) (60 * areaDifficulty / Config.DIFFICULTY_MAX);
+            drawTexturedModalRect(posX + 2, posY + 2, 194, 14, barLength, 6, 0xFFFFFF);
+
+            // Difficulty
+            barLength = (int) (60 * difficulty / Config.DIFFICULTY_MAX);
+            drawTexturedModalRect(posX + 2, posY + 8, 194, 20, barLength, 2, 0xFFFFFF);
+
+            // Text
+            float textScale = 0.6f;
+            GlStateManager.pushMatrix();
+            GlStateManager.scale(textScale, textScale, 1.0f);
+            String localizedString = ScalingHealth.i18n.miscText("difficultyMeterText");
+            mc.fontRenderer.drawStringWithShadow(localizedString, posX / textScale + 4, posY / textScale - 9, 0xFFFFFF);
+            // Text Difficulty
+            String str = String.format("%d", areaDifficulty);
+            int strWidth = mc.fontRenderer.getStringWidth(str);
+            mc.fontRenderer.drawStringWithShadow(str, posX / textScale + 104 - strWidth, posY / textScale - 9, 0xAAAAAA);
+            GlStateManager.popMatrix();
+
+            GlStateManager.popMatrix();
+            GlStateManager.disableBlend();
+        }
     }
-  }
 
-  protected void drawTexturedModalRect(int x, int y, int textureX, int textureY, int width, int height, int color) {
-
-    float r = ((color >> 16) & 255) / 255f;
-    float g = ((color >> 8) & 255) / 255f;
-    float b = (color & 255) / 255f;
-    GlStateManager.color(r, g, b);
-    drawTexturedModalRect(x, y, textureX, textureY, width, height);
-    GlStateManager.color(1f, 1f, 1f);
-  }
+    private void drawTexturedModalRect(int x, int y, int textureX, int textureY, int width, int height, int color) {
+        float r = ((color >> 16) & 255) / 255f;
+        float g = ((color >> 8) & 255) / 255f;
+        float b = (color & 255) / 255f;
+        GlStateManager.color(r, g, b);
+        drawTexturedModalRect(x, y, textureX, textureY, width, height);
+        GlStateManager.color(1f, 1f, 1f);
+    }
 }

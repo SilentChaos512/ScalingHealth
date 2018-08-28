@@ -2,6 +2,6 @@
     "player_died": {
         "category": "player",
         "subtitle": "scalinghealth.subtitle.player_died",
-        "sounds": [ "scalinghealth:sadtrombone", "scalinghealth:mlg_airhorn" ]
+        "sounds": [ "scalinghealth:sadtrombone", "scalinghealth:mlg_airhorn", "scalinghealth:wilhelm" ]
     }
 }
