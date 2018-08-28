@@ -238,7 +238,8 @@ public class HeartDisplayHandler extends Gui {
 
             // Half heart on the end?
             if (absorbCeil % 2 == 1 && renderHearts < 10) {
-                drawTexturedModalRect(left + 8 * renderHearts, top - 10, 26 + 9, potionOffset, 9, 9, rowColor);
+                y = top - 10 + (x == regen - 10 ? -2 : 0);
+                drawTexturedModalRect(left + 8 * renderHearts, y, 26 + 9, potionOffset, 9, 9, rowColor);
                 anythingDrawn = true;
             }
 
