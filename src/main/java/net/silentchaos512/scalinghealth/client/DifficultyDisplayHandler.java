@@ -97,15 +97,15 @@ public class DifficultyDisplayHandler extends Gui {
                 posY = posY + height - 12;
 
             // Frame
-            drawTexturedModalRect(posX, posY, 192, 0, 64, 12, 0xFFFFFF);
+            drawTexturedModalRect(posX, posY, 190, 0, 66, 14, 0xFFFFFF);
 
             // Area Difficulty
             int barLength = (int) (60 * areaDifficulty / Config.DIFFICULTY_MAX);
-            drawTexturedModalRect(posX + 2, posY + 2, 194, 14, barLength, 6, 0xFFFFFF);
+            drawTexturedModalRect(posX + 3, posY + 5, 193, 19, barLength, 6, 0xFFFFFF);
 
-            // Difficulty
+            // Player Difficulty
             barLength = (int) (60 * difficulty / Config.DIFFICULTY_MAX);
-            drawTexturedModalRect(posX + 2, posY + 8, 194, 20, barLength, 2, 0xFFFFFF);
+            drawTexturedModalRect(posX + 3, posY + 3, 193, 17, barLength, 2, 0xFFFFFF);
 
             // Text
             float textScale = 0.6f;
