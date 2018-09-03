@@ -39,6 +39,10 @@ import net.silentchaos512.scalinghealth.config.Config;
 import java.awt.*;
 import java.util.Random;
 
+/**
+ * Handles display of regular and absorption hearts.
+ * <p>For future reference, much of the vanilla code can be found in {@link GuiIngameForge}.</p>
+ */
 public class HeartDisplayHandler extends Gui {
     public enum TextStyle {
         DISABLED, ROWS, HEALTH_AND_MAX;
@@ -48,7 +52,6 @@ public class HeartDisplayHandler extends Gui {
         public static TextStyle loadFromConfig(ConfigBase config) {
             return config.loadEnum("Health Text Style", Config.CAT_CLIENT, TextStyle.class, ROWS, COMMENT);
         }
-
     }
 
     public enum TextColor {
@@ -59,7 +62,16 @@ public class HeartDisplayHandler extends Gui {
         public static TextColor loadFromConfig(ConfigBase config) {
             return config.loadEnum("Health Text Color", Config.CAT_CLIENT, TextColor.class, GREEN_TO_RED, COMMENT);
         }
+    }
 
+    public enum AbsorptionHeartStyle {
+        SHIELD, GOLD_OUTLINE, VANILLA;
+
+        public static final String COMMENT = "Determines how absorption hearts should be rendered.";
+
+        public static AbsorptionHeartStyle loadDromConfig(ConfigBase config) {
+            return config.loadEnum("Absorption Heart Style", Config.CAT_CLIENT, AbsorptionHeartStyle.class, SHIELD, COMMENT);
+        }
     }
 
     public static final HeartDisplayHandler INSTANCE = new HeartDisplayHandler();
@@ -213,54 +225,62 @@ public class HeartDisplayHandler extends Gui {
             }
         }
 
-        // Absorption hearts override
-        int absorbCeil = (int) Math.ceil(absorb);
-        rowCount = (int) Math.ceil(absorb / 20);
+        /* ==========================
+         * Absorption hearts override
+         * ========================== */
 
-        // Dark underlay for first row
-        for (int i = 0; i < 10 && i < absorb / 2; ++i) {
-            int y = top - 10 + (i == regen - 10 ? -2 : 0);
-            drawTexturedModalRect(left + 8 * i, y, 17, 45, 9, 9, 0xFFFFFF);
-        }
+        if (Config.ABSORPTION_HEART_STYLE != AbsorptionHeartStyle.VANILLA) {
+            int absorbCeil = (int) Math.ceil(absorb);
+            rowCount = (int) Math.ceil(absorb / 20);
 
-        // Draw the top two absorption rows
-        for (int i = Math.max(0, rowCount - 2); i < rowCount; ++i) {
-            int renderHearts = Math.min((absorbCeil - 20 * i) / 2, 10);
-            int rowColor = getColorForRow(i);
-            boolean anythingDrawn;
-
-            // Draw the hearts
-            int x;
-            int y;
-            for (x = 0; x < renderHearts; ++x) {
-                y = top - 10 + (x == regen - 10 ? -2 : 0);
-                drawTexturedModalRect(left + 8 * x, y, 26, 0, 9, 9, rowColor);
-            }
-            anythingDrawn = x > 0;
-
-            // Half heart on the end?
-            if (absorbCeil % 2 == 1 && renderHearts < 10) {
-                y = top - 10 + (x == regen - 10 ? -2 : 0);
-                drawTexturedModalRect(left + 8 * renderHearts, y, 26 + 9, 0, 9, 9, rowColor);
-                anythingDrawn = true;
+            // Dark underlay for first row
+            int texX = 17;
+            int texY = Config.ABSORPTION_HEART_STYLE == AbsorptionHeartStyle.SHIELD ? 45 : 54;
+            for (int i = 0; i < 10 && i < absorb / 2; ++i) {
+                int y = top - 10 + (i == regen - 10 ? -2 : 0);
+                drawTexturedModalRect(left + 8 * i, y, texX, texY, 9, 9, 0xFFFFFF);
             }
 
-            // Outline for last heart, to make seeing max health a little easier.
-//            if (Config.LAST_HEART_OUTLINE_ENABLED && anythingDrawn && i == MathHelper.ceil(player.getMaxHealth() / 20) - 2) {
-//                j = (int) ((player.getMaxHealth() % 20) / 2) - 1;
-//                if (j < 0) {
-//                    j += 10;
-//                }
-//                drawTexturedModalRect(left + 8 * j, top + y, 17, 9, 10, 9, Config.LAST_HEART_OUTLINE_COLOR);
-//            }
-        }
+            // Draw the top two absorption rows, just the basic "hearts"
+            texX = Config.ABSORPTION_HEART_STYLE == AbsorptionHeartStyle.SHIELD ? 26 : 0;
+            texY = Config.ABSORPTION_HEART_STYLE == AbsorptionHeartStyle.SHIELD ? 0 : potionOffset;
+            for (int i = Math.max(0, rowCount - 2); i < rowCount; ++i) {
+                int renderHearts = Math.min((absorbCeil - 20 * i) / 2, 10);
+                int rowColor = getColorForRow(i);
+                boolean anythingDrawn;
 
-        // Golden hearts in center
-        for (int i = 0; i < 10 && i < absorb / 2; ++i) {
-            int y = top - 10 + (i == regen - 10 ? -2 : 0);
-            drawTexturedModalRect(left + 8 * i, y, 17, 36, 9, 9, 0xFFFFFF);
-            // Shiny glint on top, same as hearts.
-            drawTexturedModalRect(left + 8 * i, y, 17, 0, 9, 9, 0xCCFFFFFF);
+                // Draw the hearts
+                int x;
+                int y;
+                for (x = 0; x < renderHearts; ++x) {
+                    y = top - 10 + (x == regen - 10 ? -2 : 0);
+                    drawTexturedModalRect(left + 8 * x, y, texX, texY, 9, 9, rowColor);
+                }
+                anythingDrawn = x > 0;
+
+                // Half heart on the end?
+                if (absorbCeil % 2 == 1 && renderHearts < 10) {
+                    y = top - 10 + (x == regen - 10 ? -2 : 0);
+                    drawTexturedModalRect(left + 8 * renderHearts, y, texX + 9, texY, 9, 9, rowColor);
+                    anythingDrawn = true;
+                }
+            }
+
+            // Add extra bits like outlines on top
+            for (int i = 0; i < 10 && i < absorb / 2; ++i) {
+                int y = top - 10 + (i == regen - 10 ? -2 : 0);
+                if (Config.ABSORPTION_HEART_STYLE == AbsorptionHeartStyle.SHIELD) {
+                    // Golden hearts in center (shield style only)
+                    drawTexturedModalRect(left + 8 * i, y, 17, 36, 9, 9, 0xFFFFFF);
+                } else if (Config.ABSORPTION_HEART_STYLE == AbsorptionHeartStyle.GOLD_OUTLINE) {
+                    // Golden outline
+                    drawTexturedModalRect(left + 8 * i, y, 17, 27, 9, 9, 0xFFFFFF);
+                }
+                // Shiny glint on top, same as hearts.
+                if (!hardcoreMode || Config.ABSORPTION_HEART_STYLE == AbsorptionHeartStyle.SHIELD) {
+                    drawTexturedModalRect(left + 8 * i, y, 17, 0, 9, 9, 0xCCFFFFFF);
+                }
+            }
         }
 
         GlStateManager.disableBlend();
@@ -272,7 +292,12 @@ public class HeartDisplayHandler extends Gui {
     }
 
     private void drawVanillaHearts(int health, boolean highlight, int healthLast, float healthMax, int rowHeight, int left, int top, int regen, int[] lowHealthBob, int TOP, int BACKGROUND, int MARGIN) {
-        for (int i = MathHelper.ceil((healthMax /*+ absorb*/) / 2f) - 1; i >= 0; --i) {
+        float absorb = MathHelper.ceil(Minecraft.getMinecraft().player.getAbsorptionAmount());
+        float absorbRemaining = absorb;
+        float healthTotal = health + absorb;
+
+        int iStart = MathHelper.ceil((healthMax + (Config.ABSORPTION_HEART_STYLE == AbsorptionHeartStyle.VANILLA ? absorb : 0)) / 2f) - 1;
+        for (int i = iStart; i >= 0; --i) {
             int row = MathHelper.ceil((i + 1) / 10f) - 1;
             int x = left + i % 10 * 8;
             int y = top - row * rowHeight;
@@ -291,21 +316,21 @@ public class HeartDisplayHandler extends Gui {
                     drawTexturedModalRect(x, y, MARGIN + 63, TOP, 9, 9);
             }
 
-//            if (absorbRemaining > 0f) {
-//                if (absorbRemaining == absorb && absorb % 2f == 1f) {
-//                    drawTexturedModalRect(x, y, MARGIN + 153, TOP, 9, 9);
-//                    absorbRemaining -= 1f;
-//                } else {
-//                    if (i * 2 + 1 < health)
-//                        drawTexturedModalRect(x, y, MARGIN + 144, TOP, 9, 9);
-//                    absorbRemaining -= 2f;
-//                }
-//            } else {
-            if (i * 2 + 1 < health)
-                drawTexturedModalRect(x, y, MARGIN + 36, TOP, 9, 9);
-            else if (i * 2 + 1 == health)
-                drawTexturedModalRect(x, y, MARGIN + 45, TOP, 9, 9);
-//            }
+            if (absorbRemaining > 0f) {
+                if (absorbRemaining == absorb && absorb % 2f == 1f) {
+                    drawTexturedModalRect(x, y, MARGIN + 153, TOP, 9, 9);
+                    absorbRemaining -= 1f;
+                } else {
+                    if (i * 2 + 1 < healthTotal)
+                        drawTexturedModalRect(x, y, MARGIN + 144, TOP, 9, 9);
+                    absorbRemaining -= 2f;
+                }
+            } else {
+                if (i * 2 + 1 < health)
+                    drawTexturedModalRect(x, y, MARGIN + 36, TOP, 9, 9);
+                else if (i * 2 + 1 == health)
+                    drawTexturedModalRect(x, y, MARGIN + 45, TOP, 9, 9);
+            }
         }
     }
 

@@ -59,6 +59,7 @@ public class Config extends AdaptiveConfig {
     public static boolean REPLACE_VANILLA_HEARTS_WITH_CUSTOM = true;
     public static HeartDisplayHandler.TextStyle HEART_DISPLAY_TEXT_STYLE;
     public static HeartDisplayHandler.TextColor HEART_DISPLAY_TEXT_COLOR;
+    public static HeartDisplayHandler.AbsorptionHeartStyle ABSORPTION_HEART_STYLE;
     public static boolean RENDER_DIFFICULTY_METER = true;
     public static boolean RENDER_DIFFICULTY_METER_ALWAYS = false;
     public static int DIFFICULTY_METER_DISPLAY_TIME = 160;
@@ -284,6 +285,7 @@ public class Config extends AdaptiveConfig {
                             " vanilla hearts are rendered first, then custom hearts are used for extra hearts.");
             HEART_DISPLAY_TEXT_STYLE = HeartDisplayHandler.TextStyle.loadFromConfig(this);
             HEART_DISPLAY_TEXT_COLOR = HeartDisplayHandler.TextColor.loadFromConfig(this);
+            ABSORPTION_HEART_STYLE = HeartDisplayHandler.AbsorptionHeartStyle.loadDromConfig(this);
             LAST_HEART_OUTLINE_ENABLED = loadBoolean("Last Heart Outline Enabled", CAT_CLIENT,
                     LAST_HEART_OUTLINE_ENABLED,
                     "Outline your last (highest) heart in a different color. This makes seeing your max health a little easier.");
