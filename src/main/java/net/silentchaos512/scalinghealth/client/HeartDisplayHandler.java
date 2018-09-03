@@ -208,7 +208,9 @@ public class HeartDisplayHandler extends Gui {
                 drawTexturedModalRect(left + 8 * i, y, 0, 54, 9, 9, color);
             }
             // Shiny glint on top of the hearts, a single white pixel in the upper left <3
-            drawTexturedModalRect(left + 8 * i, y, 17, potionOffset, 9, 9, 0xCCFFFFFF);
+            if (!hardcoreMode) {
+                drawTexturedModalRect(left + 8 * i, y, 17, 0, 9, 9, 0xCCFFFFFF);
+            }
         }
 
         // Absorption hearts override
@@ -232,14 +234,14 @@ public class HeartDisplayHandler extends Gui {
             int y;
             for (x = 0; x < renderHearts; ++x) {
                 y = top - 10 + (x == regen - 10 ? -2 : 0);
-                drawTexturedModalRect(left + 8 * x, y, 26, potionOffset, 9, 9, rowColor);
+                drawTexturedModalRect(left + 8 * x, y, 26, 0, 9, 9, rowColor);
             }
             anythingDrawn = x > 0;
 
             // Half heart on the end?
             if (absorbCeil % 2 == 1 && renderHearts < 10) {
                 y = top - 10 + (x == regen - 10 ? -2 : 0);
-                drawTexturedModalRect(left + 8 * renderHearts, y, 26 + 9, potionOffset, 9, 9, rowColor);
+                drawTexturedModalRect(left + 8 * renderHearts, y, 26 + 9, 0, 9, 9, rowColor);
                 anythingDrawn = true;
             }
 
@@ -258,7 +260,7 @@ public class HeartDisplayHandler extends Gui {
             int y = top - 10 + (i == regen - 10 ? -2 : 0);
             drawTexturedModalRect(left + 8 * i, y, 17, 36, 9, 9, 0xFFFFFF);
             // Shiny glint on top, same as hearts.
-            drawTexturedModalRect(left + 8 * i, y, 17, potionOffset, 9, 9, 0xCCFFFFFF);
+            drawTexturedModalRect(left + 8 * i, y, 17, 0, 9, 9, 0xCCFFFFFF);
         }
 
         GlStateManager.disableBlend();

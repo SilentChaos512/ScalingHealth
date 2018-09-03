@@ -1,5 +1,6 @@
 1.3.27
 Update difficulty meter textures (Z-Tunic)
+Fixed: Hearts and absorption hearts rendering incorrectly in hardcore mode (#132)
 Fixed: Sleep warning never showing
 
 1.3.26
