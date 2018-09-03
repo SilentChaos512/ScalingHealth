@@ -1,5 +1,6 @@
 1.3.27
 Update difficulty meter textures (Z-Tunic)
+Fixed: Sleep warning never showing
 
 1.3.26
 Updated heart textures (Z-Tunic)

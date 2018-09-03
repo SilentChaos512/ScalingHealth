@@ -24,7 +24,6 @@ import net.minecraft.entity.monster.EntitySlime;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayer.SleepResult;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.util.DamageSource;
@@ -239,7 +238,7 @@ public class ScalingHealthCommonEvents {
 
     @SubscribeEvent
     public void onPlayerSleepInBed(PlayerSleepInBedEvent event) {
-        if (!event.getEntityPlayer().world.isRemote && event.getResultStatus() == SleepResult.OK && Config.WARN_WHEN_SLEEPING && Config.DIFFICULTY_FOR_SLEEPING > 0f) {
+        if (!event.getEntityPlayer().world.isRemote && Config.WARN_WHEN_SLEEPING && Config.DIFFICULTY_FOR_SLEEPING != 0f) {
             ChatHelper.translate(event.getEntityPlayer(), ScalingHealth.i18n.getKey("misc", "sleepWarning"));
         }
     }
