@@ -316,7 +316,8 @@ public class HeartDisplayHandler extends Gui {
                     drawTexturedModalRect(x, y, MARGIN + 63, TOP, 9, 9);
             }
 
-            if (absorbRemaining > 0f) {
+            // TODO: Does this fix the rendering issues introduced in 1.3.27?
+            if (absorbRemaining > 0f && Config.ABSORPTION_HEART_STYLE == AbsorptionHeartStyle.VANILLA) {
                 if (absorbRemaining == absorb && absorb % 2f == 1f) {
                     drawTexturedModalRect(x, y, MARGIN + 153, TOP, 9, 9);
                     absorbRemaining -= 1f;
