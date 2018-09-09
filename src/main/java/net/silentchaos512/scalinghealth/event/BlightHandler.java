@@ -42,7 +42,7 @@ import net.silentchaos512.scalinghealth.init.ModItems;
 import net.silentchaos512.scalinghealth.network.NetworkHandler;
 import net.silentchaos512.scalinghealth.network.message.MessageMarkBlight;
 
-import java.util.List;
+import javax.annotation.Nullable;
 
 public final class BlightHandler {
     public static final BlightHandler INSTANCE = new BlightHandler();
@@ -67,7 +67,7 @@ public final class BlightHandler {
     }
 
     static void spawnBlightFire(EntityLivingBase blight) {
-        if (blight.world.isRemote)
+        if (blight.world.isRemote || getBlightFire(blight) != null)
             return;
 
         EntityBlightFire fire = new EntityBlightFire(blight);
@@ -77,12 +77,10 @@ public final class BlightHandler {
             fire.startRiding(blight);
     }
 
+    @Nullable
     private static EntityBlightFire getBlightFire(EntityLivingBase blight) {
-        World world = blight.world;
-        List<EntityBlightFire> fireList = world.getEntities(EntityBlightFire.class, e -> true);
-
-        for (EntityBlightFire fire : fireList)
-            if (fire.getParent() != null && fire.getParent().equals(blight))
+        for (EntityBlightFire fire : blight.world.getEntities(EntityBlightFire.class, e -> true))
+            if (blight.equals(fire.getParent()))
                 return fire;
 
         return null;

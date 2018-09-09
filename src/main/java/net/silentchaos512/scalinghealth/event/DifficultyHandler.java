@@ -140,7 +140,7 @@ public class DifficultyHandler {
             return;
 
         boolean makeBlight = increaseEntityHealth(entityLiving);
-        if (makeBlight)
+        if (makeBlight && !BlightHandler.isBlight(entityLiving))
             makeEntityBlight(entityLiving, ScalingHealth.random);
     }
 
@@ -383,6 +383,7 @@ public class DifficultyHandler {
             entityLiving
                     .onStruckByLightning(new EntityLightningBolt(entityLiving.world,
                             entityLiving.posX, entityLiving.posY, entityLiving.posZ, true));
+            entityLiving.extinguish();
         }
 
         // Notify clients
