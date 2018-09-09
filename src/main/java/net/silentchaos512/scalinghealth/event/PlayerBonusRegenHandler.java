@@ -49,6 +49,9 @@ public class PlayerBonusRegenHandler {
       return;
 
     EntityPlayer player = event.player;
+    float health = player.getHealth();
+    if (health >= player.getMaxHealth()) return;
+
     String name = player.getName();
 
     // Add player timer if needed.
@@ -56,10 +59,13 @@ public class PlayerBonusRegenHandler {
       timers.put(name, Config.Player.BonusRegen.initialDelay);
 
     int foodLevel = player.getFoodStats().getFoodLevel();
+
     boolean foodLevelOk = foodLevel >= Config.Player.BonusRegen.minFood
         && foodLevel <= Config.Player.BonusRegen.maxFood;
+    boolean healthLevelOk = health > Config.Player.BonusRegen.minHealth
+        && health < Config.Player.BonusRegen.maxHealth;
 
-    if (player.getHealth() < player.getMaxHealth() && foodLevelOk) {
+    if (foodLevelOk && healthLevelOk) {
       // Tick timer, heal player and reset on 0.
       int timer = timers.get(name);
       if (--timer <= 0) {

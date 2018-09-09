@@ -200,6 +200,16 @@ public class Config extends ConfigBaseNew {
             @ConfigOption.Comment("The maximum food level at which bonus regen will be active (vanilla max food is 20).")
             public static int maxFood;
 
+            @ConfigOption(name = "Health Min", category = CAT_PLAYER_REGEN)
+            @ConfigOption.RangeInt(value = 0, min = 0)
+            @ConfigOption.Comment("Bonus regen will stop when players have this much health or less.")
+            public static int minHealth;
+
+            @ConfigOption(name = "Health Max", category = CAT_PLAYER_REGEN)
+            @ConfigOption.RangeInt(value = Integer.MAX_VALUE, min = 0)
+            @ConfigOption.Comment("Bonus regen will stop when players have this much health or more.")
+            public static int maxHealth;
+
             @ConfigOption(name = "Delay (Initial)", category = CAT_PLAYER_REGEN)
             @ConfigOption.RangeInt(value = 400, min = 0)
             @ConfigOption.Comment("The amount of time (in ticks) after being hurt before bonus regen activates.")
@@ -213,7 +223,7 @@ public class Config extends ConfigBaseNew {
             @ConfigOption(name = "Exhaustion Added", category = CAT_PLAYER_REGEN)
             @ConfigOption.RangeFloat(value = 0.1f, min = 0f, max = 1f)
             @ConfigOption.Comment("The food consumption for each bonus regen tick.")
-            public static float exhaustion = 0.1f;
+            public static float exhaustion;
         }
     }
 
@@ -412,16 +422,6 @@ public class Config extends ConfigBaseNew {
                 }
             }
 
-            // Regen
-            Player.BonusRegen.initialDelay = loadInt("Delay (Initial)", CAT_PLAYER_REGEN,
-                    Player.BonusRegen.initialDelay, 0, Integer.MAX_VALUE,
-                    "The number of ticks after being hurt before bonus regen activates.");
-            Player.BonusRegen.delay = loadInt("Delay", CAT_PLAYER_REGEN,
-                    Player.BonusRegen.delay, 0, Integer.MAX_VALUE,
-                    "The number of ticks between each bonus regen tick (a half heart being healed).");
-            Player.BonusRegen.exhaustion = config.getFloat("Exhaustion Added", CAT_PLAYER_REGEN,
-                    Player.BonusRegen.exhaustion, 0f, 1f,
-                    "The food consumption for each half heart regenerated.");
             // Damage Scaling
             DamageScaling.INSTANCE.loadConfig(config);
 
