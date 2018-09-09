@@ -140,8 +140,10 @@ public final class BlightHandler {
             // Tell all players that the blight was killed.
             if (Config.BLIGHT_NOTIFY_PLAYERS_ON_DEATH && player != null) {
                 ScalingHealth.logHelper.info("Blight {} was killed by {}", blight.getName(), actualKiller.getName());
-                for (EntityPlayer p : player.world.getPlayers(EntityPlayer.class, e -> true))
-                    ChatHelper.translate(p, ScalingHealth.i18n.getKey("blight", "killedByPlayer"), blight.getName(), actualKiller.getName());
+                for (EntityPlayer p : player.world.getPlayers(EntityPlayer.class, e -> true)) {
+                    // FIXME: blight name translation
+                    ChatHelper.translate(p, ScalingHealth.i18n.getKey("blight", "killedByPlayer"), "Blight " + blight.getName(), actualKiller.getName());
+                }
             }
 
             // Drop hearts!
@@ -165,7 +167,9 @@ public final class BlightHandler {
                     // Assuming arguments are the same as in DamageSource#getDeathMessage
                     // May fail with some modded damage sources, but should be fine in most cases
                     TextComponentTranslation original = (TextComponentTranslation) deathMessage;
-                    TextComponentTranslation newMessage = new TextComponentTranslation(original.getKey(), blight);
+                    // FIXME: blight name translation
+                    TextComponentTranslation newMessage = new TextComponentTranslation(original.getKey(),
+                            "Blight " + blight.getName());
                     ScalingHealth.logHelper.info("Blight {} has died", blight.getName());
                     for (EntityPlayer p : blight.world.getPlayers(EntityPlayer.class, e -> true))
                         ChatHelper.sendMessage(p, newMessage);
