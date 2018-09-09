@@ -158,7 +158,7 @@ public class DifficultyHandler {
             if (data != null) {
                 boolean isBlight = BlightHandler.isBlight(killed);
                 float amount = isBlight ? changes.onBlightKill : changes.onStandardKill;
-                if (Config.DEBUG_MODE) {
+                if (Config.Debug.debugMode) {
                     ScalingHealth.logHelper.info("Killed " + (isBlight ? "Blight " : "") + killed.getName()
                             + ": difficulty " + (amount > 0 ? "+" : "") + amount);
                 }
@@ -282,7 +282,7 @@ public class DifficultyHandler {
             entityLiving.setHealth(entityLiving.getMaxHealth());
         }
 
-        if (Config.DEBUG_MODE && Config.DEBUG_LOG_SPAWNS && originalDifficulty > 0f) {
+        if (Config.Debug.debugMode && Config.Debug.logSpawns && originalDifficulty > 0f) {
             BlockPos pos = entityLiving.getPosition();
             String line = "Spawn debug: %s (%d, %d, %d): Difficulty=%.2f, Health +%.2f, Damage +%.2f";
             line = String.format(line, entityLiving.getName(), pos.getX(), pos.getY(), pos.getZ(),

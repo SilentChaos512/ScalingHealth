@@ -63,7 +63,7 @@ public class ItemHeartContainer extends Item {
             PlayerData data = SHPlayerDataHandler.get(player);
 
             boolean healthIncreaseAllowed = Config.HEARTS_INCREASE_HEALTH && data != null
-                    && (Config.PLAYER_HEALTH_MAX == 0 || data.getMaxHealth() < Config.PLAYER_HEALTH_MAX);
+                    && (Config.Player.Health.maxHealth == 0 || data.getMaxHealth() < Config.Player.Health.maxHealth);
             int levelRequirement = getLevelsRequiredToUse(player, stack, healthIncreaseAllowed);
 
             // Does player have enough XP?

@@ -34,7 +34,7 @@ public class WitEventHandler {
   @SubscribeEvent
   public void onWitEntityInfo(WitEntityInfoEvent event) {
 
-    if (!Config.DEBUG_MODE)
+    if (!Config.Debug.debugMode)
       return;
 
     EntityLivingBase entity = event.entityLiving;

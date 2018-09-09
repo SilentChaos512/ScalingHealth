@@ -93,14 +93,14 @@ public class HeartDisplayHandler extends Gui {
         EntityPlayer player = mc.player;
 
         // Health text
-        TextStyle style = Config.HEART_DISPLAY_TEXT_STYLE;
-        TextColor styleColor = Config.HEART_DISPLAY_TEXT_COLOR;
+        TextStyle style = Config.Client.Hearts.textStyle;
+        TextColor styleColor = Config.Client.Hearts.textColor;
         if (event.getType() == ElementType.TEXT && style != TextStyle.DISABLED && mc.playerController.gameIsSurvivalOrAdventure()) {
             renderHealthText(event, player, style, styleColor);
         }
 
         // Hearts
-        if (event.getType() == ElementType.HEALTH && Config.CHANGE_HEART_RENDERING) {
+        if (event.getType() == ElementType.HEALTH && Config.Client.Hearts.customHeartRendering) {
             event.setCanceled(true);
             renderHearts(event, mc, player);
         }
@@ -173,7 +173,7 @@ public class HeartDisplayHandler extends Gui {
         int maxHealthRows = getCustomHeartRowCount((int) player.getMaxHealth());
 
         for (int row = Math.max(0, rowCount - 2); row < rowCount; ++row) {
-            int actualRow = row + (Config.REPLACE_VANILLA_HEARTS_WITH_CUSTOM ? 0 : 1);
+            int actualRow = row + (Config.Client.Hearts.replaceVanillaRow ? 0 : 1);
             int renderHearts = Math.min((health - 20 * actualRow) / 2, 10);
             int rowColor = getColorForRow(row);
             boolean anythingDrawn;
@@ -199,14 +199,14 @@ public class HeartDisplayHandler extends Gui {
             }
 
             // Outline for last heart, to make seeing max health a little easier.
-            if (Config.LAST_HEART_OUTLINE_ENABLED && anythingDrawn && row == maxHealthRows - 1) {
+            if (Config.Client.Hearts.lastHeartOutline && anythingDrawn && row == maxHealthRows - 1) {
                 // Get position of last partial/full heart
                 j = (int) (Math.ceil(player.getMaxHealth() % 20f / 2f)) - 1;
                 if (j < 0) j += 10;
                 y = top + (j == regen ? -2 : 0);
                 if (health <= 4)
                     y += lowHealthBob[MathHelper.clamp(j, 0, lowHealthBob.length - 1)];
-                drawTexturedModalRect(left + 8 * j, y, 17, 9, 9, 9, Config.LAST_HEART_OUTLINE_COLOR);
+                drawTexturedModalRect(left + 8 * j, y, 17, 9, 9, 9, Config.Client.Hearts.lastHeartOutlineColor);
             }
         }
 
@@ -229,21 +229,21 @@ public class HeartDisplayHandler extends Gui {
          * Absorption hearts override
          * ========================== */
 
-        if (Config.ABSORPTION_HEART_STYLE != AbsorptionHeartStyle.VANILLA) {
+        if (Config.Client.Hearts.absorptionStyle != AbsorptionHeartStyle.VANILLA) {
             int absorbCeil = (int) Math.ceil(absorb);
             rowCount = (int) Math.ceil(absorb / 20);
 
             // Dark underlay for first row
             int texX = 17;
-            int texY = Config.ABSORPTION_HEART_STYLE == AbsorptionHeartStyle.SHIELD ? 45 : 54;
+            int texY = Config.Client.Hearts.absorptionStyle == AbsorptionHeartStyle.SHIELD ? 45 : 54;
             for (int i = 0; i < 10 && i < absorb / 2; ++i) {
                 int y = top - 10 + (i == regen - 10 ? -2 : 0);
                 drawTexturedModalRect(left + 8 * i, y, texX, texY, 9, 9, 0xFFFFFF);
             }
 
             // Draw the top two absorption rows, just the basic "hearts"
-            texX = Config.ABSORPTION_HEART_STYLE == AbsorptionHeartStyle.SHIELD ? 26 : 0;
-            texY = Config.ABSORPTION_HEART_STYLE == AbsorptionHeartStyle.SHIELD ? 0 : potionOffset;
+            texX = Config.Client.Hearts.absorptionStyle == AbsorptionHeartStyle.SHIELD ? 26 : 0;
+            texY = Config.Client.Hearts.absorptionStyle == AbsorptionHeartStyle.SHIELD ? 0 : potionOffset;
             for (int i = Math.max(0, rowCount - 2); i < rowCount; ++i) {
                 int renderHearts = Math.min((absorbCeil - 20 * i) / 2, 10);
                 int rowColor = getColorForRow(i);
@@ -269,15 +269,15 @@ public class HeartDisplayHandler extends Gui {
             // Add extra bits like outlines on top
             for (int i = 0; i < 10 && i < absorb / 2; ++i) {
                 int y = top - 10 + (i == regen - 10 ? -2 : 0);
-                if (Config.ABSORPTION_HEART_STYLE == AbsorptionHeartStyle.SHIELD) {
+                if (Config.Client.Hearts.absorptionStyle == AbsorptionHeartStyle.SHIELD) {
                     // Golden hearts in center (shield style only)
                     drawTexturedModalRect(left + 8 * i, y, 17, 36, 9, 9, 0xFFFFFF);
-                } else if (Config.ABSORPTION_HEART_STYLE == AbsorptionHeartStyle.GOLD_OUTLINE) {
+                } else if (Config.Client.Hearts.absorptionStyle == AbsorptionHeartStyle.GOLD_OUTLINE) {
                     // Golden outline
                     drawTexturedModalRect(left + 8 * i, y, 17, 27, 9, 9, 0xFFFFFF);
                 }
                 // Shiny glint on top, same as hearts.
-                if (!hardcoreMode || Config.ABSORPTION_HEART_STYLE == AbsorptionHeartStyle.SHIELD) {
+                if (!hardcoreMode || Config.Client.Hearts.absorptionStyle == AbsorptionHeartStyle.SHIELD) {
                     drawTexturedModalRect(left + 8 * i, y, 17, 0, 9, 9, 0xCCFFFFFF);
                 }
             }
@@ -288,7 +288,7 @@ public class HeartDisplayHandler extends Gui {
     }
 
     private int getCustomHeartRowCount(int health) {
-        return Config.REPLACE_VANILLA_HEARTS_WITH_CUSTOM ? MathHelper.ceil(health / 20f) : health / 20;
+        return Config.Client.Hearts.replaceVanillaRow ? MathHelper.ceil(health / 20f) : health / 20;
     }
 
     private void drawVanillaHearts(int health, boolean highlight, int healthLast, float healthMax, int rowHeight, int left, int top, int regen, int[] lowHealthBob, int TOP, int BACKGROUND, int MARGIN) {
@@ -296,7 +296,7 @@ public class HeartDisplayHandler extends Gui {
         float absorbRemaining = absorb;
         float healthTotal = health + absorb;
 
-        int iStart = MathHelper.ceil((healthMax + (Config.ABSORPTION_HEART_STYLE == AbsorptionHeartStyle.VANILLA ? absorb : 0)) / 2f) - 1;
+        int iStart = MathHelper.ceil((healthMax + (Config.Client.Hearts.absorptionStyle == AbsorptionHeartStyle.VANILLA ? absorb : 0)) / 2f) - 1;
         for (int i = iStart; i >= 0; --i) {
             int row = MathHelper.ceil((i + 1) / 10f) - 1;
             int x = left + i % 10 * 8;
@@ -317,7 +317,7 @@ public class HeartDisplayHandler extends Gui {
             }
 
             // TODO: Does this fix the rendering issues introduced in 1.3.27?
-            if (absorbRemaining > 0f && Config.ABSORPTION_HEART_STYLE == AbsorptionHeartStyle.VANILLA) {
+            if (absorbRemaining > 0f && Config.Client.Hearts.absorptionStyle == AbsorptionHeartStyle.VANILLA) {
                 if (absorbRemaining == absorb && absorb % 2f == 1f) {
                     drawTexturedModalRect(x, y, MARGIN + 153, TOP, 9, 9);
                     absorbRemaining -= 1f;
@@ -383,7 +383,7 @@ public class HeartDisplayHandler extends Gui {
     }
 
     private int getColorForRow(int row) {
-        return Config.HEART_COLORS[row % Config.HEART_COLORS.length];
+        return Config.Client.Hearts.heartColors[row % Config.Client.Hearts.heartColors.length];
     }
 
     private boolean showEffectHearts(EntityPlayer player) {

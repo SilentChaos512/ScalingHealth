@@ -45,7 +45,7 @@ public class PlayerBonusRegenHandler {
   @SubscribeEvent
   public void onPlayerTick(PlayerTickEvent event) {
 
-    if (event.side == Side.CLIENT || !Config.ENABLE_BONUS_HEALTH_REGEN)
+    if (event.side == Side.CLIENT || !Config.Player.BonusRegen.enabled)
       return;
 
     EntityPlayer player = event.player;
@@ -53,19 +53,19 @@ public class PlayerBonusRegenHandler {
 
     // Add player timer if needed.
     if (!timers.containsKey(name))
-      timers.put(name, Config.BONUS_HEALTH_REGEN_INITIAL_DELAY);
+      timers.put(name, Config.Player.BonusRegen.initialDelay);
 
     int foodLevel = player.getFoodStats().getFoodLevel();
-    boolean foodLevelOk = foodLevel >= Config.BONUS_HEALTH_REGEN_MIN_FOOD
-        && foodLevel <= Config.BONUS_HEALTH_REGEN_MAX_FOOD;
+    boolean foodLevelOk = foodLevel >= Config.Player.BonusRegen.minFood
+        && foodLevel <= Config.Player.BonusRegen.maxFood;
 
     if (player.getHealth() < player.getMaxHealth() && foodLevelOk) {
       // Tick timer, heal player and reset on 0.
       int timer = timers.get(name);
       if (--timer <= 0) {
         player.heal(1f);
-        player.addExhaustion(Config.BONUS_HEALTH_REGEN_EXHAUSTION);
-        timer = Config.BONUS_HEALTH_REGEN_DELAY;
+        player.addExhaustion(Config.Player.BonusRegen.exhaustion);
+        timer = Config.Player.BonusRegen.delay;
       }
       timers.put(name, timer);
     }
@@ -77,6 +77,6 @@ public class PlayerBonusRegenHandler {
     EntityLivingBase entityLiving = event.getEntityLiving();
     if (entityLiving.world.isRemote || !(entityLiving instanceof EntityPlayer))
       return;
-    timers.put(entityLiving.getName(), Config.BONUS_HEALTH_REGEN_INITIAL_DELAY);
+    timers.put(entityLiving.getName(), Config.Player.BonusRegen.initialDelay);
   }
 }

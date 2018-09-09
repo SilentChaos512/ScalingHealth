@@ -172,9 +172,9 @@ public class ScalingHealthCommonEvents {
             if (data == null) return;
 
             // Lose health on death?
-            if (Config.PLAYER_HEALTH_LOST_ON_DEATH > 0 && !event.isEndConquered()) {
-                float newHealth = data.getMaxHealth() - Config.PLAYER_HEALTH_LOST_ON_DEATH;
-                float startHealth = Config.PLAYER_STARTING_HEALTH;
+            if (Config.Player.Health.lostOnDeath > 0 && !event.isEndConquered()) {
+                float newHealth = data.getMaxHealth() - Config.Player.Health.lostOnDeath;
+                float startHealth = Config.Player.Health.startingHealth;
                 data.setMaxHealth(newHealth < startHealth ? startHealth : newHealth);
             }
 
@@ -188,7 +188,7 @@ public class ScalingHealthCommonEvents {
             }
 
             // Apply health modifier
-            if (Config.ALLOW_PLAYER_MODIFIED_HEALTH) {
+            if (Config.Player.Health.allowModify) {
                 float health = player.getHealth();
                 float maxHealth = data.getMaxHealth();
                 ModifierHandler.setMaxHealth(player, maxHealth, 0);
@@ -215,16 +215,16 @@ public class ScalingHealthCommonEvents {
                 ChatHelper.sendMessage(player, "[Scaling Health] Your difficulty has been reset.");
                 data.setDifficulty(Config.DIFFICULTY_DEFAULT);
             }
-            if (Config.PLAYER_HEALTH_RESET_TIME.shouldReset(today, lastTimePlayed)) {
-                data.setMaxHealth(Config.PLAYER_STARTING_HEALTH);
-                ScalingHealth.logHelper.info("Reset player {}'s health to {}", player.getName(), Config.PLAYER_STARTING_HEALTH);
+            if (Config.Player.Health.resetTime.shouldReset(today, lastTimePlayed)) {
+                data.setMaxHealth(Config.Player.Health.startingHealth);
+                ScalingHealth.logHelper.info("Reset player {}'s health to {}", player.getName(), Config.Player.Health.startingHealth);
                 ChatHelper.sendMessage(player, "[Scaling Health] Your health has been reset.");
             }
 
             data.getLastTimePlayed().setTime(today.getTime());
 
             // Apply health modifier
-            if (Config.ALLOW_PLAYER_MODIFIED_HEALTH) {
+            if (Config.Player.Health.allowModify) {
                 float maxHealth = data.getMaxHealth();
                 ModifierHandler.setMaxHealth(player, maxHealth, 0);
             }
@@ -238,7 +238,7 @@ public class ScalingHealthCommonEvents {
 
     @SubscribeEvent
     public void onPlayerSleepInBed(PlayerSleepInBedEvent event) {
-        if (!event.getEntityPlayer().world.isRemote && Config.WARN_WHEN_SLEEPING && Config.DIFFICULTY_FOR_SLEEPING != 0f) {
+        if (!event.getEntityPlayer().world.isRemote && Config.Client.Difficulty.warnWhenSleeping && Config.DIFFICULTY_FOR_SLEEPING != 0f) {
             ChatHelper.translate(event.getEntityPlayer(), ScalingHealth.i18n.getKey("misc", "sleepWarning"));
         }
     }

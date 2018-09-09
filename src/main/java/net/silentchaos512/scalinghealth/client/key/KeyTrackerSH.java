@@ -45,7 +45,7 @@ public class KeyTrackerSH extends KeyTrackerSL {
     public void onKeyInput(KeyInputEvent event) {
         if (keyShowDifficultyBarAlways.isPressed()) {
             // Toggle the "Render Difficulty Meter Always" config option.
-            Config.RENDER_DIFFICULTY_METER_ALWAYS = !Config.RENDER_DIFFICULTY_METER_ALWAYS;
+            Config.Client.Difficulty.renderMeterAlways = !Config.Client.Difficulty.renderMeterAlways;
             Config.INSTANCE.save();
         } else if (keyShowDifficultyBar.isPressed()) {
             // Briefly show the difficulty meter.

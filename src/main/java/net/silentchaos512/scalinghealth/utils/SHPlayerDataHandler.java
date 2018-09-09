@@ -171,7 +171,7 @@ public class SHPlayerDataHandler {
 
     double difficulty = 0.0D;
     float health = 20;
-    float maxHealth = Config.PLAYER_STARTING_HEALTH;
+    float maxHealth = Config.Player.Health.startingHealth;
     Calendar lastTimePlayed = Calendar.getInstance();
 
     public WeakReference<EntityPlayer> playerWR;
@@ -251,16 +251,16 @@ public class SHPlayerDataHandler {
     public float getMaxHealth() {
 
       if (maxHealth < 2)
-        maxHealth = Config.PLAYER_STARTING_HEALTH;
+        maxHealth = Config.Player.Health.startingHealth;
       return maxHealth;
     }
 
     public void setMaxHealth(float value) {
 
-      if (!Config.ALLOW_PLAYER_MODIFIED_HEALTH)
+      if (!Config.Player.Health.allowModify)
         return;
 
-      int configMax = Config.PLAYER_HEALTH_MAX;
+      int configMax = Config.Player.Health.maxHealth;
       configMax = configMax <= 0 ? Integer.MAX_VALUE : configMax;
 
       maxHealth = MathHelper.clamp(value, 2, configMax);
@@ -316,14 +316,14 @@ public class SHPlayerDataHandler {
           }
 
           // Health by XP?
-          if (!Config.PLAYER_HEALTH_BY_XP.isEmpty()) {
+          if (!Config.Player.Health.byXP.isEmpty()) {
             int highestLevel = 0;
-            for (int key : Config.PLAYER_HEALTH_BY_XP.keySet())
+            for (int key : Config.Player.Health.byXP.keySet())
               if (key > highestLevel && key <= player.experienceLevel)
                 highestLevel = key;
 
-            if (Config.PLAYER_HEALTH_BY_XP.containsKey(highestLevel)) {
-              float modAmount = Config.PLAYER_HEALTH_BY_XP.get(highestLevel) - Config.PLAYER_STARTING_HEALTH;
+            if (Config.Player.Health.byXP.containsKey(highestLevel)) {
+              float modAmount = Config.Player.Health.byXP.get(highestLevel) - Config.Player.Health.startingHealth;
               AttributeHelper.apply(player, SharedMonsterAttributes.MAX_HEALTH, UUID_XP_HEALTH_BONUS, "health_from_xp", modAmount, 0);
             } else {
               AttributeHelper.remove(player, SharedMonsterAttributes.MAX_HEALTH, UUID_XP_HEALTH_BONUS);

@@ -25,9 +25,12 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.relauncher.ReflectionHelper;
-import net.silentchaos512.lib.config.AdaptiveConfig;
+import net.silentchaos512.lib.config.ConfigBaseNew;
 import net.silentchaos512.lib.config.ConfigMultiValueLineParser;
+import net.silentchaos512.lib.config.ConfigOption;
 import net.silentchaos512.lib.event.Greetings;
+import net.silentchaos512.lib.util.I18nHelper;
+import net.silentchaos512.lib.util.LogHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.client.HeartDisplayHandler;
 import net.silentchaos512.scalinghealth.event.DamageScaling;
@@ -47,58 +50,172 @@ import java.util.List;
 import java.util.Map;
 
 // TODO: Major cleanup needed!
-public class Config extends AdaptiveConfig {
-    // Debug TODO: Add a debug category to config
-    public static boolean DEBUG_MODE = false;
-    // FIXME: These are not loaded yet!
-    public static boolean DEBUG_LOG_SPAWNS = false;
-    public static boolean DEBUG_LOG_PLAYER_DAMAGE = true;
+public class Config extends ConfigBaseNew {
+    public static final class Debug {
+        @ConfigOption(name = "Debug Mode", category = CAT_DEBUG)
+        @ConfigOption.BooleanDefault(false)
+        @ConfigOption.Comment("Draws random stuffs on the screen! And maybe does some other things.")
+        public static boolean debugMode;
 
-    // Client
-    public static boolean CHANGE_HEART_RENDERING = true;
-    public static boolean REPLACE_VANILLA_HEARTS_WITH_CUSTOM = true;
-    public static HeartDisplayHandler.TextStyle HEART_DISPLAY_TEXT_STYLE;
-    public static HeartDisplayHandler.TextColor HEART_DISPLAY_TEXT_COLOR;
-    public static HeartDisplayHandler.AbsorptionHeartStyle ABSORPTION_HEART_STYLE;
-    public static boolean RENDER_DIFFICULTY_METER = true;
-    public static boolean RENDER_DIFFICULTY_METER_ALWAYS = false;
-    public static int DIFFICULTY_METER_DISPLAY_TIME = 160;
-    public static int DIFFICULTY_METER_POS_X = 5;
-    public static int DIFFICULTY_METER_POS_Y = -30;
-    public static boolean WARN_WHEN_SLEEPING = true;
-    public static boolean LAST_HEART_OUTLINE_ENABLED = true;
-    public static int LAST_HEART_OUTLINE_COLOR = 0xFFFFFF;
-    public static int[] HEART_COLORS = {//
-            0xBF0000, // 0 red
-            0xE66000, // 25 orange-red
-            0xE69900, // 40 orange
-            0xE6D300, // 55 yellow
-            0x99E600, // 80 lime
-            0x4CE600, // 100 green
-            0x00E699, // 160 teal
-            0x00E6E6, // 180 aqua
-            0x0099E6, // 200 sky blue
-            0x0000E6, // 240 blue
-            0x9900E6, // 280 dark purple
-            0xD580FF, // 280 light purple
-            0x8C8C8C, // 0 gray
-            0xE6E6E6  // 0 white
-    };
+        @ConfigOption(name = "Log Spawns", category = CAT_DEBUG)
+        @ConfigOption.BooleanDefault(false)
+        @ConfigOption.Comment("If debug mode is on, this will log details on mob spawns. This may slow down your game.")
+        public static boolean logSpawns;
 
-    // Player Health
-    public static boolean ALLOW_PLAYER_MODIFIED_HEALTH = true;
-    public static int PLAYER_STARTING_HEALTH = 20;
-    public static int PLAYER_HEALTH_MAX = 0;
-    public static int PLAYER_HEALTH_LOST_ON_DEATH = 0;
-    public static EnumResetTime PLAYER_HEALTH_RESET_TIME = EnumResetTime.NONE;
-    public static Map<Integer, Integer> PLAYER_HEALTH_BY_XP = new HashMap<>();
-    // Regen
-    public static boolean ENABLE_BONUS_HEALTH_REGEN = true;
-    public static int BONUS_HEALTH_REGEN_MIN_FOOD = 10;
-    public static int BONUS_HEALTH_REGEN_MAX_FOOD = 20;
-    public static int BONUS_HEALTH_REGEN_INITIAL_DELAY = 400;
-    public static int BONUS_HEALTH_REGEN_DELAY = 100;
-    public static float BONUS_HEALTH_REGEN_EXHAUSTION = 0.1f;
+        @ConfigOption(name = "Log Player Damage", category = CAT_DEBUG)
+        @ConfigOption.BooleanDefault(true)
+        @ConfigOption.Comment("If debug mode is on, this will log details of damage done to players.")
+        public static boolean logPlayerDamage;
+    }
+
+    // TODO: 1.13 - Split client category into client.hearts and client.difficulty
+    public static final class Client {
+        public static final class Hearts {
+            @ConfigOption(name = "Custom Heart Rendering", category = CAT_CLIENT)
+            @ConfigOption.BooleanDefault(true)
+            @ConfigOption.Comment("Replaces vanilla heart rendering (regular and absorption)")
+            public static boolean customHeartRendering;
+
+            @ConfigOption(name = "Replace Vanilla Heart Row With Custom", category = CAT_CLIENT)
+            @ConfigOption.BooleanDefault(true)
+            @ConfigOption.Comment("If true, replaces the vanilla hearts with Scaling Health's hearts. Otherwise," +
+                    " regular vanilla hearts are rendered first, then custom hearts are used for extra health.")
+            public static boolean replaceVanillaRow;
+
+            public static HeartDisplayHandler.TextStyle textStyle;
+            public static HeartDisplayHandler.TextColor textColor;
+            public static HeartDisplayHandler.AbsorptionHeartStyle absorptionStyle;
+
+            @ConfigOption(name = "Last Heart Outline Enabled", category = CAT_CLIENT)
+            @ConfigOption.BooleanDefault(true)
+            @ConfigOption.Comment("Outline your highest (max health) heart in a different color. This makes seeing your" +
+                    " max health a little bit easier.")
+            public static boolean lastHeartOutline;
+
+            @ConfigOption(name = "Last Heart Outline Color", category = CAT_CLIENT)
+            @ConfigOption.RangeInt(value = 0xFFFFFF, min = 0, max = 0xFFFFFF)
+            @ConfigOption.Comment("The color of the last heart outline (default value). Due to an oversight, this ended" +
+                    " up as a decimal number. Oops.")
+            public static int lastHeartOutlineColor;
+
+            public static int[] heartColors = {
+                    0xBF0000, // 0 red
+                    0xE66000, // 25 orange-red
+                    0xE69900, // 40 orange
+                    0xE6D300, // 55 yellow
+                    0x99E600, // 80 lime
+                    0x4CE600, // 100 green
+                    0x00E699, // 160 teal
+                    0x00E6E6, // 180 aqua
+                    0x0099E6, // 200 sky blue
+                    0x0000E6, // 240 blue
+                    0x9900E6, // 280 dark purple
+                    0xD580FF, // 280 light purple
+                    0x8C8C8C, // 0 gray
+                    0xE6E6E6  // 0 white
+            };
+        }
+
+        public static final class Difficulty {
+            @ConfigOption(name = "Render Difficulty Meter", category = CAT_CLIENT)
+            @ConfigOption.BooleanDefault(true)
+            @ConfigOption.Comment("Show the difficulty meter. Usually, it is display for a few seconds occasionally." +
+                    " If false, it is never shown.")
+            public static boolean renderMeter;
+
+            @ConfigOption(name = "Render Difficulty Meter Always", category = CAT_CLIENT)
+            @ConfigOption.BooleanDefault(false)
+            @ConfigOption.Comment("Render the difficulty meter at all times. If false, it displays occasionally.")
+            public static boolean renderMeterAlways;
+
+            @ConfigOption(name = "Difficulty Meter Display Time", category = CAT_CLIENT)
+            @ConfigOption.RangeInt(value = 160, min = 0)
+            @ConfigOption.Comment("The time (in ticks) to show the difficulty meter whenever it pops up.")
+            public static int meterDisplayTime;
+
+            @ConfigOption(name = "Position X", category = CAT_CLIENT)
+            @ConfigOption.RangeInt(5)
+            @ConfigOption.Comment("Sets position of the difficulty meter. Negative numbers anchor it to the right side of the screen.")
+            public static int meterPosX;
+            @ConfigOption(name = "Position Y", category = CAT_CLIENT)
+            @ConfigOption.RangeInt(-30)
+            @ConfigOption.Comment("Sets position of the difficulty meter. Negative numbers anchor it to the bottom of the screen.")
+            public static int meterPosY;
+
+            @ConfigOption(name = "Warn When Sleeping", category = CAT_CLIENT)
+            @ConfigOption.BooleanDefault(true)
+            @ConfigOption.Comment("If difficulty is set to change when the player sleeps, they will be warned when they get in bed.")
+            public static boolean warnWhenSleeping;
+        }
+    }
+
+    public static final class Player {
+        public static final class Health {
+            @ConfigOption(name = "Allow Modified Health", category = CAT_PLAYER_HEALTH)
+            @ConfigOption.BooleanDefault(true)
+            @ConfigOption.Comment("Allow Scaling Health to modify the player's health. Scaling Health's changes are" +
+                    " often compatible with other mods, assuming they use Minecraft's attribute system. If set to" +
+                    " false, heart containers and the '/scalinghealth health' command will not work.")
+            public static boolean allowModify;
+
+            @ConfigOption(name = "Starting Health", category = CAT_PLAYER_HEALTH)
+            @ConfigOption.RangeInt(value = 20, min = 2)
+            @ConfigOption.Comment("The amount of health (in half hearts) players will start with when first joining" +
+                    " the world. Vanilla is 20.")
+            public static int startingHealth;
+
+            // TODO: 1.13 - should change to "max heart containers?" Current name is somewhat misleading
+            @ConfigOption(name = "Max Health", category = CAT_PLAYER_HEALTH)
+            @ConfigOption.RangeInt(value = 0, min = 0)
+            @ConfigOption.Comment("The maximum amount of health (in half hearts) a player can achieve with heart" +
+                    " containers alone. Zero means unlimited. NOTE: Players must still obey Minecraft's max health" +
+                    " cap. You can change that value with the \"Max Health Cap\" setting under the main category.")
+            public static int maxHealth;
+
+            // TODO: 1.13 - should be "change on death" for consistency
+            @ConfigOption(name = "Health Lost On Death", category = CAT_PLAYER_HEALTH)
+            @ConfigOption.RangeInt(0)
+            @ConfigOption.Comment("The amount of health (in half hearts) a player will lose each time they die. Set" +
+                    " to a negative number to cause players to gain health instead.")
+            public static int lostOnDeath;
+
+            public static EnumResetTime resetTime = EnumResetTime.NONE;
+            public static Map<Integer, Integer> byXP = new HashMap<>();
+        }
+
+        public static final class BonusRegen {
+            @ConfigOption(name = "Enable Bonus Regen", category = CAT_PLAYER_REGEN)
+            @ConfigOption.BooleanDefault(true)
+            @ConfigOption.Comment("Enable bonus health regen for players. Vanilla regen is not changed in any way," +
+                    " this just adds extra healing! Vanilla regen can be disabled with the naturalRegeneration gamerule.")
+            public static boolean enabled;
+
+            @ConfigOption(name = "Food Min", category = CAT_PLAYER_REGEN)
+            @ConfigOption.RangeInt(value = 10, min = 0)
+            @ConfigOption.Comment("The minimum food level at which bonus regen will be active (vanilla max food is 20).")
+            public static int minFood;
+
+            @ConfigOption(name = "Food Max", category = CAT_PLAYER_REGEN)
+            @ConfigOption.RangeInt(value = Integer.MAX_VALUE, min = 0)
+            @ConfigOption.Comment("The maximum food level at which bonus regen will be active (vanilla max food is 20).")
+            public static int maxFood;
+
+            @ConfigOption(name = "Delay (Initial)", category = CAT_PLAYER_REGEN)
+            @ConfigOption.RangeInt(value = 400, min = 0)
+            @ConfigOption.Comment("The amount of time (in ticks) after being hurt before bonus regen activates.")
+            public static int initialDelay;
+
+            @ConfigOption(name = "Delay", category = CAT_PLAYER_REGEN)
+            @ConfigOption.RangeInt(value = 100, min = 0)
+            @ConfigOption.Comment("The amount of time (in ticks) between each bonus regen tick (a half heart being healed).")
+            public static int delay;
+
+            @ConfigOption(name = "Exhaustion Added", category = CAT_PLAYER_REGEN)
+            @ConfigOption.RangeFloat(value = 0.1f, min = 0f, max = 1f)
+            @ConfigOption.Comment("The food consumption for each bonus regen tick.")
+            public static float exhaustion = 0.1f;
+        }
+    }
 
     // Fake Players
     public static boolean FAKE_PLAYERS_CAN_GENERATE_HEARTS = true;
@@ -207,6 +324,7 @@ public class Config extends AdaptiveConfig {
 
     static final String split = Configuration.CATEGORY_SPLITTER;
     public static final String CAT_MAIN = "main";
+    public static final String CAT_DEBUG = CAT_MAIN + split + "debug";
     public static final String CAT_CLIENT = CAT_MAIN + split + "client";
     public static final String CAT_PLAYER = CAT_MAIN + split + "player";
     public static final String CAT_FAKE_PLAYER = CAT_MAIN + split + "fake_players";
@@ -230,7 +348,7 @@ public class Config extends AdaptiveConfig {
     public static final Config INSTANCE = new Config();
 
     public Config() {
-        super(ScalingHealth.MOD_ID_LOWER, true, ScalingHealth.BUILD_NUM);
+        super(ScalingHealth.MOD_ID_LOWER);
     }
 
     @Override
@@ -241,12 +359,25 @@ public class Config extends AdaptiveConfig {
     }
 
     @Override
+    public I18nHelper i18n() {
+        return ScalingHealth.i18n;
+    }
+
+    @Override
+    public LogHelper log() {
+        return ScalingHealth.logHelper;
+    }
+
+    @Override
     public void load() {
         try {
+            super.load();
+
             ConfigMultiValueLineParser parser;
 
             // Change entity max health cap with reflection
-            final int maxHealthCap = loadInt("Max Health Cap", CAT_MAIN, 2048, "Max health cap is changed to this (vanilla is 1024)");
+            final int maxHealthCap = loadInt("Max Health Cap", CAT_MAIN, 2048, 2, Integer.MAX_VALUE,
+                    "Max health cap for all entities, players and mobs (vanilla is 1024)");
             try {
                 ScalingHealth.logHelper.info("Trying to change max health cap to {}", maxHealthCap);
                 Field field = ReflectionHelper.findField(RangedAttribute.class, "maximumValue", "field_111118_b");
@@ -255,65 +386,18 @@ public class Config extends AdaptiveConfig {
                 ScalingHealth.logHelper.warn(ex, "Failed to change max health cap");
             }
 
-            DEBUG_MODE = loadBoolean("Debug Mode", CAT_MAIN,
-                    DEBUG_MODE,
-                    "Draws random stuffs on the screen! And maybe does some other things.");
-
             // Client
-            RENDER_DIFFICULTY_METER = loadBoolean("Render Difficulty Meter", CAT_CLIENT,
-                    RENDER_DIFFICULTY_METER,
-                    "Show the difficulty meter. Usually, it is displayed for a few seconds occasionally.");
-            RENDER_DIFFICULTY_METER_ALWAYS = loadBoolean("Render Difficulty Meter Always", CAT_CLIENT,
-                    RENDER_DIFFICULTY_METER_ALWAYS,
-                    "Render the difficulty meter at all times.");
-            DIFFICULTY_METER_DISPLAY_TIME = loadInt("Difficulty Meter Display Time", CAT_CLIENT,
-                    DIFFICULTY_METER_DISPLAY_TIME, 0, Integer.MAX_VALUE,
-                    "The time (in ticks) to show the difficulty meter whenever it pops up.");
-            DIFFICULTY_METER_POS_X = loadInt("Position X", CAT_CLIENT,
-                    DIFFICULTY_METER_POS_X, Integer.MIN_VALUE, Integer.MAX_VALUE,
-                    "Sets position of the difficulty meter. Negative numbers anchor it to the right side of the screen.");
-            DIFFICULTY_METER_POS_Y = loadInt("Position Y", CAT_CLIENT,
-                    DIFFICULTY_METER_POS_Y, Integer.MIN_VALUE, Integer.MAX_VALUE,
-                    "Sets position of the difficulty meter. Negative numbers anchor it to the bottom of the screen.");
-            WARN_WHEN_SLEEPING = loadBoolean("Warn When Sleeping", CAT_CLIENT, true,
-                    "If difficulty is set to change when the player sleeps, they will be warned when they get in bed.");
-            CHANGE_HEART_RENDERING = loadBoolean("Custom Heart Rendering", CAT_CLIENT,
-                    CHANGE_HEART_RENDERING,
-                    "Replace vanilla heart rendering.");
-            REPLACE_VANILLA_HEARTS_WITH_CUSTOM = loadBoolean("Replace Vanilla Heart Row With Custom", CAT_CLIENT,
-                    true, "If true, replaces the vanilla hearts with Scaling Health's hearts. Otherwise, regular" +
-                            " vanilla hearts are rendered first, then custom hearts are used for extra hearts.");
-            HEART_DISPLAY_TEXT_STYLE = HeartDisplayHandler.TextStyle.loadFromConfig(this);
-            HEART_DISPLAY_TEXT_COLOR = HeartDisplayHandler.TextColor.loadFromConfig(this);
-            ABSORPTION_HEART_STYLE = HeartDisplayHandler.AbsorptionHeartStyle.loadDromConfig(this);
-            LAST_HEART_OUTLINE_ENABLED = loadBoolean("Last Heart Outline Enabled", CAT_CLIENT,
-                    LAST_HEART_OUTLINE_ENABLED,
-                    "Outline your last (highest) heart in a different color. This makes seeing your max health a little easier.");
-            LAST_HEART_OUTLINE_COLOR = loadInt("Last Heart Outline Color", CAT_CLIENT,
-                    LAST_HEART_OUTLINE_COLOR,
-                    "The color of your last (highest) heart outline.");
+            Client.Hearts.textStyle = HeartDisplayHandler.TextStyle.loadFromConfig(this);
+            Client.Hearts.textColor = HeartDisplayHandler.TextColor.loadFromConfig(this);
+            Client.Hearts.absorptionStyle = HeartDisplayHandler.AbsorptionHeartStyle.loadDromConfig(this);
+
             loadHeartColors(config);
 
             // Players
             // Health
-            ALLOW_PLAYER_MODIFIED_HEALTH = loadBoolean("Allow Modified Health", CAT_PLAYER_HEALTH,
-                    ALLOW_PLAYER_MODIFIED_HEALTH,
-                    "Allow Scaling Health to modify the player's health. Set to false if you have another mod that"
-                            + " modifies player health, and you would like that mod to handle health modifications instead."
-                            + " With this option set to false, heart containers will not work, nor will the '/scalinghealth"
-                            + " health' command.");
-            PLAYER_STARTING_HEALTH = loadInt("Starting Health", CAT_PLAYER_HEALTH,
-                    PLAYER_STARTING_HEALTH, 2, Integer.MAX_VALUE,
-                    "The amount of health (in half hearts) the player starts with.");
-            PLAYER_HEALTH_MAX = loadInt("Max Health", CAT_PLAYER_HEALTH,
-                    PLAYER_HEALTH_MAX, 0, Integer.MAX_VALUE,
-                    "The maximum amount of health (in half hearts) the player can reach. Zero means unlimited.");
-            PLAYER_HEALTH_LOST_ON_DEATH = (int) config.getFloat("Health Lost on Death", CAT_PLAYER_HEALTH,
-                    PLAYER_HEALTH_LOST_ON_DEATH, Integer.MIN_VALUE, Integer.MAX_VALUE,
-                    "The amount of health (in half hearts) the player will lose each time they die.");
-            PLAYER_HEALTH_RESET_TIME = EnumResetTime.loadFromConfig(config, PLAYER_HEALTH_RESET_TIME, CAT_PLAYER_HEALTH);
+            Player.Health.resetTime = EnumResetTime.loadFromConfig(config, Player.Health.resetTime, CAT_PLAYER_HEALTH);
 
-            PLAYER_HEALTH_BY_XP.clear();
+            Player.Health.byXP.clear();
             parser = new ConfigMultiValueLineParser("Set Health By XP", ScalingHealth.logHelper, "\\s+", Integer.class, Integer.class);
             for (String str : config.getStringList("Set Health By XP", CAT_PLAYER_HEALTH, new String[0],
                     "Allows the player's health to be set according to XP level. Each line will have the level, then" +
@@ -324,28 +408,19 @@ public class Config extends AdaptiveConfig {
                             " containers (just remember heart containers consume XP by default).")) {
                 Object[] array = parser.parse(str);
                 if (array != null) {
-                    PLAYER_HEALTH_BY_XP.put((int) array[0], (int) array[1]);
+                    Player.Health.byXP.put((int) array[0], (int) array[1]);
                 }
             }
 
             // Regen
-            ENABLE_BONUS_HEALTH_REGEN = loadBoolean("Enable Bonus Regen", CAT_PLAYER_REGEN,
-                    ENABLE_BONUS_HEALTH_REGEN,
-                    "Bonus health regen will be enabled. Vanilla regen is not changed in any way, this just adds extra healing!");
-            BONUS_HEALTH_REGEN_MIN_FOOD = loadInt("Food Min", CAT_PLAYER_REGEN,
-                    BONUS_HEALTH_REGEN_MIN_FOOD, 0, Integer.MAX_VALUE,
-                    "The minimum food level at which bonus regen will be active.");
-            BONUS_HEALTH_REGEN_MAX_FOOD = loadInt("Food Max", CAT_PLAYER_REGEN,
-                    BONUS_HEALTH_REGEN_MAX_FOOD, 0, Integer.MAX_VALUE,
-                    "The maximum food level at which bonus regen will be active.");
-            BONUS_HEALTH_REGEN_INITIAL_DELAY = loadInt("Delay (Initial)", CAT_PLAYER_REGEN,
-                    BONUS_HEALTH_REGEN_INITIAL_DELAY, 0, Integer.MAX_VALUE,
+            Player.BonusRegen.initialDelay = loadInt("Delay (Initial)", CAT_PLAYER_REGEN,
+                    Player.BonusRegen.initialDelay, 0, Integer.MAX_VALUE,
                     "The number of ticks after being hurt before bonus regen activates.");
-            BONUS_HEALTH_REGEN_DELAY = loadInt("Delay", CAT_PLAYER_REGEN,
-                    BONUS_HEALTH_REGEN_DELAY, 0, Integer.MAX_VALUE,
+            Player.BonusRegen.delay = loadInt("Delay", CAT_PLAYER_REGEN,
+                    Player.BonusRegen.delay, 0, Integer.MAX_VALUE,
                     "The number of ticks between each bonus regen tick (a half heart being healed).");
-            BONUS_HEALTH_REGEN_EXHAUSTION = config.getFloat("Exhaustion Added", CAT_PLAYER_REGEN,
-                    BONUS_HEALTH_REGEN_EXHAUSTION, 0f, 1f,
+            Player.BonusRegen.exhaustion = config.getFloat("Exhaustion Added", CAT_PLAYER_REGEN,
+                    Player.BonusRegen.exhaustion, 0f, 1f,
                     "The food consumption for each half heart regenerated.");
             // Damage Scaling
             DamageScaling.INSTANCE.loadConfig(config);
@@ -726,9 +801,9 @@ public class Config extends AdaptiveConfig {
 
     private static void loadHeartColors(Configuration c) {
         // Get hex strings for default colors.
-        String[] defaults = new String[HEART_COLORS.length];
+        String[] defaults = new String[Client.Hearts.heartColors.length];
         for (int i = 0; i < defaults.length; ++i)
-            defaults[i] = String.format("%06x", HEART_COLORS[i]);
+            defaults[i] = String.format("%06x", Client.Hearts.heartColors[i]);
 
         // Load the string list from config.
         String[] list = c.getStringList("Heart Colors", Config.CAT_CLIENT, defaults,
@@ -736,9 +811,9 @@ public class Config extends AdaptiveConfig {
 
         // Convert hex strings to ints.
         try {
-            HEART_COLORS = new int[list.length];
-            for (int i = 0; i < HEART_COLORS.length; ++i)
-                HEART_COLORS[i] = Integer.decode("0x" + list[i]);
+            Client.Hearts.heartColors = new int[list.length];
+            for (int i = 0; i < Client.Hearts.heartColors.length; ++i)
+                Client.Hearts.heartColors[i] = Integer.decode("0x" + list[i]);
         } catch (NumberFormatException ex) {
             ScalingHealth.logHelper.warn("Failed to load heart colors because a value could not be parsed. Make sure all values are valid hexadecimal integers. Try using an online HTML color picker if you are having problems.");
             ex.printStackTrace();

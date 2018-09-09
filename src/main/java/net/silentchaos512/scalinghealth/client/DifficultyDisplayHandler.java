@@ -50,7 +50,7 @@ public class DifficultyDisplayHandler extends Gui {
     @SubscribeEvent
     public void onRenderOverlay(RenderGameOverlayEvent.Post event) {
 
-        if (event.getType() != ElementType.TEXT || Config.DIFFICULTY_MAX <= 0 || !Config.RENDER_DIFFICULTY_METER)
+        if (event.getType() != ElementType.TEXT || Config.DIFFICULTY_MAX <= 0 || !Config.Client.Difficulty.renderMeter)
             return;
 
         Minecraft mc = Minecraft.getMinecraft();
@@ -81,7 +81,7 @@ public class DifficultyDisplayHandler extends Gui {
         }
 
         int currentTime = ClientTickHandler.ticksInGame;
-        if (Config.RENDER_DIFFICULTY_METER_ALWAYS || currentTime - lastUpdateTime < Config.DIFFICULTY_METER_DISPLAY_TIME) {
+        if (Config.Client.Difficulty.renderMeterAlways || currentTime - lastUpdateTime < Config.Client.Difficulty.meterDisplayTime) {
             GlStateManager.enableBlend();
 
             mc.renderEngine.bindTexture(TEXTURE);
@@ -89,10 +89,10 @@ public class DifficultyDisplayHandler extends Gui {
             GlStateManager.pushMatrix();
             // GlStateManager.scale(1f, 0.5f, 1f);
 
-            int posX = Config.DIFFICULTY_METER_POS_X; // 5;
+            int posX = Config.Client.Difficulty.meterPosX; // 5;
             if (posX < 0)
                 posX = posX + width - 64;
-            int posY = Config.DIFFICULTY_METER_POS_Y; // height - 30;
+            int posY = Config.Client.Difficulty.meterPosY; // height - 30;
             if (posY < 0)
                 posY = posY + height - 12;
 

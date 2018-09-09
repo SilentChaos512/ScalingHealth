@@ -185,7 +185,7 @@ public class CommandScalingHealth extends CommandBaseSL {
         // Report health.
         float current = player.getHealth();
         float max = player.getMaxHealth();
-        float modValue = data.getMaxHealth() - Config.PLAYER_STARTING_HEALTH;
+        float modValue = data.getMaxHealth() - Config.Player.Health.startingHealth;
         String strCurrent = String.format(NUMFORMAT, current);
         String strMax = String.format(NUMFORMAT, max);
         String strMod = (modValue >= 0f ? "+" : "") + modValue;
@@ -194,7 +194,7 @@ public class CommandScalingHealth extends CommandBaseSL {
         // Try set health.
         double current = data.getMaxHealth();
         double toSet = getValueToSet(subCommand, value, current);
-        double hardMax = Config.PLAYER_HEALTH_MAX;
+        double hardMax = Config.Player.Health.maxHealth;
         hardMax = (int) (hardMax <= 0 ? SharedMonsterAttributes.MAX_HEALTH.clampValue(Integer.MAX_VALUE) : hardMax);
         double min = getMinValue(subCommand, current, 2, hardMax);
         double max = getMaxValue(subCommand, current, 2, hardMax);

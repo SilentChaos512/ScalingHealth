@@ -47,7 +47,7 @@ public class ScalingHealthClientEvents {
     if (Minecraft.getMinecraft().world == null || event.getType() != ElementType.ALL)
       return;
 
-    if (!Config.DEBUG_MODE)
+    if (!Config.Debug.debugMode)
       return;
 
     ScaledResolution res = event.getResolution();

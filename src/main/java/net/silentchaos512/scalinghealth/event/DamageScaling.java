@@ -74,7 +74,7 @@ public class DamageScaling {
                 affectedAmount *= difficultyWeight;
                 break;
             case MAX_HEALTH:
-                double baseHealth = entity instanceof EntityPlayer ? Config.PLAYER_STARTING_HEALTH
+                double baseHealth = entity instanceof EntityPlayer ? Config.Player.Health.startingHealth
                         : entity.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue();
                 affectedAmount = (float) ((entity.getMaxHealth() - baseHealth) / baseHealth);
                 break;
@@ -98,7 +98,7 @@ public class DamageScaling {
             event.setAmount(Float.MAX_VALUE);
 
         LogHelper log = ScalingHealth.logHelper;
-        if (Config.DEBUG_MODE && Config.DEBUG_LOG_PLAYER_DAMAGE) {
+        if (Config.Debug.debugMode && Config.Debug.logPlayerDamage) {
             log.info("Damage scaling: type={}, scale={}, affected={}, change={}, original={}",
                     source.damageType, scale, affectedAmount, change, original);
         }

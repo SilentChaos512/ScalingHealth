@@ -59,7 +59,7 @@ public class ModifierHandler {
             return;
         }
 
-        if (entity instanceof EntityPlayer && !Config.ALLOW_PLAYER_MODIFIED_HEALTH) {
+        if (entity instanceof EntityPlayer && !Config.Player.Health.allowModify) {
             // It's a player, but the user has disallowed Scaling Health from modifying the player's health.
             ScalingHealth.logHelper.info(String.format(
                     "Would have set player %s's health to %.1f, but modified player health has been disabled"
