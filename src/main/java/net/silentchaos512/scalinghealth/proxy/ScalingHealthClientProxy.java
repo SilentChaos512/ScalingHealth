@@ -18,20 +18,17 @@
 
 package net.silentchaos512.scalinghealth.proxy;
 
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import org.apache.commons.lang3.NotImplementedException;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.silentchaos512.lib.registry.SRegistry;
 import net.silentchaos512.lib.util.Color;
-import net.silentchaos512.scalinghealth.client.ClientTickHandler;
 import net.silentchaos512.scalinghealth.client.DifficultyDisplayHandler;
 import net.silentchaos512.scalinghealth.client.HeartDisplayHandler;
 import net.silentchaos512.scalinghealth.client.key.KeyTrackerSH;
@@ -40,6 +37,7 @@ import net.silentchaos512.scalinghealth.event.ScalingHealthClientEvents;
 import net.silentchaos512.scalinghealth.event.WitEventHandler;
 import net.silentchaos512.scalinghealth.init.ModEntities;
 import net.silentchaos512.scalinghealth.lib.EnumModParticles;
+import org.apache.commons.lang3.NotImplementedException;
 
 public class ScalingHealthClientProxy extends ScalingHealthCommonProxy {
     @Override
@@ -47,7 +45,6 @@ public class ScalingHealthClientProxy extends ScalingHealthCommonProxy {
         super.preInit(registry, event);
 
         MinecraftForge.EVENT_BUS.register(new ScalingHealthClientEvents());
-        MinecraftForge.EVENT_BUS.register(new ClientTickHandler());
         MinecraftForge.EVENT_BUS.register(HeartDisplayHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(DifficultyDisplayHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(KeyTrackerSH.INSTANCE);

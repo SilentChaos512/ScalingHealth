@@ -27,6 +27,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.silentchaos512.lib.event.ClientTicks;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.lib.EnumAreaDifficultyMode;
@@ -69,18 +70,18 @@ public class DifficultyDisplayHandler extends Gui {
         if (Config.AREA_DIFFICULTY_MODE == EnumAreaDifficultyMode.SERVER_WIDE) {
             difficulty = areaDifficulty;
         }
-        int timeSinceLastUpdate = ClientTickHandler.ticksInGame - lastUpdateTime;
+        int timeSinceLastUpdate = ClientTicks.ticksInGame - lastUpdateTime;
 
         if (difficulty != lastDifficultyDisplayed) {
             lastDifficultyDisplayed = difficulty;
-            lastUpdateTime = ClientTickHandler.ticksInGame;
+            lastUpdateTime = ClientTicks.ticksInGame;
         }
         if (areaDifficulty < lastAreaDifficultyDisplayed - 10 || areaDifficulty > lastAreaDifficultyDisplayed + 10 && timeSinceLastUpdate > 1200) {
             lastAreaDifficultyDisplayed = areaDifficulty;
-            lastUpdateTime = ClientTickHandler.ticksInGame;
+            lastUpdateTime = ClientTicks.ticksInGame;
         }
 
-        int currentTime = ClientTickHandler.ticksInGame;
+        int currentTime = ClientTicks.ticksInGame;
         if (Config.Client.Difficulty.renderMeterAlways || currentTime - lastUpdateTime < Config.Client.Difficulty.meterDisplayTime) {
             GlStateManager.enableBlend();
 

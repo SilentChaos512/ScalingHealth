@@ -33,6 +33,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.silentchaos512.lib.config.ConfigBase;
+import net.silentchaos512.lib.event.ClientTicks;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.Config;
 
@@ -115,7 +116,7 @@ public class HeartDisplayHandler extends Gui {
 
         int health = MathHelper.ceil(player.getHealth());
         boolean highlight = player.hurtResistantTime / 3 % 2 == 1;
-        int updateCounter = ClientTickHandler.ticksInGame;
+        int updateCounter = ClientTicks.ticksInGame;
 
         if (health < playerHealth && player.hurtResistantTime > 0 || health > playerHealth && player.hurtResistantTime > 0) {
             lastSystemTime = Minecraft.getSystemTime();
@@ -356,7 +357,7 @@ public class HeartDisplayHandler extends Gui {
                 break;
             case PSYCHEDELIC:
                 color = Color.HSBtoRGB(
-                        (ClientTickHandler.ticksInGame % COLOR_CHANGE_PERIOD) / COLOR_CHANGE_PERIOD,
+                        (ClientTicks.ticksInGame % COLOR_CHANGE_PERIOD) / COLOR_CHANGE_PERIOD,
                         0.55f * playerHealth / player.getMaxHealth(), 1.0f);
                 break;
             case WHITE:

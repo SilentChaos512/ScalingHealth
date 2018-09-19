@@ -18,8 +18,7 @@
 
 package net.silentchaos512.scalinghealth.client.render.entity;
 
-import org.lwjgl.util.Color;
-
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.culling.ICamera;
@@ -30,11 +29,13 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
-import net.silentchaos512.lib.client.render.BufferBuilderSL;
+import net.silentchaos512.lib.event.ClientTicks;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.client.ClientTickHandler;
 import net.silentchaos512.scalinghealth.entity.EntityBlightFire;
 import net.silentchaos512.scalinghealth.lib.module.ModuleAprilTricks;
+import org.lwjgl.util.Color;
+
+import javax.annotation.Nonnull;
 
 public class RenderBlightFire extends Render<EntityBlightFire> {
 
@@ -50,6 +51,7 @@ public class RenderBlightFire extends Render<EntityBlightFire> {
     super(renderManager);
   }
 
+  @Nonnull
   @Override
   protected ResourceLocation getEntityTexture(EntityBlightFire entity) {
 
@@ -90,7 +92,7 @@ public class RenderBlightFire extends Render<EntityBlightFire> {
     float f = parent.width * FIRE_SCALE;
     GlStateManager.scale(f, f, f);
     Tessellator tessellator = Tessellator.getInstance();
-    BufferBuilderSL vertexbuffer = BufferBuilderSL.INSTANCE.acquireBuffer(tessellator);
+    BufferBuilder vertexbuffer = tessellator.getBuffer();
 
     float f1 = 0.5F;
     float f2 = 0.0F;
@@ -103,7 +105,7 @@ public class RenderBlightFire extends Render<EntityBlightFire> {
     if (ModuleAprilTricks.instance.isRightDay() && ModuleAprilTricks.instance.isEnabled()) {
       float changeRate = 40f + parent.getEntityId() % 80f;
       Color color = new Color();
-      float hue = ((ClientTickHandler.ticksInGame + parent.getEntityId()) % changeRate / changeRate);
+      float hue = ((ClientTicks.ticksInGame + parent.getEntityId()) % changeRate / changeRate);
       color.fromHSB(hue, 1f, 1f);
       GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f,
           1.0F);
@@ -119,7 +121,7 @@ public class RenderBlightFire extends Render<EntityBlightFire> {
 
     while (f3 > 0.0F) {
       boolean flag = i % 2 == 0;
-      int frame = ClientTickHandler.ticksInGame % 32;
+      int frame = ClientTicks.ticksInGame % 32;
       float minU = flag ? 0.5f : 0.0f;
       float minV = frame / 32f;
       float maxU = flag ? 1.0f : 0.5f;
