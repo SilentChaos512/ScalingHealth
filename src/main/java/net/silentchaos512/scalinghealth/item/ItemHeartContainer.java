@@ -61,15 +61,15 @@ public class ItemHeartContainer extends Item {
 
         if (!world.isRemote) {
             PlayerData data = SHPlayerDataHandler.get(player);
+            if (data == null) return ActionResult.newResult(EnumActionResult.PASS, stack);
 
-            boolean healthIncreaseAllowed = Config.HEARTS_INCREASE_HEALTH && data != null
-                    && (Config.Player.Health.maxHealth == 0 || data.getMaxHealth() < Config.Player.Health.maxHealth);
+            boolean healthIncreaseAllowed = isHealthIncreaseAllowed(data);
             int levelRequirement = getLevelsRequiredToUse(player, stack, healthIncreaseAllowed);
 
             // Does player have enough XP?
             if (player.experienceLevel < levelRequirement) {
                 ChatHelper.translateStatus(player, ScalingHealth.i18n.getKey(this, "notEnoughXP"), true, levelRequirement);
-                return new ActionResult<>(EnumActionResult.PASS, stack);
+                return ActionResult.newResult(EnumActionResult.PASS, stack);
             }
 
             // Heal the player (this is separate from the "healing" of the newly added heart, if that's allowed).
@@ -83,13 +83,13 @@ public class ItemHeartContainer extends Item {
             // End here if health increases are not allowed.
             if (!healthIncreaseAllowed) {
                 if (consumed) {
-                    world.playSound(null, player.getPosition(), SoundEvents.ENTITY_PLAYER_BURP, SoundCategory.PLAYERS, 0.5f,
-                            1.0f + 0.1f * (float) ScalingHealth.random.nextGaussian());
+                    world.playSound(null, player.getPosition(), SoundEvents.ENTITY_PLAYER_BURP, SoundCategory.PLAYERS,
+                            0.5f, 1.0f + 0.1f * (float) ScalingHealth.random.nextGaussian());
                     stack.shrink(1);
                     consumeLevels(player, levelRequirement);
-                    return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+                    return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
                 } else {
-                    return new ActionResult<>(EnumActionResult.PASS, stack);
+                    return ActionResult.newResult(EnumActionResult.PASS, stack);
                 }
             }
 
@@ -97,32 +97,39 @@ public class ItemHeartContainer extends Item {
             data.incrementMaxHealth(2);
             stack.shrink(1);
 
-            // Particles and sound.
-            double particleX = player.posX;
-            double particleY = player.posY + 0.65f * player.height;
-            double particleZ = player.posZ;
-            for (int i = 0; i < 40 - 10 * ScalingHealth.proxy.getParticleSettings(); ++i) {
-                double xSpeed = 0.08 * ScalingHealth.random.nextGaussian();
-                double ySpeed = 0.05 * ScalingHealth.random.nextGaussian();
-                double zSpeed = 0.08 * ScalingHealth.random.nextGaussian();
-                ScalingHealth.proxy.spawnParticles(EnumModParticles.HEART_CONTAINER,
-                        new Color(1f, 0f, 0f), world, particleX, particleY, particleZ, xSpeed, ySpeed, zSpeed);
-            }
-            world.playSound(null, player.getPosition(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS, 0.5f,
-                    0.7f + 0.1f * (float) ScalingHealth.random.nextGaussian());
-
+            spawnParticlesAndPlaySound(world, player);
             consumeLevels(player, levelRequirement);
-
             NetworkHandler.INSTANCE.sendTo(new MessageDataSync(data, player), (EntityPlayerMP) player);
         }
-        return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+        return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
     }
 
-    private int getLevelsRequiredToUse(EntityPlayer player, ItemStack stack, boolean healthIncreaseAllowed) {
+    private static int getLevelsRequiredToUse(EntityPlayer player, ItemStack stack, boolean healthIncreaseAllowed) {
         return player.capabilities.isCreativeMode ? 0 : Config.HEART_XP_LEVEL_COST;
     }
 
-    private void consumeLevels(EntityPlayer player, int amount) {
+    private static void consumeLevels(EntityPlayer player, int amount) {
         player.experienceLevel -= amount;
+    }
+
+    private static boolean isHealthIncreaseAllowed(PlayerData data) {
+        return Config.HEARTS_INCREASE_HEALTH
+                && (Config.Player.Health.maxHealth == 0
+                || data.getMaxHealth() < Config.Player.Health.maxHealth);
+    }
+
+    private static void spawnParticlesAndPlaySound(World world, EntityPlayer player) {
+        double particleX = player.posX;
+        double particleY = player.posY + 0.65f * player.height;
+        double particleZ = player.posZ;
+        for (int i = 0; i < 40 - 10 * ScalingHealth.proxy.getParticleSettings(); ++i) {
+            double xSpeed = 0.08 * ScalingHealth.random.nextGaussian();
+            double ySpeed = 0.05 * ScalingHealth.random.nextGaussian();
+            double zSpeed = 0.08 * ScalingHealth.random.nextGaussian();
+            ScalingHealth.proxy.spawnParticles(EnumModParticles.HEART_CONTAINER,
+                    new Color(1f, 0f, 0f), world, particleX, particleY, particleZ, xSpeed, ySpeed, zSpeed);
+        }
+        world.playSound(null, player.getPosition(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS,
+                0.5f, 0.7f + 0.1f * (float) ScalingHealth.random.nextGaussian());
     }
 }
