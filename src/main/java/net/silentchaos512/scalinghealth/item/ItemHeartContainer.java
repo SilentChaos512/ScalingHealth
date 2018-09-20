@@ -34,6 +34,7 @@ import net.silentchaos512.lib.util.ChatHelper;
 import net.silentchaos512.lib.util.Color;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.Config;
+import net.silentchaos512.scalinghealth.init.ModSounds;
 import net.silentchaos512.scalinghealth.lib.EnumModParticles;
 import net.silentchaos512.scalinghealth.network.NetworkHandler;
 import net.silentchaos512.scalinghealth.network.message.MessageDataSync;
@@ -129,7 +130,7 @@ public class ItemHeartContainer extends Item {
             ScalingHealth.proxy.spawnParticles(EnumModParticles.HEART_CONTAINER,
                     new Color(1f, 0f, 0f), world, particleX, particleY, particleZ, xSpeed, ySpeed, zSpeed);
         }
-        world.playSound(null, player.getPosition(), SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP, SoundCategory.PLAYERS,
-                0.5f, 0.7f + 0.1f * (float) ScalingHealth.random.nextGaussian());
+        ScalingHealth.proxy.playSoundOnClient(player, ModSounds.HEART_CONTAINER_USE,
+                0.5f, 1.0f + 0.1f * (float) ScalingHealth.random.nextGaussian());
     }
 }

@@ -23,15 +23,26 @@ import net.minecraft.util.SoundEvent;
 import net.silentchaos512.lib.registry.SRegistry;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 
-public class ModSounds {
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public final class ModSounds {
+    private static final Map<String, SoundEvent> SOUND_EVENTS = new LinkedHashMap<>();
+
+    public static final SoundEvent HEART_CONTAINER_USE = create("heart_container_use");
     public static final SoundEvent PLAYER_DIED = create("player_died");
 
+    private ModSounds() {
+    }
+
     public static void registerAll(SRegistry reg) {
-        reg.registerSoundEvent(PLAYER_DIED, "player_died");
+        SOUND_EVENTS.forEach((name, sound) -> reg.registerSoundEvent(sound, name));
     }
 
     private static SoundEvent create(String soundId) {
         ResourceLocation name = new ResourceLocation(ScalingHealth.MOD_ID_LOWER, soundId);
-        return new SoundEvent(name);
+        SoundEvent sound = new SoundEvent(name);
+        SOUND_EVENTS.put(soundId, sound);
+        return sound;
     }
 }

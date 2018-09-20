@@ -3,5 +3,10 @@
         "category": "player",
         "subtitle": "scalinghealth.subtitle.player_died",
         "sounds": [ "scalinghealth:sadtrombone", "scalinghealth:mlg_airhorn", "scalinghealth:wilhelm" ]
+    },
+    "heart_container_use": {
+        "category": "player",
+        "subtitle": "scalinghealth.subtitle.heart_container_use",
+        "sounds": [ "scalinghealth:heart_container_use" ]
     }
 }
