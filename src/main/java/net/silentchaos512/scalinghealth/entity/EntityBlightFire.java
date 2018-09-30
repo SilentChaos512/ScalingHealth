@@ -66,6 +66,11 @@ public class EntityBlightFire extends Entity implements IEntityAdditionalSpawnDa
     }
 
     @Override
+    public int getBrightnessForRender() {
+        return 15728880;
+    }
+
+    @Override
     protected void readEntityFromNBT(NBTTagCompound compound) {
         if (compound.hasKey(NBT_PARENT)) {
             int id = compound.getInteger(NBT_PARENT);
