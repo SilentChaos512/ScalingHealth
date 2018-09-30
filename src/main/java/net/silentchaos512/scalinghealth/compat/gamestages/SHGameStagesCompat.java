@@ -23,6 +23,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.silentchaos512.scalinghealth.config.Config;
 
 public class SHGameStagesCompat {
+    private SHGameStagesCompat() {}
 
     public static int getDifficultyFromStages(EntityPlayer player) {
         int max = 0;

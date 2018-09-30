@@ -12,6 +12,7 @@ import net.silentchaos512.lib.event.ClientTicks;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.network.Message;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 
 @SuppressWarnings("WeakerAccess")
@@ -21,8 +22,7 @@ public class MessagePlaySound extends Message {
     public float pitch;
 
     @SuppressWarnings("unused")
-    public MessagePlaySound() {
-    }
+    public MessagePlaySound() {}
 
     public MessagePlaySound(SoundEvent sound, float volume, float pitch) {
         this.soundId = Objects.requireNonNull(sound.getRegistryName()).toString();
@@ -31,6 +31,7 @@ public class MessagePlaySound extends Message {
     }
 
     @Override
+    @Nullable
     @SideOnly(Side.CLIENT)
     public IMessage handleMessage(MessageContext ctx) {
         ClientTicks.scheduleAction(() -> {

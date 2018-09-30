@@ -35,7 +35,7 @@ import net.silentchaos512.scalinghealth.config.Config;
 
 import java.util.Map;
 
-public class DamageScaling {
+public final class DamageScaling {
     private static final String[] SOURCES_DEFAULT = {"inFire", "lightningBolt", "onFire", "lava", "hotFloor", "inWall", "cramming", "drown", "starve", "cactus", "fall", "flyIntoWall", "outOfWorld", "generic",
             "magic", "wither", "anvil", "fallingBlock", "dragonBreath", "fireworks"};
     private static final String SOURCES_COMMENT = "Set damage scaling by damage source. All vanilla sources should be included, but set to no scaling. Mod sources can be added too, you'll just need the damage"
@@ -51,8 +51,7 @@ public class DamageScaling {
     private Mode scaleMode;
     private Map<String, Float> scalingMap = new THashMap<>();
 
-    private DamageScaling() {
-    }
+    private DamageScaling() { }
 
     @SubscribeEvent
     public void onPlayerHurt(LivingHurtEvent event) {

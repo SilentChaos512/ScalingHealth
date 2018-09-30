@@ -65,7 +65,6 @@ public class ScalingHealthCommonProxy implements IProxy {
 
         MinecraftForge.EVENT_BUS.register(new ScalingHealthCommonEvents());
         MinecraftForge.EVENT_BUS.register(new SHPlayerDataHandler.EventHandler());
-        MinecraftForge.EVENT_BUS.register(PlayerBonusRegenHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(DifficultyHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(BlightHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(PetEventHandler.INSTANCE);

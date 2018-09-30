@@ -50,8 +50,7 @@ public final class BlightHandler {
     private static final String NBT_BLIGHT = ScalingHealth.MOD_ID_OLD + ".IsBlight";
     private static final int UPDATE_DELAY = 200;
 
-    private BlightHandler() {
-    }
+    private BlightHandler() {}
 
     // ******************
     // * Blight marking *

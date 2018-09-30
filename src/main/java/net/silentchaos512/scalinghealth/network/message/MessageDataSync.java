@@ -14,6 +14,8 @@ import net.silentchaos512.scalinghealth.utils.ModifierHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
+import javax.annotation.Nullable;
+
 @SuppressWarnings("WeakerAccess")
 public class MessageDataSync extends Message {
     public NBTTagCompound tags;
@@ -21,11 +23,9 @@ public class MessageDataSync extends Message {
     public int experienceLevel;
 
     @SuppressWarnings("unused")
-    public MessageDataSync() {
-    }
+    public MessageDataSync() {}
 
     public MessageDataSync(PlayerData data, EntityPlayer player) {
-
         tags = new NBTTagCompound();
         data.writeToNBT(tags);
         this.playerName = player.getName();
@@ -33,9 +33,9 @@ public class MessageDataSync extends Message {
     }
 
     @Override
+    @Nullable
     @SideOnly(Side.CLIENT)
     public IMessage handleMessage(MessageContext context) {
-
         ClientTicks.scheduleAction(() -> {
             EntityPlayer player = ScalingHealth.proxy.getClientPlayer().world.getPlayerEntityByName(playerName);
             if (player != null) {

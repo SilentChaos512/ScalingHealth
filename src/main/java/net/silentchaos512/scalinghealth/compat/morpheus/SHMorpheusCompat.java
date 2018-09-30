@@ -32,58 +32,53 @@ import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 import net.silentchaos512.scalinghealth.world.ScalingHealthSavedData;
 
 public class SHMorpheusCompat {
+    public static class NewDayHandler implements INewDayHandler {
+        /**
+         * Seems like there can only be one INewDayHandler per dimension? So, store a reference to
+         * the original one and pass control in startNewDay to preserve whatever behavior it had.
+         */
+        INewDayHandler parent;
 
-  public static class NewDayHandler implements INewDayHandler {
-
-    /**
-     * Seems like there can only be one INewDayHandler per dimension? So, store a reference to the original one and pass
-     * control in startNewDay to preserve whatever behavior it had.
-     */
-    INewDayHandler parent;
-
-    public NewDayHandler(INewDayHandler parent) {
-
-      this.parent = parent;
-    }
-
-    @Override
-    public void startNewDay() {
-
-      if (parent != null)
-        parent.startNewDay();
-
-      // Get all players in the world and increase their difficulty.
-      MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
-      if (server == null)
-        return;
-
-      World world = server.worlds[0];
-      if (world == null)
-        return;
-
-      for (EntityPlayer player : world.getPlayers(EntityPlayer.class, e -> true)) {
-        PlayerData data = SHPlayerDataHandler.get(player);
-        if (data != null) {
-          data.incrementDifficulty(Config.DIFFICULTY_FOR_SLEEPING, false);
+        public NewDayHandler(INewDayHandler parent) {
+            this.parent = parent;
         }
-      }
 
-      ScalingHealthSavedData data = ScalingHealthSavedData.get(world);
-      if (data != null) {
-        data.difficulty += Config.DIFFICULTY_FOR_SLEEPING;
-      }
+        @Override
+        public void startNewDay() {
+            if (parent != null)
+                parent.startNewDay();
+
+            // Get all players in the world and increase their difficulty.
+            MinecraftServer server = FMLCommonHandler.instance().getMinecraftServerInstance();
+            if (server == null)
+                return;
+
+            World world = server.worlds[0];
+            if (world == null)
+                return;
+
+            for (EntityPlayer player : world.getPlayers(EntityPlayer.class, e -> true)) {
+                PlayerData data = SHPlayerDataHandler.get(player);
+                if (data != null) {
+                    data.incrementDifficulty(Config.DIFFICULTY_FOR_SLEEPING, false);
+                }
+            }
+
+            ScalingHealthSavedData data = ScalingHealthSavedData.get(world);
+            if (data != null) {
+                data.difficulty += Config.DIFFICULTY_FOR_SLEEPING;
+            }
+        }
     }
-  }
 
-  public static void init() {
+    public static void init() {
+        INewDayHandler parent = null;
+        if (Morpheus.register.isDimRegistered(0))
+            parent = MorpheusRegistry.registry.get(0);
 
-    INewDayHandler parent = null;
-    if (Morpheus.register.isDimRegistered(0))
-      parent = MorpheusRegistry.registry.get(0);
-
-    INewDayHandler newHandler = new NewDayHandler(parent);
-    ScalingHealth.logHelper.info("Replacing Morpheus new day handler for dimension {}!", 0);
-    ScalingHealth.logHelper.info("Parent handler: {}", parent);
-    Morpheus.register.registerHandler(newHandler, 0);
-  }
+        INewDayHandler newHandler = new NewDayHandler(parent);
+        ScalingHealth.logHelper.info("Replacing Morpheus new day handler for dimension {}!", 0);
+        ScalingHealth.logHelper.info("Parent handler: {}", parent);
+        Morpheus.register.registerHandler(newHandler, 0);
+    }
 }

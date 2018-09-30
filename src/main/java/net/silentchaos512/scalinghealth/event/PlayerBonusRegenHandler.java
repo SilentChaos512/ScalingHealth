@@ -21,68 +21,66 @@ package net.silentchaos512.scalinghealth.event;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 import net.minecraftforge.fml.relauncher.Side;
+import net.silentchaos512.lib.util.MathUtils;
 import net.silentchaos512.scalinghealth.config.Config;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class PlayerBonusRegenHandler {
+@Mod.EventBusSubscriber
+public final class PlayerBonusRegenHandler {
+    private static final Map<String, Integer> TIMERS = new HashMap<>();
 
-  public static PlayerBonusRegenHandler INSTANCE = new PlayerBonusRegenHandler();
+    private PlayerBonusRegenHandler() {}
 
-  private Map<String, Integer> timers = new HashMap<>();
-
-  public int getTimerForPlayer(EntityPlayer player) {
-
-    if (player == null || !timers.containsKey(player.getName()))
-      return -1;
-    return timers.get(player.getName());
-  }
-
-  @SubscribeEvent
-  public void onPlayerTick(PlayerTickEvent event) {
-
-    if (event.side == Side.CLIENT || !Config.Player.BonusRegen.enabled)
-      return;
-
-    EntityPlayer player = event.player;
-    float health = player.getHealth();
-    if (health >= player.getMaxHealth()) return;
-
-    String name = player.getName();
-
-    // Add player timer if needed.
-    if (!timers.containsKey(name))
-      timers.put(name, Config.Player.BonusRegen.initialDelay);
-
-    int foodLevel = player.getFoodStats().getFoodLevel();
-
-    boolean foodLevelOk = foodLevel >= Config.Player.BonusRegen.minFood
-        && foodLevel <= Config.Player.BonusRegen.maxFood;
-    boolean healthLevelOk = health > Config.Player.BonusRegen.minHealth
-        && health < Config.Player.BonusRegen.maxHealth;
-
-    if (foodLevelOk && healthLevelOk) {
-      // Tick timer, heal player and reset on 0.
-      int timer = timers.get(name);
-      if (--timer <= 0) {
-        player.heal(1f);
-        player.addExhaustion(Config.Player.BonusRegen.exhaustion);
-        timer = Config.Player.BonusRegen.delay;
-      }
-      timers.put(name, timer);
+    static int getTimerForPlayer(EntityPlayer player) {
+        if (player == null || !TIMERS.containsKey(player.getName()))
+            return -1;
+        return TIMERS.get(player.getName());
     }
-  }
 
-  @SubscribeEvent
-  public void onPlayerHurt(LivingHurtEvent event) {
+    @SubscribeEvent
+    public static void onPlayerTick(PlayerTickEvent event) {
+        if (event.side == Side.CLIENT || !Config.Player.BonusRegen.enabled)
+            return;
 
-    EntityLivingBase entityLiving = event.getEntityLiving();
-    if (entityLiving.world.isRemote || !(entityLiving instanceof EntityPlayer))
-      return;
-    timers.put(entityLiving.getName(), Config.Player.BonusRegen.initialDelay);
-  }
+        EntityPlayer player = event.player;
+        int health = (int) Math.ceil(player.getHealth());
+        if (health >= player.getMaxHealth()) return;
+
+        String name = player.getName();
+
+        // Add player timer if needed.
+        if (!TIMERS.containsKey(name))
+            TIMERS.put(name, Config.Player.BonusRegen.initialDelay);
+
+        int foodLevel = player.getFoodStats().getFoodLevel();
+
+        boolean foodLevelOk = MathUtils.inRangeInclusive(foodLevel,
+                Config.Player.BonusRegen.minFood, Config.Player.BonusRegen.maxFood);
+        boolean healthLevelOk = MathUtils.inRangeExclusive(health,
+                Config.Player.BonusRegen.minHealth, Config.Player.BonusRegen.maxHealth);
+
+        if (foodLevelOk && healthLevelOk) {
+            // Tick timer, heal player and reset on 0.
+            int timer = TIMERS.get(name);
+            if (--timer <= 0) {
+                player.heal(1f);
+                player.addExhaustion(Config.Player.BonusRegen.exhaustion);
+                timer = Config.Player.BonusRegen.delay;
+            }
+            TIMERS.put(name, timer);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerHurt(LivingHurtEvent event) {
+        EntityLivingBase entityLiving = event.getEntityLiving();
+        if (!entityLiving.world.isRemote && entityLiving instanceof EntityPlayer)
+            TIMERS.put(entityLiving.getName(), Config.Player.BonusRegen.initialDelay);
+    }
 }

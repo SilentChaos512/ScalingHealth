@@ -11,12 +11,13 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.network.Message;
 import net.silentchaos512.scalinghealth.world.ScalingHealthSavedData;
 
+import javax.annotation.Nullable;
+
 public class MessageWorldDataSync extends Message {
     public NBTTagCompound tags;
 
     @SuppressWarnings("unused")
-    public MessageWorldDataSync() {
-    }
+    public MessageWorldDataSync() {}
 
     public MessageWorldDataSync(ScalingHealthSavedData data) {
         tags = new NBTTagCompound();
@@ -24,6 +25,7 @@ public class MessageWorldDataSync extends Message {
     }
 
     @Override
+    @Nullable
     @SideOnly(Side.CLIENT)
     public IMessage handleMessage(MessageContext context) {
         ClientTicks.scheduleAction(() -> {

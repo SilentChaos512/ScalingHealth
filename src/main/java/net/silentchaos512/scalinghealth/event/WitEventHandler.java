@@ -30,37 +30,35 @@ import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 import net.silentchaos512.wit.api.WitEntityInfoEvent;
 
 public class WitEventHandler {
+    @SubscribeEvent
+    public void onWitEntityInfo(WitEntityInfoEvent event) {
+        if (!Config.Debug.debugMode)
+            return;
 
-  @SubscribeEvent
-  public void onWitEntityInfo(WitEntityInfoEvent event) {
+        EntityLivingBase entity = event.entityLiving;
+        if (entity != null) {
+            if (entity.getEntityData() == null)
+                event.lines.add("Entity Data is null!?");
+            else
+                event.lines.add("Blight: " + BlightHandler.isBlight(entity));
+        }
 
-    if (!Config.Debug.debugMode)
-      return;
+        if (entity != null && entity.getAttributeMap() != null) {
+            TextFormatting tf = TextFormatting.GRAY;
 
-    EntityLivingBase entity = event.entityLiving;
-    if (entity != null) {
-      if (entity.getEntityData() == null)
-        event.lines.add("Entity Data is null!?");
-      else
-        event.lines.add("Blight: " + BlightHandler.isBlight(entity));
+            if (entity instanceof EntityPlayer) {
+                PlayerData data = SHPlayerDataHandler.get((EntityPlayer) entity);
+                if (data != null)
+                    event.lines.add(tf + String.format("Difficulty: %.4f", data.getDifficulty()));
+            }
+
+            for (IAttributeInstance attr : entity.getAttributeMap().getAllAttributes()) {
+                if (attr != null)
+                    for (AttributeModifier mod : attr.getModifiers())
+                        if (mod != null)
+                            event.lines.add(tf + String.format("%s: %.3f (op %d)", mod.getName(),
+                                    (float) mod.getAmount(), mod.getOperation()));
+            }
+        }
     }
-
-    if (entity != null && entity.getAttributeMap() != null) {
-      TextFormatting tf = TextFormatting.GRAY;
-
-      if (entity instanceof EntityPlayer) {
-        PlayerData data = SHPlayerDataHandler.get((EntityPlayer) entity);
-        if (data != null)
-          event.lines.add(tf + String.format("Difficulty: %.4f", data.getDifficulty()));
-      }
-
-      for (IAttributeInstance attr : entity.getAttributeMap().getAllAttributes()) {
-        if (attr != null)
-          for (AttributeModifier mod : attr.getModifiers())
-            if (mod != null)
-              event.lines.add(tf + String.format("%s: %.3f (op %d)", mod.getName(),
-                  (float) mod.getAmount(), mod.getOperation()));
-      }
-    }
-  }
 }
