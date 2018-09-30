@@ -44,7 +44,7 @@ import java.util.Random;
  * Handles display of regular and absorption hearts.
  * <p>For future reference, much of the vanilla code can be found in {@link GuiIngameForge}.</p>
  */
-public class HeartDisplayHandler extends Gui {
+public final class HeartDisplayHandler extends Gui {
     public enum TextStyle {
         DISABLED, ROWS, HEALTH_AND_MAX;
 
@@ -85,8 +85,7 @@ public class HeartDisplayHandler extends Gui {
     private int lastPlayerHealth = 0;
     private Random rand = new Random();
 
-    private HeartDisplayHandler() {
-    }
+    private HeartDisplayHandler() {}
 
     @SubscribeEvent(receiveCanceled = true)
     public void onHealthBar(RenderGameOverlayEvent.Pre event) {
@@ -340,9 +339,9 @@ public class HeartDisplayHandler extends Gui {
         final float scale = style == TextStyle.ROWS ? 0.65f : 0.5f;
         final int width = event.getResolution().getScaledWidth();
         final int height = event.getResolution().getScaledHeight();
-        final int left = (int) ((width / 2 - 91) / scale);
+        final int left = (int) ((width / 2 - 91 + Config.Client.Hearts.textOffsetX) / scale);
         // GuiIngameForge.left_height == 59 in normal cases. Making it a constant should fix some issues.
-        final int top = (int) ((height - 59 + 21 + (1 / scale)) / scale);
+        final int top = (int) ((height - 59 + 21 + Config.Client.Hearts.textOffsetY + (1 / scale)) / scale);
 
         // Draw health string
         String healthString = style == TextStyle.HEALTH_AND_MAX

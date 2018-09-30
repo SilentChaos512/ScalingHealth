@@ -82,6 +82,15 @@ public class Config extends ConfigBaseNew {
                     " regular vanilla hearts are rendered first, then custom hearts are used for extra health.")
             public static boolean replaceVanillaRow;
 
+            @ConfigOption(name = "Text Offset X", category = CAT_CLIENT)
+            @ConfigOption.RangeInt(0)
+            @ConfigOption.Comment("Offset the position of health text.")
+            public static int textOffsetX;
+            @ConfigOption(name = "Text Offset Y", category = CAT_CLIENT)
+            @ConfigOption.RangeInt(0)
+            @ConfigOption.Comment("Offset the position of health text.")
+            public static int textOffsetY;
+
             public static HeartDisplayHandler.TextStyle textStyle;
             public static HeartDisplayHandler.TextColor textColor;
             public static HeartDisplayHandler.AbsorptionHeartStyle absorptionStyle;
