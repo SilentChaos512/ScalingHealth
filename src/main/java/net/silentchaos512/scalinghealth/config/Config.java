@@ -299,6 +299,13 @@ public class Config extends ConfigBaseNew {
     public static float CURSED_HEART_DIFFICULTY_CHANGE;
     public static float ENCHANTED_HEART_DIFFICULTY_CHANGE;
 
+    public static class Difficulty {
+        @ConfigOption(name = "Stats Consume Difficulty", category = CAT_CLIENT)
+        @ConfigOption.BooleanDefault(false)
+        @ConfigOption.Comment("If true, the difficulty a mob is spawned with will be \"consumed\" when given health/damage bonuses and potion effects (as in older versions).")
+        public static boolean statsConsumeDifficulty;
+    }
+
     // Difficulty
     public static float DIFFICULTY_MIN = 0;
     public static float DIFFICULTY_MAX = 250;

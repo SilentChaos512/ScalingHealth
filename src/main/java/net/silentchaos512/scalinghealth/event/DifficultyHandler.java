@@ -123,21 +123,17 @@ public class DifficultyHandler {
 
     @SubscribeEvent
     public void onMobSpawn(LivingUpdateEvent event) {
-        if (Config.DIFFICULTY_MAX <= 0)
-            return;
+        if (!(Config.DIFFICULTY_MAX <= 0) && !event.getEntity().world.isRemote && event.getEntity() instanceof EntityLiving) {
+            EntityLiving entityLiving = (EntityLiving) event.getEntity();
 
-        // Increase mob health and make blights?
-        if (event.getEntity().world.isRemote || !(event.getEntity() instanceof EntityLiving))
-            return;
+            if (canIncreaseEntityHealth(entityLiving) && !entityBlacklistedFromHealthIncrease(entityLiving)) {
+                ScalingHealth.logHelper.debug("{}, {}", entityLiving.getEntityData().getShort(NBT_ENTITY_DIFFICULTY), entityLiving);
 
-        EntityLiving entityLiving = (EntityLiving) event.getEntity();
-
-        if (!canIncreaseEntityHealth(entityLiving) || entityBlacklistedFromHealthIncrease(entityLiving))
-            return;
-
-        boolean makeBlight = increaseEntityHealth(entityLiving);
-        if (makeBlight && !BlightHandler.isBlight(entityLiving))
-            makeEntityBlight(entityLiving, ScalingHealth.random);
+                boolean makeBlight = increaseEntityHealth(entityLiving);
+                if (makeBlight && !BlightHandler.isBlight(entityLiving))
+                    makeEntityBlight(entityLiving, ScalingHealth.random);
+            }
+        }
     }
 
     @SubscribeEvent
@@ -165,13 +161,8 @@ public class DifficultyHandler {
     private boolean increaseEntityHealth(EntityLivingBase entityLiving) {
         if (Config.DIFFICULTY_MAX <= 0) return false;
 
-        // If true, enables old behavior where health/damage subtract from difficulty as applied.
-        // TODO: Should this be a config, or should old behavior just be removed?
-        final boolean statsTakeDifficulty = false;
-
         World world = entityLiving.world;
-        float difficulty = (float) Config.AREA_DIFFICULTY_MODE.getAreaDifficulty(world,
-                entityLiving.getPosition());
+        float difficulty = (float) Config.AREA_DIFFICULTY_MODE.getAreaDifficulty(world, entityLiving.getPosition());
         float originalDifficulty = difficulty;
         float originalMaxHealth = entityLiving.getMaxHealth();
         Random rand = ScalingHealth.random;
@@ -179,8 +170,7 @@ public class DifficultyHandler {
         boolean isHostile = entityLiving instanceof IMob;
 
         // Lunar phase multipliers?
-        if (Config.DIFFICULTY_LUNAR_MULTIPLIERS_ENABLED
-                && world.getWorldTime() % 24000 > 12000) {
+        if (Config.DIFFICULTY_LUNAR_MULTIPLIERS_ENABLED && world.getWorldTime() % 24000 > 12000) {
             int moonPhase = world.provider.getMoonPhase(world.getWorldTime()) % 8;
             float multi = Config.DIFFICULTY_LUNAR_MULTIPLIERS[moonPhase];
             difficulty *= multi;
@@ -208,11 +198,11 @@ public class DifficultyHandler {
 
         genAddedHealth *= healthMultiplier;
 
-        if (statsTakeDifficulty) difficulty -= genAddedHealth;
+        if (Config.Difficulty.statsConsumeDifficulty) difficulty -= genAddedHealth;
 
         if (difficulty > 0) {
             float diffIncrease = 2 * healthMultiplier * difficulty * rand.nextFloat();
-            if (statsTakeDifficulty) difficulty -= diffIncrease;
+            if (Config.Difficulty.statsConsumeDifficulty) difficulty -= diffIncrease;
             genAddedHealth += diffIncrease;
         }
 
@@ -225,7 +215,7 @@ public class DifficultyHandler {
                 genAddedDamage = MathHelper.clamp(genAddedDamage, 0f, Config.DIFFICULTY_DAMAGE_MAX_BOOST);
 
             // Decrease difficulty based on the damage actually added, instead of diffIncrease.
-            if (statsTakeDifficulty)
+            if (Config.Difficulty.statsConsumeDifficulty)
                 difficulty -= genAddedDamage / Config.DIFFICULTY_DAMAGE_MULTIPLIER;
         }
 
@@ -235,7 +225,6 @@ public class DifficultyHandler {
         if (difficulty > 0 && rand.nextFloat() < potionChance) {
             MobPotionMap.PotionEntry pot = potionMap.getRandom(rand, (int) difficulty);
             if (pot != null) {
-                if (statsTakeDifficulty) difficulty -= pot.cost;
                 entityLiving.addPotionEffect(new PotionEffect(pot.potion, POTION_APPLY_TIME));
             }
         }
@@ -408,7 +397,7 @@ public class DifficultyHandler {
         // The tickExisted > 1 kinda helps with Lycanites, but checking for a modifier amount of 0 should catch issues with
         // some mobs not receiving health increases.
         // ScalingHealth.logHelper.debug(modifier != null ? modifier.getAmount() : null);
-        return entityLiving.ticksExisted > 1
+        return entityLiving.ticksExisted > 1 && entityLiving.getEntityData().getShort(NBT_ENTITY_DIFFICULTY) < 1
                 && (modifier == null || modifier.getAmount() == 0.0 || Double.isNaN(modifier.getAmount()));
     }
 
