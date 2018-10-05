@@ -2,6 +2,7 @@
 Added: Configs to tweak health text position (#133)
 Fixed: Blight fires being too dark
 Fixed: Mobs continuously redoing difficulty logic when health increases are disabled and difficulty is not
+Fixed: Error when loading world data
 
 1.3.28
 Partial config code rewrite. Shouldn't change anything, but let me know if anything seems broken.

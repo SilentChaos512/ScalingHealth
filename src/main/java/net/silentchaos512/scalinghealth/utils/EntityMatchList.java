@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-// TODO: Move to Silent Lib
+@Deprecated
 public class EntityMatchList {
 
   List<String> list = new ArrayList<>();

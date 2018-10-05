@@ -127,7 +127,7 @@ public class DifficultyHandler {
             EntityLiving entityLiving = (EntityLiving) event.getEntity();
 
             if (canIncreaseEntityHealth(entityLiving) && !entityBlacklistedFromHealthIncrease(entityLiving)) {
-                ScalingHealth.logHelper.debug("{}, {}", entityLiving.getEntityData().getShort(NBT_ENTITY_DIFFICULTY), entityLiving);
+//                ScalingHealth.logHelper.debug("{}, {}", entityLiving.getEntityData().getShort(NBT_ENTITY_DIFFICULTY), entityLiving);
 
                 boolean makeBlight = increaseEntityHealth(entityLiving);
                 if (makeBlight && !BlightHandler.isBlight(entityLiving))

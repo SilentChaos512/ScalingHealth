@@ -31,6 +31,10 @@ public final class ScalingHealthSavedData extends WorldSavedData {
 
     public double difficulty = -1;
 
+    public ScalingHealthSavedData(String name) {
+        super(name);
+    }
+
     private ScalingHealthSavedData() {
         super(DATA_NAME);
     }
