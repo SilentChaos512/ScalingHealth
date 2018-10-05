@@ -26,12 +26,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.silentchaos512.lib.util.MathUtils;
+import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.Config;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Mod.EventBusSubscriber
+@Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID_LOWER)
 public final class PlayerBonusRegenHandler {
     private static final Map<String, Integer> TIMERS = new HashMap<>();
 

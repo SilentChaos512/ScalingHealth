@@ -33,6 +33,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.silentchaos512.lib.util.Color;
+import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.entity.EntityBlightFire;
 import net.silentchaos512.scalinghealth.lib.EnumAreaDifficultyMode;
@@ -40,7 +41,7 @@ import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 import org.lwjgl.opengl.GL11;
 
-@Mod.EventBusSubscriber(Side.CLIENT)
+@Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID_LOWER, value = Side.CLIENT)
 public final class ScalingHealthClientEvents {
     private static final float DEBUG_TEXT_SCALE = 0.6f;
 
