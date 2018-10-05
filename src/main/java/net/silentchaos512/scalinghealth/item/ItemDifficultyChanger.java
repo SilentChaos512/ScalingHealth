@@ -21,7 +21,6 @@ package net.silentchaos512.scalinghealth.item;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.SoundEvents;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -32,6 +31,7 @@ import net.silentchaos512.lib.registry.ICustomModel;
 import net.silentchaos512.lib.util.Color;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.Config;
+import net.silentchaos512.scalinghealth.init.ModSounds;
 import net.silentchaos512.scalinghealth.lib.EnumModParticles;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
@@ -104,8 +104,10 @@ public class ItemDifficultyChanger extends Item implements ICustomModel {
             // Enchanted Heart
             case ENCHANTED:
                 // Lower difficulty, consume 1 from stack.
-                data.incrementDifficulty(Config.ENCHANTED_HEART_DIFFICULTY_CHANGE);
-                stack.shrink(1);
+                if (!world.isRemote) {
+                    data.incrementDifficulty(Config.ENCHANTED_HEART_DIFFICULTY_CHANGE);
+                    stack.shrink(1);
+                }
 
                 // Particles and sound effect!
                 for (int i = 0; i < 20 - 5 * ScalingHealth.proxy.getParticleSettings(); ++i) {
@@ -115,15 +117,17 @@ public class ItemDifficultyChanger extends Item implements ICustomModel {
                     ScalingHealth.proxy.spawnParticles(EnumModParticles.ENCHANTED_HEART,
                             new Color(1f, 1f, 0.5f), world, particleX, particleY, particleZ, xSpeed, ySpeed, zSpeed);
                 }
-                world.playSound(null, player.getPosition(), SoundEvents.BLOCK_ENCHANTMENT_TABLE_USE,
+                world.playSound(null, player.getPosition(), ModSounds.ENCHANTED_HEART_USE,
                         SoundCategory.PLAYERS, 0.4f, 1.7f);
 
                 return new ActionResult<>(EnumActionResult.SUCCESS, stack);
             // Cursed Heart
             case CURSED:
                 // Raise difficulty, consume 1 from stack.
-                data.incrementDifficulty(Config.CURSED_HEART_DIFFICULTY_CHANGE);
-                stack.shrink(1);
+                if (!world.isRemote) {
+                    data.incrementDifficulty(Config.CURSED_HEART_DIFFICULTY_CHANGE);
+                    stack.shrink(1);
+                }
 
                 // Particles and sound effect!
                 for (int i = 0; i < 20 - 5 * ScalingHealth.proxy.getParticleSettings(); ++i) {
@@ -133,7 +137,7 @@ public class ItemDifficultyChanger extends Item implements ICustomModel {
                     ScalingHealth.proxy.spawnParticles(EnumModParticles.CURSED_HEART,
                             new Color(0.4f, 0f, 0.6f), world, particleX, particleY, particleZ, xSpeed, ySpeed, zSpeed);
                 }
-                world.playSound(null, player.getPosition(), SoundEvents.BLOCK_FIRE_EXTINGUISH,
+                world.playSound(null, player.getPosition(), ModSounds.CURSED_HEART_USE,
                         SoundCategory.PLAYERS, 0.3f,
                         (float) (0.7f + 0.05f * ScalingHealth.random.nextGaussian()));
 

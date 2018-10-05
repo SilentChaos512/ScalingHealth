@@ -236,6 +236,8 @@ public class Config extends ConfigBaseNew {
         }
     }
 
+    // TODO: Finish updating config class...
+
     // Fake Players
     public static boolean FAKE_PLAYERS_CAN_GENERATE_HEARTS = true;
     public static boolean FAKE_PLAYERS_HAVE_DIFFICULTY = false;
