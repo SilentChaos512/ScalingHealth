@@ -270,13 +270,6 @@ public class CommandScalingHealth extends CommandBaseSL {
     }
 
     @Override
-    public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
-        return ((server.isDedicatedServer() && !(sender instanceof EntityPlayer))
-                || server.isSinglePlayer() && server.worlds[0].getWorldInfo().areCommandsAllowed())
-                || server.getPlayerList().getOppedPlayers().getGameProfileFromName(sender.getName()) != null;
-    }
-
-    @Override
     public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos) {
         if (args.length == 1)
             return getListOfStringsMatchingLastWord(args, "difficulty", "health", "world_difficulty");
