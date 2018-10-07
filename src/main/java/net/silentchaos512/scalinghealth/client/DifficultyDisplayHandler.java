@@ -51,7 +51,7 @@ public class DifficultyDisplayHandler extends Gui {
     @SubscribeEvent
     public void onRenderOverlay(RenderGameOverlayEvent.Post event) {
 
-        if (event.getType() != ElementType.TEXT || Config.DIFFICULTY_MAX <= 0 || !Config.Client.Difficulty.renderMeter)
+        if (event.getType() != ElementType.TEXT || Config.Difficulty.maxValue <= 0 || !Config.Client.Difficulty.renderMeter)
             return;
 
         Minecraft mc = Minecraft.getMinecraft();
@@ -65,9 +65,9 @@ public class DifficultyDisplayHandler extends Gui {
             return;
 
         int difficulty = (int) data.getDifficulty();
-        int areaDifficulty = MathHelper.clamp((int) Config.AREA_DIFFICULTY_MODE.getAreaDifficulty(player.world, player.getPosition()), 0,
-                (int) Config.DIFFICULTY_MAX);
-        if (Config.AREA_DIFFICULTY_MODE == EnumAreaDifficultyMode.SERVER_WIDE) {
+        int areaDifficulty = MathHelper.clamp((int) Config.Difficulty.AREA_DIFFICULTY_MODE.getAreaDifficulty(player.world, player.getPosition()), 0,
+                (int) Config.Difficulty.maxValue);
+        if (Config.Difficulty.AREA_DIFFICULTY_MODE == EnumAreaDifficultyMode.SERVER_WIDE) {
             difficulty = areaDifficulty;
         }
         int timeSinceLastUpdate = ClientTicks.ticksInGame - lastUpdateTime;
@@ -101,11 +101,11 @@ public class DifficultyDisplayHandler extends Gui {
             drawTexturedModalRect(posX, posY, 190, 0, 66, 14, 0xFFFFFF);
 
             // Area Difficulty
-            int barLength = (int) (60 * areaDifficulty / Config.DIFFICULTY_MAX);
+            int barLength = (int) (60 * areaDifficulty / Config.Difficulty.maxValue);
             drawTexturedModalRect(posX + 3, posY + 5, 193, 19, barLength, 6, 0xFFFFFF);
 
             // Player Difficulty
-            barLength = (int) (60 * difficulty / Config.DIFFICULTY_MAX);
+            barLength = (int) (60 * difficulty / Config.Difficulty.maxValue);
             drawTexturedModalRect(posX + 3, posY + 3, 193, 17, barLength, 2, 0xFFFFFF);
 
             // Text

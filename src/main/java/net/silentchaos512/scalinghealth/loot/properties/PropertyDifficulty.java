@@ -46,7 +46,7 @@ public class PropertyDifficulty implements EntityProperty {
     public boolean testProperty(Random random, Entity entityIn) {
         if ( entityIn instanceof EntityLivingBase) {
             double difficulty = ScalingHealthAPI.getEntityDifficulty((EntityLivingBase) entityIn);
-            difficulty /= Config.BLIGHT_DIFFICULTY_MULTIPLIER;
+            difficulty /= Config.Mob.Blight.difficultyMultiplier;
             return difficulty >= this.min && difficulty <= this.max;
         }
         return false;

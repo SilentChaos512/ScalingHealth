@@ -66,8 +66,8 @@ public class ItemDifficultyChanger extends Item implements ICustomModel {
         if (stack.getItemDamage() > 1) return;
 
         String amountStr = String.format("%d", stack.getItemDamage() == Type.ENCHANTED.ordinal()
-                ? (int) Config.ENCHANTED_HEART_DIFFICULTY_CHANGE
-                : (int) Config.CURSED_HEART_DIFFICULTY_CHANGE);
+                ? (int) Config.Items.enchantedHeartChange
+                : (int) Config.Items.cursedHeartChange);
         if (amountStr.matches("^\\d+"))
             amountStr = "+" + amountStr;
 
@@ -105,7 +105,7 @@ public class ItemDifficultyChanger extends Item implements ICustomModel {
             case ENCHANTED:
                 // Lower difficulty, consume 1 from stack.
                 if (!world.isRemote) {
-                    data.incrementDifficulty(Config.ENCHANTED_HEART_DIFFICULTY_CHANGE);
+                    data.incrementDifficulty(Config.Items.enchantedHeartChange);
                     stack.shrink(1);
                 }
 
@@ -125,7 +125,7 @@ public class ItemDifficultyChanger extends Item implements ICustomModel {
             case CURSED:
                 // Raise difficulty, consume 1 from stack.
                 if (!world.isRemote) {
-                    data.incrementDifficulty(Config.CURSED_HEART_DIFFICULTY_CHANGE);
+                    data.incrementDifficulty(Config.Items.cursedHeartChange);
                     stack.shrink(1);
                 }
 

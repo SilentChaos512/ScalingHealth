@@ -75,9 +75,9 @@ public class ItemHeartContainer extends Item {
 
             // Heal the player (this is separate from the "healing" of the newly added heart, if that's allowed).
             boolean consumed = false;
-            if (Config.HEARTS_HEALTH_RESTORED > 0 && player.getHealth() < player.getMaxHealth()) {
+            if (Config.Items.Heart.healthRestored > 0 && player.getHealth() < player.getMaxHealth()) {
                 float currentHealth = player.getHealth();
-                player.setHealth(currentHealth + Config.HEARTS_HEALTH_RESTORED);
+                player.setHealth(currentHealth + Config.Items.Heart.healthRestored);
                 consumed = true;
             }
 
@@ -106,7 +106,7 @@ public class ItemHeartContainer extends Item {
     }
 
     private static int getLevelsRequiredToUse(EntityPlayer player, ItemStack stack, boolean healthIncreaseAllowed) {
-        return player.capabilities.isCreativeMode ? 0 : Config.HEART_XP_LEVEL_COST;
+        return player.capabilities.isCreativeMode ? 0 : Config.Items.Heart.xpCost;
     }
 
     private static void consumeLevels(EntityPlayer player, int amount) {
@@ -114,7 +114,7 @@ public class ItemHeartContainer extends Item {
     }
 
     private static boolean isHealthIncreaseAllowed(PlayerData data) {
-        return Config.HEARTS_INCREASE_HEALTH
+        return Config.Items.Heart.increaseHealth
                 && (Config.Player.Health.maxHealth == 0
                 || data.getMaxHealth() < Config.Player.Health.maxHealth);
     }

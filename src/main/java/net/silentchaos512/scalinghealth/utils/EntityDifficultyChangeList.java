@@ -78,12 +78,12 @@ public class EntityDifficultyChangeList {
         boolean isBoss = !entity.isNonBoss();
         return new DifficultyChanges(
                 // Standard kill values. Varies for bosses, hostiles, and passives.
-                isBoss ? Config.DIFFICULTY_PER_BOSS_KILL
-                        : entity instanceof IMob ? Config.DIFFICULTY_PER_KILL
-                        : Config.DIFFICULTY_PER_PASSIVE_KILL,
+                isBoss ? Config.Difficulty.perBossKill
+                        : entity instanceof IMob ? Config.Difficulty.perHostileKill
+                        : Config.Difficulty.perPassiveKill,
                 // Blight kill values. Blight bosses add both the blight and boss values.
-                Config.DIFFICULTY_PER_BLIGHT_KILL
-                        + (isBoss ? Config.DIFFICULTY_PER_BOSS_KILL : 0));
+                Config.Difficulty.perBlightKill
+                        + (isBoss ? Config.Difficulty.perBossKill : 0));
     }
 
     /**

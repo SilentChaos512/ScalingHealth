@@ -42,12 +42,12 @@ public final class ScalingHealthSavedData extends WorldSavedData {
     @Override
     public void readFromNBT(NBTTagCompound nbt) {
         difficulty = nbt.getDouble(NBT_DIFFICULTY);
-        difficulty = MathHelper.clamp(difficulty, Config.DIFFICULTY_MIN, Config.DIFFICULTY_MAX);
+        difficulty = MathHelper.clamp(difficulty, Config.Difficulty.minValue, Config.Difficulty.maxValue);
     }
 
     @Override
     public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-        difficulty = MathHelper.clamp(difficulty, Config.DIFFICULTY_MIN, Config.DIFFICULTY_MAX);
+        difficulty = MathHelper.clamp(difficulty, Config.Difficulty.minValue, Config.Difficulty.maxValue);
         nbt.setDouble(NBT_DIFFICULTY, difficulty);
         return nbt;
     }

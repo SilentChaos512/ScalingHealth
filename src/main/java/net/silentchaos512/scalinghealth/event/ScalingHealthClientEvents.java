@@ -76,7 +76,7 @@ public final class ScalingHealthClientEvents {
         World world = Minecraft.getMinecraft().world;
         EntityPlayer player = Minecraft.getMinecraft().player;
         PlayerData data = SHPlayerDataHandler.get(player);
-        EnumAreaDifficultyMode areaMode = Config.AREA_DIFFICULTY_MODE;
+        EnumAreaDifficultyMode areaMode = Config.Difficulty.AREA_DIFFICULTY_MODE;
         if (data == null)
             return "Player data is null!";
 

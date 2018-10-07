@@ -35,8 +35,7 @@ public class PotionBandaged extends Potion {
 
     public PotionBandaged() {
         super(false, 0xf7dcad);
-        String name = ScalingHealth.RESOURCE_PREFIX + "bandaged";
-        setPotionName("effect." + name);
+        setPotionName("effect." + ScalingHealth.MOD_ID_LOWER + ".bandaged");
         setBeneficial();
         registerPotionAttributeModifier(SharedMonsterAttributes.MOVEMENT_SPEED,
                 "732486d8-f730-41a2-868f-eb988738986f", SPEED_MODIFIER, 2);
@@ -51,7 +50,7 @@ public class PotionBandaged extends Potion {
 
         float healAmount = BASE_HEAL_RATE * entityLiving.getMaxHealth() * (amplifier + 1);
         // Using Entity#heal allows us to prevent the cancelable LivingHealEvent from being fired.
-        EntityHelper.heal(entityLiving, healAmount, false);
+        EntityHelper.heal(entityLiving, healAmount, true); // TODO: Config!
     }
 
     @Override

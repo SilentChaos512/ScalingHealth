@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 
 // TODO: Major cleanup needed!
+@SuppressWarnings("UtilityClassWithoutPrivateConstructor")
 public class Config extends ConfigBaseNew {
     public static final class Debug {
         @ConfigOption(name = "Debug Mode", category = CAT_DEBUG)
@@ -107,6 +108,7 @@ public class Config extends ConfigBaseNew {
                     " up as a decimal number. Oops.")
             public static int lastHeartOutlineColor;
 
+            @SuppressWarnings("MagicNumber")
             public static int[] heartColors = {
                     0xBF0000, // 0 red
                     0xE66000, // 25 orange-red
@@ -236,48 +238,155 @@ public class Config extends ConfigBaseNew {
         }
     }
 
-    // TODO: Finish updating config class...
+    public static final class FakePlayer {
+        // Fake Players
+        @ConfigOption(name = "Can Generate Hearts", category = CAT_FAKE_PLAYER)
+        @ConfigOption.BooleanDefault(true)
+        @ConfigOption.Comment("If enabled, fake players will be able to get heart container drops when killing mobs." +
+                " Disabling should prevent at least some mob grinders from getting heart drops.")
+        public static boolean generateHearts = true;
+        public static boolean haveDifficulty = false; // Probably does not work?
+    }
 
-    // Fake Players
-    public static boolean FAKE_PLAYERS_CAN_GENERATE_HEARTS = true;
-    public static boolean FAKE_PLAYERS_HAVE_DIFFICULTY = false;
+    public static final class Mob {
+        // Mobs
+        @ConfigOption(name = "Damage Modifier", category = CAT_MOB)
+        @ConfigOption.RangeFloat(value = 0.1f, min = 0)
+        @ConfigOption.Comment("A multiplier for extra attack strength all mobs will receive. Set to 0 to disable extra" +
+                " attack strength.")
+        public static float damageMultiplier;
+        @ConfigOption(name = "Max Damage Bonus", category = CAT_MOB)
+        @ConfigOption.RangeFloat(value = 10, min = 0, max = 1000)
+        @ConfigOption.Comment("The maximum extra attack damage a mob can receive. Zero means unlimited.")
+        public static float maxDamageBoost;
+        @ConfigOption(name = "Potion Chance (Hostiles)", category = CAT_MOB)
+        @ConfigOption.RangeFloat(value = 0.375f, min = 0, max = 1)
+        @ConfigOption.Comment("The chance that an extra potion effect will be applied to any hostile mob. Note that"
+                + " this effect requires the mob to have a certain amount of \"difficulty\" left after"
+                + " it has been given extra health and damage. So entering 1 won't guarantee potion"
+                + " effects.")
+        public static float hostilePotionChance;
+        @ConfigOption(name = "Potion Chance (Passives)", category = CAT_MOB)
+        @ConfigOption.RangeFloat(value = 0.025f, min = 0, max = 1)
+        @ConfigOption.Comment("The chance that an extra potion effect will be applied to any passive mob. Note that"
+                + " this effect requires the mob to have a certain amount of \"difficulty\" left after"
+                + " it has been given extra health and damage. So entering 1 won't guarantee potion"
+                + " effects.")
+        public static float passivePotionChance;
+        @ConfigOption(name = "XP Boost", category = CAT_MOB)
+        @ConfigOption.RangeFloat(value = 0.01f, min = 0, max = 1)
+        @ConfigOption.Comment("Additional XP (as percentage) per point of difficulty. For example, if this is 0.01, a"
+                + " mob will drop 2x (+1.0x) XP at 100 difficulty and 3x (+2.0x) at 200")
+        public static float xpBoost;
 
-    // Mobs
-    public static float DIFFICULTY_DAMAGE_MULTIPLIER = 0.1f;
-    public static float DIFFICULTY_DAMAGE_MAX_BOOST = 10.0f;
-    public static float POTION_CHANCE_HOSTILE = 0.375f;
-    public static float POTION_CHANCE_PASSIVE = 0.025f;
-    public static float MOB_XP_BOOST = 0.01f;
-    // Mob Health
-    public static boolean ALLOW_PEACEFUL_EXTRA_HEALTH = true;
-    public static boolean ALLOW_HOSTILE_EXTRA_HEALTH = true;
-    public static boolean ALLOW_BOSS_EXTRA_HEALTH = true;
-    public static float DIFFICULTY_GENERIC_HEALTH_MULTIPLIER = 0.5F;
-    public static float DIFFICULTY_PEACEFUL_HEALTH_MULTIPLIER = 0.25F;
-    public static EnumHealthModMode MOB_HEALTH_SCALING_MODE = EnumHealthModMode.MULTI_HALF;
-    public static List<Integer> MOB_HEALTH_DIMENSION_BLACKLIST = new ArrayList<>();
-    public static EntityMatchList MOB_HEALTH_BLACKLIST = new EntityMatchList();
-    private static String[] MOB_HEALTH_BLACKLIST_DEFAULTS = new String[]{};
-    // Blights
-    public static boolean BLIGHT_ALWAYS = false;
-    public static float BLIGHT_CHANCE_MULTIPLIER = 0.0625F;
-    public static float BLIGHT_DIFFICULTY_MULTIPLIER = 3f;
-    public static int BLIGHT_AMP_SPEED = 4;
-    public static int BLIGHT_AMP_STRENGTH = 1;
-    public static int BLIGHT_POTION_DURATION;
-    public static boolean BLIGHT_FIRE_RIDES_BLIGHT = false;
-    public static boolean BLIGHT_INVISIBLE = false;
-    public static boolean BLIGHT_FIRE_RESIST = true;
-    public static float BLIGHT_XP_MULTIPLIER = 10f;
-    public static boolean BLIGHT_SUPERCHARGE_CREEPERS = true;
-    public static boolean BLIGHT_NOTIFY_PLAYERS_ON_DEATH = true;
-    public static boolean BLIGHT_BLACKLIST_ALL_HOSTILES = false;
-    public static boolean BLIGHT_BLACKLIST_ALL_PASSIVES = true;
-    public static boolean BLIGHT_BLACKLIST_ALL_BOSSES = false;
-    public static EntityMatchList BLIGHT_ALL_MATCH_LIST = new EntityMatchList();
-    public static EntityMatchList BLIGHT_BLACKLIST = new EntityMatchList();
-    private static String[] BLIGHT_BLACKLIST_DEFAULTS = new String[]{"minecraft:wither",
-            "minecraft:villager", "minecolonies:citizen"};
+        public static final class Health {
+            @ConfigOption(name = "Allow Boss Extra Health", category = CAT_MOB_HEALTH)
+            @ConfigOption.BooleanDefault(true)
+            @ConfigOption.Comment("Allow boss mobs (dragon, wither, etc.) to spawn with extra health based on difficulty.")
+            public static boolean allowBoss;
+            @ConfigOption(name = "Allow Peaceful Extra Health", category = CAT_MOB_HEALTH)
+            @ConfigOption.BooleanDefault(true)
+            @ConfigOption.Comment("Allow peaceful/passive mobs (such as animals) to spawn with extra health based on difficulty.")
+            public static boolean allowPeaceful;
+            @ConfigOption(name = "Allow Hostile Extra Health", category = CAT_MOB_HEALTH)
+            @ConfigOption.BooleanDefault(true)
+            @ConfigOption.Comment("Allow hostile mobs (monsters) to spawn with extra health based on difficulty.")
+            public static boolean allowHostile;
+            @ConfigOption(name = "Base Health Modifier", category = CAT_MOB_HEALTH)
+            @ConfigOption.RangeFloat(value = 0.5f, min = 0)
+            @ConfigOption.Comment("The minimum extra health a hostile mob will have per point of difficulty, before the" +
+                    " scaling mode is accounted for.")
+            public static float hostileHealthMultiplier;
+            @ConfigOption(name = "Base Health Modifier Peaceful", category = CAT_MOB_HEALTH)
+            @ConfigOption.RangeFloat(value = 0.25f, min = 0)
+            @ConfigOption.Comment("The minimum extra health a peaceful mob will have per point of difficulty, before the" +
+                    " scaling mode is accounted for. Same as \"Base Health Modifier\", but for peaceful/passive mobs!")
+            public static float peacefulHealthMultiplier;
+
+            public static EnumHealthModMode healthScalingMode = EnumHealthModMode.MULTI_HALF;
+            public static List<Integer> dimensionBlacklist = new ArrayList<>();
+            public static EntityMatchList mobBlacklist = new EntityMatchList();
+            private static final String[] mobBlacklistDefaults = new String[]{};
+        }
+
+        public static final class Blight {
+            @ConfigOption(name = "Blacklist All Bosses", category = CAT_MOB_BLIGHT)
+            @ConfigOption.BooleanDefault(false)
+            @ConfigOption.Comment("If enabled, no bosses can become blights. If you need more control, use the Blacklist instead.")
+            public static boolean blacklistBosses;
+            @ConfigOption(name = "Blacklist All Hostiles", category = CAT_MOB_BLIGHT)
+            @ConfigOption.BooleanDefault(false)
+            @ConfigOption.Comment("If enabled, no hostile mobs can become blights.")
+            public static boolean blacklistHostiles;
+            @ConfigOption(name = "Blacklist All Passives", category = CAT_MOB_BLIGHT)
+            @ConfigOption.BooleanDefault(true)
+            @ConfigOption.Comment("If enabled, no passive (peaceful) mobs can become blights.")
+            public static boolean blacklistPassives;
+            @ConfigOption(name = "All Mobs Are Blights", category = CAT_MOB_BLIGHT)
+            @ConfigOption.BooleanDefault(false)
+            @ConfigOption.Comment("If true, every mob that can be a blight will be one 100% of the time.")
+            public static boolean blightAlways;
+            @ConfigOption(name = "Blight Chance Multiplier", category = CAT_MOB_BLIGHT)
+            @ConfigOption.RangeFloat(value = 0.0625f, min = 0)
+            @ConfigOption.Comment("Determines the chance of a mob spawning as a blight. Formula is "
+                    + "\"blightChanceMulti * currentDifficulty / maxDifficulty\". Setting to 0 will disable blights." +
+                    " Setting to 1 will guarantee blights at max difficulty.")
+            public static float chanceMultiplier;
+            @ConfigOption(name = "Blight Difficulty Multiplier", category = CAT_MOB_BLIGHT)
+            @ConfigOption.RangeFloat(value = 3, min = 1)
+            @ConfigOption.Comment("When an entity spawns as a blight, their calculated difficulty is multiplied by" +
+                    " this. Higher numbers mean more health and damage!")
+            public static float difficultyMultiplier;
+            @ConfigOption(name = "Fire Rides Blights", category = CAT_MOB_BLIGHT)
+            @ConfigOption.BooleanDefault(false)
+            @ConfigOption.Comment("Set blight fires to \"ride\" on the blight they belong to. In some cases, this might" +
+                    " cause the fire to follow the blight more smoothly, but doesn't seem to help in most cases." +
+                    " Leaving off is recommended.")
+            public static boolean fireRidesBlight;
+            @ConfigOption(name = "Fire Resist", category = CAT_MOB_BLIGHT)
+            @ConfigOption.BooleanDefault(true)
+            @ConfigOption.Comment("Should blights have the fire resistance potion effect?")
+            public static boolean fireResist;
+            @ConfigOption(name = "Invisibility", category = CAT_MOB_BLIGHT)
+            @ConfigOption.BooleanDefault(false)
+            @ConfigOption.Comment("Should blights have the invisibility potion effect?")
+            public static boolean invisibility;
+            @ConfigOption(name = "Notify Players on Death", category = CAT_MOB_BLIGHT)
+            @ConfigOption.BooleanDefault(true)
+            @ConfigOption.Comment("Let all players know when a blight dies in chat.")
+            public static boolean notifyOnDeath;
+            @ConfigOption(name = "Potion Duration", category = CAT_MOB_BLIGHT)
+            @ConfigOption.RangeInt(value = 5 * 20 * 60, min = -1)
+            @ConfigOption.Comment("The duration (in ticks) of the potion effects applied to blights. The effects are" +
+                    " refreshed frequently, so this value doesn't matter in most cases... except for the lingering" +
+                    " potion effects left by blight creepers. Set to -1 for infinite time. Default is 5 minutes.")
+            public static int potionDuration;
+            @ConfigOption(name = "Amplifier Speed", category = CAT_MOB_BLIGHT)
+            @ConfigOption.RangeInt(value = 4, min = -1, max = 99)
+            @ConfigOption.Comment("The amplifier level on the speed potion effect applied to blights. Set -1 to" +
+                    " disable, 0 is level 1.")
+            public static int speedAmp;
+            @ConfigOption(name = "Amplifier Strength", category = CAT_MOB_BLIGHT)
+            @ConfigOption.RangeInt(value = 1, min = -1, max = 99)
+            @ConfigOption.Comment("The amplifier level on the strength potion effect applied to blights. Set -1 to" +
+                    " disable, 0 is level 1.")
+            public static int strengthAmp;
+            @ConfigOption(name = "Supercharge Creepers", category = CAT_MOB_BLIGHT)
+            @ConfigOption.BooleanDefault(true)
+            @ConfigOption.Comment("Blight creepers will be supercharged, like when they are struck by lightning.")
+            public static boolean superchargeCreepers;
+            @ConfigOption(name = "XP Multiplier", category = CAT_MOB_BLIGHT)
+            @ConfigOption.RangeFloat(value = 10, min = 0, max = 1000)
+            @ConfigOption.Comment("The multiplier applied to the amount of XP dropped when a blight is killed.")
+            public static float xpMultiplier;
+
+            public static EntityMatchList blightAllList = new EntityMatchList();
+            public static EntityMatchList blacklist = new EntityMatchList();
+            private static final String[] BLIGHT_BLACKLIST_DEFAULTS = new String[]{"minecraft:wither",
+                    "minecraft:villager", "minecolonies:citizen"};
+        }
+    }
+
     // Blight equipment
     public static int BLIGHT_EQUIPMENT_HIGHEST_COMMON_TIER = 1;
     public static float BLIGHT_EQUIPMENT_TIER_UP_CHANCE = 0.095f;
@@ -287,53 +396,139 @@ public class Config extends ConfigBaseNew {
     // Pets
     public static int PET_REGEN_DELAY = 600;
 
-    // Items
-    public static boolean HEART_DROP_SHARDS_INSTEAD = false;
-    public static float HEART_DROP_CHANCE_HOSTILE = 0.01F;
-    public static float HEART_DROP_CHANCE_PASSIVE = 0.001f;
-    public static int HEARTS_DROPPED_BY_BOSS_MIN = 3;
-    public static int HEARTS_DROPPED_BY_BOSS_MAX = 6;
-    public static int HEARTS_DROPPED_BY_BLIGHT_MIN = 0;
-    public static int HEARTS_DROPPED_BY_BLIGHT_MAX = 2;
-    public static boolean HEARTS_INCREASE_HEALTH = true;
-    public static int HEARTS_HEALTH_RESTORED = 4;
-    public static int HEART_XP_LEVEL_COST = 3;
-    public static float CURSED_HEART_DIFFICULTY_CHANGE;
-    public static float ENCHANTED_HEART_DIFFICULTY_CHANGE;
+    public static final class Items {
+        public static final class Heart {
+            @ConfigOption(name = "Hearts Dropped by Blight Min", category = CAT_ITEMS)
+            @ConfigOption.RangeInt(value = 0, min = 0, max = 64)
+            @ConfigOption.Comment("The minimum number of heart containers that a blight will drop when killed.")
+            public static int blightMin;
+            @ConfigOption(name = "Hearts Dropped by Blight Max", category = CAT_ITEMS)
+            @ConfigOption.RangeInt(value = 2, min = 0, max = 64)
+            @ConfigOption.Comment("The maximum number of heart containers that a blight will drop when killed.")
+            public static int blightMax;
+            @ConfigOption(name = "Hearts Dropped by Boss Min", category = CAT_ITEMS)
+            @ConfigOption.RangeInt(value = 3, min = 0, max = 64)
+            @ConfigOption.Comment("The minimum number of heart containers that a boss will drop when killed.")
+            public static int bossMin;
+            @ConfigOption(name = "Hearts Dropped by Boss Max", category = CAT_ITEMS)
+            @ConfigOption.RangeInt(value = 6, min = 0, max = 64)
+            @ConfigOption.Comment("The maximum number of heart containers that a boss will drop when killed.")
+            public static int bossMax;
+            @ConfigOption(name = "Heart Drop Chance", category = CAT_ITEMS)
+            @ConfigOption.RangeFloat(value = 0.01f, min = 0, max = 1)
+            @ConfigOption.Comment("The chance of a hostile mob dropping a heart container when killed.")
+            public static float chanceHostile;
+            @ConfigOption(name = "Heart Drop Chance (Passive)", category = CAT_ITEMS)
+            @ConfigOption.RangeFloat(value = 0.001f, min = 0, max = 1)
+            @ConfigOption.Comment("The chance of a passive mob (animals) dropping a heart container when killed.")
+            public static float chancePassive;
+            @ConfigOption(name = "Drop Shards Instead of Containers", category = CAT_ITEMS)
+            @ConfigOption.BooleanDefault(false)
+            @ConfigOption.Comment("If enabled, heart crystals drop shards instead of full containers.")
+            public static boolean dropShardsInstead;
+            @ConfigOption(name = "Hearts Health Restored", category = CAT_ITEMS)
+            @ConfigOption.RangeInt(value = 4, min = 0)
+            @ConfigOption.Comment("The amount of extra health restored when using a heart container. This applies whether" +
+                    " or not hearts increase max health.")
+            public static int healthRestored;
+            @ConfigOption(name = "Hearts Increase Max Health", category = CAT_ITEMS)
+            @ConfigOption.BooleanDefault(true)
+            @ConfigOption.Comment("If set to false, hearts will no longer increase the player's maximum health, but can" +
+                    " still be used for healing.")
+            public static boolean increaseHealth;
+            @ConfigOption(name = "Heart XP Level Cost", category = CAT_ITEMS)
+            @ConfigOption.RangeInt(value = 3, min = 0)
+            @ConfigOption.Comment("The number of experience levels required to use a heart container.")
+            public static int xpCost;
+        }
 
-    public static class Difficulty {
+        @ConfigOption(name = "Difficulty Change", category = CAT_ITEMS + ".cursed_heart")
+        @ConfigOption.RangeFloat(10)
+        @ConfigOption.Comment("The amount of difficulty added/removed when using a cursed heart.")
+        public static float cursedHeartChange;
+        @ConfigOption(name = "Difficulty Change", category = CAT_ITEMS + ".enchanted_heart")
+        @ConfigOption.RangeFloat(-10)
+        @ConfigOption.Comment("The amount of difficulty added/removed when using an enchanted heart.")
+        public static float enchantedHeartChange;
+    }
+
+    public static final class Difficulty {
+        @ConfigOption(name = "Difficulty Added When Sleeping", category = CAT_DIFFICULTY)
+        @ConfigOption.RangeFloat(value = 0, min = -10000, max = 10000)
+        @ConfigOption.Comment("Change in difficulty when a player sleeps through the night. Negative numbers cause difficulty to decrease.")
+        public static float forSleeping;
+        @ConfigOption(name = "Group Area Bonus", category = CAT_DIFFICULTY)
+        @ConfigOption.RangeFloat(value = 0.05f, min = -10, max = 10)
+        @ConfigOption.Comment("Adds extra difficulty per additional nearby player. So area difficulty will be" +
+                " multiplied by: 1 + group_bonus * (players_in_area - 1)")
+        public static float groupAreaBonus;
+        @ConfigOption(name = "Idle Multiplier", category = CAT_DIFFICULTY)
+        @ConfigOption.RangeFloat(value = 0.7f, min = -100, max = 100)
+        @ConfigOption.Comment("Difficulty added per second is multiplied by this if the player is not moving.")
+        public static float idleMulti;
+        @ConfigOption(name = "Lost On Death", category = CAT_DIFFICULTY)
+        @ConfigOption.RangeFloat(value = 0, min = -10000, max = 10000)
+        @ConfigOption.Comment("The difficulty a player loses on death. Negative numbers cause the player to gain difficulty.")
+        public static float lostOnDeath;
+        @ConfigOption(name = "Max Value", category = CAT_DIFFICULTY)
+        @ConfigOption.RangeFloat(value = 250, min = 0)
+        @ConfigOption.Comment("The maximum difficulty level that can be reached.")
+        public static float maxValue;
+        @ConfigOption(name = "Min Value", category = CAT_DIFFICULTY)
+        @ConfigOption.RangeFloat(value = 0, min = 0)
+        @ConfigOption.Comment("The minimum difficulty value. This can be different from the starting value.")
+        public static float minValue;
+        @ConfigOption(name = "Difficulty Per Blight Kill", category = CAT_DIFFICULTY)
+        @ConfigOption.RangeFloat(value = 0, min = -10000, max = 10000)
+        @ConfigOption.Comment("Difficulty change per blight kill. Negative numbers cause difficulty to decrease.")
+        public static float perBlightKill;
+        @ConfigOption(name = "Difficulty Per Boss Kill", category = CAT_DIFFICULTY)
+        @ConfigOption.RangeFloat(value = 0, min = -10000, max = 10000)
+        @ConfigOption.Comment("Difficulty change per boss kill. Negative numbers cause difficulty to decrease.")
+        public static float perBossKill;
+        @ConfigOption(name = "Difficulty Per Block", category = CAT_DIFFICULTY)
+        @ConfigOption.RangeFloat(0.0025f)
+        @ConfigOption.Comment("The amount of difficulty added per unit distance from the origin/spawn, assuming" +
+                " \"Area Mode\" is set to a distance-based option. Negative numbers will decrease difficulty over distance.")
+        public static float perBlock;
+        @ConfigOption(name = "Difficulty Per Kill", category = CAT_DIFFICULTY)
+        @ConfigOption.RangeFloat(value = 0, min = -10000, max = 10000)
+        @ConfigOption.Comment("Difficulty change per hostile mob killed. Negative numbers cause difficulty to decrease.")
+        public static float perHostileKill;
+        @ConfigOption(name = "Difficulty Per Passive Kill", category = CAT_DIFFICULTY)
+        @ConfigOption.RangeFloat(value = 0, min = -10000, max = 10000)
+        @ConfigOption.Comment("Difficulty change per passive mob kill. Negative numbers cause difficulty to decrease.")
+        public static float perPassiveKill;
+        @ConfigOption(name = "Increase Per Second", category = CAT_DIFFICULTY)
+        @ConfigOption.RangeFloat(value = 0.0011574f, min = -10000, max = 10000) // About 60 hrs to max (MAX / (60 * TICKS_PER_HOUR))
+        @ConfigOption.Comment("The amount difficulty changes each second. In Difficult Life, the option was named per" +
+                " tick, but was actually applied each second. Negative numbers will decrease difficulty over time.")
+        public static float perSecond;
+        @ConfigOption(name = "Search Radius", category = CAT_DIFFICULTY)
+        @ConfigOption.RangeInt(value = 256, min = 0, max = Short.MAX_VALUE)
+        @ConfigOption.Comment("The distance from a newly spawned mob to search for players to determine its difficulty" +
+                " level. Set to 0 for unlimited range.")
+        public static int searchRadius;
+        @ConfigOption(name = "Starting Value", category = CAT_DIFFICULTY)
+        @ConfigOption.RangeFloat(value = 0, min = 0)
+        @ConfigOption.Comment("The starting difficulty level for new worlds or players joining for the first time.")
+        public static float startValue;
         @ConfigOption(name = "Stats Consume Difficulty", category = CAT_CLIENT)
         @ConfigOption.BooleanDefault(false)
         @ConfigOption.Comment("If true, the difficulty a mob is spawned with will be \"consumed\" when given health/damage bonuses and potion effects (as in older versions).")
         public static boolean statsConsumeDifficulty;
-    }
 
-    // Difficulty
-    public static float DIFFICULTY_MIN = 0;
-    public static float DIFFICULTY_MAX = 250;
-    public static float DIFFICULTY_DEFAULT = 0;
-    public static int HOURS_TO_MAX_DIFFICULTY = 60; // Not actually loaded, just to make calc below clear.
-    public static float DIFFICULTY_PER_SECOND = DIFFICULTY_MAX / (HOURS_TO_MAX_DIFFICULTY * 3600);
-    public static float DIFFICULTY_PER_BLOCK = DIFFICULTY_MAX / 100000;
-    public static float DIFFICULTY_PER_KILL = 0;
-    public static float DIFFICULTY_PER_BLIGHT_KILL = 0;
-    public static float DIFFICULTY_PER_BOSS_KILL = 0;
-    public static float DIFFICULTY_PER_PASSIVE_KILL = 0;
-    public static float DIFFICULTY_FOR_SLEEPING = 0;
-    public static float DIFFICULTY_IDLE_MULTI = 0.7f;
-    public static float DIFFICULTY_LOST_ON_DEATH = 0f;
-    public static float DIFFICULTY_GROUP_AREA_BONUS = 0.05f;
-    public static int DIFFICULTY_SEARCH_RADIUS = 256;
-    public static PlayerMatchList DIFFICULTY_EXEMPT_PLAYERS = new PlayerMatchList();
-    public static EntityDifficultyChangeList DIFFICULTY_PER_KILL_BY_MOB = new EntityDifficultyChangeList();
-    public static Map<Integer, Float> DIFFICULTY_DIMENSION_MULTIPLIER = new THashMap<Integer, Float>();
-    public static EnumAreaDifficultyMode AREA_DIFFICULTY_MODE = EnumAreaDifficultyMode.WEIGHTED_AVERAGE;
-    public static EnumResetTime DIFFFICULTY_RESET_TIME = EnumResetTime.NONE;
-    public static boolean DIFFICULTY_LUNAR_MULTIPLIERS_ENABLED = false;
-    public static float[] DIFFICULTY_LUNAR_MULTIPLIERS = new float[8];
-    private static final String[] DEFAULT_DIFFICULTY_LUNAR_MULTIPLIERS = new String[]{
-            "1.5", "1.3", "1.2", "1.0", "0.8", "1.0", "1.2", "1.3"};
-    public static final Map<String, Integer> DIFFICULTY_BY_GAME_STAGES = new HashMap<>();
+        public static final Map<String, Integer> DIFFICULTY_BY_GAME_STAGES = new HashMap<>();
+        private static final String[] DEFAULT_DIFFICULTY_LUNAR_MULTIPLIERS = new String[]{
+                "1.5", "1.3", "1.2", "1.0", "0.8", "1.0", "1.2", "1.3"};
+        public static PlayerMatchList DIFFICULTY_EXEMPT_PLAYERS = new PlayerMatchList();
+        public static EntityDifficultyChangeList DIFFICULTY_PER_KILL_BY_MOB = new EntityDifficultyChangeList();
+        public static Map<Integer, Float> DIFFICULTY_DIMENSION_MULTIPLIER = new THashMap<Integer, Float>();
+        public static EnumAreaDifficultyMode AREA_DIFFICULTY_MODE = EnumAreaDifficultyMode.WEIGHTED_AVERAGE;
+        public static EnumResetTime DIFFFICULTY_RESET_TIME = EnumResetTime.NONE;
+        public static boolean DIFFICULTY_LUNAR_MULTIPLIERS_ENABLED = false;
+        public static float[] DIFFICULTY_LUNAR_MULTIPLIERS = new float[8];
+    }
 
     // Network
     public static int PACKET_DELAY = 20;
@@ -443,135 +638,36 @@ public class Config extends ConfigBaseNew {
             // Damage Scaling
             DamageScaling.INSTANCE.loadConfig(config);
 
-            // Fake Players
-            FAKE_PLAYERS_CAN_GENERATE_HEARTS = loadBoolean("Can Generate Hearts", CAT_FAKE_PLAYER,
-                    FAKE_PLAYERS_CAN_GENERATE_HEARTS,
-                    "If enabled, fake players will be able to get heart container drops when killing mobs."
-                            + " Disabling should prevent at least some mob grinders from getting heart drops.");
-            FAKE_PLAYERS_HAVE_DIFFICULTY = loadBoolean("Have Difficulty", CAT_FAKE_PLAYER,
-                    FAKE_PLAYERS_HAVE_DIFFICULTY,
-                    "If enabled, fake players can accumulate difficulty in the same way as real players."
-                            + " Enabling this could act as a sort of penalty for using mob grinders.");
-
             // Mobs
-            DIFFICULTY_DAMAGE_MULTIPLIER = config.getFloat("Damage Modifier", CAT_MOB,
-                    DIFFICULTY_DAMAGE_MULTIPLIER, 0f, Float.MAX_VALUE,
-                    "A multiplier for extra attack strength all mobs will receive. Set to 0 to disable extra attack strength.");
-            DIFFICULTY_DAMAGE_MAX_BOOST = config.getFloat("Max Damage Bonus", CAT_MOB,
-                    DIFFICULTY_DAMAGE_MAX_BOOST, 0f, 1000f,
-                    "The maximum extra attack damage a mob can receive. Zero means unlimited.");
-            POTION_CHANCE_HOSTILE = config.getFloat("Potion Chance (Hostiles)", CAT_MOB,
-                    POTION_CHANCE_HOSTILE, 0f, 1f,
-                    "The chance that an extra potion effect will be applied to any hostile mob. Note that"
-                            + " this effect requires the mob to have a certain amount of \"difficulty\" left after"
-                            + " it has been given extra health and damage. So entering 1 won't guarantee potion"
-                            + " effects.");
-            POTION_CHANCE_PASSIVE = config.getFloat("Potion Chance (Passives)", CAT_MOB,
-                    POTION_CHANCE_PASSIVE, 0f, 1f,
-                    "The chance that an extra potion effect will be applied to any passive mob. Note that"
-                            + " this effect requires the mob to have a certain amount of \"difficulty\" left after"
-                            + " it has been given extra health and damage. So entering 1 won't guarantee potion"
-                            + " effects.");
-            MOB_XP_BOOST = config.getFloat("XP Boost", CAT_MOB,
-                    0.01f, 0.0f, 1.0f,
-                    "Additional XP (as percentage) per point of difficulty. For example, if this is 0.01, a"
-                            + " mob will drop 2x (+1.0x) XP at 100 difficulty and 3x (+2.0x) at 200");
             // Health
-            ALLOW_PEACEFUL_EXTRA_HEALTH = loadBoolean("Allow Peaceful Extra Health", CAT_MOB_HEALTH,
-                    ALLOW_PEACEFUL_EXTRA_HEALTH,
-                    "Allow peaceful mobs (such as animals) to spawn with extra health based on difficulty.");
-            ALLOW_HOSTILE_EXTRA_HEALTH = loadBoolean("Allow Hostile Extra Health", CAT_MOB_HEALTH,
-                    ALLOW_HOSTILE_EXTRA_HEALTH,
-                    "Allow hostile mobs (monsters) to spawn with extra health based on difficulty.");
-            ALLOW_BOSS_EXTRA_HEALTH = loadBoolean("Allow Boss Extra Health", CAT_MOB_HEALTH,
-                    ALLOW_BOSS_EXTRA_HEALTH,
-                    "Allow boss mobs (dragon, wither, etc.) to spawn with extra health based on difficulty.");
-            DIFFICULTY_GENERIC_HEALTH_MULTIPLIER = config.getFloat("Base Health Modifier", CAT_MOB_HEALTH,
-                    DIFFICULTY_GENERIC_HEALTH_MULTIPLIER, 0f, Float.MAX_VALUE,
-                    "The minimum extra health a mob will have per point of difficulty. For example, at difficulty 30, "
-                            + "a mob that normally has 20 health would have at least 50 health.");
-            DIFFICULTY_PEACEFUL_HEALTH_MULTIPLIER = config.getFloat("Base Health Modifier Peaceful", CAT_MOB_HEALTH,
-                    DIFFICULTY_PEACEFUL_HEALTH_MULTIPLIER, 0f, Float.MAX_VALUE,
-                    "The minimum extra health a peaceful will have per point of difficulty. Same as "
-                            + "\"Base Health Modifier\", but for peaceful mobs!");
-            MOB_HEALTH_SCALING_MODE = EnumHealthModMode.loadFromConfig(config, MOB_HEALTH_SCALING_MODE);
+            Mob.Health.healthScalingMode = EnumHealthModMode.loadFromConfig(config, Mob.Health.healthScalingMode);
             String[] dimList = config.getStringList("Dimension Blacklist", CAT_MOB_HEALTH, new String[0],
                     "Mobs will not gain extra health or become blights in these dimensions. Integers only,"
                             + " any other entries will be silently ignored.");
-            MOB_HEALTH_DIMENSION_BLACKLIST.clear();
+            Mob.Health.dimensionBlacklist.clear();
             for (String str : dimList) {
                 if (canParseInt(str)) {
-                    MOB_HEALTH_DIMENSION_BLACKLIST.add(Integer.parseInt(str));
+                    Mob.Health.dimensionBlacklist.add(Integer.parseInt(str));
                 }
             }
-            MOB_HEALTH_BLACKLIST.clear();
+            Mob.Health.mobBlacklist.clear();
             for (String str : config.getStringList("Blacklist", CAT_MOB_HEALTH,
-                    MOB_HEALTH_BLACKLIST_DEFAULTS,
+                    Mob.Health.mobBlacklistDefaults,
                     "Mobs listed here will never receive extra health, and will not become blights. There is"
                             + " also a separate blacklist for blights, if you still want the mob in question to have"
                             + " extra health.")) {
-                MOB_HEALTH_BLACKLIST.add(str);
+                Mob.Health.mobBlacklist.add(str);
             }
             // Blights
-            BLIGHT_ALWAYS = config.getBoolean("All Mobs Are Blights", CAT_MOB_BLIGHT, false,
-                    "If true, every mob that can be a blight will be one.");
-            BLIGHT_CHANCE_MULTIPLIER = config.getFloat("Blight Chance Multiplier", CAT_MOB_BLIGHT,
-                    BLIGHT_CHANCE_MULTIPLIER, 0f, Float.MAX_VALUE,
-                    "Determines the chance of a mob spawning as a blight. Formula is "
-                            + "blightChanceMulti * currentDifficulty / maxDifficulty");
-            BLIGHT_DIFFICULTY_MULTIPLIER = config.getFloat("Blight Difficulty Multiplier", CAT_MOB_BLIGHT,
-                    BLIGHT_DIFFICULTY_MULTIPLIER, 1f, Float.MAX_VALUE,
-                    "When an entity spawns as a blight, their calculated difficulty is multiplied by this. Higher" +
-                            " numbers mean more health and damage.");
-            BLIGHT_AMP_SPEED = loadInt("Amplifier Speed", CAT_MOB_BLIGHT,
-                    BLIGHT_AMP_SPEED, -1, 99,
-                    "The amplifier level on the speed potion effect applied to blights.");
-            BLIGHT_AMP_STRENGTH = loadInt("Amplifier Strength", CAT_MOB_BLIGHT,
-                    BLIGHT_AMP_STRENGTH, -1, 99,
-                    "The amplifier level on the strength potion effect applied to blights.");
-            BLIGHT_POTION_DURATION = loadInt("Potion Duration", CAT_MOB_BLIGHT,
-                    5 * 1200, -1, Integer.MAX_VALUE,
-                    "The duration (in ticks) of the potion effects applied to blights. The effects are"
-                            + " refreshed frequently, so this value doesn't matter in most cases... except for the"
-                            + " lingering potion effects left by blight creepers. Set to -1 for infinite time.");
-            BLIGHT_FIRE_RIDES_BLIGHT = loadBoolean("Fire Rides Blights", CAT_MOB_BLIGHT,
-                    BLIGHT_FIRE_RIDES_BLIGHT,
-                    "Blight's fire will be set to ride the blight. This will make the fire follow the blight"
-                            + " more smoothly and prevent it from bobbing. Disable if you are having issues.");
-            BLIGHT_INVISIBLE = loadBoolean("Invisibility", CAT_MOB_BLIGHT,
-                    BLIGHT_INVISIBLE,
-                    "Should blights have the invisibility potion effect?");
-            BLIGHT_FIRE_RESIST = loadBoolean("Fire Resist", CAT_MOB_BLIGHT,
-                    BLIGHT_FIRE_RESIST,
-                    "Should blights have the fire resistance potion effect?");
-            BLIGHT_XP_MULTIPLIER = config.getFloat("XP Multiplier", CAT_MOB_BLIGHT,
-                    BLIGHT_XP_MULTIPLIER, 0f, 1000.0f,
-                    "The multiplier applied to the amount of XP dropped when a blight is killed.");
-            BLIGHT_SUPERCHARGE_CREEPERS = loadBoolean("Supercharge Creepers", CAT_MOB_BLIGHT,
-                    BLIGHT_SUPERCHARGE_CREEPERS,
-                    "Blight creepers will also be supercharged (like when they are struck by lightning).");
-            BLIGHT_ALL_MATCH_LIST.loadConfig(config, "Always Blight", CAT_MOB_BLIGHT, new String[0], false,
+            Mob.Blight.blightAllList.loadConfig(config, "Always Blight", CAT_MOB_BLIGHT, new String[0], false,
                     "If \"All Mobs Are Blights\" is enabled, this list can be used to filter mobs.");
-            BLIGHT_BLACKLIST.clear();
+            Mob.Blight.blacklist.clear();
             for (String str : config.getStringList("Blacklist", CAT_MOB_BLIGHT,
-                    BLIGHT_BLACKLIST_DEFAULTS,
+                    Mob.Blight.BLIGHT_BLACKLIST_DEFAULTS,
                     "Mobs listed here will never become blights, but can still receive extra health. There is"
                             + " also a blacklist for extra health.")) {
-                BLIGHT_BLACKLIST.add(str);
+                Mob.Blight.blacklist.add(str);
             }
-            BLIGHT_BLACKLIST_ALL_HOSTILES = loadBoolean("Blacklist All Hostiles", CAT_MOB_BLIGHT,
-                    BLIGHT_BLACKLIST_ALL_HOSTILES,
-                    "If enabled, no hostile mobs can become blights.");
-            BLIGHT_BLACKLIST_ALL_PASSIVES = loadBoolean("Blacklist All Passives", CAT_MOB_BLIGHT,
-                    BLIGHT_BLACKLIST_ALL_PASSIVES,
-                    "If enabled, no passive (peaceful) mobs can become blights.");
-            BLIGHT_BLACKLIST_ALL_BOSSES = loadBoolean("Blacklist All Bosses", CAT_MOB_BLIGHT,
-                    BLIGHT_BLACKLIST_ALL_BOSSES,
-                    "If enabled, no bosses can become blights. If you need more control, use the Blacklist"
-                            + " instead.");
-            BLIGHT_NOTIFY_PLAYERS_ON_DEATH = loadBoolean("Notify Players on Death", CAT_MOB_BLIGHT,
-                    BLIGHT_NOTIFY_PLAYERS_ON_DEATH,
-                    "Let all players know when a blight dies in chat.");
             // Blight equipment
             BLIGHT_EQUIPMENT_HIGHEST_COMMON_TIER = loadInt("Highest Common Tier", CAT_MOB_BLIGHT_EQUIP,
                     BLIGHT_EQUIPMENT_HIGHEST_COMMON_TIER, 0, 4,
@@ -601,118 +697,23 @@ public class Config extends ConfigBaseNew {
                     "The number of ticks between regen ticks on pets. Set to 0 to disable pet regen.");
 
             // Items
-            HEART_DROP_SHARDS_INSTEAD = config.getBoolean("Drop Shards Instead of Containers", CAT_ITEMS,
-                    false,
-                    "If enabled, heart crystal shards will drop instead of heart containers.");
-            HEART_DROP_CHANCE_HOSTILE = config.getFloat("Heart Drop Chance", CAT_ITEMS,
-                    HEART_DROP_CHANCE_HOSTILE, 0f, 1f,
-                    "The chance of a hostile mob dropping a heart canister when killed.");
-            HEART_DROP_CHANCE_PASSIVE = config.getFloat("Heart Drop Chance (Passive)", CAT_ITEMS,
-                    HEART_DROP_CHANCE_PASSIVE, 0f, 1f,
-                    "The chance of a passive mob (animals) dropping a heart canister when killed.");
-
-            HEARTS_DROPPED_BY_BOSS_MIN = loadInt("Hearts Dropped by Boss Min", CAT_ITEMS,
-                    HEARTS_DROPPED_BY_BOSS_MIN, 0, 64,
-                    "The minimum number of heart canisters that a boss will drop when killed.");
-            HEARTS_DROPPED_BY_BOSS_MAX = loadInt("Hearts Dropped by Boss Max", CAT_ITEMS,
-                    HEARTS_DROPPED_BY_BOSS_MAX, 0, 64,
-                    "The maximum number of heart canisters that a boss will drop when killed.");
-            if (HEARTS_DROPPED_BY_BOSS_MAX < HEARTS_DROPPED_BY_BOSS_MIN)
-                HEARTS_DROPPED_BY_BOSS_MAX = HEARTS_DROPPED_BY_BOSS_MIN;
-
-            HEARTS_DROPPED_BY_BLIGHT_MIN = loadInt("Hearts Dropped by Blight Min", CAT_ITEMS,
-                    HEARTS_DROPPED_BY_BLIGHT_MIN, 0, 64,
-                    "The minimum number of heart canisters that a blight will drop when killed.");
-            HEARTS_DROPPED_BY_BLIGHT_MAX = loadInt("Hearts Dropped by Blight Max", CAT_ITEMS,
-                    HEARTS_DROPPED_BY_BLIGHT_MAX, 0, 64,
-                    "The maximum number of heart canisters that a blight will drop when killed.");
-            if (HEARTS_DROPPED_BY_BLIGHT_MAX < HEARTS_DROPPED_BY_BLIGHT_MIN)
-                HEARTS_DROPPED_BY_BLIGHT_MAX = HEARTS_DROPPED_BY_BLIGHT_MIN;
-
-            HEARTS_INCREASE_HEALTH = loadBoolean("Hearts Increase Max Health", CAT_ITEMS,
-                    HEARTS_INCREASE_HEALTH,
-                    "If set to false, hearts will no longer increase the player's maximum health, but can still be used for healing.");
-            HEARTS_HEALTH_RESTORED = loadInt("Hearts Health Restored", CAT_ITEMS,
-                    HEARTS_HEALTH_RESTORED, 0, 2000,
-                    "The amount of health that will be restored when using a heart container.");
-            HEART_XP_LEVEL_COST = loadInt("Heart XP Level Cost", CAT_ITEMS,
-                    HEART_XP_LEVEL_COST, 0, 100,
-                    "The number of levels required to use a heart container.");
-
-            String catCursedHeart = CAT_ITEMS + split + "cursed_heart";
-            CURSED_HEART_DIFFICULTY_CHANGE = config.getFloat("Difficulty Change", catCursedHeart,
-                    10f, -1000f, 1000f,
-                    "The amount of difficulty added/removed when using a cursed heart");
-            String catEnchantedHeart = CAT_ITEMS + split + "enchanted_heart";
-            ENCHANTED_HEART_DIFFICULTY_CHANGE = config.getFloat("Difficulty Change", catEnchantedHeart,
-                    -10f, -1000f, 1000f,
-                    "The amount of difficulty added/removed when using an enchanted heart");
+            if (Items.Heart.bossMax < Items.Heart.bossMin)
+                Items.Heart.bossMax = Items.Heart.bossMin;
+            if (Items.Heart.blightMax < Items.Heart.blightMin)
+                Items.Heart.blightMax = Items.Heart.blightMin;
 
             // Difficulty
-            DIFFICULTY_MIN = config.getFloat("Min Value", CAT_DIFFICULTY,
-                    0, 0, Float.MAX_VALUE,
-                    "The minimum difficulty value. This can be different from the starting value.");
-            DIFFICULTY_MAX = config.getFloat("Max Value", CAT_DIFFICULTY,
-                    DIFFICULTY_MAX, 0f, Float.MAX_VALUE,
-                    "The maximum difficult level that can be reached. Note that values beyond 250 are not"
-                            + " tested, and extremely high values may produce strange results.");
-            DIFFICULTY_DEFAULT = config.getFloat("Starting Value", CAT_DIFFICULTY,
-                    DIFFICULTY_DEFAULT, 0f, Float.MAX_VALUE,
-                    "The starting difficulty level for new worlds.");
-            DIFFICULTY_PER_SECOND = config.getFloat("Increase Per Second", CAT_DIFFICULTY,
-                    DIFFICULTY_PER_SECOND, -1000f, 1000f,
-                    "The amount of difficulty added each second. In Difficult Life, the option was named per tick, "
-                            + "but was actually applied each second. Negative numbers will decrease difficulty over time.");
-            DIFFICULTY_PER_BLOCK = config.getFloat("Difficulty Per Block", CAT_DIFFICULTY,
-                    DIFFICULTY_PER_BLOCK, -1000f, 1000f,
-                    "The amount of difficulty added per unit distance from the origin/spawn, assuming \"Area Mode\" "
-                            + "is set to a distance-based option. Negative numbers will decrease difficulty over distance.");
-            DIFFICULTY_PER_KILL = config.getFloat("Difficulty Per Kill", CAT_DIFFICULTY,
-                    DIFFICULTY_PER_KILL, -1000f, 1000f,
-                    "The difficulty gained for each hostile mob killed. Set to 0 to disable. Negative numbers"
-                            + " cause difficulty to decrease with each kill.");
-            DIFFICULTY_PER_PASSIVE_KILL = config.getFloat("Difficulty Per Passive Kill", CAT_DIFFICULTY,
-                    0f, -1000f, 1000f,
-                    "The difficulty change for each passive mob killed. Set to 0 to disable. Positive numbers"
-                            + " will increase difficulty with each kill, negative numbers will decrease it instead.");
-            DIFFICULTY_PER_BLIGHT_KILL = config.getFloat("Difficulty Per Blight Kill", CAT_DIFFICULTY,
-                    0f, -1000f, 1000f,
-                    "The difficulty gained or lost for each blight killed. Set to 0 to disable. Positive numbers"
-                            + " will increase difficulty, negative numbers will decrease it.");
-            DIFFICULTY_PER_BOSS_KILL = config.getFloat("Difficulty Per Boss Kill", CAT_DIFFICULTY,
-                    DIFFICULTY_PER_BOSS_KILL, -1000f, 1000f,
-                    "The difficulty gained for each boss mob killed. Set to 0 to disable. Negative numbers"
-                            + " cause difficulty to decrease with each kill.");
-            DIFFICULTY_FOR_SLEEPING = config.getFloat("Difficulty Added When Sleeping", CAT_DIFFICULTY,
-                    0, -1000f, 1000f,
-                    "If a player sleeps through the night, add this much difficulty. Set to a negative number"
-                            + " to subtract from the difficulty instead.");
-            DIFFICULTY_IDLE_MULTI = config.getFloat("Idle Multiplier", CAT_DIFFICULTY,
-                    DIFFICULTY_IDLE_MULTI, -100f, 100f,
-                    "Difficulty added per second is multiplied by this if the player is not moving.");
-            DIFFICULTY_LOST_ON_DEATH = config.getFloat("Lost On Death", CAT_DIFFICULTY,
-                    DIFFICULTY_LOST_ON_DEATH, -1000f, 1000f,
-                    "The difficulty a player loses on death. Entering a negative number will cause the player"
-                            + " to gain difficulty instead!");
-            DIFFICULTY_GROUP_AREA_BONUS = config.getFloat("Group Area Bonus", CAT_DIFFICULTY,
-                    DIFFICULTY_GROUP_AREA_BONUS, -10f, 10f,
-                    "Adds this much extra difficulty per additional player in the area. So, area difficulty will"
-                            + " be multiplied by: 1 + group_bonus * (players_in_area - 1)");
-            DIFFICULTY_SEARCH_RADIUS = loadInt("Search Radius", CAT_DIFFICULTY,
-                    DIFFICULTY_SEARCH_RADIUS, 0, Short.MAX_VALUE,
-                    "The distance from a newly spawned mob to search for players to determine its difficulty "
-                            + "level. Set to 0 for unlimited range.");
             // Player exemptions
-            DIFFICULTY_EXEMPT_PLAYERS.clear();
+            Difficulty.DIFFICULTY_EXEMPT_PLAYERS.clear();
             for (String name : config.getStringList("Exempt Players", CAT_DIFFICULTY, new String[0],
                     "Players listed here will be \"exempt\" from the difficulty system. Exempt players are"
                             + " still part of difficulty calculations, but are treated as having zero difficulty.")) {
-                DIFFICULTY_EXEMPT_PLAYERS.add(name);
+                Difficulty.DIFFICULTY_EXEMPT_PLAYERS.add(name);
             }
             // Difficulty Per Kill By Mob
             parser = new ConfigMultiValueLineParser("Difficulty Per Kill By Mob",
                     ScalingHealth.logHelper, "\\s", String.class, Float.class, Float.class);
-            DIFFICULTY_PER_KILL_BY_MOB.clear();
+            Difficulty.DIFFICULTY_PER_KILL_BY_MOB.clear();
             for (String str : config.getStringList("Difficulty Per Kill By Mob", CAT_DIFFICULTY,
                     new String[]{},
                     "Lets you set difficulty changes for individual mobs. Each line has 3 values separated by"
@@ -722,7 +723,7 @@ public class Config extends ConfigBaseNew {
                 Object[] values = parser.parse(str);
                 if (values != null) {
                     // Shouldn't need any safety checks, the parser returns null if any error occurs.
-                    DIFFICULTY_PER_KILL_BY_MOB.put((String) values[0], (float) values[1], (float) values[2]);
+                    Difficulty.DIFFICULTY_PER_KILL_BY_MOB.put((String) values[0], (float) values[1], (float) values[2]);
                 }
             }
             // Difficulty Dimension Multiplier
@@ -735,21 +736,21 @@ public class Config extends ConfigBaseNew {
                             + " make difficulty increase 1.5x faster in the Nether.")) {
                 Object[] values = parser.parse(str);
                 if (values != null) {
-                    DIFFICULTY_DIMENSION_MULTIPLIER.put((int) values[0], (float) values[1]);
+                    Difficulty.DIFFICULTY_DIMENSION_MULTIPLIER.put((int) values[0], (float) values[1]);
                 }
             }
-            DIFFICULTY_LUNAR_MULTIPLIERS_ENABLED = loadBoolean("Lunar Phases Enabled", CAT_DIFFICULTY_LUNAR_PHASES, false,
+            Difficulty.DIFFICULTY_LUNAR_MULTIPLIERS_ENABLED = loadBoolean("Lunar Phases Enabled", CAT_DIFFICULTY_LUNAR_PHASES, false,
                     "Enable lunar phase difficulty multipliers. Difficulty will receive a multiplier based"
                             + " on the phase of the moon.");
             parser = new ConfigMultiValueLineParser("Lunar Phase Multipliers", ScalingHealth.logHelper, "\\s", Float.class);
             int lunarPhaseIndex = 0;
             for (String str : config.getStringList("Lunar Phase Multipliers", CAT_DIFFICULTY_LUNAR_PHASES,
-                    DEFAULT_DIFFICULTY_LUNAR_MULTIPLIERS,
+                    Difficulty.DEFAULT_DIFFICULTY_LUNAR_MULTIPLIERS,
                     "Difficulty multipliers for each lunar phase. There must be exactly 8 values. The first"
                             + " is full moon, the fifth is new moon.")) {
                 Object[] values = parser.parse(str);
                 if (values != null && lunarPhaseIndex < 8) {
-                    DIFFICULTY_LUNAR_MULTIPLIERS[lunarPhaseIndex] = (float) values[0];
+                    Difficulty.DIFFICULTY_LUNAR_MULTIPLIERS[lunarPhaseIndex] = (float) values[0];
                 }
                 ++lunarPhaseIndex;
             }
@@ -757,18 +758,18 @@ public class Config extends ConfigBaseNew {
                 ScalingHealth.logHelper.warn("Config \"Lunar Phase Multipliers\" has the wrong number"
                         + " of values. Needs 8, has " + lunarPhaseIndex);
             }
-            DIFFICULTY_BY_GAME_STAGES.clear();
+            Difficulty.DIFFICULTY_BY_GAME_STAGES.clear();
             parser = new ConfigMultiValueLineParser("Game Stages", ScalingHealth.logHelper, "\\s+", String.class, Integer.class);
             for (String str : config.getStringList("Game Stages", CAT_DIFFICULTY, new String[0],
                     "Allows difficulty to be set via Game Stages. Each line should consist of the stage key, followed" +
                             " by a space and the difficulty value (integers only). Example: \"my_stage_key 100\"")) {
                 Object[] values = parser.parse(str);
                 if (values != null) {
-                    DIFFICULTY_BY_GAME_STAGES.put((String) values[0], (Integer) values[1]);
+                    Difficulty.DIFFICULTY_BY_GAME_STAGES.put((String) values[0], (Integer) values[1]);
                 }
             }
-            AREA_DIFFICULTY_MODE = EnumAreaDifficultyMode.loadFromConfig(config, AREA_DIFFICULTY_MODE);
-            DIFFFICULTY_RESET_TIME = EnumResetTime.loadFromConfig(config, DIFFFICULTY_RESET_TIME, CAT_DIFFICULTY);
+            Difficulty.AREA_DIFFICULTY_MODE = EnumAreaDifficultyMode.loadFromConfig(config, Difficulty.AREA_DIFFICULTY_MODE);
+            Difficulty.DIFFFICULTY_RESET_TIME = EnumResetTime.loadFromConfig(config, Difficulty.DIFFFICULTY_RESET_TIME, CAT_DIFFICULTY);
 
             // Network
             PACKET_DELAY = loadInt("Packet Delay", CAT_NETWORK,

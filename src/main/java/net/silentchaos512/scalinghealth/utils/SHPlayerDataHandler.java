@@ -54,7 +54,7 @@ public final class SHPlayerDataHandler {
 
     @Nullable
     public static PlayerData get(EntityPlayer player) {
-        if (player instanceof FakePlayer && !Config.FAKE_PLAYERS_HAVE_DIFFICULTY) {
+        if (player instanceof FakePlayer && !Config.FakePlayer.haveDifficulty) {
             return null;
         }
 
@@ -125,7 +125,7 @@ public final class SHPlayerDataHandler {
                 // Get data from nearby players.
                 if (!player.world.isRemote
                         && player.world.getTotalWorldTime() % 5 * Config.PACKET_DELAY == 0) {
-                    int radius = Config.DIFFICULTY_SEARCH_RADIUS;
+                    int radius = Config.Difficulty.searchRadius;
                     int radiusSquared = radius <= 0 ? Integer.MAX_VALUE : radius * radius;
                     for (EntityPlayer p : player.world.getPlayers(EntityPlayer.class,
                             p -> !p.equals(player) && p.getDistanceSq(player.getPosition()) < radiusSquared)) {
@@ -144,7 +144,7 @@ public final class SHPlayerDataHandler {
                 MessageDataSync message = new MessageDataSync(get(event.player), event.player);
                 NetworkHandler.INSTANCE.sendTo(message, playerMP);
 
-                if (Config.AREA_DIFFICULTY_MODE == EnumAreaDifficultyMode.SERVER_WIDE) {
+                if (Config.Difficulty.AREA_DIFFICULTY_MODE == EnumAreaDifficultyMode.SERVER_WIDE) {
                     MessageWorldDataSync message2 = new MessageWorldDataSync(
                             ScalingHealthSavedData.get(event.player.world));
                     NetworkHandler.INSTANCE.sendTo(message2, playerMP);
@@ -186,12 +186,12 @@ public final class SHPlayerDataHandler {
             EntityPlayer player = playerWR.get();
 
             // Player exempt from difficulty?
-            if (Config.DIFFICULTY_EXEMPT_PLAYERS.contains(player)) {
+            if (Config.Difficulty.DIFFICULTY_EXEMPT_PLAYERS.contains(player)) {
                 difficulty = 0;
             }
             // Non-exempt, just clamp between min and max configs.
             else {
-                difficulty = MathHelper.clamp(value, Config.DIFFICULTY_MIN, Config.DIFFICULTY_MAX);
+                difficulty = MathHelper.clamp(value, Config.Difficulty.minValue, Config.Difficulty.maxValue);
             }
 
             // Update scoreboard
@@ -212,8 +212,8 @@ public final class SHPlayerDataHandler {
                     return;
                 }
                 // Multiplier for this dimension?
-                if (Config.DIFFICULTY_DIMENSION_MULTIPLIER.containsKey(player.dimension)) {
-                    amount *= Config.DIFFICULTY_DIMENSION_MULTIPLIER.get(player.dimension);
+                if (Config.Difficulty.DIFFICULTY_DIMENSION_MULTIPLIER.containsKey(player.dimension)) {
+                    amount *= Config.Difficulty.DIFFICULTY_DIMENSION_MULTIPLIER.get(player.dimension);
                 }
             }
 
@@ -276,11 +276,11 @@ public final class SHPlayerDataHandler {
 
                 // Increase player difficulty.
                 if (player.world.getTotalWorldTime() % 20 == 0) {
-                    float amount = Config.DIFFICULTY_PER_SECOND;
+                    float amount = Config.Difficulty.perSecond;
 
                     // Idle multiplier
                     if (lastPosX == (int) player.posX && lastPosZ == (int) player.posZ)
-                        amount *= Config.DIFFICULTY_IDLE_MULTI;
+                        amount *= Config.Difficulty.idleMulti;
 
                     // TODO: Multiplier for other dimensions?
 
@@ -290,7 +290,7 @@ public final class SHPlayerDataHandler {
                     lastPosY = (int) player.posY;
                     lastPosZ = (int) player.posZ;
 
-                    if (!Config.DIFFICULTY_BY_GAME_STAGES.isEmpty() && Loader.isModLoaded("gamestages")) {
+                    if (!Config.Difficulty.DIFFICULTY_BY_GAME_STAGES.isEmpty() && Loader.isModLoaded("gamestages")) {
                         setDifficulty(SHGameStagesCompat.getDifficultyFromStages(player));
                     }
 
@@ -326,7 +326,7 @@ public final class SHPlayerDataHandler {
                 MessageDataSync message = new MessageDataSync(get(player), player);
                 NetworkHandler.INSTANCE.sendTo(message, playerMP);
 
-                if (Config.AREA_DIFFICULTY_MODE == EnumAreaDifficultyMode.SERVER_WIDE) {
+                if (Config.Difficulty.AREA_DIFFICULTY_MODE == EnumAreaDifficultyMode.SERVER_WIDE) {
                     MessageWorldDataSync message2 = new MessageWorldDataSync(
                             ScalingHealthSavedData.get(player.world));
                     NetworkHandler.INSTANCE.sendTo(message2, playerMP);

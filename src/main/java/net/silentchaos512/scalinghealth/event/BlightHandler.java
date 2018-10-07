@@ -72,7 +72,7 @@ public final class BlightHandler {
         EntityBlightFire fire = new EntityBlightFire(blight);
         fire.setPosition(blight.posX, blight.posY, blight.posZ);
         blight.world.spawnEntity(fire);
-        if (Config.BLIGHT_FIRE_RIDES_BLIGHT)
+        if (Config.Mob.Blight.fireRidesBlight)
             fire.startRiding(blight);
     }
 
@@ -86,7 +86,7 @@ public final class BlightHandler {
     }
 
     static void applyBlightPotionEffects(EntityLivingBase entityLiving) {
-        int duration = Config.BLIGHT_POTION_DURATION;
+        int duration = Config.Mob.Blight.potionDuration;
         if (duration < 0) {
             duration = Integer.MAX_VALUE;
         } else if (duration == 0) {
@@ -96,21 +96,21 @@ public final class BlightHandler {
         // TODO: Replace specific potion effects with a list where users can add specific effects.
 
         // Invisibility
-        if (Config.BLIGHT_INVISIBLE)
+        if (Config.Mob.Blight.invisibility)
             entityLiving
                     .addPotionEffect(new PotionEffect(MobEffects.INVISIBILITY, duration, 0, true, false));
         // Fire Resistance
-        if (Config.BLIGHT_FIRE_RESIST)
+        if (Config.Mob.Blight.fireResist)
             entityLiving
                     .addPotionEffect(new PotionEffect(MobEffects.FIRE_RESISTANCE, duration, 0, true, false));
         // Speed
-        if (Config.BLIGHT_AMP_SPEED > -1)
+        if (Config.Mob.Blight.speedAmp > -1)
             entityLiving.addPotionEffect(new PotionEffect(MobEffects.SPEED, duration,
-                    Config.BLIGHT_AMP_SPEED, true, false));
+                    Config.Mob.Blight.speedAmp, true, false));
         // Strength
-        if (Config.BLIGHT_AMP_STRENGTH > -1)
+        if (Config.Mob.Blight.strengthAmp > -1)
             entityLiving.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, duration,
-                    Config.BLIGHT_AMP_STRENGTH, true, false));
+                    Config.Mob.Blight.strengthAmp, true, false));
     }
 
     // **********
@@ -137,7 +137,7 @@ public final class BlightHandler {
             }
 
             // Tell all players that the blight was killed.
-            if (Config.BLIGHT_NOTIFY_PLAYERS_ON_DEATH && player != null) {
+            if (Config.Mob.Blight.notifyOnDeath && player != null) {
                 ScalingHealth.logHelper.info("Blight {} was killed by {}", blight.getName(), actualKiller.getName());
                 for (EntityPlayer p : player.world.getPlayers(EntityPlayer.class, e -> true)) {
                     // FIXME: blight name translation
@@ -146,13 +146,13 @@ public final class BlightHandler {
             }
 
             // Drop hearts!
-            final boolean canGetHearts = !(player instanceof FakePlayer) || Config.FAKE_PLAYERS_CAN_GENERATE_HEARTS;
-            final int min = Config.HEARTS_DROPPED_BY_BLIGHT_MIN;
-            final int max = Config.HEARTS_DROPPED_BY_BLIGHT_MAX;
+            final boolean canGetHearts = !(player instanceof FakePlayer) || Config.FakePlayer.generateHearts;
+            final int min = Config.Items.Heart.blightMin;
+            final int max = Config.Items.Heart.blightMax;
             final int heartCount = ScalingHealth.random.nextInt(max - min + 1) + min;
 
             if (canGetHearts && heartCount > 0) {
-                Item itemToDrop = Config.HEART_DROP_SHARDS_INSTEAD ? ModItems.crystalShard : ModItems.heart;
+                Item itemToDrop = Config.Items.Heart.dropShardsInstead ? ModItems.crystalShard : ModItems.heart;
                 blight.dropItem(itemToDrop, heartCount);
             }
         } else {
@@ -160,7 +160,7 @@ public final class BlightHandler {
             EntityLivingBase blight = event.getEntityLiving();
 
             // Tell all players that the blight died.
-            if (Config.BLIGHT_NOTIFY_PLAYERS_ON_DEATH) {
+            if (Config.Mob.Blight.notifyOnDeath) {
                 ITextComponent deathMessage = event.getSource().getDeathMessage(blight);
                 if (deathMessage instanceof TextComponentTranslation) {
                     // Assuming arguments are the same as in DamageSource#getDeathMessage

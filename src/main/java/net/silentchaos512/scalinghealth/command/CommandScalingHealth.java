@@ -23,7 +23,6 @@ import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
@@ -106,14 +105,14 @@ public class CommandScalingHealth extends CommandBaseSL {
                 // Report difficulty
                 double current = data.getDifficulty();
                 String strCurrent = String.format(NUMFORMAT, current);
-                String strMax = String.format(NUMFORMAT, Config.DIFFICULTY_MAX);
+                String strMax = String.format(NUMFORMAT, Config.Difficulty.maxValue);
                 tell(sender, "showDifficulty", true, player.getName(), strCurrent, strMax);
             } else {
                 // Try set difficulty
                 double current = data.getDifficulty();
                 double toSet = getValueToSet(subCommand, value, current);
-                double min = getMinValue(subCommand, current, Config.DIFFICULTY_MIN, Config.DIFFICULTY_MAX);
-                double max = getMaxValue(subCommand, current, Config.DIFFICULTY_MIN, Config.DIFFICULTY_MAX);
+                double min = getMinValue(subCommand, current, Config.Difficulty.minValue, Config.Difficulty.maxValue);
+                double max = getMaxValue(subCommand, current, Config.Difficulty.minValue, Config.Difficulty.maxValue);
 
                 // Bounds check
                 if (!checkBounds(subCommand, value, toSet, current, min, max)) {
@@ -139,14 +138,14 @@ public class CommandScalingHealth extends CommandBaseSL {
             // Report difficulty
             double current = data.difficulty;
             String strCurrent = String.format(NUMFORMAT, current);
-            String strMax = String.format(NUMFORMAT, Config.DIFFICULTY_MAX);
+            String strMax = String.format(NUMFORMAT, Config.Difficulty.maxValue);
             tell(sender, "showWorldDifficulty", true, strCurrent, strMax);
         } else {
             // Try set difficulty
             double current = data.difficulty;
             double toSet = getValueToSet(subCommand, value, current);
-            double min = getMinValue(subCommand, current, Config.DIFFICULTY_MIN, Config.DIFFICULTY_MAX);
-            double max = getMaxValue(subCommand, current, Config.DIFFICULTY_MIN, Config.DIFFICULTY_MAX);
+            double min = getMinValue(subCommand, current, Config.Difficulty.minValue, Config.Difficulty.maxValue);
+            double max = getMaxValue(subCommand, current, Config.Difficulty.minValue, Config.Difficulty.maxValue);
 
             // Bounds check
             if (!checkBounds(subCommand, value, toSet, current, min, max)) {

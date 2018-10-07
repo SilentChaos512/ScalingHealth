@@ -81,7 +81,7 @@ public enum EnumAreaDifficultyMode {
         }
 
         // Get players in range. TODO: Only get player list for types that need it?
-        int radius = Config.DIFFICULTY_SEARCH_RADIUS;
+        int radius = Config.Difficulty.searchRadius;
         final long radiusSquared = radius <= 0 ? Long.MAX_VALUE : radius * radius;
         radius = radius <= 0 ? Integer.MAX_VALUE : radius;
         List<EntityPlayer> players = world.getPlayers(EntityPlayer.class,
@@ -132,7 +132,7 @@ public enum EnumAreaDifficultyMode {
                 break;
 
             case MIN_LEVEL:
-                double min = Config.DIFFICULTY_MAX;
+                double min = Config.Difficulty.maxValue;
                 for (EntityPlayer player : players) {
                     PlayerData data = SHPlayerDataHandler.get(player);
                     if (data != null) {
@@ -149,7 +149,7 @@ public enum EnumAreaDifficultyMode {
                 double dx = pos.getX() - origin.getX();
                 double dz = pos.getZ() - origin.getZ();
                 double distance = Math.sqrt(dx * dx + dz * dz);
-                ret = distance * Config.DIFFICULTY_PER_BLOCK;
+                ret = distance * Config.Difficulty.perBlock;
                 break;
 
             case DISTANCE_AND_TIME:
@@ -166,11 +166,11 @@ public enum EnumAreaDifficultyMode {
 
         // Clamp to difficulty range (intentionally done before group bonus)
         if (clampValue)
-            ret = MathHelper.clamp(ret, Config.DIFFICULTY_MIN, Config.DIFFICULTY_MAX);
+            ret = MathHelper.clamp(ret, Config.Difficulty.minValue, Config.Difficulty.maxValue);
 
         // Group bonus?
         if (addGroupBonus)
-            ret *= 1 + Config.DIFFICULTY_GROUP_AREA_BONUS * (players.size() - 1);
+            ret *= 1 + Config.Difficulty.groupAreaBonus * (players.size() - 1);
 
         return ret;
     }

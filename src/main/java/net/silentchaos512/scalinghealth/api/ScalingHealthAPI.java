@@ -43,7 +43,7 @@ public class ScalingHealthAPI {
      * @return The area difficulty.
      */
     public static double getAreaDifficulty(World world, BlockPos pos) {
-        return Config.AREA_DIFFICULTY_MODE.getAreaDifficulty(world, pos);
+        return Config.Difficulty.AREA_DIFFICULTY_MODE.getAreaDifficulty(world, pos);
     }
 
     /**

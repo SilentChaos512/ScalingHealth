@@ -60,13 +60,13 @@ public class SHMorpheusCompat {
             for (EntityPlayer player : world.getPlayers(EntityPlayer.class, e -> true)) {
                 PlayerData data = SHPlayerDataHandler.get(player);
                 if (data != null) {
-                    data.incrementDifficulty(Config.DIFFICULTY_FOR_SLEEPING, false);
+                    data.incrementDifficulty(Config.Difficulty.forSleeping, false);
                 }
             }
 
             ScalingHealthSavedData data = ScalingHealthSavedData.get(world);
             if (data != null) {
-                data.difficulty += Config.DIFFICULTY_FOR_SLEEPING;
+                data.difficulty += Config.Difficulty.forSleeping;
             }
         }
     }
