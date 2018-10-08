@@ -2,6 +2,7 @@ package net.silentchaos512.scalinghealth.network.message;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
@@ -37,7 +38,7 @@ public class MessageDataSync extends Message {
     @SideOnly(Side.CLIENT)
     public IMessage handleMessage(MessageContext context) {
         ClientTicks.scheduleAction(() -> {
-            EntityPlayer player = ScalingHealth.proxy.getClientPlayer().world.getPlayerEntityByName(playerName);
+            EntityPlayer player = getPlayerByName(playerName);
             if (player != null) {
                 PlayerData data = SHPlayerDataHandler.get(player);
                 if (data != null) {
@@ -55,6 +56,18 @@ public class MessageDataSync extends Message {
             }
         });
 
+        return null;
+    }
+
+    @Nullable
+    private static EntityPlayer getPlayerByName(String name) {
+        EntityPlayer localPlayer = ScalingHealth.proxy.getClientPlayer();
+        if (localPlayer != null) {
+            World world = localPlayer.world;
+            if (world != null) {
+                return world.getPlayerEntityByName(name);
+            }
+        }
         return null;
     }
 }
