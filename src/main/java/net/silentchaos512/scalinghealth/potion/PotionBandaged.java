@@ -26,6 +26,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.silentchaos512.lib.util.EntityHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.config.Config;
 
 import java.util.List;
 
@@ -50,7 +51,7 @@ public class PotionBandaged extends Potion {
 
         float healAmount = BASE_HEAL_RATE * entityLiving.getMaxHealth() * (amplifier + 1);
         // Using Entity#heal allows us to prevent the cancelable LivingHealEvent from being fired.
-        EntityHelper.heal(entityLiving, healAmount, true); // TODO: Config!
+        EntityHelper.heal(entityLiving, healAmount, Config.Items.healingItemFireEvent);
     }
 
     @Override

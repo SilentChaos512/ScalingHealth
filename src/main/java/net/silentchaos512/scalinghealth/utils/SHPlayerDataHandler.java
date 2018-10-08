@@ -31,6 +31,7 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
 import net.silentchaos512.lib.util.AttributeHelper;
+import net.silentchaos512.lib.util.EntityHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.compat.gamestages.SHGameStagesCompat;
 import net.silentchaos512.scalinghealth.config.Config;
@@ -260,7 +261,13 @@ public final class SHPlayerDataHandler {
 
             EntityPlayer player = playerWR.get();
             if (player != null) {
-                player.setHealth(player.getHealth() + amount);
+                int current = (int) player.getHealth();
+                EntityHelper.heal(player, amount, Config.Items.Heart.healingEvent);
+                int newHealth = (int) player.getHealth();
+
+                if (current + (int) amount != newHealth) {
+                    ScalingHealth.logHelper.warn("Another mod seems to have canceled healing from a max health increase (player {})", player.getName());
+                }
             }
         }
 

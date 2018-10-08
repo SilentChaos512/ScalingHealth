@@ -426,6 +426,11 @@ public class Config extends ConfigBaseNew {
             @ConfigOption.BooleanDefault(false)
             @ConfigOption.Comment("If enabled, heart crystals drop shards instead of full containers.")
             public static boolean dropShardsInstead;
+            @ConfigOption(name = "Heart Healing Event", category = CAT_ITEMS)
+            @ConfigOption.BooleanDefault(true)
+            @ConfigOption.Comment("If true, the healing from heart containers will fire a standard healing event," +
+                    " allowing other mods to execute additional code or cancel the healing altogether. Disable if needed.")
+            public static boolean healingEvent;
             @ConfigOption(name = "Hearts Health Restored", category = CAT_ITEMS)
             @ConfigOption.RangeInt(value = 4, min = 0)
             @ConfigOption.Comment("The amount of extra health restored when using a heart container. This applies whether" +
@@ -450,6 +455,11 @@ public class Config extends ConfigBaseNew {
         @ConfigOption.RangeFloat(-10)
         @ConfigOption.Comment("The amount of difficulty added/removed when using an enchanted heart.")
         public static float enchantedHeartChange;
+        @ConfigOption(name = "Healing Items Fire Healing Event", category = CAT_ITEMS)
+        @ConfigOption.BooleanDefault(true)
+        @ConfigOption.Comment("If true, the healing from bandages and medkits will fire a standard healing event," +
+                " allowing other mods to execute additional code or cancel the healing altogether. Disable if needed.")
+        public static boolean healingItemFireEvent;
     }
 
     public static final class Difficulty {

@@ -32,6 +32,7 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.world.World;
 import net.silentchaos512.lib.util.ChatHelper;
 import net.silentchaos512.lib.util.Color;
+import net.silentchaos512.lib.util.EntityHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.init.ModSounds;
@@ -64,8 +65,8 @@ public class ItemHeartContainer extends Item {
             PlayerData data = SHPlayerDataHandler.get(player);
             if (data == null) return ActionResult.newResult(EnumActionResult.PASS, stack);
 
-            boolean healthIncreaseAllowed = isHealthIncreaseAllowed(data);
-            int levelRequirement = getLevelsRequiredToUse(player, stack, healthIncreaseAllowed);
+            final boolean healthIncreaseAllowed = isHealthIncreaseAllowed(data);
+            final int levelRequirement = getLevelsRequiredToUse(player, stack, healthIncreaseAllowed);
 
             // Does player have enough XP?
             if (player.experienceLevel < levelRequirement) {
@@ -74,11 +75,14 @@ public class ItemHeartContainer extends Item {
             }
 
             // Heal the player (this is separate from the "healing" of the newly added heart, if that's allowed).
-            boolean consumed = false;
-            if (Config.Items.Heart.healthRestored > 0 && player.getHealth() < player.getMaxHealth()) {
-                float currentHealth = player.getHealth();
-                player.setHealth(currentHealth + Config.Items.Heart.healthRestored);
-                consumed = true;
+            final boolean consumed = Config.Items.Heart.healthRestored > 0 && player.getHealth() < player.getMaxHealth();
+            if (consumed) {
+                int current = (int) player.getHealth();
+                EntityHelper.heal(player, Config.Items.Heart.healthRestored, Config.Items.Heart.healingEvent);
+                int newHealth = (int) player.getHealth();
+                if (current + Config.Items.Heart.healthRestored != newHealth) {
+                    ScalingHealth.logHelper.warn("Another mod seems to have canceled healing from a heart container (player {})", player.getName());
+                }
             }
 
             // End here if health increases are not allowed.
