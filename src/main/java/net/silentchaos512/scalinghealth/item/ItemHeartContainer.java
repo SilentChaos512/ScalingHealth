@@ -25,6 +25,8 @@ import net.minecraft.init.SoundEvents;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.stats.StatBase;
+import net.minecraft.stats.StatList;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
@@ -42,6 +44,7 @@ import net.silentchaos512.scalinghealth.network.message.MessageDataSync;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
@@ -77,36 +80,55 @@ public class ItemHeartContainer extends Item {
             // Heal the player (this is separate from the "healing" of the newly added heart, if that's allowed).
             final boolean consumed = Config.Items.Heart.healthRestored > 0 && player.getHealth() < player.getMaxHealth();
             if (consumed) {
-                int current = (int) player.getHealth();
-                EntityHelper.heal(player, Config.Items.Heart.healthRestored, Config.Items.Heart.healingEvent);
-                int newHealth = (int) player.getHealth();
-                if (current + Config.Items.Heart.healthRestored != newHealth) {
-                    ScalingHealth.logHelper.warn("Another mod seems to have canceled healing from a heart container (player {})", player.getName());
-                }
+                doExtraHealing(player);
             }
 
             // End here if health increases are not allowed.
             if (!healthIncreaseAllowed) {
-                if (consumed) {
-                    world.playSound(null, player.getPosition(), SoundEvents.ENTITY_PLAYER_BURP, SoundCategory.PLAYERS,
-                            0.5f, 1.0f + 0.1f * (float) ScalingHealth.random.nextGaussian());
-                    stack.shrink(1);
-                    consumeLevels(player, levelRequirement);
-                    return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
-                } else {
-                    return ActionResult.newResult(EnumActionResult.PASS, stack);
-                }
+                return useAsHealingItem(world, player, stack, levelRequirement, consumed);
             }
 
             // Increase health, consume heart.
-            data.incrementMaxHealth(2);
-            stack.shrink(1);
-
-            spawnParticlesAndPlaySound(world, player);
-            consumeLevels(player, levelRequirement);
-            NetworkHandler.INSTANCE.sendTo(new MessageDataSync(data, player), (EntityPlayerMP) player);
+            useForHealthIncrease(world, player, stack, data, levelRequirement);
         }
         return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
+    }
+
+    private static void doExtraHealing(EntityPlayer player) {
+        int current = (int) player.getHealth();
+        EntityHelper.heal(player, Config.Items.Heart.healthRestored, Config.Items.Heart.healingEvent);
+        int newHealth = (int) player.getHealth();
+        if (current + Config.Items.Heart.healthRestored != newHealth) {
+            ScalingHealth.logHelper.warn("Another mod seems to have canceled healing from a heart container (player {})", player.getName());
+        }
+    }
+
+    private void incrementUseStat(EntityPlayer player) {
+        StatBase useStat = StatList.getObjectUseStats(this);
+        if (useStat != null) player.addStat(useStat);
+    }
+
+    @Nonnull
+    private ActionResult<ItemStack> useAsHealingItem(World world, EntityPlayer player, ItemStack stack, int levelRequirement, boolean consumed) {
+        if (consumed) {
+            world.playSound(null, player.getPosition(), SoundEvents.ENTITY_PLAYER_BURP, SoundCategory.PLAYERS,
+                    0.5f, 1.0f + 0.1f * (float) ScalingHealth.random.nextGaussian());
+            stack.shrink(1);
+            consumeLevels(player, levelRequirement);
+            incrementUseStat(player);
+            return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
+        } else {
+            return ActionResult.newResult(EnumActionResult.PASS, stack);
+        }
+    }
+
+    private void useForHealthIncrease(World world, EntityPlayer player, ItemStack stack, PlayerData data, int levelRequirement) {
+        data.incrementMaxHealth(2);
+        stack.shrink(1);
+        spawnParticlesAndPlaySound(world, player);
+        consumeLevels(player, levelRequirement);
+        incrementUseStat(player);
+        NetworkHandler.INSTANCE.sendTo(new MessageDataSync(data, player), (EntityPlayerMP) player);
     }
 
     private static int getLevelsRequiredToUse(EntityPlayer player, ItemStack stack, boolean healthIncreaseAllowed) {
