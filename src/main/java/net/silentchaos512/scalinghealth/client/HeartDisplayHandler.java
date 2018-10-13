@@ -46,22 +46,54 @@ import java.util.Random;
  */
 public final class HeartDisplayHandler extends Gui {
     public enum TextStyle {
-        DISABLED, ROWS, HEALTH_AND_MAX;
+        DISABLED(1f) {
+            @Override
+            public String textFor(float current, float max) {
+                return "";
+            }
+        },
+        ROWS(0.65f) {
+            @Override
+            public String textFor(float current, float max) {
+                return (int) Math.ceil(current / 20) + "x";
+            }
+        },
+        HEALTH_AND_MAX(0.5f) {
+            @Override
+            public String textFor(float current, float max) {
+                if (max == 0) return HEALTH_ONLY.textFor(current, max);
+                return Math.round(current) + "/" + Math.round(max);
+            }
+        },
+        HEALTH_ONLY(0.5f) {
+            @Override
+            public String textFor(float current, float max) {
+                return String.valueOf(Math.round(current));
+            }
+        };
 
-        private static final String COMMENT = "Determines what the text next to your hearts will display. DISABLED will display nothing, ROWS will display the number of remaining rows that have health left, and HEALTH_AND_MAX will display your actual health and max health values.";
+        private static final String COMMENT = "Determines what the text next to your hearts will display. DISABLED will display nothing, ROWS will display the number of remaining rows that have health left, and HEALTH_AND_MAX will display your actual health and max health values (for absorption, there is no max value). HEALTH_ONLY displays just the current amount.";
 
-        public static TextStyle loadFromConfig(ConfigBase config) {
-            return config.loadEnum("Health Text Style", Config.CAT_CLIENT, TextStyle.class, ROWS, COMMENT);
+        private final float scale;
+
+        TextStyle(float scale) {
+            this.scale = scale;
         }
+
+        public static TextStyle loadFromConfig(ConfigBase config, String name, TextStyle defaultValue) {
+            return config.loadEnum(name, Config.CAT_CLIENT, TextStyle.class, defaultValue, COMMENT);
+        }
+
+        public abstract String textFor(float current, float max);
     }
 
     public enum TextColor {
         GREEN_TO_RED, WHITE, PSYCHEDELIC;
 
-        public static final String COMMENT = "Determines the color of the text next to your hearts. GREEN_TO_RED displays green at full health, and moves to red as you lose health. WHITE will just be good old fashioned white text. Set to PSYCHEDELIC if you want to taste the rainbow.";
+        public static final String COMMENT = "Determines the color of the text next to your hearts. GREEN_TO_RED displays green at full health, and moves to red as you lose health (does not work with absorption). WHITE will just be good old fashioned white text. Set to PSYCHEDELIC if you want to taste the rainbow.";
 
-        public static TextColor loadFromConfig(ConfigBase config) {
-            return config.loadEnum("Health Text Color", Config.CAT_CLIENT, TextColor.class, GREEN_TO_RED, COMMENT);
+        public static TextColor loadFromConfig(ConfigBase config, String name, TextColor defaultValue) {
+            return config.loadEnum(name, Config.CAT_CLIENT, TextColor.class, defaultValue, COMMENT);
         }
     }
 
@@ -93,10 +125,13 @@ public final class HeartDisplayHandler extends Gui {
         EntityPlayer player = mc.player;
 
         // Health text
-        TextStyle style = Config.Client.Hearts.textStyle;
-        TextColor styleColor = Config.Client.Hearts.textColor;
-        if (event.getType() == ElementType.TEXT && style != TextStyle.DISABLED && mc.playerController.gameIsSurvivalOrAdventure()) {
-            renderHealthText(event, player, style, styleColor);
+        if (event.getType() == ElementType.TEXT && mc.playerController.gameIsSurvivalOrAdventure()) {
+            // Draw health string?
+            if (Config.Client.Hearts.textStyle != TextStyle.DISABLED)
+                renderHealthText(event, player.getHealth(), player.getMaxHealth(), -91, -38, Config.Client.Hearts.textStyle, Config.Client.Hearts.textColor);
+            // Draw absorption amount string?
+            if (Config.Client.Hearts.absorbTextStyle != TextStyle.DISABLED && player.getAbsorptionAmount() > 0)
+                renderHealthText(event, player.getAbsorptionAmount(), 0, -91, -49, Config.Client.Hearts.absorbTextStyle, Config.Client.Hearts.absorbTextColor);
         }
 
         // Hearts
@@ -287,7 +322,7 @@ public final class HeartDisplayHandler extends Gui {
         mc.renderEngine.bindTexture(Gui.ICONS);
     }
 
-    private int getCustomHeartRowCount(int health) {
+    private static int getCustomHeartRowCount(int health) {
         return Config.Client.Hearts.replaceVanillaRow ? MathHelper.ceil(health / 20f) : health / 20;
     }
 
@@ -335,29 +370,28 @@ public final class HeartDisplayHandler extends Gui {
         }
     }
 
-    private void renderHealthText(RenderGameOverlayEvent event, EntityPlayer player, TextStyle style, TextColor styleColor) {
-        final float scale = style == TextStyle.ROWS ? 0.65f : 0.5f;
+    private void renderHealthText(RenderGameOverlayEvent event, float current, float max, int offsetX, int offsetY, TextStyle style, TextColor styleColor) {
+        final float scale = style.scale;
         final int width = event.getResolution().getScaledWidth();
         final int height = event.getResolution().getScaledHeight();
-        final int left = (int) ((width / 2 - 91 + Config.Client.Hearts.textOffsetX) / scale);
+        final int left = (int) ((width / 2 + offsetX + Config.Client.Hearts.textOffsetX) / scale);
         // GuiIngameForge.left_height == 59 in normal cases. Making it a constant should fix some issues.
-        final int top = (int) ((height - 59 + 21 + Config.Client.Hearts.textOffsetY + (1 / scale)) / scale);
+        final int top = (int) ((height + offsetY + Config.Client.Hearts.textOffsetY + (1 / scale)) / scale);
 
         // Draw health string
-        String healthString = style == TextStyle.HEALTH_AND_MAX
-                ? (int) player.getHealth() + "/" + (int) player.getMaxHealth()
-                : (int) Math.ceil(player.getHealth() / 20) + "x";
+        String healthString = style.textFor(current, max);
         FontRenderer fontRenderer = Minecraft.getMinecraft().fontRenderer;
         int stringWidth = fontRenderer.getStringWidth(healthString);
         int color;
+        float divisor = max == 0 ? current : max;
         switch (styleColor) {
             case GREEN_TO_RED:
-                color = Color.HSBtoRGB(0.34f * playerHealth / player.getMaxHealth(), 0.7f, 1.0f);
+                color = Color.HSBtoRGB(0.34f * current / divisor, 0.7f, 1.0f);
                 break;
             case PSYCHEDELIC:
                 color = Color.HSBtoRGB(
                         (ClientTicks.ticksInGame % COLOR_CHANGE_PERIOD) / COLOR_CHANGE_PERIOD,
-                        0.55f * playerHealth / player.getMaxHealth(), 1.0f);
+                        0.55f * current / divisor, 1.0f);
                 break;
             case WHITE:
             default:

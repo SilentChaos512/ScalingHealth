@@ -95,6 +95,8 @@ public class Config extends ConfigBaseNew {
             public static HeartDisplayHandler.TextStyle textStyle;
             public static HeartDisplayHandler.TextColor textColor;
             public static HeartDisplayHandler.AbsorptionHeartStyle absorptionStyle;
+            public static HeartDisplayHandler.TextStyle absorbTextStyle;
+            public static HeartDisplayHandler.TextColor absorbTextColor;
 
             @ConfigOption(name = "Last Heart Outline Enabled", category = CAT_CLIENT)
             @ConfigOption.BooleanDefault(true)
@@ -620,9 +622,11 @@ public class Config extends ConfigBaseNew {
             }
 
             // Client
-            Client.Hearts.textStyle = HeartDisplayHandler.TextStyle.loadFromConfig(this);
-            Client.Hearts.textColor = HeartDisplayHandler.TextColor.loadFromConfig(this);
+            Client.Hearts.textStyle = HeartDisplayHandler.TextStyle.loadFromConfig(this, "Health Text Style", HeartDisplayHandler.TextStyle.ROWS);
+            Client.Hearts.textColor = HeartDisplayHandler.TextColor.loadFromConfig(this, "Health Text Color", HeartDisplayHandler.TextColor.GREEN_TO_RED);
             Client.Hearts.absorptionStyle = HeartDisplayHandler.AbsorptionHeartStyle.loadDromConfig(this);
+            Client.Hearts.absorbTextStyle = HeartDisplayHandler.TextStyle.loadFromConfig(this, "Absorption Text Style", HeartDisplayHandler.TextStyle.DISABLED);
+            Client.Hearts.absorbTextColor = HeartDisplayHandler.TextColor.loadFromConfig(this, "Absorption Text Color", HeartDisplayHandler.TextColor.WHITE);
 
             loadHeartColors(config);
 
