@@ -26,6 +26,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.silentchaos512.lib.config.ConfigMultiValueLineParser;
 import net.silentchaos512.lib.util.LogHelper;
@@ -53,7 +54,7 @@ public final class DamageScaling {
 
     private DamageScaling() { }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPlayerHurt(LivingHurtEvent event) {
         EntityLivingBase entity = event.getEntityLiving();
         if ((entity instanceof IMob && !affectHostileMobs) || (!(entity instanceof EntityPlayer) && !affectPassiveMobs))
