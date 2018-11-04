@@ -1,4 +1,13 @@
-## [1.3.30]
+# Changelog
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unreleased]
+### Changed
+- Damage scaling events now have highest priority, should improve compatibility with some mods
+
+## [1.3.30] - 2018-10-13
 ### Added
 - Absorption text, similar to the health text displayed to the left of hearts. Cannot display a max amount, as vanilla does not have any concept of max absorption. The GREEN_TO_RED color style will not work correctly because of this.
 - Configs to enable/disable healing events for items. These are now enabled by default (they were disabled for some reason, disable if you have issues)
@@ -6,8 +15,7 @@
 ### Fixed
 - A possible (rare?) crash when joining a LAN game or server [#141]
 
-2018-10-13: Changing style, renamed from changelog.txt to CHANGELOG.md, format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).  
-Remainder of file is left unchanged.
+2018-10-13: Changing style, renamed from changelog.txt to CHANGELOG.md. Remainder of file is left unchanged.
 
 1.3.29
 Added: Configs to tweak health text position (#133)

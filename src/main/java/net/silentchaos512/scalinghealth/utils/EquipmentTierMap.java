@@ -27,68 +27,62 @@ import java.util.List;
 import java.util.Random;
 
 public class EquipmentTierMap {
+    public final int tierCount;
+    public final EntityEquipmentSlot slot;
 
-  public final int tierCount;
-  public final EntityEquipmentSlot slot;
+    List<List<StackProducer>> sets;
 
-  List<List<StackProducer>> sets;
+    public EquipmentTierMap(int tierCount, EntityEquipmentSlot slot) {
+        this.tierCount = tierCount;
+        this.slot = slot;
 
-  public EquipmentTierMap(int tierCount, EntityEquipmentSlot slot) {
-
-    this.tierCount = tierCount;
-    this.slot = slot;
-
-    sets = new ArrayList<>();
-    for (int i = 0; i < tierCount; ++i) {
-      sets.add(new ArrayList<>());
-    }
-  }
-
-  public void put(ItemStack stack, int tier) {
-
-    put(new StackProducer(stack), tier);
-  }
-
-  public void put(StackProducer producer, int tier) {
-
-    if (tier < 0 || tier >= tierCount) {
-      throw new IllegalArgumentException("tier must be between 0 and " + tierCount);
+        sets = new ArrayList<>();
+        for (int i = 0; i < tierCount; ++i) {
+            sets.add(new ArrayList<>());
+        }
     }
 
-    // TODO: We could also check the stack is valid for the slot.
-
-    sets.get(tier).add(producer);
-  }
-
-  public ItemStack getRandom(int tier) {
-
-    if (tier < 0 || tier >= tierCount) {
-      throw new IllegalArgumentException("tier must be between 0 and " + tierCount);
+    public void put(ItemStack stack, int tier) {
+        put(new StackProducer(stack), tier);
     }
 
-    List<StackProducer> list = sets.get(tier);
-    if (list.isEmpty()) {
-      return ItemStack.EMPTY;
+    public void put(StackProducer producer, int tier) {
+        if (tier < 0 || tier >= tierCount) {
+            throw new IllegalArgumentException("tier must be between 0 and " + tierCount);
+        }
+
+        // TODO: We could also check the stack is valid for the slot.
+
+        sets.get(tier).add(producer);
     }
 
-    Random rand = ScalingHealth.random;
-    return list.get(rand.nextInt(list.size())).get(rand);
-  }
+    public ItemStack getRandom(int tier) {
+        if (tier < 0 || tier >= tierCount) {
+            throw new IllegalArgumentException("tier must be between 0 and " + tierCount);
+        }
 
-  public ItemStack get(int tier, int index) {
+        List<StackProducer> list = sets.get(tier);
+        if (list.isEmpty()) {
+            return ItemStack.EMPTY;
+        }
 
-    if (tier < 0 || tier >= tierCount) {
-      throw new IllegalArgumentException("tier must be between 0 and " + tierCount);
+        Random rand = ScalingHealth.random;
+        return list.get(rand.nextInt(list.size())).get(rand);
     }
 
-    List<StackProducer> list = sets.get(tier);
-    if (list.isEmpty()) {
-      return ItemStack.EMPTY;
-    }
-    if (index < 0 || index >= list.size()) {
-      throw new IllegalArgumentException("index must be between 0 and " + list.size());
-    }
+    public ItemStack get(int tier, int index) {
+        if (tier < 0 || tier >= tierCount) {
+            throw new IllegalArgumentException("tier must be between 0 and " + tierCount);
+        }
 
-    return list.get(index).get(ScalingHealth.random);
-  }
+        List<StackProducer> list = sets.get(tier);
+        if (list.isEmpty()) {
+            return ItemStack.EMPTY;
+        }
+        if (index < 0 || index >= list.size()) {
+            throw new IllegalArgumentException("index must be between 0 and " + list.size());
+        }
+
+        return list.get(index).get(ScalingHealth.random);
+    }
 }

@@ -27,52 +27,51 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * Used to match entities to a list loaded from config.
+ *
+ * @deprecated Will remove in 1.13, as Silent Lib has a more fleshed-out equivalent
+ */
 @Deprecated
 public class EntityMatchList {
+    private final List<String> list = new ArrayList<>();
+    private boolean whitelist = false;
 
-  List<String> list = new ArrayList<>();
-  boolean whitelist = false;
+    public void add(String str) {
+        list.add(str);
+    }
 
-  public void add(String str) {
+    @Deprecated
+    public void clear() {
+        list.clear();
+    }
 
-    list.add(str);
-  }
+    public boolean matches(Entity entity) {
+        boolean contains = this.contains(entity);
+        return this.whitelist == contains;
+    }
 
-  @Deprecated
-  public void clear() {
+    @Deprecated
+    public boolean contains(Entity entity) {
+        ResourceLocation resource = EntityList.getKey(entity);
+        if (resource == null)
+            return false;
 
-    list.clear();
-  }
+        String id = resource.toString();
+        String idOld = EntityList.getEntityString(entity);
 
-  public boolean matches(Entity entity) {
+        for (String entry : list)
+            if (entry.equalsIgnoreCase(id) || entry.equalsIgnoreCase(idOld) || entry.equalsIgnoreCase("minecraft:" + id))
+                return true;
 
-    boolean contains = this.contains(entity);
-    return this.whitelist == contains;
-  }
+        return false;
+    }
 
-  @Deprecated
-  public boolean contains(Entity entity) {
+    public void loadConfig(Configuration config, String name, String category, String[] defaults, boolean defaultWhitelist, String comment) {
+        this.clear();
+        Collections.addAll(list, config.getStringList(name + " List", category, defaults, comment));
 
-    ResourceLocation resource = EntityList.getKey(entity);
-    if (resource == null)
-      return false;
-
-    String id = resource.toString();
-    String idOld = EntityList.getEntityString(entity);
-
-    for (String entry : list)
-      if (entry.equalsIgnoreCase(id) || entry.equalsIgnoreCase(idOld) || entry.equalsIgnoreCase("minecraft:" + id))
-        return true;
-
-    return false;
-  }
-
-  public void loadConfig(Configuration config, String name, String category, String[] defaults, boolean defaultWhitelist, String comment) {
-
-    this.clear();
-    Collections.addAll(list, config.getStringList(name + " List", category, defaults, comment));
-
-    this.whitelist = config.getBoolean(name + " IsWhitelist", category, defaultWhitelist,
-        "If true, the list is a whitelist. Otherwise it is a blacklist.");
-  }
+        this.whitelist = config.getBoolean(name + " IsWhitelist", category, defaultWhitelist,
+                "If true, the list is a whitelist. Otherwise it is a blacklist.");
+    }
 }

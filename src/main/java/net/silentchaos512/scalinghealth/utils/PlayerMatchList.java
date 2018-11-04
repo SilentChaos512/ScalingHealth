@@ -23,28 +23,30 @@ import net.minecraft.entity.player.EntityPlayer;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Matches players by name.
+ *
+ * @deprecated Will move to Silent Lib in 1.13
+ */
+@Deprecated
 public class PlayerMatchList {
+    private final List<String> list = new ArrayList<>();
 
-  List<String> list = new ArrayList<>();
+    public void add(String name) {
+        list.add(name);
+    }
 
-  public void add(String name) {
+    public void clear() {
+        list.clear();
+    }
 
-    list.add(name);
-  }
+    public boolean contains(EntityPlayer player) {
+        if (player == null)
+            return false;
 
-  public void clear() {
-
-    list.clear();
-  }
-
-  public boolean contains(EntityPlayer player) {
-
-    if (player == null)
-      return false;
-
-    for (String name : list)
-      if (name.equalsIgnoreCase(player.getName()))
-        return true;
-    return false;
-  }
+        for (String name : list)
+            if (name.equalsIgnoreCase(player.getName()))
+                return true;
+        return false;
+    }
 }
