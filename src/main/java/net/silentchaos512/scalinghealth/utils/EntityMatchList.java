@@ -26,6 +26,8 @@ import net.minecraftforge.common.config.Configuration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Used to match entities to a list loaded from config.
@@ -34,6 +36,8 @@ import java.util.List;
  */
 @Deprecated
 public class EntityMatchList {
+    private static final Pattern WILDCARD_PATTERN = Pattern.compile("\\*");
+
     private final List<String> list = new ArrayList<>();
     private boolean whitelist = false;
 
@@ -60,9 +64,15 @@ public class EntityMatchList {
         String id = resource.toString();
         String idOld = EntityList.getEntityString(entity);
 
-        for (String entry : list)
-            if (entry.equalsIgnoreCase(id) || entry.equalsIgnoreCase(idOld) || entry.equalsIgnoreCase("minecraft:" + id))
+        for (String entry : list) {
+            if (entry.endsWith("*")) {
+                String regex = WILDCARD_PATTERN.matcher(entry).replaceAll(Matcher.quoteReplacement(".*"));
+                return id.matches("(?i)" + regex);
+            }
+            if (entry.equalsIgnoreCase(id) || entry.equalsIgnoreCase(idOld) || entry.equalsIgnoreCase("minecraft:" + id)) {
                 return true;
+            }
+        }
 
         return false;
     }

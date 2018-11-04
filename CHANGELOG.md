@@ -4,6 +4,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Wildcard support for all entity lists (like the blight blacklist). Wildcard character is asterisk (*). Wildcards are only allowed at the end of the entry. Examples: `modid:*` or `modid:something_*`.
 ### Changed
 - Damage scaling events now have highest priority, should improve compatibility with some mods
 
