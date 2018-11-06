@@ -25,16 +25,19 @@ import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.silentchaos512.lib.config.ConfigMultiValueLineParser;
-import net.silentchaos512.lib.util.LogHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.api.ScalingHealthAPI;
 import net.silentchaos512.scalinghealth.config.Config;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 public final class DamageScaling {
     private static final String[] SOURCES_DEFAULT = {"inFire", "lightningBolt", "onFire", "lava", "hotFloor", "inWall", "cramming", "drown", "starve", "cactus", "fall", "flyIntoWall", "outOfWorld", "generic",
@@ -50,14 +53,18 @@ public final class DamageScaling {
     private boolean affectHostileMobs;
     private boolean affectPassiveMobs;
     private Mode scaleMode;
-    private Map<String, Float> scalingMap = new THashMap<>();
+    private final Map<String, Float> scalingMap = new THashMap<>();
+    private final Set<UUID> entityAttackedThisTick = new HashSet<>();
 
-    private DamageScaling() { }
+    private DamageScaling() {}
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onPlayerHurt(LivingHurtEvent event) {
+    public void onPlayerHurt(LivingAttackEvent event) {
         EntityLivingBase entity = event.getEntityLiving();
-        if ((entity instanceof IMob && !affectHostileMobs) || (!(entity instanceof EntityPlayer) && !affectPassiveMobs))
+        // Check entity has already been processed from original event, or is not allowed to be affected
+        if (entityAttackedThisTick.contains(entity.getPersistentID())
+                || (entity instanceof IMob && !affectHostileMobs)
+                || (!(entity instanceof EntityPlayer) && !affectPassiveMobs))
             return;
 
         DamageSource source = event.getSource();
@@ -92,16 +99,22 @@ public final class DamageScaling {
         // Bounds and error checks
         if (newAmount < 0f)
             newAmount = 0f;
-        if (Float.isFinite(newAmount))
-            event.setAmount(newAmount);
-        else
-            event.setAmount(Float.MAX_VALUE);
+        if (!Float.isFinite(newAmount))
+            newAmount = Float.MAX_VALUE;
 
-        LogHelper log = ScalingHealth.logHelper;
+        event.setCanceled(true);
+        entityAttackedThisTick.add(entity.getPersistentID());
+        entity.attackEntityFrom(event.getSource(), newAmount);
+
         if (Config.Debug.debugMode && Config.Debug.logPlayerDamage) {
-            log.info("Damage scaling: type={}, scale={}, affected={}, change={}, original={}",
+            ScalingHealth.logHelper.info("Damage scaling: type={}, scale={}, affected={}, change={}, original={}",
                     source.damageType, scale, affectedAmount, change, original);
         }
+    }
+
+    @SubscribeEvent
+    public void onServerTick(TickEvent.ServerTickEvent event) {
+        entityAttackedThisTick.clear();
     }
 
     public void loadConfig(Configuration config) {
