@@ -127,11 +127,17 @@ public final class HeartDisplayHandler extends Gui {
         // Health text
         if (event.getType() == ElementType.TEXT && mc.playerController.gameIsSurvivalOrAdventure()) {
             // Draw health string?
-            if (Config.Client.Hearts.textStyle != TextStyle.DISABLED)
-                renderHealthText(event, player.getHealth(), player.getMaxHealth(), -91, -38, Config.Client.Hearts.textStyle, Config.Client.Hearts.textColor);
+            if (Config.Client.Hearts.textStyle != TextStyle.DISABLED) {
+                renderHealthText(event, player.getHealth(), player.getMaxHealth(),
+                        -91 + Config.Client.Hearts.textOffsetX, -38 + Config.Client.Hearts.textOffsetY,
+                        Config.Client.Hearts.textStyle, Config.Client.Hearts.textColor);
+            }
             // Draw absorption amount string?
-            if (Config.Client.Hearts.absorbTextStyle != TextStyle.DISABLED && player.getAbsorptionAmount() > 0)
-                renderHealthText(event, player.getAbsorptionAmount(), 0, -91, -49, Config.Client.Hearts.absorbTextStyle, Config.Client.Hearts.absorbTextColor);
+            if (Config.Client.Hearts.absorbTextStyle != TextStyle.DISABLED && player.getAbsorptionAmount() > 0) {
+                renderHealthText(event, player.getAbsorptionAmount(), 0,
+                        -91 + Config.Client.Hearts.absorbTextOffsetX, -49 + Config.Client.Hearts.absorbTextOffsetY,
+                        Config.Client.Hearts.absorbTextStyle, Config.Client.Hearts.absorbTextColor);
+            }
         }
 
         // Hearts
@@ -374,9 +380,9 @@ public final class HeartDisplayHandler extends Gui {
         final float scale = style.scale;
         final int width = event.getResolution().getScaledWidth();
         final int height = event.getResolution().getScaledHeight();
-        final int left = (int) ((width / 2 + offsetX + Config.Client.Hearts.textOffsetX) / scale);
+        final int left = (int) ((width / 2 + offsetX) / scale);
         // GuiIngameForge.left_height == 59 in normal cases. Making it a constant should fix some issues.
-        final int top = (int) ((height + offsetY + Config.Client.Hearts.textOffsetY + (1 / scale)) / scale);
+        final int top = (int) ((height + offsetY + (1 / scale)) / scale);
 
         // Draw health string
         String healthString = style.textFor(current, max);

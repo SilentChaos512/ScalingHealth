@@ -92,6 +92,15 @@ public class Config extends ConfigBaseNew {
             @ConfigOption.Comment("Offset the position of health text.")
             public static int textOffsetY;
 
+            @ConfigOption(name = "Text Offset Absorption X", category = CAT_CLIENT)
+            @ConfigOption.RangeInt(0)
+            @ConfigOption.Comment("Offset the position of the absorption text")
+            public static int absorbTextOffsetX;
+            @ConfigOption(name = "Text Offset Absorption Y", category = CAT_CLIENT)
+            @ConfigOption.RangeInt(0)
+            @ConfigOption.Comment("Offset the position of the absorption text")
+            public static int absorbTextOffsetY;
+
             public static HeartDisplayHandler.TextStyle textStyle;
             public static HeartDisplayHandler.TextColor textColor;
             public static HeartDisplayHandler.AbsorptionHeartStyle absorptionStyle;
