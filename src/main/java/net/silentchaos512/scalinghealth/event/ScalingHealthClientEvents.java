@@ -49,7 +49,7 @@ public final class ScalingHealthClientEvents {
 
     @SubscribeEvent
     public static void renderTick(RenderGameOverlayEvent.Post event) {
-        if (Config.Debug.debugMode && Minecraft.getMinecraft().world != null && event.getType() == ElementType.ALL) {
+        if (Config.Debug.debugMode && Config.Debug.debugOverlay && Minecraft.getMinecraft().world != null && event.getType() == ElementType.ALL) {
             FontRenderer fontRender = Minecraft.getMinecraft().fontRenderer;
 
             GL11.glPushMatrix();

@@ -55,8 +55,14 @@ public class Config extends ConfigBaseNew {
     public static final class Debug {
         @ConfigOption(name = "Debug Mode", category = CAT_DEBUG)
         @ConfigOption.BooleanDefault(false)
-        @ConfigOption.Comment("Draws random stuffs on the screen! And maybe does some other things.")
+        @ConfigOption.Comment("Master switch for the other debug configs.")
         public static boolean debugMode;
+
+        @ConfigOption(name = "Debug Overlay", category = CAT_DEBUG)
+        @ConfigOption.BooleanDefault(true)
+        @ConfigOption.Comment("Draws information related to the mod on-screen, including health modifiers," +
+                " difficulty data, and more. This is intended for testing purposes only, not normal gameplay.")
+        public static boolean debugOverlay;
 
         @ConfigOption(name = "Log Spawns", category = CAT_DEBUG)
         @ConfigOption.BooleanDefault(false)

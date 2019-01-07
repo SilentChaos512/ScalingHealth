@@ -5,7 +5,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Nada
+- New config, Debug Overlay. Debug text will display if both this and Debug Mode are set to 'true'.
 
 ## [1.3.31] - 2018-11-04
 ### Added
