@@ -216,7 +216,7 @@ public final class HeartDisplayHandler extends Gui {
         for (int row = Math.max(0, rowCount - 2); row < rowCount; ++row) {
             int actualRow = row + (Config.Client.Hearts.replaceVanillaRow ? 0 : 1);
             int renderHearts = Math.min((health - 20 * actualRow) / 2, 10);
-            int rowColor = getColorForRow(row);
+            int rowColor = getColorForRow(row, false);
             boolean anythingDrawn;
 
             // Draw the hearts
@@ -287,7 +287,7 @@ public final class HeartDisplayHandler extends Gui {
             texY = Config.Client.Hearts.absorptionStyle == AbsorptionHeartStyle.SHIELD ? 0 : potionOffset;
             for (int i = Math.max(0, rowCount - 2); i < rowCount; ++i) {
                 int renderHearts = Math.min((absorbCeil - 20 * i) / 2, 10);
-                int rowColor = getColorForRow(i);
+                int rowColor = getColorForRow(i, true);
                 boolean anythingDrawn;
 
                 // Draw the hearts
@@ -422,8 +422,9 @@ public final class HeartDisplayHandler extends Gui {
         GlStateManager.color(1f, 1f, 1f, 1f);
     }
 
-    private int getColorForRow(int row) {
-        return Config.Client.Hearts.heartColors[row % Config.Client.Hearts.heartColors.length];
+    private int getColorForRow(int row, boolean absorption) {
+        int[] colors = absorption ? Config.Client.Hearts.absorptionHeartColors : Config.Client.Hearts.heartColors;
+        return colors[row % colors.length];
     }
 
     private boolean showEffectHearts(EntityPlayer player) {

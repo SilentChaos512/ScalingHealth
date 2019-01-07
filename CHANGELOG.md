@@ -3,9 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.3.32] - 2019-01-07
 ### Added
 - New config, Debug Overlay. Debug text will display if both this and Debug Mode are set to 'true'.
+- Absorption heart color config
 
 ## [1.3.31] - 2018-11-04
 ### Added

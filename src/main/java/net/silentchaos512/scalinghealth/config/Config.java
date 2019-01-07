@@ -126,7 +126,7 @@ public class Config extends ConfigBaseNew {
             public static int lastHeartOutlineColor;
 
             @SuppressWarnings("MagicNumber")
-            public static int[] heartColors = {
+            public static int[] defaultHeartColors = {
                     0xBF0000, // 0 red
                     0xE66000, // 25 orange-red
                     0xE69900, // 40 orange
@@ -142,6 +142,8 @@ public class Config extends ConfigBaseNew {
                     0x8C8C8C, // 0 gray
                     0xE6E6E6  // 0 white
             };
+            public static int[] heartColors = new int[0];
+            public static int[] absorptionHeartColors = new int[0];
         }
 
         public static final class Difficulty {
@@ -849,19 +851,25 @@ public class Config extends ConfigBaseNew {
 
     private static void loadHeartColors(Configuration c) {
         // Get hex strings for default colors.
-        String[] defaults = new String[Client.Hearts.heartColors.length];
+        String[] defaults = new String[Client.Hearts.defaultHeartColors.length];
         for (int i = 0; i < defaults.length; ++i)
-            defaults[i] = String.format("%06x", Client.Hearts.heartColors[i]);
+            defaults[i] = String.format("%06x", Client.Hearts.defaultHeartColors[i]);
 
         // Load the string list from config.
         String[] list = c.getStringList("Heart Colors", Config.CAT_CLIENT, defaults,
                 "The colors for each additional row of hearts. The colors will loop back around to the beginning if necessary. Use hexadecimal to specify colors (like HTML color codes).");
+        String[] listAbsorb = c.getStringList("Absorption Heart Colors", Config.CAT_CLIENT, defaults,
+                "The colors for each row of absorption hearts. Works the same way as \"Heart Colors\"");
 
         // Convert hex strings to ints.
         try {
             Client.Hearts.heartColors = new int[list.length];
             for (int i = 0; i < Client.Hearts.heartColors.length; ++i)
                 Client.Hearts.heartColors[i] = Integer.decode("0x" + list[i]);
+
+            Client.Hearts.absorptionHeartColors = new int[listAbsorb.length];
+            for (int i = 0; i < Client.Hearts.absorptionHeartColors.length; ++i)
+                Client.Hearts.absorptionHeartColors[i] = Integer.decode("0x" + listAbsorb[i]);
         } catch (NumberFormatException ex) {
             ScalingHealth.logHelper.warn("Failed to load heart colors because a value could not be parsed. Make sure all values are valid hexadecimal integers. Try using an online HTML color picker if you are having problems.");
             ex.printStackTrace();
