@@ -2,6 +2,7 @@ package net.silentchaos512.scalinghealth.capability;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.INBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
@@ -12,7 +13,11 @@ import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fml.network.NetworkDirection;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.difficulty.Difficulty;
+import net.silentchaos512.scalinghealth.network.ClientSyncMessage;
+import net.silentchaos512.scalinghealth.network.Network;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -47,7 +52,19 @@ public class CapabilityPlayerData implements IPlayerData, ICapabilitySerializabl
 
         // TODO: Health by XP
 
-        // TODO: Send update packet to client?
+        if (player.world.getGameTime() % 20 == 0 && player instanceof EntityPlayerMP) {
+            sendUpdatePacketTo(player);
+        }
+    }
+
+    private static void sendUpdatePacketTo(EntityPlayer player) {
+        ClientSyncMessage msg = new ClientSyncMessage(
+                Difficulty.source(player).getDifficulty(),
+                Difficulty.source(player.world).getDifficulty(),
+                (float) Difficulty.forPos(player.world, player.getPosition())
+        );
+        EntityPlayerMP playerMP = (EntityPlayerMP) player;
+        Network.channel.sendTo(msg, playerMP.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
     }
 
     @Nonnull

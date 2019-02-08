@@ -44,6 +44,7 @@ public final class DifficultyEvents {
     public static void onAttachWorldCapabilities(AttachCapabilitiesEvent<World> event) {
         World world = event.getObject();
         if (CapabilityDifficultySource.canAttachTo(world)) {
+            ScalingHealth.LOGGER.debug(MARKER, "Attaching difficulty source capability to {}", world);
             event.addCapability(CapabilityDifficultySource.NAME, new CapabilityDifficultySource());
         }
     }
@@ -53,39 +54,36 @@ public final class DifficultyEvents {
         EntityLivingBase entity = event.getEntityLiving();
         if (entity.world.isRemote) return;
 
-        entity.getCapability(CapabilityDifficultyAffected.INSTANCE).ifPresent(affected -> {
-            if (affected.getDifficulty() < 10) {
-//                ScalingHealth.LOGGER.debug(MARKER, "We found a {}! Difficulty={}", entity, affected.getDifficulty());
-                affected.tick(entity);
-            }
-        });
+        // Tick mobs, which will calculate difficulty when appropriate and apply changes
+        entity.getCapability(CapabilityDifficultyAffected.INSTANCE).ifPresent(affected -> affected.tick(entity));
+
+        // Tick difficulty source, such as players
         if (entity.world.getGameTime() % 20 == 0) {
             entity.getCapability(CapabilityDifficultySource.INSTANCE).ifPresent(source -> {
                 source.setDifficulty(source.getDifficulty() + 0.001f);
                 ScalingHealth.LOGGER.debug(MARKER, "Source {} difficulty is now {}", entity, source.getDifficulty());
             });
         }
-
-//        DimensionConfig config = Config.get(entity);
-//
-//        if (config.difficulty.maxValue.get() <= 0 || !healthIncreaseAllowed(entity, config))
-//            return;
-//
-//        applyDifficulty(entity, config);
     }
 
     @SubscribeEvent
     public static void onWorldTick(TickEvent.WorldTickEvent event) {
-        if (event.world.getGameTime() % 20 == 0) {
-            event.world.getCapability(CapabilityDifficultySource.INSTANCE).ifPresent(source -> {
+        World world = event.world;
+        if (world.isRemote) return;
+
+        // Tick world difficulty source
+        if (world.getGameTime() % 20 == 0) {
+            world.getCapability(CapabilityDifficultySource.INSTANCE).ifPresent(source -> {
                 source.setDifficulty(source.getDifficulty() + 0.001f);
-                ScalingHealth.LOGGER.debug(MARKER, "World {} difficulty is now {}", event.world, source.getDifficulty());
+                ScalingHealth.LOGGER.debug(MARKER, "World {} difficulty is now {}", world, source.getDifficulty());
             });
         }
     }
 
+    @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
         EntityPlayer player = event.player;
+        if (player.world.isRemote) return;
         player.getCapability(CapabilityPlayerData.INSTANCE).ifPresent(data -> data.tick(player));
     }
 
