@@ -4,6 +4,7 @@ import com.udojava.evalex.Expression;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.silentchaos512.scalinghealth.difficulty.Difficulty;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 
 import javax.annotation.Nullable;
@@ -32,8 +33,8 @@ public enum EvalVars {
             0
     ),
     AREA_PLAYER_COUNT("areaPlayerCount", ctx -> {
-//        long radiusSquared = ctx.config.difficulty.searchRadius.get() * ctx.config.difficulty.searchRadius.get();
-        long radiusSquared = 128 * 128;
+        long radius = Difficulty.searchRadius(ctx.world);
+        long radiusSquared = radius * radius;
         return ctx.world.getPlayers(EntityPlayer.class, p ->
                 radiusSquared == 0 || p.getDistanceSq(ctx.pos) <= radiusSquared)
                 .size();

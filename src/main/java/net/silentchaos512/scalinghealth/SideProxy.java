@@ -2,9 +2,12 @@ package net.silentchaos512.scalinghealth;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.event.lifecycle.*;
+import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLModLoadingContext;
 import net.silentchaos512.scalinghealth.capability.CapabilityDifficultyAffected;
 import net.silentchaos512.scalinghealth.capability.CapabilityDifficultySource;
+import net.silentchaos512.scalinghealth.capability.CapabilityPlayerData;
+import net.silentchaos512.scalinghealth.client.gui.DebugOverlay;
 import net.silentchaos512.scalinghealth.event.*;
 import net.silentchaos512.scalinghealth.init.*;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
@@ -34,12 +37,17 @@ class SideProxy {
     private void commonSetup(FMLCommonSetupEvent event) {
         CapabilityDifficultyAffected.register();
         CapabilityDifficultySource.register();
+        CapabilityPlayerData.register();
         DifficultyHandler.INSTANCE.initPotionMap();
     }
 
     private void imcEnqueue(InterModEnqueueEvent event) { }
 
     private void imcProcess(InterModProcessEvent event) { }
+
+    private void serverStarted(FMLServerStartedEvent event) {
+        ModGameRules.registerAll(event.getServer());
+    }
 
     static class Client extends SideProxy {
         Client() {
@@ -48,6 +56,8 @@ class SideProxy {
 //            MinecraftForge.EVENT_BUS.register(HeartDisplayHandler.INSTANCE);
 //            MinecraftForge.EVENT_BUS.register(DifficultyMeter.INSTANCE);
 //            MinecraftForge.EVENT_BUS.register(KeyTrackerSH.INSTANCE);
+
+            DebugOverlay.init();
         }
 
         private void clientSetup(FMLClientSetupEvent event) { }

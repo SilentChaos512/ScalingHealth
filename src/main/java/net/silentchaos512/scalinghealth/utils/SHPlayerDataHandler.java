@@ -214,9 +214,9 @@ public final class SHPlayerDataHandler {
             EntityPlayer player = playerWR.get();
             if (player != null) {
                 // Difficulty disabled via game rule?
-                if (!player.world.getGameRules().getBoolean(ScalingHealth.GAME_RULE_DIFFICULTY)) {
-                    return;
-                }
+//                if (!player.world.getGameRules().getBoolean(ScalingHealth.GAME_RULE_DIFFICULTY)) {
+//                    return;
+//                }
                 // Multiplier for this dimension?
 //                if (Config.Difficulty.DIFFICULTY_DIMENSION_MULTIPLIER.containsKey(player.dimension)) {
 //                    amount *= Config.Difficulty.DIFFICULTY_DIMENSION_MULTIPLIER.get(player.dimension);

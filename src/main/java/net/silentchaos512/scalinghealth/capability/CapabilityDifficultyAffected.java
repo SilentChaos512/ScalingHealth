@@ -13,6 +13,8 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.difficulty.Difficulty;
+import net.silentchaos512.scalinghealth.difficulty.DifficultyEvents;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -22,11 +24,14 @@ public class CapabilityDifficultyAffected implements IDifficultyAffected, ICapab
     public static Capability<IDifficultyAffected> INSTANCE = null;
     public static ResourceLocation NAME = ScalingHealth.res("difficulty_affected");
 
+    private static final String NBT_BLIGHT = "Blight";
     private static final String NBT_DIFFICULTY = "Difficulty";
 
     private final LazyOptional<IDifficultyAffected> holder = LazyOptional.of(() -> this);
 
     private float difficulty;
+    private boolean blight;
+    private boolean processed;
 
     @Override
     public float getDifficulty() {
@@ -38,6 +43,21 @@ public class CapabilityDifficultyAffected implements IDifficultyAffected, ICapab
         difficulty = value;
     }
 
+    @Override
+    public boolean isBlight() {
+        return blight;
+    }
+
+    @Override
+    public void tick(EntityLivingBase entity) {
+        if (!processed && difficulty == 0 && entity.ticksExisted > 20) {
+            difficulty = (float) Difficulty.forPos(entity.world, entity.getPosition());
+            ScalingHealth.LOGGER.debug(DifficultyEvents.MARKER, "Set difficulty of {} to {}", entity, difficulty);
+            // TODO: Modify health, set blight flag
+            processed = true;
+        }
+    }
+
     @Nonnull
     @Override
     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable EnumFacing side) {
@@ -47,19 +67,20 @@ public class CapabilityDifficultyAffected implements IDifficultyAffected, ICapab
     @Override
     public NBTTagCompound serializeNBT() {
         NBTTagCompound nbt = new NBTTagCompound();
+        nbt.setBoolean(NBT_BLIGHT, blight);
         nbt.setFloat(NBT_DIFFICULTY, difficulty);
         return nbt;
     }
 
     @Override
     public void deserializeNBT(NBTTagCompound nbt) {
+        blight = nbt.getBoolean(NBT_BLIGHT);
         difficulty = nbt.getFloat(NBT_DIFFICULTY);
     }
 
     public static boolean canAttachTo(Entity entity) {
-        return !entity.getCapability(INSTANCE).isPresent()
-                && entity instanceof EntityLivingBase
-                && !(entity instanceof EntityPlayer);
+        if (entity.getCapability(INSTANCE).isPresent()) return false;
+        return entity instanceof EntityLivingBase && !(entity instanceof EntityPlayer);
     }
 
     public static void register() {

@@ -2,6 +2,7 @@ package net.silentchaos512.scalinghealth.difficulty;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -11,6 +12,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.CapabilityDifficultyAffected;
 import net.silentchaos512.scalinghealth.capability.CapabilityDifficultySource;
+import net.silentchaos512.scalinghealth.capability.CapabilityPlayerData;
 import net.silentchaos512.scalinghealth.config.DimensionConfig;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
@@ -18,7 +20,6 @@ import org.apache.logging.log4j.MarkerManager;
 @Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID)
 public final class DifficultyEvents {
     public static final Marker MARKER = MarkerManager.getMarker("Difficulty");
-    public static final String NBT_ENTITY_DIFFICULTY = ScalingHealth.RESOURCE_PREFIX + "difficulty";
 
     private DifficultyEvents() {}
 
@@ -33,10 +34,14 @@ public final class DifficultyEvents {
             ScalingHealth.LOGGER.debug(MARKER, "Attaching difficulty source capability to {}", entity);
             event.addCapability(CapabilityDifficultySource.NAME, new CapabilityDifficultySource());
         }
+        if (CapabilityPlayerData.canAttachTo(entity)) {
+            ScalingHealth.LOGGER.debug(MARKER, "Attaching player data capability to {}", entity);
+            event.addCapability(CapabilityPlayerData.NAME, new CapabilityPlayerData());
+        }
     }
 
     @SubscribeEvent
-    public static void onAttachWorldCababilities(AttachCapabilitiesEvent<World> event) {
+    public static void onAttachWorldCapabilities(AttachCapabilitiesEvent<World> event) {
         World world = event.getObject();
         if (CapabilityDifficultySource.canAttachTo(world)) {
             event.addCapability(CapabilityDifficultySource.NAME, new CapabilityDifficultySource());
@@ -48,10 +53,10 @@ public final class DifficultyEvents {
         EntityLivingBase entity = event.getEntityLiving();
         if (entity.world.isRemote) return;
 
-        entity.getCapability(CapabilityDifficultyAffected.INSTANCE).ifPresent(iDifficultyAffected -> {
-            if (iDifficultyAffected.getDifficulty() < 10) {
-                ScalingHealth.LOGGER.debug(MARKER, "We found a {}! Difficulty={}", entity, iDifficultyAffected.getDifficulty());
-                iDifficultyAffected.setDifficulty(iDifficultyAffected.getDifficulty() + 5);
+        entity.getCapability(CapabilityDifficultyAffected.INSTANCE).ifPresent(affected -> {
+            if (affected.getDifficulty() < 10) {
+//                ScalingHealth.LOGGER.debug(MARKER, "We found a {}! Difficulty={}", entity, affected.getDifficulty());
+                affected.tick(entity);
             }
         });
         if (entity.world.getGameTime() % 20 == 0) {
@@ -77,6 +82,11 @@ public final class DifficultyEvents {
                 ScalingHealth.LOGGER.debug(MARKER, "World {} difficulty is now {}", event.world, source.getDifficulty());
             });
         }
+    }
+
+    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        EntityPlayer player = event.player;
+        player.getCapability(CapabilityPlayerData.INSTANCE).ifPresent(data -> data.tick(player));
     }
 
     private static void applyDifficulty(EntityLivingBase entity, DimensionConfig config) {

@@ -17,8 +17,6 @@ public class ScalingHealth {
     public static final int BUILD_NUM = 0;
     public static final String RESOURCE_PREFIX = MOD_ID + ":";
 
-    public static final String GAME_RULE_DIFFICULTY = "ScalingHealthDifficulty";
-
     public static final Random random = new Random();
 
     private static ScalingHealth INSTANCE;
