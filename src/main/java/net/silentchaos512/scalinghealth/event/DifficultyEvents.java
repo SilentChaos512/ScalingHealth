@@ -1,4 +1,4 @@
-package net.silentchaos512.scalinghealth.difficulty;
+package net.silentchaos512.scalinghealth.event;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;

@@ -31,7 +31,7 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IDifficultySource;
-import net.silentchaos512.scalinghealth.difficulty.Difficulty;
+import net.silentchaos512.scalinghealth.utils.Difficulty;
 
 import java.util.List;
 

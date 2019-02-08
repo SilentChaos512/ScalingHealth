@@ -28,7 +28,7 @@ import net.minecraft.util.JsonUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.storage.loot.properties.EntityProperty;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.difficulty.Difficulty;
+import net.silentchaos512.scalinghealth.utils.Difficulty;
 
 import java.util.Random;
 

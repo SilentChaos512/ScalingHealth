@@ -3,7 +3,7 @@ package net.silentchaos512.scalinghealth.utils;
 import net.minecraft.entity.player.EntityPlayer;
 
 /**
- * Utility class for player-related settings. Same as with {@link net.silentchaos512.scalinghealth.difficulty.Difficulty},
+ * Utility class for player-related settings. Same as with {@link Difficulty},
  * this should put a stop to the tangled mess of config references.
  */
 public final class Players {

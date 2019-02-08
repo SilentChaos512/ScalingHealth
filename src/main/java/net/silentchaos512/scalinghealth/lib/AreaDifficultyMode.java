@@ -24,7 +24,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IDifficultySource;
-import net.silentchaos512.scalinghealth.difficulty.Difficulty;
+import net.silentchaos512.scalinghealth.utils.Difficulty;
 
 import java.util.Collection;
 

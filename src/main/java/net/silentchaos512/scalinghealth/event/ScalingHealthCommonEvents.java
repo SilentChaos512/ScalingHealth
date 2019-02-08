@@ -31,7 +31,7 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
-import net.silentchaos512.scalinghealth.difficulty.Difficulty;
+import net.silentchaos512.scalinghealth.utils.Difficulty;
 import net.silentchaos512.scalinghealth.lib.module.ModuleAprilTricks;
 
 import javax.annotation.Nullable;

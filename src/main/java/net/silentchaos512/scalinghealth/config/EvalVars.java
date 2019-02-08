@@ -4,7 +4,7 @@ import com.udojava.evalex.Expression;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.silentchaos512.scalinghealth.difficulty.Difficulty;
+import net.silentchaos512.scalinghealth.utils.Difficulty;
 
 import javax.annotation.Nullable;
 import java.util.function.Function;

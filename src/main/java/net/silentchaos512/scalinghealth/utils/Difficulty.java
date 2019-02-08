@@ -1,4 +1,4 @@
-package net.silentchaos512.scalinghealth.difficulty;
+package net.silentchaos512.scalinghealth.utils;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.Tuple;

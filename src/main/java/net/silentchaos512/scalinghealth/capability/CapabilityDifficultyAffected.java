@@ -13,8 +13,8 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.difficulty.Difficulty;
-import net.silentchaos512.scalinghealth.difficulty.DifficultyEvents;
+import net.silentchaos512.scalinghealth.utils.Difficulty;
+import net.silentchaos512.scalinghealth.event.DifficultyEvents;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
