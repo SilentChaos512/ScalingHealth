@@ -5,7 +5,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.silentchaos512.scalinghealth.difficulty.Difficulty;
-import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 
 import javax.annotation.Nullable;
 import java.util.function.Function;
@@ -21,20 +20,17 @@ public enum EvalVars {
             ctx.player != null ? ctx.player.getFoodStats().getFoodLevel() : 0
     ),
     PLAYER_DIFFICULTY("difficulty", ctx -> {
-        SHPlayerDataHandler.PlayerData data = SHPlayerDataHandler.get(ctx.player);
-        return data != null ? data.getDifficulty() : 0;
+        if (ctx.player == null) return 0;
+        return Difficulty.source(ctx.player).getDifficulty();
     }),
     MAX_DIFFICULTY("maxDifficulty", ctx ->
-//            ctx.config.difficulty.maxValue.get()
-            250
+            Difficulty.maxValue(ctx.world)
     ),
     AREA_DIFFICULTY("areaDifficulty", ctx ->
-//            ctx.config.difficulty.areaMode.get().getAreaDifficulty(ctx.world, ctx.pos)
-            0
+            Difficulty.forPos(ctx.world, ctx.pos)
     ),
     AREA_PLAYER_COUNT("areaPlayerCount", ctx -> {
-        long radius = Difficulty.searchRadius(ctx.world);
-        long radiusSquared = radius * radius;
+        long radiusSquared = Difficulty.searchRadiusSquared(ctx.world);
         return ctx.world.getPlayers(EntityPlayer.class, p ->
                 radiusSquared == 0 || p.getDistanceSq(ctx.pos) <= radiusSquared)
                 .size();

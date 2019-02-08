@@ -18,14 +18,17 @@
 
 package net.silentchaos512.scalinghealth.loot.properties;
 
-import com.google.gson.*;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.JsonUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.storage.loot.properties.EntityProperty;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.event.BlightHandler;
+import net.silentchaos512.scalinghealth.difficulty.Difficulty;
 
 import java.util.Random;
 
@@ -38,7 +41,8 @@ public class PropertyBlight implements EntityProperty {
 
     @Override
     public boolean testProperty(Random random, Entity entityIn) {
-        return entityIn instanceof EntityLivingBase && this.isBlight == BlightHandler.isBlight((EntityLivingBase) entityIn);
+        return entityIn instanceof EntityLivingBase
+                && this.isBlight == Difficulty.affected(entityIn).isBlight();
     }
 
     public static class Serializer extends EntityProperty.Serializer<PropertyBlight> {

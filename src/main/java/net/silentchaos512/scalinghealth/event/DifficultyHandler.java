@@ -25,6 +25,7 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.utils.EquipmentTierMap;
 import net.silentchaos512.scalinghealth.utils.MobPotionMap;
 
+@Deprecated
 public class DifficultyHandler {
     public static final String NBT_ENTITY_DIFFICULTY = ScalingHealth.RESOURCE_PREFIX + "difficulty";
     public static DifficultyHandler INSTANCE = new DifficultyHandler();

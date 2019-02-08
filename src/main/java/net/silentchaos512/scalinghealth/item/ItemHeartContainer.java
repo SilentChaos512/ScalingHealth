@@ -33,8 +33,9 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
-import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
+import net.silentchaos512.scalinghealth.capability.CapabilityPlayerData;
+import net.silentchaos512.scalinghealth.capability.IPlayerData;
+import net.silentchaos512.scalinghealth.utils.Players;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -59,8 +60,8 @@ public class ItemHeartContainer extends Item {
         ItemStack stack = player.getHeldItem(hand);
 
         if (!world.isRemote) {
-            PlayerData data = SHPlayerDataHandler.get(player);
-            if (data == null) return ActionResult.newResult(EnumActionResult.PASS, stack);
+            IPlayerData data = player.getCapability(CapabilityPlayerData.INSTANCE).orElseThrow(() ->
+                    new IllegalStateException("Player data is null! " + player));
 
             final boolean healthIncreaseAllowed = isHealthIncreaseAllowed(player, data);
             final int levelRequirement = getLevelsRequiredToUse(player, stack, healthIncreaseAllowed);
@@ -118,8 +119,8 @@ public class ItemHeartContainer extends Item {
         }
     }
 
-    private void useForHealthIncrease(World world, EntityPlayer player, ItemStack stack, PlayerData data, int levelRequirement) {
-        data.incrementMaxHealth(2);
+    private void useForHealthIncrease(World world, EntityPlayer player, ItemStack stack, IPlayerData data, int levelRequirement) {
+        data.addHeart(player);
         stack.shrink(1);
         spawnParticlesAndPlaySound(world, player);
         consumeLevels(player, levelRequirement);
@@ -136,11 +137,11 @@ public class ItemHeartContainer extends Item {
         player.experienceLevel -= amount;
     }
 
-    private static boolean isHealthIncreaseAllowed(EntityPlayer player, PlayerData data) {
+    private static boolean isHealthIncreaseAllowed(EntityPlayer player, IPlayerData data) {
 //        DimensionConfig config = Config.get(player);
 //        Integer max = config.player.maxHealth.get();
 //        return Config.Items.Heart.increaseHealth && (max == 0 || data.getMaxHealth() < max);
-        return true;
+        return data.getExtraHearts() < Players.maxHeartContainers(player);
     }
 
     private static void spawnParticlesAndPlaySound(World world, EntityPlayer player) {

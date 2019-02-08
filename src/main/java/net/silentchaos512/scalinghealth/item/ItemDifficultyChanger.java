@@ -30,8 +30,8 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
-import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
+import net.silentchaos512.scalinghealth.capability.IDifficultySource;
+import net.silentchaos512.scalinghealth.difficulty.Difficulty;
 
 import java.util.List;
 
@@ -70,11 +70,7 @@ public class ItemDifficultyChanger extends Item {
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
-        PlayerData data = SHPlayerDataHandler.get(player);
-
-        if (data == null) {
-            return new ActionResult<>(EnumActionResult.PASS, stack);
-        }
+        IDifficultySource source = Difficulty.source(player);
 
         double particleX = player.posX;
         double particleY = player.posY + 0.65f * player.height;
@@ -82,7 +78,7 @@ public class ItemDifficultyChanger extends Item {
 
         if (!world.isRemote) {
             float change = getEffectAmount(stack);
-            data.incrementDifficulty(change);
+            source.addDifficulty(change);
             stack.shrink(1);
         }
 

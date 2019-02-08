@@ -28,6 +28,7 @@ import net.minecraft.util.JsonUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.storage.loot.properties.EntityProperty;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.difficulty.Difficulty;
 
 import java.util.Random;
 
@@ -43,9 +44,8 @@ public class PropertyDifficulty implements EntityProperty {
     @Override
     public boolean testProperty(Random random, Entity entityIn) {
         if ( entityIn instanceof EntityLivingBase) {
-//            double difficulty = ScalingHealthAPI.getEntityDifficulty((EntityLivingBase) entityIn);
-//            difficulty /= Config.Mob.Blight.difficultyMultiplier;
-//            return difficulty >= this.min && difficulty <= this.max;
+            double difficulty = Difficulty.affected(entityIn).getDifficulty();
+            return difficulty >= this.min && difficulty <= this.max;
         }
         return false;
     }

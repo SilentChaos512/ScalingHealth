@@ -9,5 +9,14 @@ public interface IDifficultyAffected {
 
     boolean isBlight();
 
+    default float affectiveDifficulty() {
+        // TODO: Blight difficulty config
+        return isBlight() ? 3 * getDifficulty() : getDifficulty();
+    }
+
+    default int getDisplayLevel() {
+        return (int) (getDifficulty() / 3);
+    }
+
     void tick(EntityLivingBase entity);
 }

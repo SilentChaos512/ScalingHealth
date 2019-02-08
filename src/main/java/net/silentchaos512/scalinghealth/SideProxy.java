@@ -10,7 +10,6 @@ import net.silentchaos512.scalinghealth.capability.CapabilityPlayerData;
 import net.silentchaos512.scalinghealth.client.gui.DebugOverlay;
 import net.silentchaos512.scalinghealth.event.*;
 import net.silentchaos512.scalinghealth.init.*;
-import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 
 class SideProxy {
     SideProxy() {
@@ -27,8 +26,6 @@ class SideProxy {
         MinecraftForge.EVENT_BUS.addListener(ModSounds::registerAll);
 
         MinecraftForge.EVENT_BUS.register(new ScalingHealthCommonEvents());
-        MinecraftForge.EVENT_BUS.register(new SHPlayerDataHandler.EventHandler());
-        MinecraftForge.EVENT_BUS.register(DifficultyHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(BlightHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(PetEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(DamageScaling.INSTANCE);

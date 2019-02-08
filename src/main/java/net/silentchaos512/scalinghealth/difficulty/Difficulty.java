@@ -15,6 +15,10 @@ import net.silentchaos512.scalinghealth.lib.AreaDifficultyMode;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * Master utility class for difficulty-related stuff. Any calls should be done through this class
+ * whenever possible, to prevent the tangled mess of config references from earlier versions.
+ */
 public final class Difficulty {
     private Difficulty() {throw new IllegalAccessError("Utility class");}
 
@@ -33,7 +37,7 @@ public final class Difficulty {
         Collection<Tuple<BlockPos, IDifficultySource>> list = new ArrayList<>();
 
         // Get players
-        for (EntityPlayer player : world.getPlayers(EntityPlayer.class, p -> p.getDistanceSq(center) < rsq)) {
+        for (EntityPlayer player : world.getPlayers(EntityPlayer.class, p -> rsq == 0 || p.getDistanceSq(center) < rsq)) {
             player.getCapability(CapabilityDifficultySource.INSTANCE).ifPresent(source ->
                     list.add(new Tuple<>(player.getPosition(), source)));
         }

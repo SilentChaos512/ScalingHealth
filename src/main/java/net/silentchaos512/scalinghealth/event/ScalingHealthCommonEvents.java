@@ -31,9 +31,8 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
+import net.silentchaos512.scalinghealth.difficulty.Difficulty;
 import net.silentchaos512.scalinghealth.lib.module.ModuleAprilTricks;
-import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
-import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
 import javax.annotation.Nullable;
 
@@ -240,10 +239,8 @@ public class ScalingHealthCommonEvents {
     public void onPlayerWakeUp(PlayerWakeUpEvent event) {
         if (!event.getEntityPlayer().world.isRemote && !event.updateWorld()) {
             EntityPlayer player = event.getEntityPlayer();
-            PlayerData data = SHPlayerDataHandler.get(player);
-            if (data != null) {
-//                data.incrementDifficulty(Config.Difficulty.forSleeping, false);
-            }
+            // TODO: Sleep difficulty change config
+            Difficulty.source(player).addDifficulty(0);
 
             // TODO: World difficulty increase?
         }
