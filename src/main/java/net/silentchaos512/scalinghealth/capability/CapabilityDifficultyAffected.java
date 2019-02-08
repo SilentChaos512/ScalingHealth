@@ -16,7 +16,6 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.naming.spi.ResolveResult;
 
 public class CapabilityDifficultyAffected implements IDifficultyAffected, ICapabilitySerializable<NBTTagCompound> {
     @CapabilityInject(IDifficultyAffected.class)

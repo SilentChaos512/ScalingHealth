@@ -28,8 +28,6 @@ import net.minecraft.util.JsonUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.storage.loot.properties.EntityProperty;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.api.ScalingHealthAPI;
-import net.silentchaos512.scalinghealth.config.Config;
 
 import java.util.Random;
 
@@ -45,16 +43,16 @@ public class PropertyDifficulty implements EntityProperty {
     @Override
     public boolean testProperty(Random random, Entity entityIn) {
         if ( entityIn instanceof EntityLivingBase) {
-            double difficulty = ScalingHealthAPI.getEntityDifficulty((EntityLivingBase) entityIn);
-            difficulty /= Config.Mob.Blight.difficultyMultiplier;
-            return difficulty >= this.min && difficulty <= this.max;
+//            double difficulty = ScalingHealthAPI.getEntityDifficulty((EntityLivingBase) entityIn);
+//            difficulty /= Config.Mob.Blight.difficultyMultiplier;
+//            return difficulty >= this.min && difficulty <= this.max;
         }
         return false;
     }
 
     public static class Serializer extends EntityProperty.Serializer<PropertyDifficulty> {
         public Serializer() {
-            super(new ResourceLocation(ScalingHealth.MOD_ID_LOWER, "difficulty"), PropertyDifficulty.class);
+            super(new ResourceLocation(ScalingHealth.MOD_ID, "difficulty"), PropertyDifficulty.class);
         }
 
         @Override

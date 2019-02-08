@@ -20,39 +20,33 @@ package net.silentchaos512.scalinghealth.item;
 
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraft.stats.StatBase;
-import net.minecraft.stats.StatList;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
-import net.silentchaos512.lib.util.ChatHelper;
-import net.silentchaos512.lib.util.Color;
-import net.silentchaos512.lib.util.EntityHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.config.Config;
-import net.silentchaos512.scalinghealth.init.ModSounds;
-import net.silentchaos512.scalinghealth.lib.EnumModParticles;
-import net.silentchaos512.scalinghealth.network.NetworkHandler;
-import net.silentchaos512.scalinghealth.network.message.MessageDataSync;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class ItemHeartContainer extends Item {
+    public ItemHeartContainer() {
+        super(new Builder().group(ItemGroup.MISC));
+    }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag flag) {
-        list.add(ScalingHealth.i18n.subText(this, "desc"));
+    public void addInformation(ItemStack stack, World world, List<ITextComponent> list, ITooltipFlag flag) {
+        list.add(new TextComponentTranslation("item.scalinghealth.heart_container.desc"));
     }
 
     @Override
@@ -68,17 +62,17 @@ public class ItemHeartContainer extends Item {
             PlayerData data = SHPlayerDataHandler.get(player);
             if (data == null) return ActionResult.newResult(EnumActionResult.PASS, stack);
 
-            final boolean healthIncreaseAllowed = isHealthIncreaseAllowed(data);
+            final boolean healthIncreaseAllowed = isHealthIncreaseAllowed(player, data);
             final int levelRequirement = getLevelsRequiredToUse(player, stack, healthIncreaseAllowed);
 
             // Does player have enough XP?
             if (player.experienceLevel < levelRequirement) {
-                ChatHelper.translateStatus(player, ScalingHealth.i18n.getKey(this, "notEnoughXP"), true, levelRequirement);
+                player.sendMessage(new TextComponentTranslation("item.scalinghealth.heart_container.notEnoughXP", levelRequirement));
                 return ActionResult.newResult(EnumActionResult.PASS, stack);
             }
 
             // Heal the player (this is separate from the "healing" of the newly added heart, if that's allowed).
-            final boolean consumed = Config.Items.Heart.healthRestored > 0 && player.getHealth() < player.getMaxHealth();
+            final boolean consumed = true; //Config.Items.Heart.healthRestored > 0 && player.getHealth() < player.getMaxHealth();
             if (consumed) {
                 doExtraHealing(player);
             }
@@ -95,17 +89,19 @@ public class ItemHeartContainer extends Item {
     }
 
     private static void doExtraHealing(EntityPlayer player) {
+        /*
         int current = (int) player.getHealth();
         EntityHelper.heal(player, Config.Items.Heart.healthRestored, Config.Items.Heart.healingEvent);
         int newHealth = (int) player.getHealth();
         if (current + Config.Items.Heart.healthRestored != newHealth) {
-            ScalingHealth.logHelper.warn("Another mod seems to have canceled healing from a heart container (player {})", player.getName());
+            ScalingHealth.LOGGER.warn("Another mod seems to have canceled healing from a heart container (player {})", player.getName());
         }
+        */
     }
 
     private void incrementUseStat(EntityPlayer player) {
-        StatBase useStat = StatList.getObjectUseStats(this);
-        if (useStat != null) player.addStat(useStat);
+//        StatBase useStat = StatList.getObjectUseStats(this);
+//        if (useStat != null) player.addStat(useStat);
     }
 
     @Nonnull
@@ -128,24 +124,27 @@ public class ItemHeartContainer extends Item {
         spawnParticlesAndPlaySound(world, player);
         consumeLevels(player, levelRequirement);
         incrementUseStat(player);
-        NetworkHandler.INSTANCE.sendTo(new MessageDataSync(data, player), (EntityPlayerMP) player);
+//        NetworkHandler.INSTANCE.sendTo(new MessageDataSync(data, player), (EntityPlayerMP) player);
     }
 
     private static int getLevelsRequiredToUse(EntityPlayer player, ItemStack stack, boolean healthIncreaseAllowed) {
-        return player.capabilities.isCreativeMode ? 0 : Config.Items.Heart.xpCost;
+//        return player.abilities.isCreativeMode ? 0 : Config.Items.Heart.xpCost;
+        return 3;
     }
 
     private static void consumeLevels(EntityPlayer player, int amount) {
         player.experienceLevel -= amount;
     }
 
-    private static boolean isHealthIncreaseAllowed(PlayerData data) {
-        return Config.Items.Heart.increaseHealth
-                && (Config.Player.Health.maxHealth == 0
-                || data.getMaxHealth() < Config.Player.Health.maxHealth);
+    private static boolean isHealthIncreaseAllowed(EntityPlayer player, PlayerData data) {
+//        DimensionConfig config = Config.get(player);
+//        Integer max = config.player.maxHealth.get();
+//        return Config.Items.Heart.increaseHealth && (max == 0 || data.getMaxHealth() < max);
+        return true;
     }
 
     private static void spawnParticlesAndPlaySound(World world, EntityPlayer player) {
+        /*
         double particleX = player.posX;
         double particleY = player.posY + 0.65f * player.height;
         double particleZ = player.posZ;
@@ -158,5 +157,6 @@ public class ItemHeartContainer extends Item {
         }
         ScalingHealth.proxy.playSoundOnClient(player, ModSounds.HEART_CONTAINER_USE,
                 0.5f, 1.0f + 0.1f * (float) ScalingHealth.random.nextGaussian());
+        */
     }
 }

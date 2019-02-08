@@ -19,72 +19,52 @@
 package net.silentchaos512.scalinghealth.item;
 
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.*;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
-import net.silentchaos512.lib.registry.ICustomModel;
-import net.silentchaos512.lib.util.Color;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.config.Config;
-import net.silentchaos512.scalinghealth.init.ModSounds;
-import net.silentchaos512.scalinghealth.lib.EnumModParticles;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
-import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Locale;
 
-public class ItemDifficultyChanger extends Item implements ICustomModel {
-    enum Type {
-        ENCHANTED, CURSED; // down (0), up (1)
-
-        static Type getByMeta(int meta) {
-            return values()[meta & 1];
-        }
-
-        public String getItemName() {
-            return name().toLowerCase(Locale.ROOT) + "_heart";
-        }
-
-        public int getItemDamage() {
-            return ordinal();
-        }
+public class ItemDifficultyChanger extends Item {
+    public enum Type {
+        ENCHANTED, CURSED
     }
 
-    public ItemDifficultyChanger() {
-        setHasSubtypes(true);
+    private final Type type;
+
+    public ItemDifficultyChanger(Type type) {
+        super(new Item.Builder());
+        this.type = type;
+    }
+
+    public float getEffectAmount(ItemStack stack) {
+//        if (type == Type.CURSED)
+//            return Config.Items.cursedHeartChange;
+//        else
+//            return Config.Items.enchantedHeartChange;
+        return 0;
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<String> list, ITooltipFlag flag) {
-        if (stack.getItemDamage() > 1) return;
-
-        String amountStr = String.format("%d", stack.getItemDamage() == Type.ENCHANTED.ordinal()
-                ? (int) Config.Items.enchantedHeartChange
-                : (int) Config.Items.cursedHeartChange);
-        if (amountStr.matches("^\\d+"))
-            amountStr = "+" + amountStr;
-
-        String line = ScalingHealth.i18n.itemSubText("difficultychanger", "effectDesc", amountStr);
-        list.add(TextFormatting.WHITE + line);
+    public void addInformation(ItemStack stack, World world, List<ITextComponent> list, ITooltipFlag flag) {
+        float amount = getEffectAmount(stack);
+        String amountStr = (amount > 0 ? "+" : "") + String.format("%.1f", amount);
+        list.add(new TextComponentTranslation("item.scalinghealth.difficulty_changer.effectDesc", amountStr));
     }
 
     @Override
     public EnumRarity getRarity(ItemStack stack) {
         return EnumRarity.EPIC;
-    }
-
-    @Override
-    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> list) {
-        if (!isInCreativeTab(tab)) return;
-        for (Type type : Type.values())
-            list.add(new ItemStack(this, 1, type.getItemDamage()));
     }
 
     @Override
@@ -100,62 +80,49 @@ public class ItemDifficultyChanger extends Item implements ICustomModel {
         double particleY = player.posY + 0.65f * player.height;
         double particleZ = player.posZ;
 
-        switch (Type.getByMeta(stack.getItemDamage())) {
+        if (!world.isRemote) {
+            float change = getEffectAmount(stack);
+            data.incrementDifficulty(change);
+            stack.shrink(1);
+        }
+
+        switch (this.type) {
             // Enchanted Heart
             case ENCHANTED:
-                // Lower difficulty, consume 1 from stack.
-                if (!world.isRemote) {
-                    data.incrementDifficulty(Config.Items.enchantedHeartChange);
-                    stack.shrink(1);
-                }
-
-                // Particles and sound effect!
-                for (int i = 0; i < 20 - 5 * ScalingHealth.proxy.getParticleSettings(); ++i) {
-                    double xSpeed = 0.08 * ScalingHealth.random.nextGaussian();
-                    double ySpeed = 0.05 * ScalingHealth.random.nextGaussian();
-                    double zSpeed = 0.08 * ScalingHealth.random.nextGaussian();
-                    ScalingHealth.proxy.spawnParticles(EnumModParticles.ENCHANTED_HEART,
-                            new Color(1f, 1f, 0.5f), world, particleX, particleY, particleZ, xSpeed, ySpeed, zSpeed);
-                }
-                world.playSound(null, player.getPosition(), ModSounds.ENCHANTED_HEART_USE,
-                        SoundCategory.PLAYERS, 0.4f, 1.7f);
-
+                enchantedHeartEffects(world, player, particleX, particleY, particleZ);
                 return new ActionResult<>(EnumActionResult.SUCCESS, stack);
             // Cursed Heart
             case CURSED:
-                // Raise difficulty, consume 1 from stack.
-                if (!world.isRemote) {
-                    data.incrementDifficulty(Config.Items.cursedHeartChange);
-                    stack.shrink(1);
-                }
-
-                // Particles and sound effect!
-                for (int i = 0; i < 20 - 5 * ScalingHealth.proxy.getParticleSettings(); ++i) {
-                    double xSpeed = 0.08 * ScalingHealth.random.nextGaussian();
-                    double ySpeed = 0.05 * ScalingHealth.random.nextGaussian();
-                    double zSpeed = 0.08 * ScalingHealth.random.nextGaussian();
-                    ScalingHealth.proxy.spawnParticles(EnumModParticles.CURSED_HEART,
-                            new Color(0.4f, 0f, 0.6f), world, particleX, particleY, particleZ, xSpeed, ySpeed, zSpeed);
-                }
-                world.playSound(null, player.getPosition(), ModSounds.CURSED_HEART_USE,
-                        SoundCategory.PLAYERS, 0.3f,
-                        (float) (0.7f + 0.05f * ScalingHealth.random.nextGaussian()));
-
+                cursedHeartEffects(world, player, particleX, particleY, particleZ);
                 return new ActionResult<>(EnumActionResult.SUCCESS, stack);
             default:
-                ScalingHealth.logHelper.warn("DifficultyChanger invalid meta: {}", stack.getItemDamage());
+                ScalingHealth.LOGGER.error("ItemDifficultyChanger invalid type: {}", this.type);
                 return new ActionResult<>(EnumActionResult.PASS, stack);
         }
     }
 
-    @Override
-    public String getTranslationKey(ItemStack stack) {
-        return ScalingHealth.i18n.getKey("item", Type.getByMeta(stack.getItemDamage()).getItemName());
+    private void cursedHeartEffects(World world, EntityPlayer player, double particleX, double particleY, double particleZ) {
+//        for (int i = 0; i < 20 - 5 * ScalingHealth.proxy.getParticleSettings(); ++i) {
+//            double xSpeed = 0.08 * ScalingHealth.random.nextGaussian();
+//            double ySpeed = 0.05 * ScalingHealth.random.nextGaussian();
+//            double zSpeed = 0.08 * ScalingHealth.random.nextGaussian();
+//            ScalingHealth.proxy.spawnParticles(EnumModParticles.CURSED_HEART,
+//                    new Color(0.4f, 0f, 0.6f), world, particleX, particleY, particleZ, xSpeed, ySpeed, zSpeed);
+//        }
+//        world.playSound(null, player.getPosition(), ModSounds.CURSED_HEART_USE,
+//                SoundCategory.PLAYERS, 0.3f,
+//                (float) (0.7f + 0.05f * ScalingHealth.random.nextGaussian()));
     }
 
-    @Override
-    public void registerModels() {
-        for (Type type : Type.values())
-            ScalingHealth.registry.setModel(this, type.getItemDamage(), type.getItemName());
+    private void enchantedHeartEffects(World world, EntityPlayer player, double particleX, double particleY, double particleZ) {
+//        for (int i = 0; i < 20 - 5 * ScalingHealth.proxy.getParticleSettings(); ++i) {
+//            double xSpeed = 0.08 * ScalingHealth.random.nextGaussian();
+//            double ySpeed = 0.05 * ScalingHealth.random.nextGaussian();
+//            double zSpeed = 0.08 * ScalingHealth.random.nextGaussian();
+//            ScalingHealth.proxy.spawnParticles(EnumModParticles.ENCHANTED_HEART,
+//                    new Color(1f, 1f, 0.5f), world, particleX, particleY, particleZ, xSpeed, ySpeed, zSpeed);
+//        }
+//        world.playSound(null, player.getPosition(), ModSounds.ENCHANTED_HEART_USE,
+//                SoundCategory.PLAYERS, 0.4f, 1.7f);
     }
 }

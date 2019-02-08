@@ -22,14 +22,11 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
-import net.minecraft.entity.player.EntityPlayer;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.config.Config;
 
 import java.util.UUID;
 
 public class ModifierHandler {
-
     public static final UUID MODIFIER_ID_HEALTH = UUID.fromString("c0bef565-35f6-4dc5-bb4c-3644c382e6ce");
     public static final UUID MODIFIER_ID_DAMAGE = UUID.fromString("d3560b15-c459-451c-86a8-0247015ae899");
     public static final String MODIFIER_NAME_HEALTH = ScalingHealth.MOD_ID_OLD + ".HealthModifier";
@@ -55,21 +52,21 @@ public class ModifierHandler {
 
     public static void setMaxHealth(EntityLivingBase entity, double amount, int op) {
         if (amount <= 0) {
-            ScalingHealth.logHelper.warn("ModifierHandler.setMaxHealth: amount <= 0!");
+            ScalingHealth.LOGGER.warn("ModifierHandler.setMaxHealth: amount <= 0!");
             return;
         }
 
+        /*
         if (entity instanceof EntityPlayer && !Config.Player.Health.allowModify) {
             // It's a player, but the user has disallowed Scaling Health from modifying the player's health.
-            ScalingHealth.logHelper.info(String.format(
-                    "Would have set player %s's health to %.1f, but modified player health has been disabled"
-                            + " in the config!",
-                    entity.getName(), amount));
+            ScalingHealth.LOGGER.info("Would have set player {}'s health to {}, but modified player health has been disabled in the config!",
+                    entity.getName(), amount);
             return;
         }
+        */
 
         float originalHealth = entity.getHealth();
-        IAttributeInstance attr = entity.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
+        IAttributeInstance attr = entity.getAttribute(SharedMonsterAttributes.MAX_HEALTH);
         if (attr != null) {
             setModifier(attr, MODIFIER_ID_HEALTH, MODIFIER_NAME_HEALTH, amount, op);
             entity.setHealth(originalHealth);
@@ -77,7 +74,7 @@ public class ModifierHandler {
     }
 
     public static void addAttackDamage(EntityLivingBase entity, double amount, int op) {
-        IAttributeInstance attr = entity.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
+        IAttributeInstance attr = entity.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
         if (attr != null) {
             amount += attr.getBaseValue();
             setModifier(attr, MODIFIER_ID_DAMAGE, MODIFIER_NAME_DAMAGE, amount, op);

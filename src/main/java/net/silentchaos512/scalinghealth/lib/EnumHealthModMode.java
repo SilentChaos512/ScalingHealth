@@ -18,9 +18,6 @@
 
 package net.silentchaos512.scalinghealth.lib;
 
-import net.minecraftforge.common.config.Configuration;
-import net.silentchaos512.scalinghealth.config.Config;
-
 public enum EnumHealthModMode {
     ADD(0), MULTI(1), MULTI_HALF(1), MULTI_QUARTER(1);
 
@@ -30,6 +27,7 @@ public enum EnumHealthModMode {
         this.op = op;
     }
 
+    /*
     public static EnumHealthModMode loadFromConfig(Configuration c, EnumHealthModMode defaultValue) {
         String[] validValues = new String[values().length];
         for (int i = 0; i < values().length; ++i)
@@ -50,4 +48,5 @@ public enum EnumHealthModMode {
                 return mode;
         return defaultValue;
     }
+    */
 }

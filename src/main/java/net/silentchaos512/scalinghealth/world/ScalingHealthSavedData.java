@@ -19,12 +19,11 @@
 package net.silentchaos512.scalinghealth.world;
 
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraft.world.storage.MapStorage;
 import net.minecraft.world.storage.WorldSavedData;
-import net.silentchaos512.scalinghealth.config.Config;
+import net.minecraft.world.storage.WorldSavedDataStorage;
 
+@Deprecated
 public final class ScalingHealthSavedData extends WorldSavedData {
     private static final String DATA_NAME = "ScalingHealth_Difficulty";
     private static final String NBT_DIFFICULTY = "Difficulty";
@@ -40,21 +39,21 @@ public final class ScalingHealthSavedData extends WorldSavedData {
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound nbt) {
+    public void read(NBTTagCompound nbt) {
         difficulty = nbt.getDouble(NBT_DIFFICULTY);
-        difficulty = MathHelper.clamp(difficulty, Config.Difficulty.minValue, Config.Difficulty.maxValue);
+//        difficulty = MathHelper.clamp(difficulty, Config.Difficulty.minValue, Config.Difficulty.maxValue);
     }
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound nbt) {
-        difficulty = MathHelper.clamp(difficulty, Config.Difficulty.minValue, Config.Difficulty.maxValue);
+    public NBTTagCompound write(NBTTagCompound nbt) {
+//        difficulty = MathHelper.clamp(difficulty, Config.Difficulty.minValue, Config.Difficulty.maxValue);
         nbt.setDouble(NBT_DIFFICULTY, difficulty);
         return nbt;
     }
 
     public static ScalingHealthSavedData get(World world) {
-        MapStorage storage = world.getPerWorldStorage();
-        ScalingHealthSavedData instance = (ScalingHealthSavedData) storage.getOrLoadData(ScalingHealthSavedData.class, DATA_NAME);
+        WorldSavedDataStorage storage = world.getPerWorldStorage();
+        ScalingHealthSavedData instance = storage.getOrLoadData(ScalingHealthSavedData::new, DATA_NAME);
 
         if (instance == null) {
             instance = new ScalingHealthSavedData();

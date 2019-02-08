@@ -18,18 +18,16 @@
 
 package net.silentchaos512.scalinghealth.compat.gamestages;
 
-import net.darkhax.gamestages.GameStageHelper;
 import net.minecraft.entity.player.EntityPlayer;
-import net.silentchaos512.scalinghealth.config.Config;
 
 public class SHGameStagesCompat {
     private SHGameStagesCompat() {}
 
     public static int getDifficultyFromStages(EntityPlayer player) {
         int max = 0;
-        for (String stage : GameStageHelper.getPlayerData(player).getStages()) {
-            max = Math.max(max, Config.Difficulty.DIFFICULTY_BY_GAME_STAGES.get(stage));
-        }
+//        for (String stage : GameStageHelper.getPlayerData(player).getStages()) {
+//            max = Math.max(max, Config.Difficulty.DIFFICULTY_BY_GAME_STAGES.get(stage));
+//        }
         return max;
     }
 }

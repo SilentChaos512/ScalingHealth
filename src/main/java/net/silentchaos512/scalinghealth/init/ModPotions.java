@@ -18,13 +18,26 @@
 
 package net.silentchaos512.scalinghealth.init;
 
-import net.silentchaos512.lib.registry.SRegistry;
+import net.minecraft.potion.Potion;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.potion.PotionBandaged;
 
 public class ModPotions {
-    public static final PotionBandaged bandaged = new PotionBandaged();
+    public static PotionBandaged bandaged;
 
-    public static void registerAll(SRegistry reg) {
-        reg.registerPotion(bandaged, "bandaged");
+    public static void registerAll(RegistryEvent.Register<Potion> event) {
+        if (!event.getName().equals(ForgeRegistries.POTIONS.getRegistryName())) return;
+
+        bandaged = register("bandaged", new PotionBandaged());
+    }
+
+    private static <T extends Potion> T register(String name, T potion) {
+        ResourceLocation registryName = new ResourceLocation(ScalingHealth.MOD_ID, name);
+        potion.setRegistryName(registryName);
+        ForgeRegistries.POTIONS.register(potion);
+        return potion;
     }
 }

@@ -19,46 +19,30 @@
 package net.silentchaos512.scalinghealth.event;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.EntitySlime;
-import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.Item;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
-import net.minecraftforge.fml.client.event.ConfigChangedEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
-import net.silentchaos512.lib.util.ChatHelper;
-import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.config.Config;
-import net.silentchaos512.scalinghealth.init.ModItems;
-import net.silentchaos512.scalinghealth.init.ModSounds;
 import net.silentchaos512.scalinghealth.lib.module.ModuleAprilTricks;
-import net.silentchaos512.scalinghealth.utils.ModifierHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 
 import javax.annotation.Nullable;
-import java.util.Calendar;
-import java.util.Random;
 
 public class ScalingHealthCommonEvents {
     @SubscribeEvent
     public void onLivingDrops(LivingDropsEvent event) {
         // Handle heart drops.
         // Was a player responsible for the death?
+        /*
         EntityPlayer player = getPlayerThatCausedDeath(event.getSource());
         if (player == null || (player instanceof FakePlayer
                 && !Config.FakePlayer.generateHearts)) {
@@ -96,10 +80,12 @@ public class ScalingHealthCommonEvents {
                 killedEntity.dropItem(itemToDrop, stackSize);
             }
         }
+        */
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onXPDropped(LivingExperienceDropEvent event) {
+        /*
         EntityLivingBase entityLiving = event.getEntityLiving();
 
         // Additional XP from all mobs.
@@ -116,6 +102,7 @@ public class ScalingHealthCommonEvents {
         }
 
         event.setDroppedExperience(Math.round(amount));
+        */
     }
 
     /**
@@ -124,8 +111,8 @@ public class ScalingHealthCommonEvents {
      * @return The player that caused the damage, or the owner of the tamed animal that caused the
      * damage.
      */
-    private @Nullable
-    EntityPlayer getPlayerThatCausedDeath(DamageSource source) {
+    @Nullable
+    private EntityPlayer getPlayerThatCausedDeath(DamageSource source) {
         if (source == null) {
             return null;
         }
@@ -159,12 +146,13 @@ public class ScalingHealthCommonEvents {
         EntityPlayer player = (EntityPlayer) event.getEntity();
 
         if (ModuleAprilTricks.instance.isEnabled() && ModuleAprilTricks.instance.isRightDay()) {
-            ScalingHealth.proxy.playSoundOnClient(player, ModSounds.PLAYER_DIED, 0.6f, 1f);
+//            ScalingHealth.proxy.playSoundOnClient(player, ModSounds.PLAYER_DIED, 0.6f, 1f);
         }
     }
 
     @SubscribeEvent
     public void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
+        /*
         // Set player health correctly after respawn.
         if (event.player instanceof EntityPlayerMP) {
             EntityPlayerMP player = (EntityPlayerMP) event.player;
@@ -197,10 +185,12 @@ public class ScalingHealthCommonEvents {
                 }
             }
         }
+        */
     }
 
     @SubscribeEvent
     public void onPlayerJoinedServer(PlayerLoggedInEvent event) {
+        /*
         // Sync player data and set health.
         if (event.player instanceof EntityPlayerMP) {
             EntityPlayerMP player = (EntityPlayerMP) event.player;
@@ -234,13 +224,16 @@ public class ScalingHealthCommonEvents {
             ChatHelper.sendMessage(event.player,
                     TextFormatting.RED + "[Scaling Health] It's April Fool's time... hehehe.");
         }
+        */
     }
 
     @SubscribeEvent
     public void onPlayerSleepInBed(PlayerSleepInBedEvent event) {
+        /*
         if (!event.getEntityPlayer().world.isRemote && Config.Client.Difficulty.warnWhenSleeping && Config.Difficulty.forSleeping != 0f) {
             ChatHelper.translate(event.getEntityPlayer(), ScalingHealth.i18n.getKey("misc", "sleepWarning"));
         }
+        */
     }
 
     @SubscribeEvent
@@ -249,18 +242,20 @@ public class ScalingHealthCommonEvents {
             EntityPlayer player = event.getEntityPlayer();
             PlayerData data = SHPlayerDataHandler.get(player);
             if (data != null) {
-                data.incrementDifficulty(Config.Difficulty.forSleeping, false);
+//                data.incrementDifficulty(Config.Difficulty.forSleeping, false);
             }
 
             // TODO: World difficulty increase?
         }
     }
 
+    /*
     @SubscribeEvent
     public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
-        if (event.getModID().equals(ScalingHealth.MOD_ID_LOWER)) {
+        if (event.getModID().equals(ScalingHealth.MOD_ID)) {
             Config.INSTANCE.load();
             Config.INSTANCE.save();
         }
     }
+    */
 }

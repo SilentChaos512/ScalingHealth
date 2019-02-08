@@ -42,7 +42,7 @@ public class PropertyBlight implements EntityProperty {
     }
 
     public static class Serializer extends EntityProperty.Serializer<PropertyBlight> {
-        static final ResourceLocation NAME = new ResourceLocation(ScalingHealth.MOD_ID_LOWER, "is_blight");
+        static final ResourceLocation NAME = new ResourceLocation(ScalingHealth.MOD_ID, "is_blight");
 
         public Serializer() {
             super(NAME, PropertyBlight.class);

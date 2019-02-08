@@ -18,9 +18,6 @@
 
 package net.silentchaos512.scalinghealth.lib.module;
 
-import net.minecraftforge.common.config.Configuration;
-import net.silentchaos512.scalinghealth.config.Config;
-
 import java.util.Calendar;
 
 public class ModuleAprilTricks {
@@ -59,12 +56,12 @@ public class ModuleAprilTricks {
     return forcedOn;
   }
 
-  public void loadConfig(Configuration c) {
-
-    String cat = Config.CAT_HOLIDAYS + c.CATEGORY_SPLITTER + "april_trickery";
-    c.setCategoryComment(cat, "April Fools event options.");
-    moduleEnabled = c.getBoolean("Enabled", cat, true,
-        "May cause silly things to happen on certain day(s) in April.");
-    forcedOn = c.getBoolean("Forced On", cat, false, "I need this in my life 24/7!");
-  }
+//  public void loadConfig(Configuration c) {
+//
+//    String cat = Config.CAT_HOLIDAYS + c.CATEGORY_SPLITTER + "april_trickery";
+//    c.setCategoryComment(cat, "April Fools event options.");
+//    moduleEnabled = c.getBoolean("Enabled", cat, true,
+//        "May cause silly things to happen on certain day(s) in April.");
+//    forcedOn = c.getBoolean("Forced On", cat, false, "I need this in my life 24/7!");
+//  }
 }

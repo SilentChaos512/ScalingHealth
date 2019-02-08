@@ -18,27 +18,33 @@
 
 package net.silentchaos512.scalinghealth.init;
 
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
-import net.silentchaos512.lib.block.BlockOreSL;
-import net.silentchaos512.lib.registry.SRegistry;
-import net.silentchaos512.scalinghealth.config.Config;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.block.BlockShardOre;
 
-import java.util.Random;
+public final class ModBlocks {
+    public static BlockShardOre crystalOre;
 
-public class ModBlocks {
-    public static final BlockOreSL crystalOre = new BlockOreSL(ModItems.crystalShard, 2, 1, 1, 1, 5) {
-        @Override
-        public int quantityDropped(Random random) {
-            return Config.HEART_CRYSTAL_ORE_QUANTITY_DROPPED;
-        }
+    private ModBlocks() {}
 
-        @Override
-        public float bonusAmount(int fortune, Random random) {
-            return (fortune - 1) * random.nextFloat() - 1f;
-        }
-    };
+    public static void registerAll(RegistryEvent.Register<Block> event) {
+        IForgeRegistry<Block> reg = event.getRegistry();
+        crystalOre = register(reg, "heart_shard_ore", new BlockShardOre(() -> ModItems.crystalShard));
+    }
 
-    public static void registerAll(SRegistry reg) {
-        reg.registerBlock(crystalOre, "crystalore", new ItemBlock(crystalOre));
+    private static <T extends Block> T register(IForgeRegistry<Block> reg, String name, T block) {
+        ResourceLocation registryName = new ResourceLocation(ScalingHealth.MOD_ID, name);
+        block.setRegistryName(registryName);
+        reg.register(block);
+
+        ItemBlock item = new ItemBlock(block, new Item.Builder());
+        ModItems.blocksToRegister.add(item);
+
+        return block;
     }
 }

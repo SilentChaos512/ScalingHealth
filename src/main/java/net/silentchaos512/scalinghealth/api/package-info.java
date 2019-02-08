@@ -1,7 +1,7 @@
 @ParametersAreNonnullByDefault
-@API(owner = "ScalingHealth", apiVersion = "2", provides = "ScalingHealthAPI")
+@MethodsReturnNonnullByDefault
 package net.silentchaos512.scalinghealth.api;
 
-import net.minecraftforge.fml.common.API;
+import mcp.MethodsReturnNonnullByDefault;
 
 import javax.annotation.ParametersAreNonnullByDefault;

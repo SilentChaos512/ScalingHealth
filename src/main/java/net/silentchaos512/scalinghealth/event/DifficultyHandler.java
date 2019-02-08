@@ -18,43 +18,12 @@
 
 package net.silentchaos512.scalinghealth.event;
 
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.effect.EntityLightningBolt;
-import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.entity.monster.IMob;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
-import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.api.event.BlightSpawnEvent;
-import net.silentchaos512.scalinghealth.config.Config;
-import net.silentchaos512.scalinghealth.network.NetworkHandler;
-import net.silentchaos512.scalinghealth.network.message.MessageMarkBlight;
-import net.silentchaos512.scalinghealth.utils.EntityDifficultyChangeList.DifficultyChanges;
-import net.silentchaos512.scalinghealth.utils.*;
-import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
-import net.silentchaos512.scalinghealth.world.ScalingHealthSavedData;
-
-import java.util.List;
-import java.util.Random;
+import net.silentchaos512.scalinghealth.utils.EquipmentTierMap;
+import net.silentchaos512.scalinghealth.utils.MobPotionMap;
 
 public class DifficultyHandler {
     public static final String NBT_ENTITY_DIFFICULTY = ScalingHealth.RESOURCE_PREFIX + "difficulty";
@@ -73,6 +42,7 @@ public class DifficultyHandler {
     public MobPotionMap potionMap = new MobPotionMap();
 
     public void initPotionMap() {
+        /*
         potionMap.clear();
 
         String[] lines = Config.INSTANCE.getConfiguration().getStringList("Mob Potions",
@@ -119,8 +89,10 @@ public class DifficultyHandler {
                         + line + "Ignoring entire line.");
             }
         }
+        */
     }
 
+    /*
     @SubscribeEvent
     public void onMobSpawn(LivingUpdateEvent event) {
         if (!(Config.Difficulty.maxValue <= 0) && !event.getEntity().world.isRemote && event.getEntity() instanceof EntityLiving) {
@@ -143,9 +115,9 @@ public class DifficultyHandler {
 
         // Killed by player?
         if (source.getTrueSource() instanceof EntityPlayer) {
-            DifficultyChanges changes = Config.Difficulty.DIFFICULTY_PER_KILL_BY_MOB.get(killed);
+            EntityDifficultyChangeList.DifficultyChanges changes = Config.Difficulty.DIFFICULTY_PER_KILL_BY_MOB.get(killed);
             EntityPlayer player = (EntityPlayer) source.getTrueSource();
-            PlayerData data = SHPlayerDataHandler.get(player);
+            SHPlayerDataHandler.PlayerData data = SHPlayerDataHandler.get(player);
             if (data != null) {
                 boolean isBlight = BlightHandler.isBlight(killed);
                 float amount = isBlight ? changes.onBlightKill : changes.onStandardKill;
@@ -192,7 +164,7 @@ public class DifficultyHandler {
         float genAddedHealth = difficulty;
         float genAddedDamage = 0;
         float baseMaxHealth = (float) entityLiving
-                .getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue();
+                .getAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue();
         float healthMultiplier = isHostile ? Config.Mob.Health.hostileHealthMultiplier
                 : Config.Mob.Health.peacefulHealthMultiplier;
 
@@ -265,7 +237,7 @@ public class DifficultyHandler {
             String line = "Spawn debug: %s (%d, %d, %d): Difficulty=%.2f, Health +%.2f, Damage +%.2f";
             line = String.format(line, entityLiving.getName(), pos.getX(), pos.getY(), pos.getZ(),
                     totalDifficulty, genAddedHealth, genAddedDamage);
-            ScalingHealth.logHelper.info(line);
+            ScalingHealth.LOGGER.info(line);
         }
 
         return makeBlight;
@@ -345,7 +317,7 @@ public class DifficultyHandler {
         // Add random enchantments
         for (EntityEquipmentSlot slot : EntityEquipmentSlot.values()) {
             ItemStack stack = entityLiving.getItemStackFromSlot(slot);
-            if (!stack.isEmpty() && !stack.isItemEnchanted())
+            if (!stack.isEmpty() && !stack.isEnchanted())
                 EnchantmentHelper.addRandomEnchantment(rand, stack, 30, false);
         }
 
@@ -392,7 +364,7 @@ public class DifficultyHandler {
         if (entityLiving == null || !entityLiving.world.getGameRules().getBoolean(ScalingHealth.GAME_RULE_DIFFICULTY))
             return false;
 
-        AttributeModifier modifier = entityLiving.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
+        AttributeModifier modifier = entityLiving.getAttribute(SharedMonsterAttributes.MAX_HEALTH)
                 .getModifier(ModifierHandler.MODIFIER_ID_HEALTH);
         // The tickExisted > 1 kinda helps with Lycanites, but checking for a modifier amount of 0 should catch issues with
         // some mobs not receiving health increases.
@@ -404,6 +376,9 @@ public class DifficultyHandler {
     private boolean entityBlacklistedFromBecomingBlight(EntityLivingBase entityLiving) {
         if (entityLiving == null) return true;
 
+        DimensionConfig config = Config.get(entityLiving);
+        // TODO
+
         EntityMatchList blacklist = Config.Mob.Blight.blacklist;
         boolean isBoss = !entityLiving.isNonBoss();
         boolean isHostile = entityLiving instanceof IMob;
@@ -413,24 +388,28 @@ public class DifficultyHandler {
                 || (isHostile && Config.Mob.Blight.blacklistHostiles)
                 || (isPassive && Config.Mob.Blight.blacklistPassives)
                 || (isBoss && Config.Mob.Blight.blacklistBosses));
-
     }
 
     @SubscribeEvent
     public void onWorldTick(WorldTickEvent event) {
-        if (event.world.getTotalWorldTime() % 20 == 0) {
+        if (event.world.getGameTime() % 20 == 0) {
             ScalingHealthSavedData data = ScalingHealthSavedData.get(event.world);
             data.difficulty += Config.Difficulty.perSecond;
             data.markDirty();
         }
     }
+    */
 
     // **************************************************************************
     // Equipment
     // **************************************************************************
 
-    private EntityEquipmentSlot[] ORDERED_SLOTS = {EntityEquipmentSlot.HEAD,
-            EntityEquipmentSlot.CHEST, EntityEquipmentSlot.LEGS, EntityEquipmentSlot.FEET};
+    private static final EntityEquipmentSlot[] ORDERED_SLOTS = {
+            EntityEquipmentSlot.HEAD,
+            EntityEquipmentSlot.CHEST,
+            EntityEquipmentSlot.LEGS,
+            EntityEquipmentSlot.FEET
+    };
 
     public EquipmentTierMap mapHelmets = new EquipmentTierMap(5, EntityEquipmentSlot.HEAD);
     public EquipmentTierMap mapChestplates = new EquipmentTierMap(5, EntityEquipmentSlot.CHEST);
@@ -440,6 +419,7 @@ public class DifficultyHandler {
     public EquipmentTierMap mapOffhands = new EquipmentTierMap(5, EntityEquipmentSlot.OFFHAND);
 
     public void initDefaultEquipment() {
+        /*
         mapHelmets.put(new ItemStack(Items.LEATHER_HELMET), 0);
         mapHelmets.put(new ItemStack(Items.GOLDEN_HELMET), 1);
         mapHelmets.put(new ItemStack(Items.CHAINMAIL_HELMET), 2);
@@ -463,6 +443,7 @@ public class DifficultyHandler {
         mapBoots.put(new ItemStack(Items.CHAINMAIL_BOOTS), 2);
         mapBoots.put(new ItemStack(Items.IRON_BOOTS), 3);
         mapBoots.put(new ItemStack(Items.DIAMOND_BOOTS), 4);
+        */
     }
 
     private ItemStack selectEquipmentForSlot(EntityEquipmentSlot slot, int tier) {

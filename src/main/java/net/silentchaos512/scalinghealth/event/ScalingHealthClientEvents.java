@@ -18,30 +18,13 @@
 
 package net.silentchaos512.scalinghealth.event;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
-import net.silentchaos512.lib.util.Color;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.config.Config;
-import net.silentchaos512.scalinghealth.entity.EntityBlightFire;
-import net.silentchaos512.scalinghealth.lib.EnumAreaDifficultyMode;
-import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
-import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
-import org.lwjgl.opengl.GL11;
 
-@Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID_LOWER, value = Side.CLIENT)
+@Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID, value = Dist.CLIENT)
 public final class ScalingHealthClientEvents {
     private static final float DEBUG_TEXT_SCALE = 0.6f;
 
@@ -49,11 +32,13 @@ public final class ScalingHealthClientEvents {
 
     @SubscribeEvent
     public static void renderTick(RenderGameOverlayEvent.Post event) {
-        if (Config.Debug.debugMode && Config.Debug.debugOverlay && Minecraft.getMinecraft().world != null && event.getType() == ElementType.ALL) {
-            FontRenderer fontRender = Minecraft.getMinecraft().fontRenderer;
+        /*
+        Minecraft mc = Minecraft.getInstance();
+        if (Config.Debug.debugMode && Config.Debug.debugOverlay && mc.world != null && event.getType() == ElementType.ALL) {
+            FontRenderer fontRender = mc.fontRenderer;
 
             GL11.glPushMatrix();
-            GlStateManager.scale(DEBUG_TEXT_SCALE, DEBUG_TEXT_SCALE, 1.0f);
+            GlStateManager.scaled(DEBUG_TEXT_SCALE, DEBUG_TEXT_SCALE, 1);
 
             String text = getDebugText();
             int y = 3;
@@ -70,13 +55,16 @@ public final class ScalingHealthClientEvents {
 
             GL11.glPopMatrix();
         }
+        */
     }
 
     private static String getDebugText() {
-        World world = Minecraft.getMinecraft().world;
-        EntityPlayer player = Minecraft.getMinecraft().player;
+        /*
+        Minecraft mc = Minecraft.getInstance();
+        World world = mc.world;
+        EntityPlayer player = mc.player;
         PlayerData data = SHPlayerDataHandler.get(player);
-        EnumAreaDifficultyMode areaMode = Config.Difficulty.AREA_DIFFICULTY_MODE;
+        AreaDifficultyMode areaMode = Config.Difficulty.AREA_DIFFICULTY_MODE;
         if (data == null)
             return "Player data is null!";
 
@@ -88,7 +76,7 @@ public final class ScalingHealthClientEvents {
         ret.append("Player Health = ").append(player.getHealth()).append(" / ").append(player.getMaxHealth()).append("\n");
 
         // Display all health attribute modifiers.
-        IAttributeInstance attr = player.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
+        IAttributeInstance attr = player.getAttribute(SharedMonsterAttributes.MAX_HEALTH);
         if (!attr.getModifiers().isEmpty()) {
             for (AttributeModifier mod : attr.getModifiers()) {
                 ret.append("         ").append(mod).append("\n");
@@ -108,5 +96,7 @@ public final class ScalingHealthClientEvents {
         ret.append(String.format("Blights (Fires) = %d (%d)", blightCount, blightFires));
 
         return ret.toString();
+        */
+        return "";
     }
 }

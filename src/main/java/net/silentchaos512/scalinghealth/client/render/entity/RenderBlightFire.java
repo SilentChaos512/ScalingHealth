@@ -29,19 +29,17 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
-import net.silentchaos512.lib.event.ClientTicks;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.entity.EntityBlightFire;
 import net.silentchaos512.scalinghealth.lib.module.ModuleAprilTricks;
-import org.lwjgl.util.Color;
 
 import javax.annotation.Nonnull;
 
 public final class RenderBlightFire extends Render<EntityBlightFire> {
     private static final float FIRE_SCALE = 1.8F;
 
-    private final ResourceLocation TEXTURE = new ResourceLocation(ScalingHealth.MOD_ID_LOWER, "textures/entity/blightfire.png");
-    private final ResourceLocation TEXTURE_GRAY = new ResourceLocation(ScalingHealth.MOD_ID_LOWER, "textures/entity/blightfire_gray.png");
+    private static final ResourceLocation TEXTURE = new ResourceLocation(ScalingHealth.MOD_ID, "textures/entity/blightfire.png");
+    private static final ResourceLocation TEXTURE_GRAY = new ResourceLocation(ScalingHealth.MOD_ID, "textures/entity/blightfire_gray.png");
 
     private RenderBlightFire(RenderManager renderManager) {
         super(renderManager);
@@ -79,29 +77,28 @@ public final class RenderBlightFire extends Render<EntityBlightFire> {
 
         GlStateManager.disableLighting();
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x, y - parent.height + 0.5, z);
+        GlStateManager.translated(x, y - parent.height + 0.5, z);
         float f = parent.width * FIRE_SCALE;
-        GlStateManager.scale(f, f, f);
+        GlStateManager.scalef(f, f, f);
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder vertexbuffer = tessellator.getBuffer();
 
         float f1 = 0.5F;
         float f2 = 0.0F;
         float f3 = parent.height / f;
-        float f4 = (float) (parent.posY - parent.getEntityBoundingBox().minY);
+        float f4 = (float) (parent.posY - parent.getBoundingBox().minY);
 
-        GlStateManager.rotate(-this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-        GlStateManager.translate(0.0F, 0.0F, (float) ((int) f3) * 0.02F);
+        GlStateManager.rotatef(-this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
+        GlStateManager.translatef(0, 0, f3 * 0.02f);
 
         if (ModuleAprilTricks.instance.isRightDay() && ModuleAprilTricks.instance.isEnabled()) {
-            float changeRate = 40f + parent.getEntityId() % 80f;
-            Color color = new Color();
-            float hue = ((ClientTicks.ticksInGame + parent.getEntityId()) % changeRate / changeRate);
-            color.fromHSB(hue, 1f, 1f);
-            GlStateManager.color(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f,
-                    1.0F);
+//            float changeRate = 40f + parent.getEntityId() % 80f;
+//            Color color = new Color();
+//            float hue = ((ClientTicks.ticksInGame + parent.getEntityId()) % changeRate / changeRate);
+//            color.fromHSB(hue, 1f, 1f);
+//            GlStateManager.color4f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1.0F);
         } else {
-            GlStateManager.color(1f, 1f, 1f, 1f);
+            GlStateManager.color4f(1, 1, 1, 1);
         }
 
         float f5 = 0.0F;
@@ -112,7 +109,8 @@ public final class RenderBlightFire extends Render<EntityBlightFire> {
 
         while (f3 > 0.0F) {
             boolean flag = i % 2 == 0;
-            int frame = ClientTicks.ticksInGame % 32;
+            // FIXME
+            int frame = 0; //= ClientTicks.ticksInGame % 32;
             float minU = flag ? 0.5f : 0.0f;
             float minV = frame / 32f;
             float maxU = flag ? 1.0f : 0.5f;

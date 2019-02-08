@@ -32,7 +32,6 @@ import net.minecraftforge.event.entity.living.LivingSpawnEvent;
  * @since 1.2.0
  */
 public class BlightSpawnEvent extends LivingSpawnEvent {
-
     private BlightSpawnEvent(EntityLiving entity, World world, float x, float y, float z) {
         super(entity, world, x, y, z);
     }

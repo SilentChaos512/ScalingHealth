@@ -25,8 +25,6 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.silentchaos512.lib.util.EntityHelper;
-import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.config.Config;
 
 import java.util.List;
 
@@ -36,7 +34,7 @@ public class PotionBandaged extends Potion {
 
     public PotionBandaged() {
         super(false, 0xf7dcad);
-        setPotionName("effect." + ScalingHealth.MOD_ID_LOWER + ".bandaged");
+//        setPotionName("effect." + ScalingHealth.MOD_ID + ".bandaged");
         setBeneficial();
         registerPotionAttributeModifier(SharedMonsterAttributes.MOVEMENT_SPEED,
                 "732486d8-f730-41a2-868f-eb988738986f", SPEED_MODIFIER, 2);
@@ -51,7 +49,7 @@ public class PotionBandaged extends Potion {
 
         float healAmount = BASE_HEAL_RATE * entityLiving.getMaxHealth() * (amplifier + 1);
         // Using Entity#heal allows us to prevent the cancelable LivingHealEvent from being fired.
-        EntityHelper.heal(entityLiving, healAmount, Config.Items.healingItemFireEvent);
+        EntityHelper.heal(entityLiving, healAmount, true);
     }
 
     @Override

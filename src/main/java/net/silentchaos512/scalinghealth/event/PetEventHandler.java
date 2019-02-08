@@ -18,17 +18,15 @@
 
 package net.silentchaos512.scalinghealth.event;
 
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.passive.EntityTameable;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.silentchaos512.scalinghealth.config.Config;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public class PetEventHandler {
     public static PetEventHandler INSTANCE = new PetEventHandler();
 
     @SubscribeEvent
     public void onLivingUpdate(LivingUpdateEvent event) {
+        /*
         final int regenDelay = Config.PET_REGEN_DELAY;
         if (regenDelay <= 0) {
             return;
@@ -42,5 +40,6 @@ public class PetEventHandler {
                 entity.heal(2f);
             }
         }
+        */
     }
 }

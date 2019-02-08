@@ -18,18 +18,8 @@
 
 package net.silentchaos512.scalinghealth.event;
 
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.silentchaos512.scalinghealth.config.Config;
-import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
-import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
-import net.silentchaos512.wit.api.WitEntityInfoEvent;
-
 public class WitEventHandler {
+    /*
     @SubscribeEvent
     public void onWitEntityInfo(WitEntityInfoEvent event) {
         if (!Config.Debug.debugMode)
@@ -61,4 +51,5 @@ public class WitEventHandler {
             }
         }
     }
+    */
 }

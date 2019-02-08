@@ -18,13 +18,14 @@
 
 package net.silentchaos512.scalinghealth.entity;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
+import net.silentchaos512.scalinghealth.init.ModEntities;
 
 public class EntityBlightFire extends Entity implements IEntityAdditionalSpawnData {
     private static final String NBT_PARENT = "ParentBlight";
@@ -32,25 +33,28 @@ public class EntityBlightFire extends Entity implements IEntityAdditionalSpawnDa
     private EntityLivingBase parent;
 
     public EntityBlightFire(World worldIn) {
-        super(worldIn);
+        super(ModEntities.blightFire, worldIn);
     }
 
     public EntityBlightFire(EntityLivingBase parent) {
-        super(parent.world);
+        this(parent.world);
         this.parent = parent;
     }
 
     @Override
-    public void onUpdate() {
+    protected void registerData() { }
+
+    @Override
+    public void tick() {
         // Server side only, blight fire must have a parent.
-        if (!world.isRemote && (parent == null || parent.isDead)) {
-            setDead();
+        if (!world.isRemote && (parent == null || parent.removed)) {
+            remove();
             return;
         }
 
         // Occasionally players get a blight fire... what?
         if (parent instanceof EntityPlayer) {
-            setDead();
+            remove();
         }
 
         // Update position manually in case fire is not riding the blight.
@@ -62,18 +66,14 @@ public class EntityBlightFire extends Entity implements IEntityAdditionalSpawnDa
     }
 
     @Override
-    protected void entityInit() {
-    }
-
-    @Override
     public int getBrightnessForRender() {
         return 15728880;
     }
 
     @Override
-    protected void readEntityFromNBT(NBTTagCompound compound) {
+    protected void readAdditional(NBTTagCompound compound) {
         if (compound.hasKey(NBT_PARENT)) {
-            int id = compound.getInteger(NBT_PARENT);
+            int id = compound.getInt(NBT_PARENT);
             Entity entity = world.getEntityByID(id);
             if (entity instanceof EntityLivingBase)
                 parent = (EntityLivingBase) entity;
@@ -81,9 +81,9 @@ public class EntityBlightFire extends Entity implements IEntityAdditionalSpawnDa
     }
 
     @Override
-    protected void writeEntityToNBT(NBTTagCompound compound) {
+    protected void writeAdditional(NBTTagCompound compound) {
         if (parent != null) {
-            compound.setInteger(NBT_PARENT, parent.getEntityId());
+            compound.setInt(NBT_PARENT, parent.getEntityId());
         }
     }
 
@@ -92,12 +92,12 @@ public class EntityBlightFire extends Entity implements IEntityAdditionalSpawnDa
     }
 
     @Override
-    public void writeSpawnData(ByteBuf buffer) {
+    public void writeSpawnData(PacketBuffer buffer) {
         buffer.writeInt(parent == null ? -1 : parent.getEntityId());
     }
 
     @Override
-    public void readSpawnData(ByteBuf additionalData) {
+    public void readSpawnData(PacketBuffer additionalData) {
         int id = additionalData.readInt();
         if (id != -1) {
             Entity entity = world.getEntityByID(id);

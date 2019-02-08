@@ -18,16 +18,28 @@
 
 package net.silentchaos512.scalinghealth.init;
 
-import net.silentchaos512.lib.registry.SRegistry;
-import net.silentchaos512.scalinghealth.client.render.entity.RenderBlightFire;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.entity.EntityBlightFire;
 
 public class ModEntities {
-    public static void init(SRegistry reg) {
-        reg.registerEntity(EntityBlightFire.class, "BlightFire", 64, 20, true);
+    public static EntityType<EntityBlightFire> blightFire;
+
+    public static void registerAll(RegistryEvent.Register<EntityType<?>> event) {
+        IForgeRegistry<EntityType<?>> reg = event.getRegistry();
+
+        blightFire = register(reg, "blight_fire", EntityType.Builder.create(EntityBlightFire.class, EntityBlightFire::new));
     }
 
-    public static void registerRenderers(SRegistry reg) {
-        reg.registerEntityRenderer(EntityBlightFire.class, RenderBlightFire.Factory.INSTANCE);
+    private static <T extends Entity> EntityType<T> register(IForgeRegistry<EntityType<?>> reg, String name, EntityType.Builder<T> builder) {
+        ResourceLocation id = new ResourceLocation(ScalingHealth.MOD_ID, name);
+        EntityType<T> entityType = builder.build(id.toString());
+        entityType.setRegistryName(id);
+        reg.register(entityType);
+        return entityType;
     }
 }

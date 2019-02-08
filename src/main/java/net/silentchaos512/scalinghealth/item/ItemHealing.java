@@ -19,7 +19,6 @@
 package net.silentchaos512.scalinghealth.item;
 
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
@@ -30,58 +29,36 @@ import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
-import net.silentchaos512.lib.registry.ICustomModel;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.init.ModPotions;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Locale;
 
-public class ItemHealing extends Item implements ICustomModel {
-    public enum Type {
-        BANDAGE(0.3f, 1), MEDKIT(0.7f, 4);
-
-        public final float healPercentage;
-        public final int effectDuration;
-        public final int amplifier;
-
-        Type(float healPercentage, int speed) {
-            this.healPercentage = healPercentage;
-            this.effectDuration = (int) (healPercentage * 100 * 20 * 2 / speed);
-            this.amplifier = speed - 1;
-        }
-
-        public static Type clampMeta(int unclampedMetadata) {
-            return values()[MathHelper.clamp(unclampedMetadata, 0, values().length - 1)];
-        }
-
-        public String getItemName() {
-            return name().toLowerCase(Locale.ROOT);
-        }
-
-        public int getItemDamage() {
-            return ordinal();
-        }
-    }
-
+public class ItemHealing extends Item {
     private static final int USE_TIME = 5 * 20;
 
-    public ItemHealing() {
-        setMaxStackSize(4);
-        setHasSubtypes(true);
+    private final float healAmount;
+    private final int healSpeed;
+    private final int effectDuration;
+
+    public ItemHealing(float healAmount, int healSpeed) {
+        super(new Item.Builder().maxStackSize(16));
+        this.healAmount = healAmount;
+        this.healSpeed = healSpeed;
+        this.effectDuration = (int) (this.healAmount * 100 * 20 * 2 / this.healSpeed);
     }
 
     @Override
-    public EnumAction getItemUseAction(ItemStack stack) {
+    public EnumAction getUseAction(ItemStack stack) {
         return EnumAction.BOW;
     }
 
     @Override
-    public int getMaxItemUseDuration(ItemStack stack) {
+    public int getUseDuration(ItemStack stack) {
         return USE_TIME;
     }
 
@@ -90,17 +67,16 @@ public class ItemHealing extends Item implements ICustomModel {
         ItemStack stack = player.getHeldItem(hand);
         if (player.getHealth() < player.getMaxHealth() && !player.isPotionActive(ModPotions.bandaged)) {
             player.setActiveHand(hand);
-            return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+            return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
         }
-        return new ActionResult<>(EnumActionResult.FAIL, stack);
+        return ActionResult.newResult(EnumActionResult.FAIL, stack);
     }
 
     @Override
     public ItemStack onItemUseFinish(ItemStack stack, World world, EntityLivingBase entityLiving) {
         if (!world.isRemote) {
-            Type healingType = Type.clampMeta(stack.getItemDamage());
-            entityLiving.addPotionEffect(new PotionEffect(ModPotions.bandaged, healingType.effectDuration,
-                    healingType.amplifier, false, false));
+            entityLiving.addPotionEffect(new PotionEffect(ModPotions.bandaged,
+                    this.effectDuration, this.healSpeed, false, false));
             stack.shrink(1);
         }
         return stack;
@@ -115,29 +91,11 @@ public class ItemHealing extends Item implements ICustomModel {
     }
 
     @Override
-    public void getSubItems(CreativeTabs tab, NonNullList<ItemStack> list) {
-        if (!isInCreativeTab(tab)) return;
-        for (Type type : Type.values()) {
-            list.add(new ItemStack(this, 1, type.ordinal()));
-        }
-    }
-
-    @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> list, ITooltipFlag flagIn) {
-        Type healingType = Type.clampMeta(stack.getItemDamage());
-        list.add(ScalingHealth.i18n.itemSubText("healingitem", "healingValue",
-                (int) (healingType.healPercentage * 100), healingType.effectDuration / 20));
-        list.add(ScalingHealth.i18n.itemSubText("healingitem", "howToUse", USE_TIME / 20));
-    }
-
-    @Override
-    public String getTranslationKey(ItemStack stack) {
-        return ScalingHealth.i18n.getKey("item", Type.clampMeta(stack.getItemDamage()).getItemName());
-    }
-
-    @Override
-    public void registerModels() {
-        for (Type type : Type.values())
-            ScalingHealth.registry.setModel(this, type.getItemDamage(), type.getItemName());
+    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
+        tooltip.add(new TextComponentTranslation("item.scalinghealth.healing_item.value",
+                (int) (this.healAmount * 100),
+                this.effectDuration / 20));
+        tooltip.add(new TextComponentTranslation("item.scalinghealth.healing_item.howToUse",
+                USE_TIME / 20));
     }
 }

@@ -19,23 +19,47 @@
 package net.silentchaos512.scalinghealth.init;
 
 import net.minecraft.item.Item;
-import net.silentchaos512.lib.registry.SRegistry;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.registries.IForgeRegistry;
+import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.item.ItemDifficultyChanger;
 import net.silentchaos512.scalinghealth.item.ItemHealing;
 import net.silentchaos512.scalinghealth.item.ItemHeartContainer;
 
-public class ModItems {
-    public static final ItemHeartContainer heart = new ItemHeartContainer();
-    public static final Item crystalShard = new Item();
-    public static final Item heartDust = new Item();
-    public static final ItemHealing healingItem = new ItemHealing();
-    public static final ItemDifficultyChanger difficultyChanger = new ItemDifficultyChanger();
+import java.util.ArrayList;
+import java.util.Collection;
 
-    public static void registerAll(SRegistry reg) {
-        reg.registerItem(heart, "heartcontainer");
-        reg.registerItem(crystalShard, "crystalshard");
-        reg.registerItem(heartDust, "heartdust");
-        reg.registerItem(healingItem, "healingitem");
-        reg.registerItem(difficultyChanger, "difficultychanger");
+public final class ModItems {
+    public static ItemHeartContainer heart;
+    public static Item crystalShard;
+    public static ItemDifficultyChanger cursedHeart;
+    public static ItemDifficultyChanger enchantedHeart;
+
+    static Collection<ItemBlock> blocksToRegister = new ArrayList<>();
+
+    private ModItems() {}
+
+    public static void registerAll(RegistryEvent.Register<Item> event) {
+        IForgeRegistry<Item> reg = event.getRegistry();
+
+        blocksToRegister.forEach(reg::register);
+
+        heart = register(reg, "heart_container", new ItemHeartContainer());
+        crystalShard = register(reg, "heart_shard", new Item(new Item.Builder()));
+        register(reg, "heart_dust", new Item(new Item.Builder()));
+        register(reg, "bandages", new ItemHealing(0.3f, 1));
+        register(reg, "medkit", new ItemHealing(0.7f, 4));
+        cursedHeart = register(reg, "cursed_heart", new ItemDifficultyChanger(ItemDifficultyChanger.Type.CURSED));
+        enchantedHeart = register(reg, "enchanted_heart", new ItemDifficultyChanger(ItemDifficultyChanger.Type.ENCHANTED));
+    }
+
+    private static <T extends Item> T register(IForgeRegistry<Item> reg, String name, T item) {
+        ResourceLocation registryName = new ResourceLocation(ScalingHealth.MOD_ID, name);
+        item.setRegistryName(registryName);
+        reg.register(item);
+
+        return item;
     }
 }

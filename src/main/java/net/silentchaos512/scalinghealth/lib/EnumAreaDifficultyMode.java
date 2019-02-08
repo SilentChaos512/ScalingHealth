@@ -20,11 +20,8 @@ package net.silentchaos512.scalinghealth.lib;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraftforge.common.config.Configuration;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 import net.silentchaos512.scalinghealth.world.ScalingHealthSavedData;
@@ -41,6 +38,7 @@ public enum EnumAreaDifficultyMode {
     DISTANCE_AND_TIME,
     SERVER_WIDE;
 
+    /*
     public static EnumAreaDifficultyMode loadFromConfig(Configuration c, EnumAreaDifficultyMode defaultValue) {
 
         String[] validValues = new String[values().length];
@@ -65,6 +63,7 @@ public enum EnumAreaDifficultyMode {
                 return mode;
         return defaultValue;
     }
+    */
 
     public double getAreaDifficulty(World world, BlockPos pos) {
         return getAreaDifficulty(world, pos, true);
@@ -81,7 +80,7 @@ public enum EnumAreaDifficultyMode {
         }
 
         // Get players in range. TODO: Only get player list for types that need it?
-        int radius = Config.Difficulty.searchRadius;
+        int radius = 128; //Config.Difficulty.searchRadius;
         final long radiusSquared = radius <= 0 ? Long.MAX_VALUE : radius * radius;
         radius = radius <= 0 ? Integer.MAX_VALUE : radius;
         List<EntityPlayer> players = world.getPlayers(EntityPlayer.class,
@@ -132,7 +131,7 @@ public enum EnumAreaDifficultyMode {
                 break;
 
             case MIN_LEVEL:
-                double min = Config.Difficulty.maxValue;
+                double min = 250; //Config.Difficulty.maxValue;
                 for (EntityPlayer player : players) {
                     PlayerData data = SHPlayerDataHandler.get(player);
                     if (data != null) {
@@ -149,7 +148,7 @@ public enum EnumAreaDifficultyMode {
                 double dx = pos.getX() - origin.getX();
                 double dz = pos.getZ() - origin.getZ();
                 double distance = Math.sqrt(dx * dx + dz * dz);
-                ret = distance * Config.Difficulty.perBlock;
+                ret = distance * 0.0025; // Config.Difficulty.perBlock;
                 break;
 
             case DISTANCE_AND_TIME:
@@ -165,12 +164,12 @@ public enum EnumAreaDifficultyMode {
         }
 
         // Clamp to difficulty range (intentionally done before group bonus)
-        if (clampValue)
-            ret = MathHelper.clamp(ret, Config.Difficulty.minValue, Config.Difficulty.maxValue);
+//        if (clampValue)
+//            ret = MathHelper.clamp(ret, Config.Difficulty.minValue, Config.Difficulty.maxValue);
 
         // Group bonus?
-        if (addGroupBonus)
-            ret *= 1 + Config.Difficulty.groupAreaBonus * (players.size() - 1);
+//        if (addGroupBonus)
+//            ret *= 1 + Config.Difficulty.groupAreaBonus * (players.size() - 1);
 
         return ret;
     }

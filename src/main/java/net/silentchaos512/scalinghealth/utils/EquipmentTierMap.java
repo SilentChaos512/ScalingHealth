@@ -25,12 +25,13 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Supplier;
 
 public class EquipmentTierMap {
     public final int tierCount;
     public final EntityEquipmentSlot slot;
 
-    List<List<StackProducer>> sets;
+    List<List<Supplier<ItemStack>>> sets;
 
     public EquipmentTierMap(int tierCount, EntityEquipmentSlot slot) {
         this.tierCount = tierCount;
@@ -42,11 +43,7 @@ public class EquipmentTierMap {
         }
     }
 
-    public void put(ItemStack stack, int tier) {
-        put(new StackProducer(stack), tier);
-    }
-
-    public void put(StackProducer producer, int tier) {
+    public void put(Supplier<ItemStack> producer, int tier) {
         if (tier < 0 || tier >= tierCount) {
             throw new IllegalArgumentException("tier must be between 0 and " + tierCount);
         }
@@ -61,13 +58,13 @@ public class EquipmentTierMap {
             throw new IllegalArgumentException("tier must be between 0 and " + tierCount);
         }
 
-        List<StackProducer> list = sets.get(tier);
+        List<Supplier<ItemStack>> list = sets.get(tier);
         if (list.isEmpty()) {
             return ItemStack.EMPTY;
         }
 
         Random rand = ScalingHealth.random;
-        return list.get(rand.nextInt(list.size())).get(rand);
+        return list.get(rand.nextInt(list.size())).get();
     }
 
     public ItemStack get(int tier, int index) {
@@ -75,7 +72,7 @@ public class EquipmentTierMap {
             throw new IllegalArgumentException("tier must be between 0 and " + tierCount);
         }
 
-        List<StackProducer> list = sets.get(tier);
+        List<Supplier<ItemStack>> list = sets.get(tier);
         if (list.isEmpty()) {
             return ItemStack.EMPTY;
         }
@@ -83,6 +80,6 @@ public class EquipmentTierMap {
             throw new IllegalArgumentException("index must be between 0 and " + list.size());
         }
 
-        return list.get(index).get(ScalingHealth.random);
+        return list.get(index).get();
     }
 }

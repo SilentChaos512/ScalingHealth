@@ -18,29 +18,13 @@
 
 package net.silentchaos512.scalinghealth.event;
 
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.passive.EntityTameable;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.MobEffects;
-import net.minecraft.item.Item;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.world.World;
-import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
-import net.minecraftforge.fml.common.eventhandler.EventPriority;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
-import net.silentchaos512.lib.util.ChatHelper;
+import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.entity.EntityBlightFire;
-import net.silentchaos512.scalinghealth.init.ModItems;
-import net.silentchaos512.scalinghealth.network.NetworkHandler;
-import net.silentchaos512.scalinghealth.network.message.MessageMarkBlight;
 
 import javax.annotation.Nullable;
 
@@ -57,12 +41,14 @@ public final class BlightHandler {
     // ******************
 
     public static boolean isBlight(EntityLivingBase entityLiving) {
-        return entityLiving != null && entityLiving.getEntityData().getBoolean(NBT_BLIGHT);
+//        entityLiving.getCapability()
+//        return entityLiving != null && entityLiving.getEntityData().getBoolean(NBT_BLIGHT);
+        return false;
     }
 
     public static void markBlight(EntityLivingBase entityLiving) {
-        if (entityLiving != null)
-            entityLiving.getEntityData().setBoolean(NBT_BLIGHT, true);
+//        if (entityLiving != null)
+//            entityLiving.getEntityData().setBoolean(NBT_BLIGHT, true);
     }
 
     static void spawnBlightFire(EntityLivingBase blight) {
@@ -72,8 +58,6 @@ public final class BlightHandler {
         EntityBlightFire fire = new EntityBlightFire(blight);
         fire.setPosition(blight.posX, blight.posY, blight.posZ);
         blight.world.spawnEntity(fire);
-        if (Config.Mob.Blight.fireRidesBlight)
-            fire.startRiding(blight);
     }
 
     @Nullable
@@ -86,7 +70,7 @@ public final class BlightHandler {
     }
 
     static void applyBlightPotionEffects(EntityLivingBase entityLiving) {
-        int duration = Config.Mob.Blight.potionDuration;
+        int duration = 5000; //Config.Mob.Blight.potionDuration;
         if (duration < 0) {
             duration = Integer.MAX_VALUE;
         } else if (duration == 0) {
@@ -95,6 +79,7 @@ public final class BlightHandler {
 
         // TODO: Replace specific potion effects with a list where users can add specific effects.
 
+        /*
         // Invisibility
         if (Config.Mob.Blight.invisibility)
             entityLiving
@@ -111,6 +96,7 @@ public final class BlightHandler {
         if (Config.Mob.Blight.strengthAmp > -1)
             entityLiving.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, duration,
                     Config.Mob.Blight.strengthAmp, true, false));
+        */
     }
 
     // **********
@@ -119,6 +105,7 @@ public final class BlightHandler {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public void onBlightKilled(LivingDeathEvent event) {
+        /*
         if (event.getSource() == null || !isBlight(event.getEntityLiving()) || event.getEntity().world.isRemote)
             return;
 
@@ -185,10 +172,12 @@ public final class BlightHandler {
 //                }
             }
         }
+        */
     }
 
     @SubscribeEvent
     public void onBlightUpdate(LivingUpdateEvent event) {
+        /*
         EntityLivingBase entityLiving = event.getEntityLiving();
         if (entityLiving != null && !entityLiving.world.isRemote && isBlight(entityLiving)) {
             World world = entityLiving.world;
@@ -209,5 +198,6 @@ public final class BlightHandler {
                 applyBlightPotionEffects(entityLiving);
             }
         }
+        */
     }
 }
