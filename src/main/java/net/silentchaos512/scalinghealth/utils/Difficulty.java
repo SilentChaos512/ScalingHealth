@@ -1,5 +1,6 @@
 package net.silentchaos512.scalinghealth.utils;
 
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.BlockPos;
@@ -75,7 +76,7 @@ public final class Difficulty {
 
     public static int searchRadius(World world) {
         // TODO: Config
-        final int radius = 128;
+        final int radius = 256;
         return radius <= 0 ? Integer.MAX_VALUE : radius;
     }
 
@@ -97,5 +98,13 @@ public final class Difficulty {
     public static double maxValue(World world) {
         // TODO: Config
         return 250;
+    }
+
+    public static boolean allowsDifficultyChanges(EntityLivingBase entity) {
+        return true;
+    }
+
+    public static boolean canBecomeBlight(EntityLivingBase entity) {
+        return true;
     }
 }

@@ -18,6 +18,9 @@
 
 package net.silentchaos512.scalinghealth.config;
 
+import net.minecraft.entity.Entity;
+import net.minecraftforge.common.extensions.IForgeDimension;
+
 public final class Config {
     /*
     // Per-dimension configs. The "default" dimension is stored in its own field below.
@@ -291,6 +294,9 @@ public final class Config {
         }
         return parent.resolve(path);
     }
+    */
+
+    private static final DimensionConfig TEMP = new DimensionConfig();
 
     public static DimensionConfig get(IForgeDimension dimension) {
         return get(dimension.getId());
@@ -301,7 +307,7 @@ public final class Config {
     }
 
     public static DimensionConfig get(int dimension) {
-        return DIMENSIONS.getOrDefault(dimension, DEFAULT);
+//        return DIMENSIONS.getOrDefault(dimension, DEFAULT);
+        return TEMP;
     }
-    */
 }

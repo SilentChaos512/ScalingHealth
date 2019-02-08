@@ -13,8 +13,9 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.utils.Difficulty;
 import net.silentchaos512.scalinghealth.event.DifficultyEvents;
+import net.silentchaos512.scalinghealth.utils.Difficulty;
+import net.silentchaos512.scalinghealth.utils.MobDifficultyHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -49,11 +50,16 @@ public class CapabilityDifficultyAffected implements IDifficultyAffected, ICapab
     }
 
     @Override
+    public void setIsBlight(boolean value) {
+        blight = value;
+    }
+
+    @Override
     public void tick(EntityLivingBase entity) {
-        if (!processed && difficulty == 0 && entity.ticksExisted > 20) {
+        if (!processed /*&& difficulty == 0*/ && entity.ticksExisted > 20) {
             difficulty = (float) Difficulty.forPos(entity.world, entity.getPosition());
             ScalingHealth.LOGGER.debug(DifficultyEvents.MARKER, "Set difficulty of {} to {}", entity, difficulty);
-            // TODO: Modify health, set blight flag
+            MobDifficultyHandler.process(entity, this);
             processed = true;
         }
     }
@@ -80,7 +86,9 @@ public class CapabilityDifficultyAffected implements IDifficultyAffected, ICapab
 
     public static boolean canAttachTo(Entity entity) {
         if (entity.getCapability(INSTANCE).isPresent()) return false;
-        return entity instanceof EntityLivingBase && !(entity instanceof EntityPlayer);
+        return entity instanceof EntityLivingBase
+                && !(entity instanceof EntityPlayer)
+                && Difficulty.allowsDifficultyChanges((EntityLivingBase) entity);
     }
 
     public static void register() {

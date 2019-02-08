@@ -50,6 +50,7 @@ public class ModifierHandler {
         attr.applyModifier(newMod);
     }
 
+    @Deprecated
     public static void setMaxHealth(EntityLivingBase entity, double amount, int op) {
         if (amount <= 0) {
             ScalingHealth.LOGGER.warn("ModifierHandler.setMaxHealth: amount <= 0!");
@@ -71,6 +72,15 @@ public class ModifierHandler {
             setModifier(attr, MODIFIER_ID_HEALTH, MODIFIER_NAME_HEALTH, amount, op);
             entity.setHealth(originalHealth);
         }
+    }
+
+    public static void addMaxHealth(EntityLivingBase entity, double amount, int op) {
+        IAttributeInstance attribute = entity.getAttribute(SharedMonsterAttributes.MAX_HEALTH);
+        AttributeModifier mod = attribute.getModifier(MODIFIER_ID_HEALTH);
+        if (mod != null) {
+            attribute.removeModifier(mod);
+        }
+        attribute.applyModifier(new AttributeModifier(MODIFIER_ID_HEALTH, MODIFIER_NAME_HEALTH, amount, op));
     }
 
     public static void addAttackDamage(EntityLivingBase entity, double amount, int op) {

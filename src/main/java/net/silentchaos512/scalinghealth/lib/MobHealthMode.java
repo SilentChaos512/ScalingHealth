@@ -19,11 +19,42 @@
 package net.silentchaos512.scalinghealth.lib;
 
 public enum MobHealthMode {
-    ADD(0), MULTI(1), MULTI_HALF(1), MULTI_QUARTER(1);
+    ADD(0) {
+        @Override
+        public double getModifierValue(double baseHealthBoost, double baseMaxHealth) {
+            return baseHealthBoost;
+        }
+    },
+    MULTI(1) {
+        @Override
+        public double getModifierValue(double baseHealthBoost, double baseMaxHealth) {
+            return baseHealthBoost / 20.0;
+        }
+    },
+    MULTI_HALF(1) {
+        @Override
+        public double getModifierValue(double baseHealthBoost, double baseMaxHealth) {
+            double healthScaleDiff = Math.max(0, baseMaxHealth - 20f);
+            return baseHealthBoost / (20.0 + healthScaleDiff * 0.5);
+        }
+    },
+    MULTI_QUARTER(1) {
+        @Override
+        public double getModifierValue(double baseHealthBoost, double baseMaxHealth) {
+            double healthScaleDiff = Math.max(0, baseMaxHealth - 20f);
+            return baseHealthBoost / (20.0 + healthScaleDiff * 0.75);
+        }
+    };
 
-    public final int op;
+    public final int operator;
 
-    MobHealthMode(int op) {
-        this.op = op;
+    MobHealthMode(int operator) {
+        this.operator = operator;
+    }
+
+    public abstract double getModifierValue(double baseHealthBoost, double baseMaxHealth);
+
+    public int getOperator() {
+        return operator;
     }
 }

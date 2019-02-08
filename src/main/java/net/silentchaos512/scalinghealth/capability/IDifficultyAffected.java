@@ -9,6 +9,8 @@ public interface IDifficultyAffected {
 
     boolean isBlight();
 
+    void setIsBlight(boolean value);
+
     default float affectiveDifficulty() {
         // TODO: Blight difficulty config
         return isBlight() ? 3 * getDifficulty() : getDifficulty();

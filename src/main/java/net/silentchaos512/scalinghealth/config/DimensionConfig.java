@@ -308,6 +308,12 @@ public class DimensionConfig {
     private final String configFileName;
     private final int dimensionId;
 
+    DimensionConfig() {
+        // temporary, until config system stabilizes
+        this.configFileName = "unknown";
+        this.dimensionId = 0;
+    }
+
     @SuppressWarnings("DynamicRegexReplaceableByCompiledPattern")
     DimensionConfig(final Path path) {
 //        spec.setConfigFile(path);
