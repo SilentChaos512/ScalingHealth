@@ -1,18 +1,17 @@
 package net.silentchaos512.scalinghealth.config;
 
 import com.electronwill.nightconfig.core.CommentedConfig;
+import com.electronwill.nightconfig.core.ConfigSpec;
 import com.google.common.collect.ImmutableList;
 import com.udojava.evalex.Expression;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.IAnimal;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.common.ForgeConfigSpec.*;
-import net.silentchaos512.lib.util.EnumUtils;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.lib.AreaDifficultyMode;
 import net.silentchaos512.scalinghealth.lib.MobHealthMode;
+import net.silentchaos512.utils.config.*;
 
 import javax.annotation.Nullable;
 import java.nio.file.Path;
@@ -22,22 +21,20 @@ import java.util.function.Supplier;
 
 public class DimensionConfig {
     public static class General {
-        General(ForgeConfigSpec.Builder builder) {
+        General(ConfigSpecWrapper wrapper) {
         }
     }
 
     public static class Pets {
         public final DoubleValue regenDelay;
 
-        Pets(ForgeConfigSpec.Builder builder) {
-            builder.comment("Settings for tamed creatures");
-            builder.push("pets");
+        Pets(ConfigSpecWrapper wrapper) {
+            wrapper.comment("pets", "Settings for tamed creatures");
 
-            regenDelay = builder
+            regenDelay = wrapper
+                    .builder("pets.regenDelay")
                     .comment("Delay (in seconds) between regen ticks for pets. Set 0 to disable.")
-                    .defineInRange("regenDelay", 30, 0, Double.MAX_VALUE);
-
-            builder.pop(); // pets
+                    .defineInRange(30, 0, Double.MAX_VALUE);
         }
     }
 
@@ -51,45 +48,44 @@ public class DimensionConfig {
 
         // TODO: regen configs
 
-        Player(ForgeConfigSpec.Builder builder) {
-            builder.comment("Settings for players");
-            builder.push("player");
+        Player(ConfigSpecWrapper wrapper) {
+            wrapper.comment("player", "Settings for players");
 
-            builder.push("health");
-            allowHealthModification = builder
+            allowHealthModification = wrapper
+                    .builder("player.health.allowModification")
                     .comment("Allow Scaling Health to apply health modifiers. Heart Containers will not work if this is disabled.")
-                    .define("allowModification", true);
-            localHealth = builder
+                    .define(true);
+            localHealth = wrapper
+                    .builder("player.health.localHealth")
                     .comment("Player health and max health are unique to this dimension.")
-                    .define("localHealth", false);
-            startingHealth = builder
+                    .define(false);
+            startingHealth = wrapper
+                    .builder("player.health.startingHealth")
                     .comment("Starting player health, in half-hearts (20 = 10 hearts)")
-                    .defineInRange("startingHealth", 20, 2, Integer.MAX_VALUE);
-            maxHealth = builder
+                    .defineInRange(20, 2, Integer.MAX_VALUE);
+            maxHealth = wrapper
+                    .builder("player.health.maxHealth")
                     .comment("The highest max health a player can reach, not considering the vanilla health cap and modifiers from other sources. 0 means 'unlimited'.")
-                    .defineInRange("maxHealth", 0, 0, Integer.MAX_VALUE);
-            setOnDeath = defineExpression(builder,
+                    .defineInRange(0, 0, Integer.MAX_VALUE);
+            setOnDeath = defineExpression(wrapper,
                     "setOnDeath",
                     EvalVars.MAX_HEALTH.varName(),
                     EvalVars.MAX_HEALTH,
                     "On death, set the player's max health to this value. By default, there is no change.");
-            builder.pop(); // health
-
-            builder.pop(); // player
         }
     }
 
     public static class Mobs {
-        public final Supplier<MobHealthMode> healthMode;
+        public final EnumValue<MobHealthMode> healthMode;
 
-        Mobs(ForgeConfigSpec.Builder builder) {
-            builder.comment("Mob health settings");
-            builder.push("mob.health");
+        Mobs(ConfigSpecWrapper wrapper) {
+            wrapper.comment("mob.health", "Mob health settings");
 
-            healthMode = EnumUtils.defineEnumFix(builder, "modifierMode", MobHealthMode.MULTI_HALF);
-
-            builder.pop(); // health
-            builder.pop(); // mob
+            healthMode = wrapper
+                    .builder("mob.health.modifierMode")
+                    .comment("Determines how difficulty affects mob health.",
+                            "TODO: Describe each mode")
+                    .defineEnum(MobHealthMode.MULTI_HALF);
         }
     }
 
@@ -101,7 +97,7 @@ public class DimensionConfig {
         public final DoubleValue maxValue;
         public final DoubleValue changePerSecond;
         public final DoubleValue distanceFactor;
-        public final Supplier<AreaDifficultyMode> areaMode;
+        public final EnumValue<AreaDifficultyMode> areaMode;
         public final IntValue searchRadius;
         public final BooleanValue localPlayerDifficulty;
         public final BooleanValue localDimensionDifficulty;
@@ -119,97 +115,109 @@ public class DimensionConfig {
         public final Supplier<Expression> onPlayerSleep;
         private final ConfigValue<List<? extends CommentedConfig>> byEntityMutators;
 
-        private final ForgeConfigSpec byEntitySpec = new ForgeConfigSpec.Builder()
-                .defineList("types", ImmutableList.of("minecraft:villager"), o -> o instanceof String).next()
-                .define("onKilled", "difficulty + 0.01", o -> validateExpression(o, "onKilled", EvalVars.PLAYER_DIFFICULTY)).next()
-                .build();
+        private final ConfigSpec byEntitySpec = new ConfigSpec();
         private final CommentedConfig byEntityDefault = CommentedConfig.inMemory();
 
-        Difficulty(ForgeConfigSpec.Builder builder) {
-            builder.comment("Settings related to difficulty. Difficulty determines various things, such as how much health mobs have.");
-            builder.push("difficulty");
+        Difficulty(ConfigSpecWrapper wrapper) {
+            byEntitySpec.defineList("types", ImmutableList.of("minecraft:villager"), o -> o instanceof String);
+            byEntitySpec.define("onKilled", "difficulty + 0.01", o -> validateExpression(o, "onKilled", EvalVars.PLAYER_DIFFICULTY));
 
-            difficultyExempt = builder
+            wrapper.comment("difficulty", "Settings related to difficulty. Difficulty determines various things, such as how much health mobs have.");
+
+            difficultyExempt = wrapper
+                    .builder("difficulty.exemptPlayers")
                     .comment("These players will not gain difficulty. Use either name or UUID.",
                             "Note: if non-exempt players are nearby, mobs will still be stronger.")
-                    .defineList("exemptPlayers", ImmutableList.of(), o -> o instanceof String);
-            startingValue = builder
+                    .defineList(ImmutableList.of(), ConfigValue.IS_NONEMPTY_STRING);
+            startingValue = wrapper
+                    .builder("difficulty.startingValue")
                     .comment("The initial player difficulty value for newly spawned players.")
-                    .defineInRange("startingValue", 0, 0, Double.MAX_VALUE);
-            minValue = builder
+                    .defineInRange(0, 0, Double.MAX_VALUE);
+            minValue = wrapper
+                    .builder("difficulty.minValue")
                     .comment("The minimum difficulty value a player can have. This can be smaller from startingValue.")
-                    .defineInRange("minValue", 0, 0, Double.MAX_VALUE);
-            maxValue = builder
+                    .defineInRange(0, 0, Double.MAX_VALUE);
+            maxValue = wrapper
+                    .builder("difficulty.maxValue")
                     .comment("The maximum difficulty value a player can have.")
-                    .defineInRange("maxValue", 250, 0, Double.MAX_VALUE);
-            changePerSecond = builder
+                    .defineInRange(250, 0, Double.MAX_VALUE);
+            changePerSecond = wrapper
+                    .builder("difficulty.changePerSecond")
                     .comment("Every second, this value is added to player and dimension difficulty.",
                             "Enter a negative number to subtract difficulty instead.")
-                    .defineInRange("changePerSecond", 0.0011575, -10000, 10000);
-            distanceFactor = builder
+                    .defineInRange(0.0011575, -10000, 10000);
+            distanceFactor = wrapper
+                    .builder("difficulty.distanceFactor")
                     .comment("Distance-based area modes will multiply distance by this value to get difficulty")
-                    .defineInRange("distanceFactor", 0.0025, -100, 100);
-            areaMode = EnumUtils.defineEnumFix(builder, "areaMode", AreaDifficultyMode.WEIGHTED_AVERAGE);
-            searchRadius = builder
+                    .defineInRange(0.0025, -100, 100);
+            areaMode = wrapper
+                    .builder("difficulty.areaMode")
+                    .comment("Determines how difficulty is calculated.",
+                            "TODO: List and describe values")
+                    .defineEnum(AreaDifficultyMode.WEIGHTED_AVERAGE);
+            searchRadius = wrapper
+                    .builder("difficulty.searchRadius")
                     .comment("Distance to look for difficulty sources (players) when calculating area difficulty.")
-                    .defineInRange("searchRadius", 256, 64, Integer.MAX_VALUE);
-            localPlayerDifficulty = builder
+                    .defineInRange(256, 64, Integer.MAX_VALUE);
+            localPlayerDifficulty = wrapper
+                    .builder("difficulty.localPlayerDifficulty")
                     .comment("If true, player difficulty is tracked for this dimension.",
                             "Otherwise, the value tracked for the \"default\" dimension is used.")
-                    .define("localPlayerDifficulty", false);
-            localDimensionDifficulty = builder
+                    .define(false);
+            localDimensionDifficulty = wrapper
+                    .builder("difficulty.localDimensionDifficulty")
                     .comment("Track a difficulty value for this dimension. Otherwise, uses the \"default\" dimension.")
-                    .define("localDimensionDifficulty", false);
-            ignoreYAxis = builder
+                    .define(false);
+            ignoreYAxis = wrapper
+                    .builder("difficulty.ignoreYAxis")
                     .comment("Ignore the Y-axis in difficulty calculations")
-                    .define("ignoreYAxis", true);
-            groupAreaBonus = defineExpression(builder,
-                    "groupAreaBonus",
+                    .define(true);
+            groupAreaBonus = defineExpression(wrapper,
+                    "difficulty.groupAreaBonus",
                     "1 + 0.05 * (areaPlayerCount - 1)",
                     EvalVars.AREA_PLAYER_COUNT,
                     "A multiplier for area difficulty calculations, typically based on the number of players in the search radius.");
-            idleMultiplier = defineExpression(builder,
-                    "idleMultiplier",
+            idleMultiplier = defineExpression(wrapper,
+                    "difficulty.idleMultiplier",
                     "0.75",
                     null,
                     "Multiplier for changePerSecond when the player is not moving.");
 
             // Mutators
-            builder.comment("Change difficulty when certain things happen")
-                    .push("mutators");
+            wrapper.comment("difficulty.mutators", "Change difficulty when certain things happen");
 
-            onBlightKilled = defineExpression(builder,
-                    "onBlightKilled",
+            onBlightKilled = defineExpression(wrapper,
+                    "difficulty.mutators.onBlightKilled",
                     EvalVars.PLAYER_DIFFICULTY.varName(),
                     EvalVars.PLAYER_DIFFICULTY,
                     "A blight is killed by a player");
-            onBossKilled = defineExpression(builder,
-                    "onBossKilled",
+            onBossKilled = defineExpression(wrapper,
+                    "difficulty.mutators.onBossKilled",
                     EvalVars.PLAYER_DIFFICULTY.varName(),
                     EvalVars.PLAYER_DIFFICULTY,
                     "A boss is killed by a player");
-            onHostileKilled = defineExpression(builder,
-                    "onHostileKilled",
+            onHostileKilled = defineExpression(wrapper,
+                    "difficulty.mutators.onHostileKilled",
                     EvalVars.PLAYER_DIFFICULTY.varName(),
                     EvalVars.PLAYER_DIFFICULTY,
                     "A normal hostile mob is killed by a player");
-            onPeacefulKilled = defineExpression(builder,
-                    "onPeacefulKilled",
+            onPeacefulKilled = defineExpression(wrapper,
+                    "difficulty.mutators.onPeacefulKilled",
                     EvalVars.PLAYER_DIFFICULTY.varName(),
                     EvalVars.PLAYER_DIFFICULTY,
                     "A peaceful mob is killed by a player");
-            onPlayerKilled = defineExpression(builder,
-                    "onPlayerKilled",
+            onPlayerKilled = defineExpression(wrapper,
+                    "difficulty.mutators.onPlayerKilled",
                     EvalVars.PLAYER_DIFFICULTY.varName() + " + 1.0",
                     EvalVars.PLAYER_DIFFICULTY,
                     "A player killed another player");
-            onPlayerDeath = defineExpression(builder,
-                    "onPlayerDeath",
+            onPlayerDeath = defineExpression(wrapper,
+                    "difficulty.mutators.onPlayerDeath",
                     EvalVars.PLAYER_DIFFICULTY.varName(),
                     EvalVars.PLAYER_DIFFICULTY,
                     "A player dies");
-            onPlayerSleep = defineExpression(builder,
-                    "onPlayerSleep",
+            onPlayerSleep = defineExpression(wrapper,
+                    "difficulty.mutators.onPlayerSleep",
                     EvalVars.PLAYER_DIFFICULTY.varName(),
                     EvalVars.PLAYER_DIFFICULTY,
                     "A player sleeps in a bed");
@@ -217,15 +225,12 @@ public class DimensionConfig {
             byEntitySpec.correct(byEntityDefault);
 
             // byEntity table list
-            byEntityMutators = builder
-                    .defineList("byEntity", ImmutableList.of(byEntityDefault), o -> {
+            byEntityMutators = wrapper
+                    .builder("difficulty.mutators.byEntity")
+                    .defineList(ImmutableList.of(byEntityDefault), o -> {
                         if (!(o instanceof CommentedConfig)) return false;
                         return byEntitySpec.isCorrect((CommentedConfig) o);
                     });
-
-            builder.pop(); // mutators
-
-            builder.pop(); // difficulty
         }
 
         /**
@@ -265,10 +270,11 @@ public class DimensionConfig {
         }
     }
 
-    private static Supplier<Expression> defineExpression(ForgeConfigSpec.Builder builder, String path, String defaultValue, @Nullable EvalVars intendedVar, String comment) {
-        ConfigValue<String> config = builder
+    private static Supplier<Expression> defineExpression(ConfigSpecWrapper wrapper, String path, String defaultValue, @Nullable EvalVars intendedVar, String comment) {
+        StringValue config = wrapper
+                .builder(path)
                 .comment("EvalEx expression: " + comment)
-                .define(path, () -> defaultValue, o -> validateExpression(o, path, intendedVar));
+                .defineString(() -> defaultValue, o -> validateExpression(o, path, intendedVar));
 
         // TODO: I would guess creating an Expression is very expensive. Is this OK?
         // Expression creation time: roughly 5000 ns (0.005 ms)
@@ -296,33 +302,35 @@ public class DimensionConfig {
         return true;
     }
 
-    private final ForgeConfigSpec.Builder builder = new ForgeConfigSpec.Builder();
+    private final ConfigSpecWrapper wrapper;
 
-    public final General general = new General(builder);
-    public final Player player = new Player(builder);
-    public final Pets pets = new Pets(builder);
-    public final Difficulty difficulty = new Difficulty(builder);
+    public final General general;
+    public final Player player;
+    public final Pets pets;
+    public final Difficulty difficulty;
 
-    private final ForgeConfigSpec spec = builder.build();
+//    private final ForgeConfigSpec spec = builder.build();
 
     private final String configFileName;
     private final int dimensionId;
 
-    DimensionConfig() {
-        // temporary, until config system stabilizes
-        this.configFileName = "unknown";
-        this.dimensionId = 0;
-    }
-
     @SuppressWarnings("DynamicRegexReplaceableByCompiledPattern")
     DimensionConfig(final Path path) {
-//        spec.setConfigFile(path);
+        wrapper = ConfigSpecWrapper.create(path);
+        general = new General(wrapper);
+        player = new Player(wrapper);
+        pets = new Pets(wrapper);
+        difficulty = new Difficulty(wrapper);
 
         configFileName = path.getFileName().toString();
         String trimmed = configFileName
                 .replaceFirst("\\.toml$", "")
                 .replaceFirst("^dim(ension)?_?", "");
         this.dimensionId = dimensionIdFromString(trimmed);
+    }
+
+    void validate() {
+        wrapper.validate();
     }
 
     int dimensionID() {

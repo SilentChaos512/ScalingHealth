@@ -8,12 +8,13 @@ import net.silentchaos512.scalinghealth.capability.CapabilityDifficultyAffected;
 import net.silentchaos512.scalinghealth.capability.CapabilityDifficultySource;
 import net.silentchaos512.scalinghealth.capability.CapabilityPlayerData;
 import net.silentchaos512.scalinghealth.client.gui.DebugOverlay;
+import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.event.*;
 import net.silentchaos512.scalinghealth.init.*;
 
 class SideProxy {
     SideProxy() {
-//        Config.load();
+        Config.init();
         ModLoot.init();
         
         FMLModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
