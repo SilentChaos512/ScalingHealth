@@ -2,12 +2,14 @@ package net.silentchaos512.scalinghealth;
 
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.event.lifecycle.*;
+import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLModLoadingContext;
 import net.silentchaos512.scalinghealth.capability.CapabilityDifficultyAffected;
 import net.silentchaos512.scalinghealth.capability.CapabilityDifficultySource;
 import net.silentchaos512.scalinghealth.capability.CapabilityPlayerData;
 import net.silentchaos512.scalinghealth.client.gui.DebugOverlay;
+import net.silentchaos512.scalinghealth.command.ModCommands;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.event.*;
 import net.silentchaos512.scalinghealth.init.*;
@@ -20,6 +22,8 @@ class SideProxy {
         FMLModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
         FMLModLoadingContext.get().getModEventBus().addListener(this::imcEnqueue);
         FMLModLoadingContext.get().getModEventBus().addListener(this::imcProcess);
+        MinecraftForge.EVENT_BUS.addListener(this::serverAboutToStart);
+        MinecraftForge.EVENT_BUS.addListener(this::serverStarted);
 
         MinecraftForge.EVENT_BUS.addListener(ModBlocks::registerAll);
         MinecraftForge.EVENT_BUS.addListener(ModItems::registerAll);
@@ -42,6 +46,10 @@ class SideProxy {
     private void imcEnqueue(InterModEnqueueEvent event) { }
 
     private void imcProcess(InterModProcessEvent event) { }
+
+    private void serverAboutToStart(FMLServerAboutToStartEvent event) {
+        ModCommands.registerAll(event.getServer().getCommandManager().getDispatcher());
+    }
 
     private void serverStarted(FMLServerStartedEvent event) {
         ModGameRules.registerAll(event.getServer());

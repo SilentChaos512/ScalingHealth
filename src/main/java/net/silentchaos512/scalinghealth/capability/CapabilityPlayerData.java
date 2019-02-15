@@ -15,9 +15,11 @@ import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.utils.Difficulty;
 import net.silentchaos512.scalinghealth.network.ClientSyncMessage;
 import net.silentchaos512.scalinghealth.network.Network;
+import net.silentchaos512.scalinghealth.utils.Difficulty;
+import net.silentchaos512.scalinghealth.utils.ModifierHandler;
+import net.silentchaos512.scalinghealth.utils.Players;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -41,7 +43,8 @@ public class CapabilityPlayerData implements IPlayerData, ICapabilitySerializabl
 
     @Override
     public void setExtraHearts(EntityPlayer player, int value) {
-        extraHearts = value;
+        extraHearts = Players.clampExtraHearts(player, value);
+        ModifierHandler.addMaxHealth(player, 2 * extraHearts, 0);
     }
 
     @Override

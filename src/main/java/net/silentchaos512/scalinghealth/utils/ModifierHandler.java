@@ -21,73 +21,41 @@ package net.silentchaos512.scalinghealth.utils;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
-import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.lib.util.EntityHelper;
 
 import java.util.UUID;
 
-public class ModifierHandler {
-    public static final UUID MODIFIER_ID_HEALTH = UUID.fromString("c0bef565-35f6-4dc5-bb4c-3644c382e6ce");
-    public static final UUID MODIFIER_ID_DAMAGE = UUID.fromString("d3560b15-c459-451c-86a8-0247015ae899");
-    public static final String MODIFIER_NAME_HEALTH = ScalingHealth.MOD_ID_OLD + ".HealthModifier";
-    public static final String MODIFIER_NAME_DAMAGE = ScalingHealth.MOD_ID_OLD + ".DamageModifier";
+public final class ModifierHandler {
+    private static final UUID MODIFIER_ID_HEALTH = UUID.fromString("c0bef565-35f6-4dc5-bb4c-3644c382e6ce");
+    private static final UUID MODIFIER_ID_DAMAGE = UUID.fromString("d3560b15-c459-451c-86a8-0247015ae899");
+    private static final String MODIFIER_NAME_HEALTH = "ScalingHealth.HealthModifier";
+    private static final String MODIFIER_NAME_DAMAGE = "ScalingHealth.DamageModifier";
 
-    private static void setModifier(IAttributeInstance attr, UUID id, String name, double amount, int op) {
-        if (attr == null)
-            return;
+    private ModifierHandler() {throw new IllegalAccessError("Utility class");}
 
-        // Calculate the difference for the modifier.
-        double normalValue = attr.getBaseValue();
-        double difference = amount - normalValue;
-
-        // Get current and new modifier.
-        AttributeModifier mod = attr.getModifier(id);
-        AttributeModifier newMod = new AttributeModifier(id, name, difference, op);
-
-        // Remove the old, apply the new.
-        if (mod != null)
-            attr.removeModifier(mod);
-        attr.applyModifier(newMod);
-    }
-
-    @Deprecated
-    public static void setMaxHealth(EntityLivingBase entity, double amount, int op) {
-        if (amount <= 0) {
-            ScalingHealth.LOGGER.warn("ModifierHandler.setMaxHealth: amount <= 0!");
-            return;
-        }
-
-        /*
-        if (entity instanceof EntityPlayer && !Config.Player.Health.allowModify) {
-            // It's a player, but the user has disallowed Scaling Health from modifying the player's health.
-            ScalingHealth.LOGGER.info("Would have set player {}'s health to {}, but modified player health has been disabled in the config!",
-                    entity.getName(), amount);
-            return;
-        }
-        */
-
-        float originalHealth = entity.getHealth();
-        IAttributeInstance attr = entity.getAttribute(SharedMonsterAttributes.MAX_HEALTH);
-        if (attr != null) {
-            setModifier(attr, MODIFIER_ID_HEALTH, MODIFIER_NAME_HEALTH, amount, op);
-            entity.setHealth(originalHealth);
-        }
+    public static void setModifier(EntityLivingBase entity, IAttribute attribute, UUID uuid, String name, double amount, int op) {
+        IAttributeInstance instance = entity.getAttribute(attribute);
+        //noinspection ConstantConditions -- instance CAN be null!
+        if (instance == null) return;
+        AttributeModifier mod = instance.getModifier(uuid);
+        if (mod != null) instance.removeModifier(mod);
+        instance.applyModifier(new AttributeModifier(uuid, name, amount, op));
     }
 
     public static void addMaxHealth(EntityLivingBase entity, double amount, int op) {
-        IAttributeInstance attribute = entity.getAttribute(SharedMonsterAttributes.MAX_HEALTH);
-        AttributeModifier mod = attribute.getModifier(MODIFIER_ID_HEALTH);
-        if (mod != null) {
-            attribute.removeModifier(mod);
+        double oldMax = entity.getMaxHealth();
+        setModifier(entity, SharedMonsterAttributes.MAX_HEALTH, MODIFIER_ID_HEALTH, MODIFIER_NAME_HEALTH, amount, op);
+        double newMax = entity.getMaxHealth();
+        // Heal entity when increasing max health
+        if (newMax > oldMax) {
+            float healAmount = (float) (newMax - oldMax);
+            EntityHelper.heal(entity, healAmount, false);
         }
-        attribute.applyModifier(new AttributeModifier(MODIFIER_ID_HEALTH, MODIFIER_NAME_HEALTH, amount, op));
     }
 
     public static void addAttackDamage(EntityLivingBase entity, double amount, int op) {
-        IAttributeInstance attr = entity.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
-        if (attr != null) {
-            amount += attr.getBaseValue();
-            setModifier(attr, MODIFIER_ID_DAMAGE, MODIFIER_NAME_DAMAGE, amount, op);
-        }
+        setModifier(entity, SharedMonsterAttributes.ATTACK_DAMAGE, MODIFIER_ID_DAMAGE, MODIFIER_NAME_DAMAGE, amount, op);
     }
 }

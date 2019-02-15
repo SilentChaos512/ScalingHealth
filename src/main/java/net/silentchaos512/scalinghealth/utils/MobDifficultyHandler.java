@@ -89,12 +89,6 @@ public final class MobDifficultyHandler {
         double healthModAmount = mode.getModifierValue(healthBoost, baseMaxHealth);
         ModifierHandler.addMaxHealth(entity, healthModAmount, mode.getOperator());
         ModifierHandler.addAttackDamage(entity, damageBoost, 0);
-
-        // Heal.
-        float healthChange = entity.getMaxHealth() - originalMaxHealth;
-        if (Math.abs(healthChange) > 0.01) {
-            entity.setHealth(entity.getHealth() + healthChange);
-        }
     }
 
     private static MobHealthMode getHealthMode(EntityLivingBase entity) {

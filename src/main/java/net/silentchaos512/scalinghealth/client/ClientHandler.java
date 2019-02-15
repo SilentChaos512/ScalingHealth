@@ -22,5 +22,6 @@ public final class ClientHandler {
             worldDifficulty = msg.worldDifficulty;
             areaDifficulty = msg.areaDifficulty;
         });
+        ctx.get().setPacketHandled(true);
     }
 }

@@ -1,7 +1,7 @@
 package net.silentchaos512.scalinghealth.command;
 
 import com.mojang.brigadier.CommandDispatcher;
-import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.FloatArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -12,14 +12,14 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
-import net.silentchaos512.scalinghealth.capability.CapabilityPlayerData;
-import net.silentchaos512.scalinghealth.utils.Players;
+import net.silentchaos512.scalinghealth.capability.CapabilityDifficultySource;
+import net.silentchaos512.scalinghealth.utils.Difficulty;
 
-public final class HealthCommand {
-    private HealthCommand() {}
+public final class DifficultyCommand {
+    private DifficultyCommand() {}
 
     public static void register(CommandDispatcher<CommandSource> dispatcher) {
-        LiteralArgumentBuilder<CommandSource> builder = Commands.literal("sh_health").requires(source ->
+        LiteralArgumentBuilder<CommandSource> builder = Commands.literal("sh_difficulty").requires(source ->
                 source.hasPermissionLevel(2));
 
         // get
@@ -27,19 +27,19 @@ public final class HealthCommand {
                 Commands.literal("get").then(
                         Commands.argument("targets", EntityArgument.multiplePlayers()).executes(
                                 // Run for all targets
-                                HealthCommand::runGetHealth
+                                DifficultyCommand::runGetHealth
                         )
                 ).executes(context -> {
                     // No target, use sender
-                    return getHealthSingle(context, context.getSource().asPlayer());
+                    return getDifficultySingle(context, context.getSource().asPlayer());
                 })
         );
         // set
         builder.then(
                 Commands.literal("set").then(
                         Commands.argument("targets", EntityArgument.multiplePlayers()).then(
-                                Commands.argument("amount", IntegerArgumentType.integer()).executes(
-                                        HealthCommand::runSetHealth
+                                Commands.argument("amount", FloatArgumentType.floatArg()).executes(
+                                        DifficultyCommand::runSetDifficulty
                                 )
                         )
                 )
@@ -48,8 +48,8 @@ public final class HealthCommand {
         builder.then(
                 Commands.literal("add").then(
                         Commands.argument("targets", EntityArgument.multiplePlayers()).then(
-                                Commands.argument("amount", IntegerArgumentType.integer()).executes(
-                                        HealthCommand::runAddHealth
+                                Commands.argument("amount", FloatArgumentType.floatArg()).executes(
+                                        DifficultyCommand::runAddDifficulty
                                 )
                         )
                 )
@@ -60,44 +60,44 @@ public final class HealthCommand {
 
     private static int runGetHealth(CommandContext<CommandSource> context) throws CommandSyntaxException {
         for (EntityPlayerMP player : EntityArgument.getPlayers(context, "targets")) {
-            getHealthSingle(context, player);
+            getDifficultySingle(context, player);
         }
         return 1;
     }
 
-    private static int getHealthSingle(CommandContext<CommandSource> context, EntityPlayer player) {
-        player.getCapability(CapabilityPlayerData.INSTANCE).ifPresent(data -> {
+    private static int getDifficultySingle(CommandContext<CommandSource> context, EntityPlayer player) {
+        player.getCapability(CapabilityDifficultySource.INSTANCE).ifPresent(source -> {
             context.getSource().sendFeedback(ModCommands.playerNameText(player), true);
-            context.getSource().sendFeedback(text("actual", player.getHealth(), player.getMaxHealth()), true);
-            int extraHearts = data.getExtraHearts();
-            String extraHealth = (extraHearts >= 0 ? "+" : "") + (2 * extraHearts);
-            context.getSource().sendFeedback(text("heartContainers", extraHearts, extraHealth), true);
+            float difficulty = source.getDifficulty();
+            double maxDifficulty = Difficulty.maxValue(player.world);
+            context.getSource().sendFeedback(text("player", difficulty, maxDifficulty), true);
+            double areaDifficulty = Difficulty.forPos(player.world, player.getPosition());
+            context.getSource().sendFeedback(text("area", areaDifficulty, maxDifficulty), true);
         });
         return 1;
     }
 
-    private static int runSetHealth(CommandContext<CommandSource> context) throws CommandSyntaxException {
-        int amount = IntegerArgumentType.getInteger(context, "amount");
+    private static int runSetDifficulty(CommandContext<CommandSource> context) throws CommandSyntaxException {
+        float amount = FloatArgumentType.getFloat(context, "amount");
         for (EntityPlayerMP player : EntityArgument.getPlayers(context, "targets")) {
-            player.getCapability(CapabilityPlayerData.INSTANCE).ifPresent(data -> {
-                int intendedExtraHearts = (amount - Players.startingHealth(player)) / 2;
-                data.setExtraHearts(player, intendedExtraHearts);
+            player.getCapability(CapabilityDifficultySource.INSTANCE).ifPresent(source -> {
+                source.setDifficulty(amount);
             });
         }
         return 1;
     }
 
-    private static int runAddHealth(CommandContext<CommandSource> context) throws CommandSyntaxException {
-        int amount = IntegerArgumentType.getInteger(context, "amount");
+    private static int runAddDifficulty(CommandContext<CommandSource> context) throws CommandSyntaxException {
+        float amount = FloatArgumentType.getFloat(context, "amount");
         for (EntityPlayerMP player : EntityArgument.getPlayers(context, "targets")) {
-            player.getCapability(CapabilityPlayerData.INSTANCE).ifPresent(data -> {
-                data.addHearts(player, amount);
+            player.getCapability(CapabilityDifficultySource.INSTANCE).ifPresent(source -> {
+                source.addDifficulty(amount);
             });
         }
         return 1;
     }
 
     private static ITextComponent text(String key, Object... args) {
-        return new TextComponentTranslation("command.scalinghealth.health." + key, args);
+        return new TextComponentTranslation("command.scalinghealth.difficulty." + key, args);
     }
 }
