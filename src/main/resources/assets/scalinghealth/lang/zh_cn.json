@@ -1,0 +1,21 @@
+{
+  "blight.scalinghealth": "%s疾病",
+  "blight.scalinghealth.killedByPlayer": "%s 死于 %s ！",
+  "block.scalinghealth.crystalore": "水晶之心矿石",
+  "command.scalinghealth.outOfBounds": "该参数必须在 %s 与 %s 之间。",
+  "command.scalinghealth.setDifficulty": "将 %s 模式设置为 %s 模式。",
+  "command.scalinghealth.setHealth": "将玩家生命值 %s 设置为 %d。",
+  "command.scalinghealth.showDifficulty": "%s模式： %s / %s",
+  "command.scalinghealth.showHealth": "%s生命值： %s / %s (%s)",
+  "effect.scalinghealth.bandaged": "包扎",
+  "item.scalinghealth.bandage": "绷带",
+  "item.scalinghealth.crystalshard": "水晶之心碎片",
+  "item.scalinghealth.cursed_heart": "诅咒之心",
+  "item.scalinghealth.enchanted_heart": "蕴魔之心",
+  "item.scalinghealth.healingitem.healingValue": "在 %d%% 秒内恢复你 %d 点生命值。",
+  "item.scalinghealth.healingitem.howToUse": "用于 %d 使用。",
+  "item.scalinghealth.heartcontainer": "心之容器",
+  "item.scalinghealth.heartdust": "心粉",
+  "item.scalinghealth.medkit": "医疗包",
+  "misc.scalinghealth.sleepWarning": "[Scaling Health]警告：睡觉将会改变你的游戏难度！"
+}
