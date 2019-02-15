@@ -19,6 +19,7 @@
 package net.silentchaos512.scalinghealth.config;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.world.IWorldReaderBase;
 import net.minecraftforge.common.extensions.IForgeDimension;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -31,6 +32,7 @@ import net.silentchaos512.utils.Anchor;
 import net.silentchaos512.utils.Color;
 import net.silentchaos512.utils.config.*;
 
+import javax.annotation.Nullable;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.EnumSet;
@@ -54,6 +56,9 @@ public final class Config {
     public static final Common COMMON = new Common(WRAPPER_COMMON);
 
     public static class Client {
+        // Debug
+        public final EnumValue<Anchor> debugOverlayAnchor;
+
         // Health Icons
         public final EnumValue<HeartIconStyle> heartIconStyle;
         public final ColorList heartColors;
@@ -88,6 +93,12 @@ public final class Config {
         public final IntValue difficultyMeterOffsetY;
 
         Client(ConfigSpecWrapper wrapper) {
+            debugOverlayAnchor = wrapper
+                    .builder("debug")
+                    .comment("Position of debug overlay",
+                            EnumValue.allValuesComment(Anchor.class))
+                    .defineEnum(Anchor.TOP_RIGHT);
+
             //region Health Hearts
 
             wrapper.comment("hearts.health.icons", "Settings for heart rows");
@@ -288,6 +299,14 @@ public final class Config {
                     directory.getAbsolutePath());
         }
         return parent.resolve(path);
+    }
+
+    public static DimensionConfig getOrDefault(@Nullable IWorldReaderBase world) {
+        return world != null ? get(world) : DEFAULT;
+    }
+
+    public static DimensionConfig get(IWorldReaderBase world) {
+        return get(world.getDimension().getId());
     }
 
     public static DimensionConfig get(IForgeDimension dimension) {

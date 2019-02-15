@@ -32,10 +32,12 @@ import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
+import net.silentchaos512.lib.util.EntityHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.CapabilityPlayerData;
 import net.silentchaos512.scalinghealth.capability.IPlayerData;
 import net.silentchaos512.scalinghealth.utils.Players;
+import net.silentchaos512.utils.MathUtils;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -64,7 +66,7 @@ public class ItemHeartContainer extends Item {
                     new IllegalStateException("Player data is null! " + player));
 
             final boolean healthIncreaseAllowed = isHealthIncreaseAllowed(player, data);
-            final int levelRequirement = getLevelsRequiredToUse(player, stack, healthIncreaseAllowed);
+            final int levelRequirement = Players.levelCostToUseHeartContainer(player);
 
             // Does player have enough XP?
             if (player.experienceLevel < levelRequirement) {
@@ -73,7 +75,7 @@ public class ItemHeartContainer extends Item {
             }
 
             // Heal the player (this is separate from the "healing" of the newly added heart, if that's allowed).
-            final boolean consumed = true; //Config.Items.Heart.healthRestored > 0 && player.getHealth() < player.getMaxHealth();
+            final boolean consumed = Players.heartContainerHealthRestored(player) > 0 && player.getHealth() < player.getMaxHealth();
             if (consumed) {
                 doExtraHealing(player);
             }
@@ -90,14 +92,13 @@ public class ItemHeartContainer extends Item {
     }
 
     private static void doExtraHealing(EntityPlayer player) {
-        /*
         int current = (int) player.getHealth();
-        EntityHelper.heal(player, Config.Items.Heart.healthRestored, Config.Items.Heart.healingEvent);
+        float healAmount = Players.heartContainerHealthRestored(player);
+        EntityHelper.heal(player, healAmount, true);
         int newHealth = (int) player.getHealth();
-        if (current + Config.Items.Heart.healthRestored != newHealth) {
+        if (!MathUtils.doublesEqual(current + healAmount, newHealth)) {
             ScalingHealth.LOGGER.warn("Another mod seems to have canceled healing from a heart container (player {})", player.getName());
         }
-        */
     }
 
     private void incrementUseStat(EntityPlayer player) {
@@ -128,20 +129,13 @@ public class ItemHeartContainer extends Item {
 //        NetworkHandler.INSTANCE.sendTo(new MessageDataSync(data, player), (EntityPlayerMP) player);
     }
 
-    private static int getLevelsRequiredToUse(EntityPlayer player, ItemStack stack, boolean healthIncreaseAllowed) {
-//        return player.abilities.isCreativeMode ? 0 : Config.Items.Heart.xpCost;
-        return 3;
-    }
-
     private static void consumeLevels(EntityPlayer player, int amount) {
         player.experienceLevel -= amount;
     }
 
     private static boolean isHealthIncreaseAllowed(EntityPlayer player, IPlayerData data) {
-//        DimensionConfig config = Config.get(player);
-//        Integer max = config.player.maxHealth.get();
-//        return Config.Items.Heart.increaseHealth && (max == 0 || data.getMaxHealth() < max);
-        return data.getExtraHearts() < Players.maxHeartContainers(player);
+        return Players.heartContainersIncreaseHealth(player)
+                && data.getExtraHearts() < Players.maxHeartContainers(player);
     }
 
     private static void spawnParticlesAndPlaySound(World world, EntityPlayer player) {

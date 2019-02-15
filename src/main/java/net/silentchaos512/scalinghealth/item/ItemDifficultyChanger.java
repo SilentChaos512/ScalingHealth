@@ -32,7 +32,9 @@ import net.minecraft.world.World;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IDifficultySource;
 import net.silentchaos512.scalinghealth.utils.Difficulty;
+import net.silentchaos512.scalinghealth.utils.Players;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
 public class ItemDifficultyChanger extends Item {
@@ -47,17 +49,16 @@ public class ItemDifficultyChanger extends Item {
         this.type = type;
     }
 
-    public float getEffectAmount(ItemStack stack) {
-//        if (type == Type.CURSED)
-//            return Config.Items.cursedHeartChange;
-//        else
-//            return Config.Items.enchantedHeartChange;
-        return 0;
+    public float getEffectAmount(ItemStack stack, @Nullable World world) {
+        if (type == Type.CURSED)
+            return Players.cursedHeartAffectAmount(world);
+        else
+            return Players.enchantedHeartAffectAmount(world);
     }
 
     @Override
-    public void addInformation(ItemStack stack, World world, List<ITextComponent> list, ITooltipFlag flag) {
-        float amount = getEffectAmount(stack);
+    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flag) {
+        double amount = getEffectAmount(stack, world);
         String amountStr = (amount > 0 ? "+" : "") + String.format("%.1f", amount);
         list.add(new TextComponentTranslation("item.scalinghealth.difficulty_changer.effectDesc", amountStr));
     }
@@ -77,7 +78,7 @@ public class ItemDifficultyChanger extends Item {
         double particleZ = player.posZ;
 
         if (!world.isRemote) {
-            float change = getEffectAmount(stack);
+            float change = getEffectAmount(stack, world);
             source.addDifficulty(change);
             stack.shrink(1);
         }

@@ -5,11 +5,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.silentchaos512.lib.client.gui.DebugRenderOverlay;
 import net.silentchaos512.scalinghealth.client.ClientHandler;
+import net.silentchaos512.scalinghealth.config.Config;
+import net.silentchaos512.utils.Anchor;
 
 import javax.annotation.Nonnull;
 import java.util.List;
 
 public class DebugOverlay extends DebugRenderOverlay {
+    private static final String FLOAT_FORMAT = "%.5f";
+
     public static DebugOverlay INSTANCE = new DebugOverlay();
 
     public static void init() {
@@ -24,9 +28,9 @@ public class DebugOverlay extends DebugRenderOverlay {
 
         return ImmutableList.of(
                 "Difficulty",
-                "    Player: " + ClientHandler.playerDifficulty,
-                "    World: " + ClientHandler.worldDifficulty,
-                "    Area: " + ClientHandler.areaDifficulty
+                "    Player=" + String.format(FLOAT_FORMAT, ClientHandler.playerDifficulty),
+                "    World=" + String.format(FLOAT_FORMAT, ClientHandler.worldDifficulty),
+                "    Area=" + String.format(FLOAT_FORMAT, ClientHandler.areaDifficulty)
         );
     }
 
@@ -38,5 +42,10 @@ public class DebugOverlay extends DebugRenderOverlay {
     @Override
     public boolean isHidden() {
         return false;
+    }
+
+    @Override
+    public Anchor getAnchorPoint() {
+        return Config.CLIENT.debugOverlayAnchor.get();
     }
 }

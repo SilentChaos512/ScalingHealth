@@ -25,6 +25,41 @@ public class DimensionConfig {
         }
     }
 
+    public static class Items {
+        public final DoubleValue cursedHeartAffect;
+        public final DoubleValue enchantedHeartAffect;
+        public final DoubleValue heartContainerHealthRestored;
+        public final IntValue heartContainerLevelCost;
+        public final BooleanValue heartContainerIncreaseHealth;
+
+        Items(ConfigSpecWrapper wrapper) {
+            wrapper.comment("items", "Settings for items when used in this dimension");
+
+            cursedHeartAffect = wrapper
+                    .builder("item.cursedHeart.change")
+                    .comment("Change in difficulty when a cursed heart is used")
+                    .defineInRange(10, -Double.MAX_VALUE, Double.MAX_VALUE);
+            enchantedHeartAffect = wrapper
+                    .builder("item.enchantedHeart.change")
+                    .comment("Change in difficulty when an enchanted heart is used")
+                    .defineInRange(-10, -Double.MAX_VALUE, Double.MAX_VALUE);
+            heartContainerHealthRestored = wrapper
+                    .builder("item.heartContainer.healthRestored")
+                    .comment("The amount of additional health restored by heart containers (min = 0)",
+                            "Heart containers always restore the amount of health they add, this is a bonus")
+                    .defineInRange(4, 0, Double.MAX_VALUE);
+            heartContainerLevelCost = wrapper
+                    .builder("item.heartContainer.levelCost")
+                    .comment("The number of levels required to use a heart container (min = 0)")
+                    .defineInRange(3, 0, Integer.MAX_VALUE);
+            heartContainerIncreaseHealth = wrapper
+                    .builder("item.heartContainer.increaseHealth")
+                    .comment("Do heart containers increase max health?",
+                            "If set to false, they can still be used as a healing item.")
+                    .define(true);
+        }
+    }
+
     public static class Pets {
         public final DoubleValue regenDelay;
 
@@ -43,6 +78,7 @@ public class DimensionConfig {
         public final BooleanValue allowHealthModification;
         public final BooleanValue localHealth;
         public final IntValue startingHealth;
+        public final IntValue minHealth;
         public final IntValue maxHealth;
         public final Supplier<Expression> setOnDeath;
 
@@ -63,6 +99,10 @@ public class DimensionConfig {
                     .builder("player.health.startingHealth")
                     .comment("Starting player health, in half-hearts (20 = 10 hearts)")
                     .defineInRange(20, 2, Integer.MAX_VALUE);
+            minHealth = wrapper
+                    .builder("player.health.minHealth")
+                    .comment("The minimum amount of health a player can have (this can be lower than starting health)")
+                    .defineInRange(2, 2, Integer.MAX_VALUE);
             maxHealth = wrapper
                     .builder("player.health.maxHealth")
                     .comment("The highest max health a player can reach, not considering the vanilla health cap and modifiers from other sources. 0 means 'unlimited'.")
@@ -305,11 +345,10 @@ public class DimensionConfig {
     private final ConfigSpecWrapper wrapper;
 
     public final General general;
+    public final Items item;
     public final Player player;
     public final Pets pets;
     public final Difficulty difficulty;
-
-//    private final ForgeConfigSpec spec = builder.build();
 
     private final String configFileName;
     private final int dimensionId;
@@ -318,6 +357,7 @@ public class DimensionConfig {
     DimensionConfig(final Path path) {
         wrapper = ConfigSpecWrapper.create(path);
         general = new General(wrapper);
+        item = new Items(wrapper);
         player = new Player(wrapper);
         pets = new Pets(wrapper);
         difficulty = new Difficulty(wrapper);
