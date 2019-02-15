@@ -49,7 +49,7 @@ public class ItemHeartContainer extends Item {
 
     @Override
     public void addInformation(ItemStack stack, World world, List<ITextComponent> list, ITooltipFlag flag) {
-        list.add(new TextComponentTranslation("item.scalinghealth.heart_container.desc"));
+        list.add(new TextComponentTranslation("item.scalinghealth.heart_crystal.desc"));
     }
 
     @Override
@@ -70,7 +70,7 @@ public class ItemHeartContainer extends Item {
 
             // Does player have enough XP?
             if (player.experienceLevel < levelRequirement) {
-                player.sendMessage(new TextComponentTranslation("item.scalinghealth.heart_container.notEnoughXP", levelRequirement));
+                player.sendMessage(new TextComponentTranslation("item.scalinghealth.heart_crystal.notEnoughXP", levelRequirement));
                 return ActionResult.newResult(EnumActionResult.PASS, stack);
             }
 

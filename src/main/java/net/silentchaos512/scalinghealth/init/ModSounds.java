@@ -21,39 +21,47 @@ package net.silentchaos512.scalinghealth.init;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.utils.Lazy;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.Locale;
 
-public final class ModSounds {
-    private static final Map<String, SoundEvent> SOUND_EVENTS = new LinkedHashMap<>();
+public enum ModSounds {
+    CURSED_HEART_USE,
+    ENCHANTED_HEART_USE,
+    HEART_CONTAINER_USE,
+    PLAYER_DIED;
 
-    public static SoundEvent CURSED_HEART_USE;
-    public static SoundEvent ENCHANTED_HEART_USE;
-    public static SoundEvent HEART_CONTAINER_USE;
-    public static SoundEvent PLAYER_DIED;
+    private final Lazy<SoundEvent> sound;
 
-    private ModSounds() { }
-
-    public static void registerAll(RegistryEvent.Register<SoundEvent> event) {
-        IForgeRegistry<SoundEvent> reg = event.getRegistry();
-
-        CURSED_HEART_USE = register(reg, "cursed_heart_use");
-        ENCHANTED_HEART_USE = register(reg, "enchanted_heart_use");
-        HEART_CONTAINER_USE = register(reg, "heart_container_use");
-        PLAYER_DIED = register(reg, "player_died");
+    ModSounds() {
+        this.sound = Lazy.of(() -> {
+            ResourceLocation id = new ResourceLocation(ScalingHealth.MOD_ID, getName());
+            return new SoundEvent(id);
+        });
     }
 
-    private static SoundEvent register(IForgeRegistry<SoundEvent> reg, String name) {
+    public SoundEvent get() {
+        return sound.get();
+    }
+
+    public String getName() {
+        return name().toLowerCase(Locale.ROOT);
+    }
+
+    public static void registerAll(RegistryEvent.Register<SoundEvent> event) {
+        // Workaround for Forge event bus bug
+        if (!event.getName().equals(ForgeRegistries.SOUND_EVENTS.getRegistryName())) return;
+
+        for (ModSounds sound : values()) {
+            register(sound.getName(), sound.get());
+        }
+    }
+
+    private static void register(String name, SoundEvent sound) {
         ResourceLocation id = new ResourceLocation(ScalingHealth.MOD_ID, name);
-        SoundEvent sound = new SoundEvent(id);
-
         sound.setRegistryName(id);
-        reg.register(sound);
-
-        SOUND_EVENTS.put(name, sound);
-        return sound;
+        ForgeRegistries.SOUND_EVENTS.register(sound);
     }
 }

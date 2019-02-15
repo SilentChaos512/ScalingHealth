@@ -24,20 +24,40 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.potion.PotionBandaged;
+import net.silentchaos512.utils.Lazy;
 
-public class ModPotions {
-    public static PotionBandaged bandaged;
+import java.util.Locale;
+import java.util.function.Supplier;
 
-    public static void registerAll(RegistryEvent.Register<Potion> event) {
-        if (!event.getName().equals(ForgeRegistries.POTIONS.getRegistryName())) return;
+public enum ModPotions {
+    BANDAGED(PotionBandaged::new);
 
-        bandaged = register("bandaged", new PotionBandaged());
+    private final Lazy<Potion> potion;
+
+    ModPotions(Supplier<Potion> factory) {
+        this.potion = Lazy.of(factory);
     }
 
-    private static <T extends Potion> T register(String name, T potion) {
+    public Potion get() {
+        return potion.get();
+    }
+
+    public String getName() {
+        return name().toLowerCase(Locale.ROOT);
+    }
+
+    public static void registerAll(RegistryEvent.Register<Potion> event) {
+        // Workaround for Forge event bus bug
+        if (!event.getName().equals(ForgeRegistries.POTIONS.getRegistryName())) return;
+
+        for (ModPotions potion : values()) {
+            register(potion.getName(), potion.get());
+        }
+    }
+
+    private static void register(String name, Potion potion) {
         ResourceLocation registryName = new ResourceLocation(ScalingHealth.MOD_ID, name);
         potion.setRegistryName(registryName);
         ForgeRegistries.POTIONS.register(potion);
-        return potion;
     }
 }

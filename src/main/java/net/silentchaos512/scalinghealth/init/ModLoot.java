@@ -60,13 +60,13 @@ public final class ModLoot {
             LootPool main = event.getTable().getPool("main");
             //noinspection ConstantConditions -- pool can be null
             if (main != null) {
-                main.addEntry(new LootEntryItem(ModItems.heart, 3, 2, new LootFunction[]{
+                main.addEntry(new LootEntryItem(ModItems.HEART_CRYSTAL.asItem(), 3, 2, new LootFunction[]{
                         new SetCount(new LootCondition[0], new RandomValueRange(1, 2))
                 }, new LootCondition[0], "sh_heart_container"));
-                main.addEntry(new LootEntryItem(ModItems.cursedHeart, 1, 5, new LootFunction[]{
+                main.addEntry(new LootEntryItem(ModItems.CURSED_HEART.asItem(), 1, 5, new LootFunction[]{
                         new SetCount(new LootCondition[0], new RandomValueRange(1, 3))
                 }, new LootCondition[0], "sh_cursed_heart"));
-                main.addEntry(new LootEntryItem(ModItems.enchantedHeart, 1, 5, new LootFunction[]{
+                main.addEntry(new LootEntryItem(ModItems.ENCHANTED_HEART.asItem(), 1, 5, new LootFunction[]{
                         new SetCount(new LootCondition[0], new RandomValueRange(1, 3))
                 }, new LootCondition[0], "sh_enchanted_heart"));
             }

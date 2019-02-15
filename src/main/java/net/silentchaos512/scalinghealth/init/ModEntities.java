@@ -18,28 +18,31 @@
 
 package net.silentchaos512.scalinghealth.init;
 
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.entity.EntityBlightFire;
+import net.silentchaos512.utils.Lazy;
 
-public class ModEntities {
-    public static EntityType<EntityBlightFire> blightFire;
+public final class ModEntities {
+    public static final Lazy<EntityType<EntityBlightFire>> BLIGHT_FIRE = Lazy.of(() ->
+            EntityType.Builder.create(EntityBlightFire.class, EntityBlightFire::new)
+                    .build(ScalingHealth.RESOURCE_PREFIX + "blight_fire"));
+
+    private ModEntities() {}
 
     public static void registerAll(RegistryEvent.Register<EntityType<?>> event) {
-        IForgeRegistry<EntityType<?>> reg = event.getRegistry();
+        // Workaround for Forge event bus bug
+        if (!event.getName().equals(ForgeRegistries.ENTITIES.getRegistryName())) return;
 
-        blightFire = register(reg, "blight_fire", EntityType.Builder.create(EntityBlightFire.class, EntityBlightFire::new));
+        register("blight_fire", BLIGHT_FIRE.get());
     }
 
-    private static <T extends Entity> EntityType<T> register(IForgeRegistry<EntityType<?>> reg, String name, EntityType.Builder<T> builder) {
+    private static void register(String name, EntityType<?> entityType) {
         ResourceLocation id = new ResourceLocation(ScalingHealth.MOD_ID, name);
-        EntityType<T> entityType = builder.build(id.toString());
         entityType.setRegistryName(id);
-        reg.register(entityType);
-        return entityType;
+        ForgeRegistries.ENTITIES.register(entityType);
     }
 }

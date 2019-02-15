@@ -20,46 +20,62 @@ package net.silentchaos512.scalinghealth.init;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.util.IItemProvider;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.item.ItemDifficultyChanger;
 import net.silentchaos512.scalinghealth.item.ItemHealing;
 import net.silentchaos512.scalinghealth.item.ItemHeartContainer;
+import net.silentchaos512.utils.Lazy;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Locale;
+import java.util.function.Supplier;
 
-public final class ModItems {
-    public static ItemHeartContainer heart;
-    public static Item crystalShard;
-    public static ItemDifficultyChanger cursedHeart;
-    public static ItemDifficultyChanger enchantedHeart;
+public enum ModItems implements IItemProvider {
+    HEART_CRYSTAL(ItemHeartContainer::new),
+    HEART_CRYSTAL_SHARD(() -> new Item(new Item.Builder().group(ItemGroup.MISC))),
+    HEART_DUST(() -> new Item(new Item.Builder().group(ItemGroup.MISC))),
+    BANDAGES(() -> new ItemHealing(0.3f, 1)),
+    MEDKIT(() -> new ItemHealing(0.7f, 4)),
+    CURSED_HEART(() -> new ItemDifficultyChanger(ItemDifficultyChanger.Type.CURSED)),
+    ENCHANTED_HEART(() -> new ItemDifficultyChanger(ItemDifficultyChanger.Type.ENCHANTED));
 
-    static Collection<ItemBlock> blocksToRegister = new ArrayList<>();
+    private final Lazy<Item> item;
 
-    private ModItems() {}
-
-    public static void registerAll(RegistryEvent.Register<Item> event) {
-        IForgeRegistry<Item> reg = event.getRegistry();
-
-        blocksToRegister.forEach(reg::register);
-
-        heart = register(reg, "heart_container", new ItemHeartContainer());
-        crystalShard = register(reg, "heart_shard", new Item(new Item.Builder()));
-        register(reg, "heart_dust", new Item(new Item.Builder()));
-        register(reg, "bandages", new ItemHealing(0.3f, 1));
-        register(reg, "medkit", new ItemHealing(0.7f, 4));
-        cursedHeart = register(reg, "cursed_heart", new ItemDifficultyChanger(ItemDifficultyChanger.Type.CURSED));
-        enchantedHeart = register(reg, "enchanted_heart", new ItemDifficultyChanger(ItemDifficultyChanger.Type.ENCHANTED));
+    ModItems(Supplier<Item> factory) {
+        item = Lazy.of(factory);
     }
 
-    private static <T extends Item> T register(IForgeRegistry<Item> reg, String name, T item) {
+    @Override
+    public Item asItem() {
+        return item.get();
+    }
+
+    public String getName() {
+        return name().toLowerCase(Locale.ROOT);
+    }
+
+    static final Collection<ItemBlock> blocksToRegister = new ArrayList<>();
+
+    public static void registerAll(RegistryEvent.Register<Item> event) {
+        // Workaround for Forge event bus bug
+        if (!event.getName().equals(ForgeRegistries.ITEMS.getRegistryName())) return;
+
+        blocksToRegister.forEach(ForgeRegistries.ITEMS::register);
+
+        for (ModItems item : values()) {
+            register(item.getName(), item.asItem());
+        }
+    }
+
+    private static void register(String name, Item item) {
         ResourceLocation registryName = new ResourceLocation(ScalingHealth.MOD_ID, name);
         item.setRegistryName(registryName);
-        reg.register(item);
-
-        return item;
+        ForgeRegistries.ITEMS.register(item);
     }
 }

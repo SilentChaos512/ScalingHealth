@@ -24,6 +24,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ActionResult;
@@ -46,7 +47,7 @@ public class ItemHealing extends Item {
     private final int effectDuration;
 
     public ItemHealing(float healAmount, int healSpeed) {
-        super(new Item.Builder().maxStackSize(16));
+        super(new Item.Builder().maxStackSize(16).group(ItemGroup.MISC));
         this.healAmount = healAmount;
         this.healSpeed = healSpeed;
         this.effectDuration = (int) (this.healAmount * 100 * 20 * 2 / this.healSpeed);
@@ -65,7 +66,7 @@ public class ItemHealing extends Item {
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer player, EnumHand hand) {
         ItemStack stack = player.getHeldItem(hand);
-        if (player.getHealth() < player.getMaxHealth() && !player.isPotionActive(ModPotions.bandaged)) {
+        if (player.getHealth() < player.getMaxHealth() && !player.isPotionActive(ModPotions.BANDAGED.get())) {
             player.setActiveHand(hand);
             return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
         }
@@ -75,7 +76,7 @@ public class ItemHealing extends Item {
     @Override
     public ItemStack onItemUseFinish(ItemStack stack, World world, EntityLivingBase entityLiving) {
         if (!world.isRemote) {
-            entityLiving.addPotionEffect(new PotionEffect(ModPotions.bandaged,
+            entityLiving.addPotionEffect(new PotionEffect(ModPotions.BANDAGED.get(),
                     this.effectDuration, this.healSpeed, false, false));
             stack.shrink(1);
         }

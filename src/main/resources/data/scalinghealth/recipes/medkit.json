@@ -1,0 +1,29 @@
+{
+  "type": "crafting_shaped",
+  "pattern": [
+    "did",
+    "bpb",
+    "ttt"
+  ],
+  "key": {
+    "p": {
+      "item": "minecraft:glistering_melon_slice"
+    },
+    "b": {
+      "item": "scalinghealth:bandages"
+    },
+    "d": {
+      "item": "scalinghealth:heart_dust"
+    },
+    "t": {
+      "item": "minecraft:terracotta"
+    },
+    "i": {
+      "tag": "forge:ingots/iron"
+    }
+  },
+  "result": {
+    "item": "scalinghealth:medkit",
+    "count": 2
+  }
+}

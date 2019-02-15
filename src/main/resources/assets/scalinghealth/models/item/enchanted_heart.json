@@ -1,7 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "scalinghealth:items/enchanted_heart"
+    "layer0": "scalinghealth:item/enchanted_heart"
   }
 }
-

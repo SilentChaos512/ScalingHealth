@@ -5,14 +5,20 @@ import net.minecraftforge.fml.event.lifecycle.*;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLModLoadingContext;
+import net.silentchaos512.lib.util.GameUtil;
 import net.silentchaos512.scalinghealth.capability.CapabilityDifficultyAffected;
 import net.silentchaos512.scalinghealth.capability.CapabilityDifficultySource;
 import net.silentchaos512.scalinghealth.capability.CapabilityPlayerData;
 import net.silentchaos512.scalinghealth.client.gui.DebugOverlay;
 import net.silentchaos512.scalinghealth.command.ModCommands;
 import net.silentchaos512.scalinghealth.config.Config;
-import net.silentchaos512.scalinghealth.event.*;
+import net.silentchaos512.scalinghealth.event.BlightHandler;
+import net.silentchaos512.scalinghealth.event.DamageScaling;
+import net.silentchaos512.scalinghealth.event.PetEventHandler;
+import net.silentchaos512.scalinghealth.event.ScalingHealthCommonEvents;
 import net.silentchaos512.scalinghealth.init.*;
+import net.silentchaos512.scalinghealth.utils.gen.GenModels;
+import net.silentchaos512.scalinghealth.utils.gen.GenRecipes;
 
 class SideProxy {
     SideProxy() {
@@ -25,10 +31,12 @@ class SideProxy {
         MinecraftForge.EVENT_BUS.addListener(this::serverAboutToStart);
         MinecraftForge.EVENT_BUS.addListener(this::serverStarted);
 
-        MinecraftForge.EVENT_BUS.addListener(ModBlocks::registerAll);
-        MinecraftForge.EVENT_BUS.addListener(ModItems::registerAll);
-        MinecraftForge.EVENT_BUS.addListener(ModEntities::registerAll);
-        MinecraftForge.EVENT_BUS.addListener(ModSounds::registerAll);
+        FMLModLoadingContext.get().getModEventBus().addListener(ModBlocks::registerAll);
+        FMLModLoadingContext.get().getModEventBus().addListener(ModEntities::registerAll);
+        FMLModLoadingContext.get().getModEventBus().addListener(ModItems::registerAll);
+        FMLModLoadingContext.get().getModEventBus().addListener(ModPotions::registerAll);
+        FMLModLoadingContext.get().getModEventBus().addListener(ModSounds::registerAll);
+//        FMLModLoadingContext.get().getModEventBus().addListener(ModTileEntities::registerAll);
 
         MinecraftForge.EVENT_BUS.register(new ScalingHealthCommonEvents());
         MinecraftForge.EVENT_BUS.register(BlightHandler.INSTANCE);
@@ -44,7 +52,12 @@ class SideProxy {
 
     private void imcEnqueue(InterModEnqueueEvent event) { }
 
-    private void imcProcess(InterModProcessEvent event) { }
+    private void imcProcess(InterModProcessEvent event) {
+        if (GameUtil.isDeobfuscated()) {
+            GenModels.generate();
+            GenRecipes.generate();
+        }
+    }
 
     private void serverAboutToStart(FMLServerAboutToStartEvent event) {
         ModCommands.registerAll(event.getServer().getCommandManager().getDispatcher());

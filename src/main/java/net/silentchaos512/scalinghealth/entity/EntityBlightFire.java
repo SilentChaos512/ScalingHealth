@@ -33,7 +33,7 @@ public class EntityBlightFire extends Entity implements IEntityAdditionalSpawnDa
     private EntityLivingBase parent;
 
     public EntityBlightFire(World worldIn) {
-        super(ModEntities.blightFire, worldIn);
+        super(ModEntities.BLIGHT_FIRE.get(), worldIn);
     }
 
     public EntityBlightFire(EntityLivingBase parent) {

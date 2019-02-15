@@ -23,28 +23,54 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.silentchaos512.lib.block.IBlockProvider;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.block.BlockShardOre;
+import net.silentchaos512.utils.Lazy;
 
-public final class ModBlocks {
-    public static BlockShardOre crystalOre;
+import java.util.Locale;
+import java.util.function.Supplier;
 
-    private ModBlocks() {}
+public enum ModBlocks implements IBlockProvider {
+    HEART_CRYSTAL_ORE(() -> new BlockShardOre(() -> ModItems.HEART_CRYSTAL_SHARD));
 
-    public static void registerAll(RegistryEvent.Register<Block> event) {
-        IForgeRegistry<Block> reg = event.getRegistry();
-        crystalOre = register(reg, "heart_shard_ore", new BlockShardOre(() -> ModItems.crystalShard));
+    private final Lazy<Block> block;
+
+    ModBlocks(Supplier<Block> factory) {
+        this.block = Lazy.of(factory);
     }
 
-    private static <T extends Block> T register(IForgeRegistry<Block> reg, String name, T block) {
+    @Override
+    public Block asBlock() {
+        return block.get();
+    }
+
+    @Override
+    public Item asItem() {
+        return asBlock().asItem();
+    }
+
+    public String getName() {
+        return name().toLowerCase(Locale.ROOT);
+    }
+
+    public static void registerAll(RegistryEvent.Register<Block> event) {
+        // Workaround for Forge event bus bug
+        if (!event.getName().equals(ForgeRegistries.BLOCKS.getRegistryName())) return;
+
+        for (ModBlocks block : values()) {
+            register(block.getName(), block.asBlock());
+        }
+    }
+
+    private static void register(String name, Block block) {
         ResourceLocation registryName = new ResourceLocation(ScalingHealth.MOD_ID, name);
         block.setRegistryName(registryName);
-        reg.register(block);
+        ForgeRegistries.BLOCKS.register(block);
 
         ItemBlock item = new ItemBlock(block, new Item.Builder());
+        item.setRegistryName(registryName);
         ModItems.blocksToRegister.add(item);
-
-        return block;
     }
 }

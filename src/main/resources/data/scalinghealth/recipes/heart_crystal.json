@@ -1,0 +1,16 @@
+{
+  "type": "crafting_shaped",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "scalinghealth:heart_crystal_shard"
+    }
+  },
+  "result": {
+    "item": "scalinghealth:heart_crystal"
+  }
+}

@@ -1,7 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "scalinghealth:items/heartdust"
+    "layer0": "scalinghealth:item/heart_crystal"
   }
 }
-

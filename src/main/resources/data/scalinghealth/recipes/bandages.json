@@ -1,0 +1,19 @@
+{
+  "type": "crafting_shaped",
+  "pattern": [
+    "ppp",
+    "ddd"
+  ],
+  "key": {
+    "p": {
+      "item": "minecraft:paper"
+    },
+    "d": {
+      "item": "scalinghealth:heart_dust"
+    }
+  },
+  "result": {
+    "item": "scalinghealth:bandages",
+    "count": 2
+  }
+}
