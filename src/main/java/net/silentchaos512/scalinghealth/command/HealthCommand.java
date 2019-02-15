@@ -12,6 +12,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TextFormatting;
 import net.silentchaos512.scalinghealth.capability.CapabilityPlayerData;
 import net.silentchaos512.scalinghealth.utils.Players;
 
@@ -68,10 +69,19 @@ public final class HealthCommand {
     private static int getHealthSingle(CommandContext<CommandSource> context, EntityPlayer player) {
         player.getCapability(CapabilityPlayerData.INSTANCE).ifPresent(data -> {
             context.getSource().sendFeedback(ModCommands.playerNameText(player), true);
-            context.getSource().sendFeedback(text("actual", player.getHealth(), player.getMaxHealth()), true);
+            // Actual health
+            ITextComponent actualValues = ModCommands.valueText(player.getHealth(), player.getMaxHealth());
+            ITextComponent actualText = text("actual", actualValues)
+                    .applyTextStyle(TextFormatting.YELLOW);
+            context.getSource().sendFeedback(actualText, true);
+            // Heart containers and health modifier
             int extraHearts = data.getExtraHearts();
             String extraHealth = (extraHearts >= 0 ? "+" : "") + (2 * extraHearts);
-            context.getSource().sendFeedback(text("heartContainers", extraHearts, extraHealth), true);
+            ITextComponent heartsValues = text("heartContainers.values", extraHearts, extraHealth)
+                    .applyTextStyle(TextFormatting.WHITE);
+            ITextComponent heartsText = text("heartContainers", heartsValues)
+                    .applyTextStyle(TextFormatting.YELLOW);
+            context.getSource().sendFeedback(heartsText, true);
         });
         return 1;
     }
