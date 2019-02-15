@@ -27,6 +27,7 @@ import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.silentchaos512.scalinghealth.ScalingHealth;
 
 import java.util.*;
 
@@ -66,6 +67,11 @@ public final class DamageScaling {
 
         // Get the amount of the damage to affect. Can be many times the base value.
         float affectedAmount = 0f;
+
+        if (scaleMode == null) {
+            // FIXME: Damage scaling!
+            ScalingHealth.LOGGER.warn("Uh-oh, damage scaling is broken! Plz fix!");
+        }
         switch (scaleMode) {
             case AREA_DIFFICULTY:
 //                affectedAmount = (float) ScalingHealthAPI.getAreaDifficulty(entity.world, entity.getPosition());
