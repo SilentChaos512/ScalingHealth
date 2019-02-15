@@ -40,7 +40,6 @@ class SideProxy {
         CapabilityDifficultyAffected.register();
         CapabilityDifficultySource.register();
         CapabilityPlayerData.register();
-        DifficultyHandler.INSTANCE.initPotionMap();
     }
 
     private void imcEnqueue(InterModEnqueueEvent event) { }

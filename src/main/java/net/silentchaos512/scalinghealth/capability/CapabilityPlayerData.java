@@ -64,7 +64,7 @@ public class CapabilityPlayerData implements IPlayerData, ICapabilitySerializabl
         ClientSyncMessage msg = new ClientSyncMessage(
                 Difficulty.source(player).getDifficulty(),
                 Difficulty.source(player.world).getDifficulty(),
-                (float) Difficulty.forPos(player.world, player.getPosition())
+                (float) Difficulty.areaDifficulty(player.world, player.getPosition())
         );
         EntityPlayerMP playerMP = (EntityPlayerMP) player;
         Network.channel.sendTo(msg, playerMP.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);

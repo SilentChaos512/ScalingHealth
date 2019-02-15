@@ -111,7 +111,7 @@ public enum AreaDifficultyMode {
 
     public abstract double getBaseAreaDifficulty(World world, BlockPos pos, int radius);
 
-    public double getAreaDifficulty(World world, BlockPos pos) {
+    public double getAreaDifficulty(World world, BlockPos pos, boolean groupBonus) {
         // Is difficulty disabled via game rule or other means?
         if (!world.isRemote && !Difficulty.enabledIn(world)) return 0.0;
 
@@ -121,6 +121,7 @@ public enum AreaDifficultyMode {
                 baseAreaDifficulty,
                 world.getPlayers(EntityPlayer.class, p -> p.getDistanceSq(pos) < radius * radius));
         final double clampedDifficulty = Difficulty.clamp(world, baseAreaDifficulty);
-        return Difficulty.withGroupBonus(world, clampedDifficulty);
+
+        return groupBonus ? Difficulty.withGroupBonus(world, pos, clampedDifficulty) : clampedDifficulty;
     }
 }

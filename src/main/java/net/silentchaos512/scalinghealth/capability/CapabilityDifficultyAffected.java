@@ -57,7 +57,7 @@ public class CapabilityDifficultyAffected implements IDifficultyAffected, ICapab
     @Override
     public void tick(EntityLivingBase entity) {
         if (!processed /*&& difficulty == 0*/ && entity.ticksExisted > 20) {
-            difficulty = (float) Difficulty.forPos(entity.world, entity.getPosition());
+            difficulty = (float) Difficulty.areaDifficulty(entity.world, entity.getPosition());
             ScalingHealth.LOGGER.debug(DifficultyEvents.MARKER, "Set difficulty of {} to {}", entity, difficulty);
             MobDifficultyHandler.process(entity, this);
             processed = true;

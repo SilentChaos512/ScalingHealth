@@ -27,7 +27,7 @@ public enum EvalVars {
             Difficulty.maxValue(ctx.world)
     ),
     AREA_DIFFICULTY("areaDifficulty", ctx ->
-            Difficulty.forPos(ctx.world, ctx.pos)
+            Difficulty.areaDifficulty(ctx.world, ctx.pos, false)
     ),
     AREA_PLAYER_COUNT("areaPlayerCount", ctx -> {
         long radiusSquared = Difficulty.searchRadiusSquared(ctx.world);

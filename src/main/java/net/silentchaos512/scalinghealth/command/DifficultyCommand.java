@@ -71,7 +71,7 @@ public final class DifficultyCommand {
             float difficulty = source.getDifficulty();
             double maxDifficulty = Difficulty.maxValue(player.world);
             context.getSource().sendFeedback(text("player", difficulty, maxDifficulty), true);
-            double areaDifficulty = Difficulty.forPos(player.world, player.getPosition());
+            double areaDifficulty = Difficulty.areaDifficulty(player.world, player.getPosition());
             context.getSource().sendFeedback(text("area", areaDifficulty, maxDifficulty), true);
         });
         return 1;

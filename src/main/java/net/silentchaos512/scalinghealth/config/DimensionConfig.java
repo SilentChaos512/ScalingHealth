@@ -117,6 +117,11 @@ public class DimensionConfig {
 
     public static class Mobs {
         public final EnumValue<MobHealthMode> healthMode;
+        public final DoubleValue hostilePotionChance;
+        public final DoubleValue peacefulPotionChance;
+        public final DoubleValue damageBoostScale;
+        public final DoubleValue maxDamageBoost;
+        public final MobPotionConfig randomPotions;
 
         Mobs(ConfigSpecWrapper wrapper) {
             wrapper.comment("mob.health", "Mob health settings");
@@ -126,6 +131,23 @@ public class DimensionConfig {
                     .comment("Determines how difficulty affects mob health.",
                             "TODO: Describe each mode")
                     .defineEnum(MobHealthMode.MULTI_HALF);
+            wrapper.comment("mob.potionChance", "Chance for mobs to receive a random potion effect (assuming their difficulty is high enough)");
+            hostilePotionChance = wrapper
+                    .builder("mob.potionChance.hostile")
+                    .defineInRange(0.375, 0, 1);
+            peacefulPotionChance = wrapper
+                    .builder("mob.potionChance.peaceful")
+                    .defineInRange(0.025, 0, 1);
+            damageBoostScale = wrapper
+                    .builder("mob.damage.boostScale")
+                    .comment("How rapidly mob attack damage rises with difficulty (0 = no damage boost)")
+                    .defineInRange(0.1, 0, Double.MAX_VALUE);
+            maxDamageBoost = wrapper
+                    .builder("mob.damage.maxBoost")
+                    .comment("The maximum extra attack damage a mob can receive")
+                    .defineInRange(10, 0, Double.MAX_VALUE);
+
+            randomPotions = MobPotionConfig.init(wrapper, "mob.randomPotionEffects");
         }
     }
 
@@ -346,6 +368,7 @@ public class DimensionConfig {
 
     public final General general;
     public final Items item;
+    public final Mobs mobs;
     public final Player player;
     public final Pets pets;
     public final Difficulty difficulty;
@@ -358,6 +381,7 @@ public class DimensionConfig {
         wrapper = ConfigSpecWrapper.create(path);
         general = new General(wrapper);
         item = new Items(wrapper);
+        mobs = new Mobs(wrapper);
         player = new Player(wrapper);
         pets = new Pets(wrapper);
         difficulty = new Difficulty(wrapper);

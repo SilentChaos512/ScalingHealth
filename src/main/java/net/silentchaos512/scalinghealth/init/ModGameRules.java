@@ -18,7 +18,9 @@ public enum ModGameRules implements IStringSerializable {
     }
 
     public boolean getBoolean(World world) {
-        return world.getGameRules().getBoolean(getName());
+        // FIXME: Game rules are not being registered?
+//        return world.getGameRules().getBoolean(getName());
+        return true;
     }
 
     @Override

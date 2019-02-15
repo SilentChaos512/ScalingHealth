@@ -71,6 +71,7 @@ public final class DamageScaling {
         if (scaleMode == null) {
             // FIXME: Damage scaling!
             ScalingHealth.LOGGER.warn("Uh-oh, damage scaling is broken! Plz fix!");
+            return;
         }
         switch (scaleMode) {
             case AREA_DIFFICULTY:
