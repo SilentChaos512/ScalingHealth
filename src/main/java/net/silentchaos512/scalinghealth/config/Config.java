@@ -38,6 +38,7 @@ import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 public final class Config {
     // Per-dimension configs. The "default" dimension is stored in its own field below.
@@ -127,7 +128,7 @@ public final class Config {
                     .builder("hearts.health.icons.lastHeartOutline")
                     .comment("The player's highest heart will get an outline around it.")
                     .define(true);
-            lastHeartOutlineColor =wrapper
+            lastHeartOutlineColor = wrapper
                     .builder("hearts.health.icons.lastHeartOutlineColor")
                     .comment("The color of the last heart outline, if enabled (see lastHeartOutline)")
                     .defineColor(Color.VALUE_WHITE);
@@ -162,7 +163,7 @@ public final class Config {
 
             //region Absorption Hearts
 
-            absorptionIconStyle =wrapper
+            absorptionIconStyle = wrapper
                     .builder("hearts.absorption.icons.style")
                     .defineEnum(AbsorptionIconStyle.SHIELD);
             absorptionHeartColors = new ColorList(wrapper, "colors",
@@ -195,7 +196,7 @@ public final class Config {
                     .builder("hearts.absorption.text.offsetY")
                     .comment("Fine-tune text position")
                     .defineInRange(0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-            absorptionTextColor =wrapper
+            absorptionTextColor = wrapper
                     .builder("hearts.absorption.text.color")
                     .comment("The color of the absorption text")
                     .defineColor(Color.VALUE_WHITE);
@@ -233,9 +234,9 @@ public final class Config {
 
     public static class Common {
         public final BooleanValue debugMaster;
-        public final BooleanValue debugShowOverlay;
-        public final BooleanValue debugLogEntitySpawns;
-        public final BooleanValue debugLogScaledDamage;
+        public final Supplier<Boolean> debugShowOverlay;
+        public final Supplier<Boolean> debugLogEntitySpawns;
+        public final Supplier<Boolean> debugLogScaledDamage;
 
         Common(ConfigSpecWrapper wrapper) {
             wrapper.comment("debug",
@@ -246,20 +247,24 @@ public final class Config {
                     .builder("debug.masterSwitch")
                     .comment("Must be true for other debug settings to apply")
                     .define(false);
-            debugShowOverlay = wrapper
+            debugShowOverlay = withMasterCheck(wrapper
                     .builder("debug.showOverlay")
                     .comment("Show some text in-game about player health, difficulty, and maybe other things.")
-                    .define(true);
-            debugLogEntitySpawns = wrapper
+                    .define(true));
+            debugLogEntitySpawns = withMasterCheck(wrapper
                     .builder("debug.logEntitySpawns")
                     .comment("Log details of entity spawns, including effects of difficulty.",
                             "This creates a lot of log spam, and will likely lag the game.")
-                    .define(false);
-            debugLogScaledDamage = wrapper
+                    .define(false));
+            debugLogScaledDamage = withMasterCheck(wrapper
                     .builder("debug.logDamageScaling")
                     .comment("Log details of scaled damage, useful for fine-tuning damage scaling.",
                             "May create a fair amount of log spam, but shouldn't slow down the game too much.")
-                    .define(true);
+                    .define(true));
+        }
+
+        Supplier<Boolean> withMasterCheck(BooleanValue option) {
+            return () -> debugMaster.get() && option.get();
         }
     }
 

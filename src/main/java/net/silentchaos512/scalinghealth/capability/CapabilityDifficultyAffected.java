@@ -13,6 +13,7 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.event.DifficultyEvents;
 import net.silentchaos512.scalinghealth.utils.Difficulty;
 import net.silentchaos512.scalinghealth.utils.MobDifficultyHandler;
@@ -58,9 +59,12 @@ public class CapabilityDifficultyAffected implements IDifficultyAffected, ICapab
     public void tick(EntityLivingBase entity) {
         if (!processed /*&& difficulty == 0*/ && entity.ticksExisted > 20) {
             difficulty = (float) Difficulty.areaDifficulty(entity.world, entity.getPosition());
-            ScalingHealth.LOGGER.debug(DifficultyEvents.MARKER, "Set difficulty of {} to {}", entity, difficulty);
             MobDifficultyHandler.process(entity, this);
             processed = true;
+
+            if (ScalingHealth.LOGGER.isDebugEnabled() && Config.COMMON.debugLogEntitySpawns.get()) {
+                ScalingHealth.LOGGER.debug(DifficultyEvents.MARKER, "Processed {} -> difficulty={}, isBlight={}", entity, difficulty, blight);
+            }
         }
     }
 

@@ -1,7 +1,7 @@
 package net.silentchaos512.scalinghealth.config;
 
 import com.google.common.collect.ImmutableList;
-import net.silentchaos512.lib.util.Color;
+import net.silentchaos512.utils.Color;
 import net.silentchaos512.utils.Lazy;
 import net.silentchaos512.utils.config.ConfigSpecWrapper;
 import net.silentchaos512.utils.config.ConfigValue;

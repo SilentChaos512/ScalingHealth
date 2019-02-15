@@ -83,13 +83,6 @@ dependencies {
 
     compile "com.udojava:EvalEx:2.1"
     compile "net.silentchaos512:silent-lib:${project.sl_version}"
-    compile ("net.silentchaos512:silent-utils:1.+") {
-        exclude module: 'guava'
-        exclude module: 'gson'
-        exclude module: 'log4j-core'
-        exclude module: 'log4j-api'
-        exclude module: 'javax'
-    }
 }
 
 jar {

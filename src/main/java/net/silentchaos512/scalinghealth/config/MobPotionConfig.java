@@ -50,7 +50,7 @@ public class MobPotionConfig {
 
     private static void debug(Supplier<?> message) {
         if (ScalingHealth.LOGGER.isDebugEnabled()) {
-            ScalingHealth.LOGGER.debug(MARKER, message);
+            ScalingHealth.LOGGER.debug(MARKER, message.get());
         }
     }
 

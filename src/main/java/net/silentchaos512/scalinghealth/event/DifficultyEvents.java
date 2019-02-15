@@ -13,12 +13,15 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.CapabilityDifficultyAffected;
 import net.silentchaos512.scalinghealth.capability.CapabilityDifficultySource;
 import net.silentchaos512.scalinghealth.capability.CapabilityPlayerData;
-import net.silentchaos512.scalinghealth.config.DimensionConfig;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
+import java.util.function.Supplier;
+
 @Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID)
 public final class DifficultyEvents {
+    private static final boolean PRINT_DEBUG_INFO = false;
+
     public static final Marker MARKER = MarkerManager.getMarker("Difficulty");
 
     private DifficultyEvents() {}
@@ -27,15 +30,15 @@ public final class DifficultyEvents {
     public static void onAttachEntityCapabilities(AttachCapabilitiesEvent<Entity> event) {
         Entity entity = event.getObject();
         if (CapabilityDifficultyAffected.canAttachTo(entity)) {
-//            ScalingHealth.LOGGER.debug(MARKER, event.getObject());
+            debug(event::getObject);
             event.addCapability(CapabilityDifficultyAffected.NAME, new CapabilityDifficultyAffected());
         }
         if (CapabilityDifficultySource.canAttachTo(entity)) {
-            ScalingHealth.LOGGER.debug(MARKER, "Attaching difficulty source capability to {}", entity);
+            debug(() -> "Attaching difficulty source capability to " + entity);
             event.addCapability(CapabilityDifficultySource.NAME, new CapabilityDifficultySource());
         }
         if (CapabilityPlayerData.canAttachTo(entity)) {
-            ScalingHealth.LOGGER.debug(MARKER, "Attaching player data capability to {}", entity);
+            debug(() -> "Attaching player data capability to " + entity);
             event.addCapability(CapabilityPlayerData.NAME, new CapabilityPlayerData());
         }
     }
@@ -44,7 +47,7 @@ public final class DifficultyEvents {
     public static void onAttachWorldCapabilities(AttachCapabilitiesEvent<World> event) {
         World world = event.getObject();
         if (CapabilityDifficultySource.canAttachTo(world)) {
-            ScalingHealth.LOGGER.debug(MARKER, "Attaching difficulty source capability to {}", world);
+            debug(() -> "Attaching difficulty source capability to " + world);
             event.addCapability(CapabilityDifficultySource.NAME, new CapabilityDifficultySource());
         }
     }
@@ -61,7 +64,7 @@ public final class DifficultyEvents {
         if (entity.world.getGameTime() % 20 == 0) {
             entity.getCapability(CapabilityDifficultySource.INSTANCE).ifPresent(source -> {
                 source.setDifficulty(source.getDifficulty() + 0.001f);
-                ScalingHealth.LOGGER.debug(MARKER, "Source {} difficulty is now {}", entity, source.getDifficulty());
+                debug(() -> String.format("Source %s difficulty is now %.5f", entity, source.getDifficulty()));
             });
         }
     }
@@ -75,7 +78,7 @@ public final class DifficultyEvents {
         if (world.getGameTime() % 20 == 0) {
             world.getCapability(CapabilityDifficultySource.INSTANCE).ifPresent(source -> {
                 source.setDifficulty(source.getDifficulty() + 0.001f);
-                ScalingHealth.LOGGER.debug(MARKER, "World {} difficulty is now {}", world, source.getDifficulty());
+                debug(() -> String.format("World %s difficulty is now %.5f", world, source.getDifficulty()));
             });
         }
     }
@@ -87,35 +90,9 @@ public final class DifficultyEvents {
         player.getCapability(CapabilityPlayerData.INSTANCE).ifPresent(data -> data.tick(player));
     }
 
-    private static void applyDifficulty(EntityLivingBase entity, DimensionConfig config) {
-//        World world = entity.world;
-//        double difficulty = config.difficulty.areaMode.get().getAreaDifficulty(world, entity.getPosition());
-//
-//        final double originalDifficulty = difficulty;
-//        final double originalMaxHealth = entity.getMaxHealth();
-//        Random random = ScalingHealth.random;
-//
-//        final boolean makeBlight = shouldMakeBlight(entity, difficulty, config);
-//        if (makeBlight) {
-//            // TODO
-////            difficulty *= config.mobs.
-//        }
-
-        // TODO: lunar cycles
-//        if (Config.Difficulty.DIFFICULTY_LUNAR_MULTIPLIERS_ENABLED && world.getWorldTime() % 24000 > 12000) {
-//            int moonPhase = world.provider.getMoonPhase(world.getWorldTime()) % 8;
-//            float multi = Config.Difficulty.DIFFICULTY_LUNAR_MULTIPLIERS[moonPhase];
-//            difficulty *= multi;
-//        }
-    }
-
-    private static boolean healthIncreaseAllowed(EntityLivingBase entity, DimensionConfig config) {
-        // TODO
-        return true;
-    }
-
-    private static boolean shouldMakeBlight(EntityLivingBase entity, double difficulty, DimensionConfig config) {
-        // TODO
-        return false;
+    private static void debug(Supplier<?> msg) {
+        if (PRINT_DEBUG_INFO && ScalingHealth.LOGGER.isDebugEnabled()) {
+            ScalingHealth.LOGGER.debug(MARKER, msg.get());
+        }
     }
 }

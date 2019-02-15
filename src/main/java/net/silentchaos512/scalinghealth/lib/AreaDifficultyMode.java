@@ -18,11 +18,9 @@
 
 package net.silentchaos512.scalinghealth.lib;
 
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IDifficultySource;
 import net.silentchaos512.scalinghealth.utils.Difficulty;
 
@@ -117,9 +115,9 @@ public enum AreaDifficultyMode {
 
         final int radius = Difficulty.searchRadius(world);
         final double baseAreaDifficulty = getBaseAreaDifficulty(world, pos, radius);
-        ScalingHealth.LOGGER.debug("Area difficulty: base={}, players={}",
-                baseAreaDifficulty,
-                world.getPlayers(EntityPlayer.class, p -> p.getDistanceSq(pos) < radius * radius));
+//        ScalingHealth.LOGGER.debug("Area difficulty: base={}, players={}",
+//                baseAreaDifficulty,
+//                world.getPlayers(EntityPlayer.class, p -> p.getDistanceSq(pos) < radius * radius));
         final double clampedDifficulty = Difficulty.clamp(world, baseAreaDifficulty);
 
         return groupBonus ? Difficulty.withGroupBonus(world, pos, clampedDifficulty) : clampedDifficulty;
