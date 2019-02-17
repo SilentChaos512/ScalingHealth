@@ -842,6 +842,7 @@ public class Config extends ConfigBaseNew {
                     "Override the Morpheus new day handler to fire sleep events. Without this, difficulty will not increase when sleeping.");
 
             ModuleAprilTricks.instance.loadConfig(config);
+            ScalingHealth.logHelper.info("Config successfully loaded!");
         } catch (Exception ex) {
             ScalingHealth.logHelper.fatal("Could not load configuration file!");
             Greetings.addMessage(() -> new TextComponentString(TextFormatting.RED + "[Scaling Health] Could not load configuration file! The mod will not work correctly. See log for details."));

@@ -56,6 +56,10 @@ public class CommandScalingHealth extends CommandBaseSL {
 
     @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+        if (args.length == 1 && "config_reload".equals(args[0])) {
+            executeConfigReload(sender);
+            return;
+        }
         if (args.length < 2) {
             tell(sender, getUsage(sender), false);
             return;
@@ -206,6 +210,11 @@ public class CommandScalingHealth extends CommandBaseSL {
                 tell(sender, "setHealth", true, player.getName(), toSet);
             }
         }
+    }
+
+    private void executeConfigReload(ICommandSender sender) {
+        sender.sendMessage(new TextComponentString("Attempting to reload config, check log for details"));
+        Config.INSTANCE.load();
     }
 
     /**
