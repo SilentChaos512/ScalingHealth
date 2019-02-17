@@ -65,6 +65,9 @@ public class ScalingHealthCommonEvents {
             return;
         }
 
+        // Mob loot disabled?
+        if (!player.world.getGameRules().getBoolean("doMobLoot")) return;
+
         EntityLivingBase killedEntity = event.getEntityLiving();
         if (!killedEntity.world.isRemote) {
             Random rand = ScalingHealth.random;

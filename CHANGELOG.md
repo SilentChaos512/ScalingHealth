@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.33] - 2019-02-17
 ### Fixed
 - Crash when connecting to servers in some cases [#157]
+- Heart container drops not respecting doMobLoot game rule [#156] 
 
 ## [1.3.32] - 2019-01-07
 ### Added
