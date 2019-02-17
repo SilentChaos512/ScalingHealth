@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
  * A list of colors loaded from a config file. Uses Silent Lib's Color class.
  */
 public class ColorList {
-    private final Lazy<List<Color>> list;
+    private final Lazy<List<Integer>> list;
 
     ColorList(ConfigSpecWrapper wrapper, String path, String comment, int... defaults) {
         // Default list of formatted values
@@ -34,11 +34,11 @@ public class ColorList {
         list = Lazy.of(() -> ImmutableList.copyOf(
                 config.get()
                         .stream()
-                        .map(Color::parse)
+                        .map(Color::parseInt)
                         .collect(Collectors.toList())));
     }
 
-    public List<Color> get() {
+    public List<Integer> get() {
         return list.get();
     }
 }

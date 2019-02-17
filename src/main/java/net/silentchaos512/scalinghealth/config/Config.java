@@ -64,15 +64,15 @@ public final class Config {
         public final EnumValue<HeartIconStyle> heartIconStyle;
         public final ColorList heartColors;
         public final BooleanValue lastHeartOutline;
-        public final ColorValue lastHeartOutlineColor;
+        public final IntValue lastHeartOutlineColor;
 
         // Health Text
         public final EnumValue<HealthTextStyle> healthTextStyle;
         public final IntValue healthTextOffsetX;
         public final IntValue healthTextOffsetY;
         public final EnumValue<HealthTextColor> healthTextColorStyle;
-        public final ColorValue healthTextFullColor;
-        public final ColorValue healthTextEmptyColor;
+        public final IntValue healthTextFullColor;
+        public final IntValue healthTextEmptyColor;
 
         // Absorption Icons
         public final EnumValue<AbsorptionIconStyle> absorptionIconStyle;
@@ -82,7 +82,7 @@ public final class Config {
         public final EnumValue<HealthTextStyle> absorptionTextStyle;
         public final IntValue absorptionTextOffsetX;
         public final IntValue absorptionTextOffsetY;
-        public final ColorValue absorptionTextColor;
+        public final IntValue absorptionTextColor;
 
         // Difficulty
         public final BooleanValue warnWhenSleeping;
@@ -132,7 +132,7 @@ public final class Config {
             lastHeartOutlineColor = wrapper
                     .builder("hearts.health.icons.lastHeartOutlineColor")
                     .comment("The color of the last heart outline, if enabled (see lastHeartOutline)")
-                    .defineColor(Color.VALUE_WHITE);
+                    .defineColorInt(Color.VALUE_WHITE);
 
             wrapper.comment("hearts.health.text", "Settings for the text displayed next to the heart rows");
 
@@ -154,11 +154,11 @@ public final class Config {
             healthTextFullColor = wrapper
                     .builder("hearts.health.text.color.full")
                     .comment("Color when health is full or style is not TRANSITION")
-                    .defineColor(0x4CFF4C);
+                    .defineColorInt(0x4CFF4C);
             healthTextEmptyColor = wrapper
                     .builder("hearts.health.text.color.empty")
                     .comment("Color when health is empty and style is TRANSITION")
-                    .defineColor(0xFF4C4C);
+                    .defineColorInt(0xFF4C4C);
 
             //endregion
 
@@ -200,7 +200,7 @@ public final class Config {
             absorptionTextColor = wrapper
                     .builder("hearts.absorption.text.color")
                     .comment("The color of the absorption text")
-                    .defineColor(Color.VALUE_WHITE);
+                    .defineColorInt(Color.VALUE_WHITE);
 
             //endregion
 

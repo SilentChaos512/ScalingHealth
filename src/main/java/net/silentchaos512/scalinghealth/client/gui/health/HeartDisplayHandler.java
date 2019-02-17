@@ -22,12 +22,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.MobEffects;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -39,11 +36,10 @@ import net.silentchaos512.utils.Color;
 import net.silentchaos512.utils.MathUtils;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Handles display of regular and absorption hearts.
- * <p>For future reference, much of the vanilla code can be found in {@link GuiIngameForge}.</p>
+ * <p>For future reference, much of the vanilla code can be found in {@link GuiIngameForge}.
  */
 public final class HeartDisplayHandler extends Gui {
     public static final HeartDisplayHandler INSTANCE = new HeartDisplayHandler();
@@ -51,16 +47,13 @@ public final class HeartDisplayHandler extends Gui {
     private static final float COLOR_CHANGE_PERIOD = 150;
     private static final ResourceLocation TEXTURE = new ResourceLocation(ScalingHealth.MOD_ID, "textures/gui/hud.png");
 
-    private long lastSystemTime = 0;
-    private int playerHealth = 0;
-    private int lastPlayerHealth = 0;
-    private final Random rand = new Random();
+    private final HeartsInfo info = new HeartsInfo();
 
     private HeartDisplayHandler() {}
 
     @SubscribeEvent(receiveCanceled = true)
     public void onHealthBar(RenderGameOverlayEvent.Pre event) {
-        if (Config.CLIENT.heartIconStyle.get() == HeartIconStyle.VANILLA) return;
+        if (info.heartStyle == HeartIconStyle.VANILLA) return;
 
         Minecraft mc = Minecraft.getInstance();
         EntityPlayer player = mc.player;
@@ -69,117 +62,74 @@ public final class HeartDisplayHandler extends Gui {
         if (event.getType() == RenderGameOverlayEvent.ElementType.TEXT && mc.playerController.gameIsSurvivalOrAdventure()) {
             // Draw health string?
             if (Config.CLIENT.healthTextStyle.get() != HealthTextStyle.DISABLED) {
-                renderHealthText(mc, player.getHealth(), player.getMaxHealth(),
+                mc.profiler.startSection("scalinghealthRenderHealthText");
+                renderHealthText(mc, info.health, info.maxHealth,
                         -91 + Config.CLIENT.healthTextOffsetX.get(),
                         -38 + Config.CLIENT.healthTextOffsetY.get(),
                         Config.CLIENT.healthTextStyle.get(),
                         Config.CLIENT.healthTextColorStyle.get());
+                mc.profiler.endSection();
             }
             // Draw absorption amount string?
             if (Config.CLIENT.absorptionTextStyle.get() != HealthTextStyle.DISABLED && player.getAbsorptionAmount() > 0) {
+                mc.profiler.startSection("scalinghealthRenderAbsorptionText");
                 renderHealthText(mc, player.getAbsorptionAmount(), 0,
                         -91 + Config.CLIENT.absorptionTextOffsetX.get(),
                         -49 + Config.CLIENT.absorptionTextOffsetY.get(),
                         Config.CLIENT.absorptionTextStyle.get(),
                         HealthTextColor.SOLID);
+                mc.profiler.endSection();
             }
         }
 
         // Hearts
-        if (event.getType() == RenderGameOverlayEvent.ElementType.HEALTH && Config.CLIENT.heartIconStyle.get() != HeartIconStyle.VANILLA) {
+        if (event.getType() == RenderGameOverlayEvent.ElementType.HEALTH && info.heartStyle != HeartIconStyle.VANILLA) {
             event.setCanceled(true);
+            mc.profiler.startSection("scalinghealthRenderHearts");
             renderHearts(event, mc, player);
+            mc.profiler.endSection();
         }
     }
 
     private void renderHearts(RenderGameOverlayEvent event, Minecraft mc, EntityPlayer player) {
-        final boolean hardcoreMode = mc.world.getWorldInfo().isHardcore();
+        info.update();
 
-        int width = mc.mainWindow.getScaledWidth();
-        int height = mc.mainWindow.getScaledHeight();
         GlStateManager.enableBlend();
 
-        int health = MathHelper.ceil(player.getHealth());
-        boolean highlight = player.hurtResistantTime / 3 % 2 == 1;
-        int updateCounter = ClientTicks.ticksInGame();
-
-        if (health < playerHealth && player.hurtResistantTime > 0 || health > playerHealth && player.hurtResistantTime > 0) {
-            lastSystemTime = Util.milliTime();
-        }
-
-        if (Util.milliTime() - lastSystemTime > 1000) {
-            playerHealth = health;
-            lastPlayerHealth = health;
-            lastSystemTime = Util.milliTime();
-        }
-
-        playerHealth = health;
-        int healthLast = lastPlayerHealth;
-
-        IAttributeInstance attrMaxHealth = player.getAttribute(SharedMonsterAttributes.MAX_HEALTH);
-        float healthMax = Math.min((float) attrMaxHealth.getValue(), 20);
         float absorb = MathHelper.ceil(player.getAbsorptionAmount());
 
-        int healthRows = absorb > 0 ? 2 : 1; // MathHelper.ceil((healthMax + absorb) / 2f / 10f);
-        int rowHeight = Math.max(10 - (healthRows - 2), 3);
-
-        rand.setSeed(updateCounter * 312871);
-        int[] lowHealthBob = new int[10];
-        for (int i = 0; i < lowHealthBob.length; ++i) lowHealthBob[i] = rand.nextInt(2);
-
-        final int left = width / 2 - 91;
-        final int top = height - GuiIngameForge.left_height;
-        GuiIngameForge.left_height += healthRows * rowHeight;
-        if (rowHeight != 10)
-            GuiIngameForge.left_height += 10 - rowHeight;
-
-        int regen = -1;
-        if (player.isPotionActive(MobEffects.REGENERATION))
-            regen = updateCounter % 25;
-
-        final int TOP = 9 * (hardcoreMode ? 5 : 0);
-        final int BACKGROUND = (highlight ? 25 : 16);
-        int MARGIN = 16;
-//        if (player.isPotionActive(MobEffects.POISON))
-//            MARGIN += 36;
-//        else if (player.isPotionActive(MobEffects.WITHER))
-//            MARGIN += 72;
+        final int left = info.scaledWindowWidth / 2 - 91;
+        final int top = info.scaledWindowHeight - GuiIngameForge.left_height;
+        GuiIngameForge.left_height += info.rowsUsedInHud * info.rowHeight;
+        if (info.rowHeight != 10)
+            GuiIngameForge.left_height += 10 - info.rowHeight;
 
         // Draw vanilla hearts
-        drawVanillaHearts(health, highlight, healthLast, healthMax, rowHeight, left, top, regen, lowHealthBob, TOP, BACKGROUND, MARGIN);
+        drawVanillaHearts(left, top);
 
-//        int potionOffset = player.isPotionActive(MobEffects.WITHER) ? 18
-//                : (player.isPotionActive(MobEffects.POISON) ? 9 : 0) + (hardcoreMode ? 27 : 0);
-        int potionOffset = hardcoreMode ? 27 : 0;
+        int potionOffset = info.hardcoreMode ? 27 : 0;
 
         // Draw extra hearts (only top 2 rows)
         mc.textureManager.bindTexture(TEXTURE);
-        health = MathHelper.ceil(player.getHealth());
-        int rowCount = getCustomHeartRowCount(health);
-        int maxHealthRows = getCustomHeartRowCount((int) player.getMaxHealth());
-        final boolean healthIsLow = health <= healthMax / 5;
+        int rowCount = info.getCustomHeartRowCount(info.healthInt);
+        int maxHealthRows = info.getCustomHeartRowCount((int) player.getMaxHealth());
 
         for (int row = Math.max(0, rowCount - 2); row < rowCount; ++row) {
-            int actualRow = row + (Config.CLIENT.heartIconStyle.get() == HeartIconStyle.REPLACE_ALL ? 0 : 1);
-            int renderHearts = Math.min((health - 20 * actualRow) / 2, 10);
+            int actualRow = info.getActualRow(row);
+            int renderHearts = info.getHeartsInRows(actualRow);
             int rowColor = getColorForRow(row, false);
 
             // Draw the hearts
             int j;
-            int y;
             for (j = 0; j < renderHearts; ++j) {
-                y = top + (j == regen ? -2 : 0);
-                if (healthIsLow)
-                    y += lowHealthBob[MathHelper.clamp(j, 0, lowHealthBob.length - 1)];
+                int y = info.offsetHeartPosY(j, top);
                 drawTexturedModalRect(left + 8 * j, y, 0, potionOffset, 9, 9, rowColor);
             }
             boolean anythingDrawn = j > 0;
 
             // Half heart on the end?
-            if (health % 2 == 1 && renderHearts < 10) {
-                y = top + (j == regen ? -2 : 0);
-                if (healthIsLow)
-                    y += lowHealthBob[MathHelper.clamp(j, 0, lowHealthBob.length - 1)];
+            if (info.healthInt % 2 == 1 && renderHearts < 10) {
+                int y = info.offsetHeartPosY(j, top);
                 drawTexturedModalRect(left + 8 * renderHearts, y, 9, potionOffset, 9, 9, rowColor);
                 anythingDrawn = true;
             }
@@ -189,25 +139,21 @@ public final class HeartDisplayHandler extends Gui {
                 // Get position of last partial/full heart
                 j = (int) (Math.ceil(player.getMaxHealth() % 20f / 2f)) - 1;
                 if (j < 0) j += 10;
-                y = top + (j == regen ? -2 : 0);
-                if (healthIsLow)
-                    y += lowHealthBob[MathHelper.clamp(j, 0, lowHealthBob.length - 1)];
-                int color = Config.CLIENT.lastHeartOutlineColor.get().getColor();
+                int y = info.offsetHeartPosY(j, top);
+                int color = Config.CLIENT.lastHeartOutlineColor.get();
                 drawTexturedModalRect(left + 8 * j, y, 17, 9, 9, 9, color);
             }
         }
 
-        for (int i = 0; i < 10 && i < Math.ceil(health / 2f); ++i) {
-            int y = top + (i == regen ? -2 : 0);
-            if (healthIsLow)
-                y += lowHealthBob[MathHelper.clamp(i, 0, lowHealthBob.length - 1)];
+        for (int i = 0; i < 10 && i < Math.ceil(info.healthInt / 2f); ++i) {
+            int y = info.offsetHeartPosY(i, top);
             // Effect hearts (poison, wither)
             if (showEffectHearts(player)) {
                 int color = effectHeartColor(player);
                 drawTexturedModalRect(left + 8 * i, y, 0, 54, 9, 9, color);
             }
             // Shiny glint on top of the hearts, a single white pixel in the upper left <3
-            if (!hardcoreMode) {
+            if (!info.hardcoreMode) {
                 drawTexturedModalRect(left + 8 * i, y, 17, 0, 9, 9, 0xCCFFFFFF);
             }
         }
@@ -225,7 +171,7 @@ public final class HeartDisplayHandler extends Gui {
             int texX = 17;
             int texY = absorptionIconStyle == AbsorptionIconStyle.SHIELD ? 45 : 54;
             for (int i = 0; i < 10 && i < absorb / 2; ++i) {
-                int y = top - 10 + (i == regen - 10 ? -2 : 0);
+                int y = info.offsetAbsorptionPosY(i, top);
                 drawTexturedModalRect(left + 8 * i, y, texX, texY, 9, 9, 0xFFFFFF);
             }
 
@@ -239,16 +185,15 @@ public final class HeartDisplayHandler extends Gui {
 
                 // Draw the hearts
                 int x;
-                int y;
                 for (x = 0; x < renderHearts; ++x) {
-                    y = top - 10 + (x == regen - 10 ? -2 : 0);
+                    int y = info.offsetAbsorptionPosY(x, top);
                     drawTexturedModalRect(left + 8 * x, y, texX, texY, 9, 9, rowColor);
                 }
                 anythingDrawn = x > 0;
 
                 // Half heart on the end?
                 if (absorbCeil % 2 == 1 && renderHearts < 10) {
-                    y = top - 10 + (x == regen - 10 ? -2 : 0);
+                    int y = info.offsetAbsorptionPosY(x, top);
                     drawTexturedModalRect(left + 8 * renderHearts, y, texX + 9, texY, 9, 9, rowColor);
                     anythingDrawn = true;
                 }
@@ -256,7 +201,7 @@ public final class HeartDisplayHandler extends Gui {
 
             // Add extra bits like outlines on top
             for (int i = 0; i < 10 && i < absorb / 2; ++i) {
-                int y = top - 10 + (i == regen - 10 ? -2 : 0);
+                int y = info.offsetAbsorptionPosY(i, top);
                 if (absorptionIconStyle == AbsorptionIconStyle.SHIELD) {
                     // Golden hearts in center (shield style only)
                     drawTexturedModalRect(left + 8 * i, y, 17, 36, 9, 9, 0xFFFFFF);
@@ -265,7 +210,7 @@ public final class HeartDisplayHandler extends Gui {
                     drawTexturedModalRect(left + 8 * i, y, 17, 27, 9, 9, 0xFFFFFF);
                 }
                 // Shiny glint on top, same as hearts.
-                if (!hardcoreMode || absorptionIconStyle == AbsorptionIconStyle.SHIELD) {
+                if (!info.hardcoreMode || absorptionIconStyle == AbsorptionIconStyle.SHIELD) {
                     drawTexturedModalRect(left + 8 * i, y, 17, 0, 9, 9, 0xCCFFFFFF);
                 }
             }
@@ -275,65 +220,56 @@ public final class HeartDisplayHandler extends Gui {
         mc.textureManager.bindTexture(Gui.ICONS);
     }
 
-    private static int getCustomHeartRowCount(int health) {
-        return Config.CLIENT.heartIconStyle.get() == HeartIconStyle.REPLACE_ALL
-                ? MathHelper.ceil(health / 20f)
-                : health / 20;
-    }
+    private void drawVanillaHearts(int left, int top) {
+        int textureX = info.recentlyHurtHighlight ? 25 : 16;
+        int textureY = 9 * (info.hardcoreMode ? 5 : 0);
+        int margin = 16;
 
-    private void drawVanillaHearts(int health, boolean highlight, int healthLast, float healthMax, int rowHeight, int left, int top, int regen, int[] lowHealthBob, int TOP, int BACKGROUND, int MARGIN) {
-        float absorb = MathHelper.ceil(Minecraft.getInstance().player.getAbsorptionAmount());
-        float absorbRemaining = absorb;
-        float healthTotal = health + absorb;
+        float healthMax = Math.min(info.health, 20);
+        float absorbRemaining = info.absorption;
+        float healthTotal = info.healthInt + info.absorptionInt;
 
-        AbsorptionIconStyle absorptionIconStyle = Config.CLIENT.absorptionIconStyle.get();
-        int iStart = MathHelper.ceil((healthMax + (absorptionIconStyle == AbsorptionIconStyle.VANILLA ? absorb : 0)) / 2f) - 1;
+        int iStart = MathHelper.ceil((healthMax + (info.absorptionStyle == AbsorptionIconStyle.VANILLA ? info.absorptionInt : 0)) / 2f) - 1;
         for (int i = iStart; i >= 0; --i) {
             int row = MathHelper.ceil((i + 1) / 10f) - 1;
             int x = left + i % 10 * 8;
-            int y = top - row * rowHeight;
+            int y = info.offsetHeartPosY(i, top - row * info.rowHeight);
 
-            if (health <= 4)
-                y += lowHealthBob[MathHelper.clamp(i, 0, lowHealthBob.length - 1)];
-            if (i == regen)
-                y -= 2;
+            drawTexturedModalRect(x, y, textureX, textureY, 9, 9);
 
-            drawTexturedModalRect(x, y, BACKGROUND, TOP, 9, 9);
-
-            if (highlight) {
-                if (i * 2 + 1 < healthLast)
-                    drawTexturedModalRect(x, y, MARGIN + 54, TOP, 9, 9);
-                else if (i * 2 + 1 == healthLast)
-                    drawTexturedModalRect(x, y, MARGIN + 63, TOP, 9, 9);
+            if (info.recentlyHurtHighlight) {
+                if (i * 2 + 1 < info.previousHealthInt)
+                    drawTexturedModalRect(x, y, margin + 54, textureY, 9, 9);
+                else if (i * 2 + 1 == info.previousHealthInt)
+                    drawTexturedModalRect(x, y, margin + 63, textureY, 9, 9);
             }
 
-            if (absorbRemaining > 0f && absorptionIconStyle == AbsorptionIconStyle.VANILLA) {
-                if (MathUtils.doublesEqual(absorbRemaining, absorb) && MathUtils.doublesEqual(absorb % 2f, 1f)) {
-                    drawTexturedModalRect(x, y, MARGIN + 153, TOP, 9, 9);
+            if (absorbRemaining > 0f && info.absorptionStyle == AbsorptionIconStyle.VANILLA) {
+                if (MathUtils.doublesEqual(absorbRemaining, info.absorption) && MathUtils.doublesEqual(info.absorption % 2f, 1f)) {
+                    drawTexturedModalRect(x, y, margin + 153, textureY, 9, 9);
                     absorbRemaining -= 1f;
                 } else {
                     if (i * 2 + 1 < healthTotal)
-                        drawTexturedModalRect(x, y, MARGIN + 144, TOP, 9, 9);
+                        drawTexturedModalRect(x, y, margin + 144, textureY, 9, 9);
                     absorbRemaining -= 2f;
                 }
             } else {
-                if (i * 2 + 1 < health)
-                    drawTexturedModalRect(x, y, MARGIN + 36, TOP, 9, 9);
-                else if (i * 2 + 1 == health)
-                    drawTexturedModalRect(x, y, MARGIN + 45, TOP, 9, 9);
+                if (i * 2 + 1 < info.healthInt)
+                    drawTexturedModalRect(x, y, margin + 36, textureY, 9, 9);
+                else if (i * 2 + 1 == info.healthInt)
+                    drawTexturedModalRect(x, y, margin + 45, textureY, 9, 9);
             }
         }
     }
 
-    private static void renderHealthText(Minecraft mc, float current, float max, int offsetX, int offsetY, HealthTextStyle style, HealthTextColor styleColor) {
+    private void renderHealthText(Minecraft mc, float current, float max, int offsetX, int offsetY, HealthTextStyle style, HealthTextColor styleColor) {
         final float scale = style.getScale();
-        final int width = mc.mainWindow.getScaledWidth();
-        final int height = mc.mainWindow.getScaledHeight();
-        final int left = (int) ((width / 2 + offsetX) / scale);
+        final int left = (int) ((info.scaledWindowWidth / 2 + offsetX) / scale);
         // GuiIngameForge.left_height == 59 in normal cases. Making it a constant should fix some issues.
-        final int top = (int) ((height + offsetY + (1 / scale)) / scale);
+        final int top = (int) ((info.scaledWindowHeight + offsetY + (1 / scale)) / scale);
 
         // Draw health string
+        mc.profiler.startSection("shTextPreDraw");
         String healthString = style.textFor(current, max);
         FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
         int stringWidth = fontRenderer.getStringWidth(healthString);
@@ -345,8 +281,7 @@ public final class HeartDisplayHandler extends Gui {
                 color = Color.blend(
                         Config.CLIENT.healthTextEmptyColor.get(),
                         Config.CLIENT.healthTextFullColor.get(),
-                        current / divisor
-                ).getColor();
+                        current / divisor);
                 break;
             case PSYCHEDELIC:
                 color = java.awt.Color.HSBtoRGB(
@@ -355,13 +290,17 @@ public final class HeartDisplayHandler extends Gui {
                 break;
             case SOLID:
             default:
-                color = Config.CLIENT.healthTextFullColor.get().getColor();
+                color = Config.CLIENT.healthTextFullColor.get();
                 break;
         }
+        mc.profiler.endSection();
+
+        mc.profiler.startSection("shTextDraw");
         GlStateManager.pushMatrix();
         GlStateManager.scalef(scale, scale, 1);
         fontRenderer.drawStringWithShadow(healthString, left - stringWidth - 2, top, color);
         GlStateManager.popMatrix();
+        mc.profiler.endSection();
     }
 
     private void drawTexturedModalRect(int x, int y, int textureX, int textureY, int width, int height, int color) {
@@ -377,8 +316,8 @@ public final class HeartDisplayHandler extends Gui {
     }
 
     private static int getColorForRow(int row, boolean absorption) {
-        List<Color> colors = absorption ? Config.CLIENT.absorptionHeartColors.get() : Config.CLIENT.heartColors.get();
-        return colors.get(row % colors.size()).getColor();
+        List<Integer> colors = absorption ? Config.CLIENT.absorptionHeartColors.get() : Config.CLIENT.heartColors.get();
+        return colors.get(row % colors.size());
     }
 
     private static boolean showEffectHearts(EntityPlayer player) {
