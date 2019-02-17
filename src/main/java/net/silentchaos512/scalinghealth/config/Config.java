@@ -125,6 +125,12 @@ public class Config extends ConfigBaseNew {
                     " up as a decimal number. Oops.")
             public static int lastHeartOutlineColor;
 
+            @ConfigOption(name = "Color Looping", category = CAT_CLIENT)
+            @ConfigOption.BooleanDefault(true)
+            @ConfigOption.Comment("If true, heart colors will 'loop around' to the first color after going through the" +
+                    " entire list. Set false to have every row after the last have the same color.")
+            public static boolean heartColorLooping;
+
             @SuppressWarnings("MagicNumber")
             public static int[] defaultHeartColors = {
                     0xBF0000, // 0 red
