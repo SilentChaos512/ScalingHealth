@@ -20,11 +20,15 @@ package net.silentchaos512.scalinghealth.lib;
 
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.silentchaos512.scalinghealth.capability.IDifficultySource;
 import net.silentchaos512.scalinghealth.utils.Difficulty;
 
 import java.util.Collection;
+import java.util.Locale;
 
 public enum AreaDifficultyMode {
     WEIGHTED_AVERAGE {
@@ -121,5 +125,13 @@ public enum AreaDifficultyMode {
         final double clampedDifficulty = Difficulty.clamp(world, baseAreaDifficulty);
 
         return groupBonus ? Difficulty.withGroupBonus(world, pos, clampedDifficulty) : clampedDifficulty;
+    }
+
+    public ITextComponent getDisplayName() {
+        return new TextComponentTranslation("config.scalinghealth.area_mode." + name().toLowerCase(Locale.ROOT));
+    }
+
+    public static AreaDifficultyMode fromOrdinal(int ordinal) {
+        return values()[MathHelper.clamp(ordinal, 0, values().length - 1)];
     }
 }

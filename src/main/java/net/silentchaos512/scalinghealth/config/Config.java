@@ -92,6 +92,7 @@ public final class Config {
         public final EnumValue<Anchor> difficultyMeterAnchor;
         public final IntValue difficultyMeterOffsetX;
         public final IntValue difficultyMeterOffsetY;
+        public final DoubleValue difficultyMeterTextScale;
 
         Client(ConfigSpecWrapper wrapper) {
             debugOverlayAnchor = wrapper
@@ -227,6 +228,9 @@ public final class Config {
             difficultyMeterOffsetY = wrapper
                     .builder("difficulty.meter.position.offsetY")
                     .defineInRange(-30, Integer.MIN_VALUE, Integer.MAX_VALUE);
+            difficultyMeterTextScale = wrapper
+                    .builder("difficulty.meter.text.scale")
+                    .defineInRange(0.6, 0, Double.MAX_VALUE);
 
             //endregion
         }
@@ -271,6 +275,10 @@ public final class Config {
     private Config() {}
 
     public static void init() {
+        WRAPPER_CLIENT.validate();
+        WRAPPER_COMMON.validate();
+        // FIXME: Sometimes corrections fail, producing an empty SimpleCommentedConfig (something = {})
+        // Validating twice should resolve the issue for now
         WRAPPER_CLIENT.validate();
         WRAPPER_COMMON.validate();
         initDimensionConfigs();

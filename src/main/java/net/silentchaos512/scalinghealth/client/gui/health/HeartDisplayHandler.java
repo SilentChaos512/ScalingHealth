@@ -19,16 +19,26 @@
 package net.silentchaos512.scalinghealth.client.gui.health;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.MobEffects;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.GuiIngameForge;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.silentchaos512.lib.event.ClientTicks;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.config.Config;
+import net.silentchaos512.utils.Color;
+import net.silentchaos512.utils.MathUtils;
 
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -44,13 +54,14 @@ public final class HeartDisplayHandler extends Gui {
     private long lastSystemTime = 0;
     private int playerHealth = 0;
     private int lastPlayerHealth = 0;
-    private Random rand = new Random();
+    private final Random rand = new Random();
 
     private HeartDisplayHandler() {}
 
     @SubscribeEvent(receiveCanceled = true)
     public void onHealthBar(RenderGameOverlayEvent.Pre event) {
-        /*
+        if (Config.CLIENT.heartIconStyle.get() == HeartIconStyle.VANILLA) return;
+
         Minecraft mc = Minecraft.getInstance();
         EntityPlayer player = mc.player;
 
@@ -58,7 +69,7 @@ public final class HeartDisplayHandler extends Gui {
         if (event.getType() == RenderGameOverlayEvent.ElementType.TEXT && mc.playerController.gameIsSurvivalOrAdventure()) {
             // Draw health string?
             if (Config.CLIENT.healthTextStyle.get() != HealthTextStyle.DISABLED) {
-                renderHealthText(event, player.getHealth(), player.getMaxHealth(),
+                renderHealthText(mc, player.getHealth(), player.getMaxHealth(),
                         -91 + Config.CLIENT.healthTextOffsetX.get(),
                         -38 + Config.CLIENT.healthTextOffsetY.get(),
                         Config.CLIENT.healthTextStyle.get(),
@@ -66,7 +77,7 @@ public final class HeartDisplayHandler extends Gui {
             }
             // Draw absorption amount string?
             if (Config.CLIENT.absorptionTextStyle.get() != HealthTextStyle.DISABLED && player.getAbsorptionAmount() > 0) {
-                renderHealthText(event, player.getAbsorptionAmount(), 0,
+                renderHealthText(mc, player.getAbsorptionAmount(), 0,
                         -91 + Config.CLIENT.absorptionTextOffsetX.get(),
                         -49 + Config.CLIENT.absorptionTextOffsetY.get(),
                         Config.CLIENT.absorptionTextStyle.get(),
@@ -79,29 +90,27 @@ public final class HeartDisplayHandler extends Gui {
             event.setCanceled(true);
             renderHearts(event, mc, player);
         }
-        */
     }
 
     private void renderHearts(RenderGameOverlayEvent event, Minecraft mc, EntityPlayer player) {
-        /*
         final boolean hardcoreMode = mc.world.getWorldInfo().isHardcore();
 
-        int width = event.getResolution().getScaledWidth();
-        int height = event.getResolution().getScaledHeight();
+        int width = mc.mainWindow.getScaledWidth();
+        int height = mc.mainWindow.getScaledHeight();
         GlStateManager.enableBlend();
 
         int health = MathHelper.ceil(player.getHealth());
         boolean highlight = player.hurtResistantTime / 3 % 2 == 1;
-        int updateCounter = ClientTicks.ticksInGame;
+        int updateCounter = ClientTicks.ticksInGame();
 
         if (health < playerHealth && player.hurtResistantTime > 0 || health > playerHealth && player.hurtResistantTime > 0) {
-            lastSystemTime = Minecraft.getSystemTime();
+            lastSystemTime = Util.milliTime();
         }
 
-        if (Minecraft.getSystemTime() - lastSystemTime > 1000) {
+        if (Util.milliTime() - lastSystemTime > 1000) {
             playerHealth = health;
             lastPlayerHealth = health;
-            lastSystemTime = Minecraft.getSystemTime();
+            lastSystemTime = Util.milliTime();
         }
 
         playerHealth = health;
@@ -148,28 +157,28 @@ public final class HeartDisplayHandler extends Gui {
         health = MathHelper.ceil(player.getHealth());
         int rowCount = getCustomHeartRowCount(health);
         int maxHealthRows = getCustomHeartRowCount((int) player.getMaxHealth());
+        final boolean healthIsLow = health <= healthMax / 5;
 
         for (int row = Math.max(0, rowCount - 2); row < rowCount; ++row) {
-            int actualRow = row + (Config.CLIENT.firstRowVanillaStyle.get() ? 1 : 0);
+            int actualRow = row + (Config.CLIENT.heartIconStyle.get() == HeartIconStyle.REPLACE_ALL ? 0 : 1);
             int renderHearts = Math.min((health - 20 * actualRow) / 2, 10);
             int rowColor = getColorForRow(row, false);
-            boolean anythingDrawn;
 
             // Draw the hearts
             int j;
             int y;
             for (j = 0; j < renderHearts; ++j) {
                 y = top + (j == regen ? -2 : 0);
-                if (health <= 4)
+                if (healthIsLow)
                     y += lowHealthBob[MathHelper.clamp(j, 0, lowHealthBob.length - 1)];
                 drawTexturedModalRect(left + 8 * j, y, 0, potionOffset, 9, 9, rowColor);
             }
-            anythingDrawn = j > 0;
+            boolean anythingDrawn = j > 0;
 
             // Half heart on the end?
             if (health % 2 == 1 && renderHearts < 10) {
                 y = top + (j == regen ? -2 : 0);
-                if (health <= 4)
+                if (healthIsLow)
                     y += lowHealthBob[MathHelper.clamp(j, 0, lowHealthBob.length - 1)];
                 drawTexturedModalRect(left + 8 * renderHearts, y, 9, potionOffset, 9, 9, rowColor);
                 anythingDrawn = true;
@@ -181,16 +190,16 @@ public final class HeartDisplayHandler extends Gui {
                 j = (int) (Math.ceil(player.getMaxHealth() % 20f / 2f)) - 1;
                 if (j < 0) j += 10;
                 y = top + (j == regen ? -2 : 0);
-                if (health <= 4)
+                if (healthIsLow)
                     y += lowHealthBob[MathHelper.clamp(j, 0, lowHealthBob.length - 1)];
-                int color = Config.CLIENT.lastHeartOutlineColor.getValue().getColor();
+                int color = Config.CLIENT.lastHeartOutlineColor.get().getColor();
                 drawTexturedModalRect(left + 8 * j, y, 17, 9, 9, 9, color);
             }
         }
 
         for (int i = 0; i < 10 && i < Math.ceil(health / 2f); ++i) {
             int y = top + (i == regen ? -2 : 0);
-            if (health <= 4)
+            if (healthIsLow)
                 y += lowHealthBob[MathHelper.clamp(i, 0, lowHealthBob.length - 1)];
             // Effect hearts (poison, wither)
             if (showEffectHearts(player)) {
@@ -264,17 +273,15 @@ public final class HeartDisplayHandler extends Gui {
 
         GlStateManager.disableBlend();
         mc.textureManager.bindTexture(Gui.ICONS);
-        */
     }
 
     private static int getCustomHeartRowCount(int health) {
-        // FIXME
-//        return Config.Client.Hearts.replaceVanillaRow ? MathHelper.ceil(health / 20f) : health / 20;
-        return 0;
+        return Config.CLIENT.heartIconStyle.get() == HeartIconStyle.REPLACE_ALL
+                ? MathHelper.ceil(health / 20f)
+                : health / 20;
     }
 
     private void drawVanillaHearts(int health, boolean highlight, int healthLast, float healthMax, int rowHeight, int left, int top, int regen, int[] lowHealthBob, int TOP, int BACKGROUND, int MARGIN) {
-        /*
         float absorb = MathHelper.ceil(Minecraft.getInstance().player.getAbsorptionAmount());
         float absorbRemaining = absorb;
         float healthTotal = health + absorb;
@@ -300,9 +307,8 @@ public final class HeartDisplayHandler extends Gui {
                     drawTexturedModalRect(x, y, MARGIN + 63, TOP, 9, 9);
             }
 
-            // TODO: Does this fix the rendering issues introduced in 1.3.27?
             if (absorbRemaining > 0f && absorptionIconStyle == AbsorptionIconStyle.VANILLA) {
-                if (absorbRemaining == absorb && absorb % 2f == 1f) {
+                if (MathUtils.doublesEqual(absorbRemaining, absorb) && MathUtils.doublesEqual(absorb % 2f, 1f)) {
                     drawTexturedModalRect(x, y, MARGIN + 153, TOP, 9, 9);
                     absorbRemaining -= 1f;
                 } else {
@@ -317,14 +323,12 @@ public final class HeartDisplayHandler extends Gui {
                     drawTexturedModalRect(x, y, MARGIN + 45, TOP, 9, 9);
             }
         }
-        */
     }
 
-    private void renderHealthText(RenderGameOverlayEvent event, float current, float max, int offsetX, int offsetY, HealthTextStyle style, HealthTextColor styleColor) {
-        /*
+    private static void renderHealthText(Minecraft mc, float current, float max, int offsetX, int offsetY, HealthTextStyle style, HealthTextColor styleColor) {
         final float scale = style.getScale();
-        final int width = event.getResolution().getScaledWidth();
-        final int height = event.getResolution().getScaledHeight();
+        final int width = mc.mainWindow.getScaledWidth();
+        final int height = mc.mainWindow.getScaledHeight();
         final int left = (int) ((width / 2 + offsetX) / scale);
         // GuiIngameForge.left_height == 59 in normal cases. Making it a constant should fix some issues.
         final int top = (int) ((height + offsetY + (1 / scale)) / scale);
@@ -338,27 +342,26 @@ public final class HeartDisplayHandler extends Gui {
         switch (styleColor) {
             case TRANSITION:
 //                color = Color.HSBtoRGB(0.34f * current / divisor, 0.7f, 1.0f);
-                color = net.silentchaos512.lib.util.Color.blend(
-                        Config.CLIENT.healthTextEmptyColor.getValue(),
-                        Config.CLIENT.healthTextFullColor.getValue(),
+                color = Color.blend(
+                        Config.CLIENT.healthTextEmptyColor.get(),
+                        Config.CLIENT.healthTextFullColor.get(),
                         current / divisor
                 ).getColor();
                 break;
             case PSYCHEDELIC:
-                color = Color.HSBtoRGB(
+                color = java.awt.Color.HSBtoRGB(
                         (ClientTicks.ticksInGame() % COLOR_CHANGE_PERIOD) / COLOR_CHANGE_PERIOD,
                         0.55f * current / divisor, 1.0f);
                 break;
             case SOLID:
             default:
-                color = Config.CLIENT.healthTextFullColor.getValue().getColor();
+                color = Config.CLIENT.healthTextFullColor.get().getColor();
                 break;
         }
         GlStateManager.pushMatrix();
         GlStateManager.scalef(scale, scale, 1);
         fontRenderer.drawStringWithShadow(healthString, left - stringWidth - 2, top, color);
         GlStateManager.popMatrix();
-        */
     }
 
     private void drawTexturedModalRect(int x, int y, int textureX, int textureY, int width, int height, int color) {
@@ -373,18 +376,16 @@ public final class HeartDisplayHandler extends Gui {
         GlStateManager.color4f(1, 1, 1, 1);
     }
 
-    private int getColorForRow(int row, boolean absorption) {
-        // FIXME
-//        int[] colors = absorption ? Config.Client.Hearts.absorptionHeartColors : Config.Client.Hearts.heartColors;
-//        return colors[row % colors.length];
-        return 0xFF00FF;
+    private static int getColorForRow(int row, boolean absorption) {
+        List<Color> colors = absorption ? Config.CLIENT.absorptionHeartColors.get() : Config.CLIENT.heartColors.get();
+        return colors.get(row % colors.size()).getColor();
     }
 
-    private boolean showEffectHearts(EntityPlayer player) {
+    private static boolean showEffectHearts(EntityPlayer player) {
         return player.isPotionActive(MobEffects.POISON) || player.isPotionActive(MobEffects.WITHER);
     }
 
-    private int effectHeartColor(EntityPlayer player) {
+    private static int effectHeartColor(EntityPlayer player) {
         if (player.isPotionActive(MobEffects.WITHER))
             return 0x663E47;
         if (player.isPotionActive(MobEffects.POISON))

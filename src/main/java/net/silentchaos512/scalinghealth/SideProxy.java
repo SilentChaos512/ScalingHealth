@@ -10,12 +10,13 @@ import net.silentchaos512.scalinghealth.capability.CapabilityDifficultyAffected;
 import net.silentchaos512.scalinghealth.capability.CapabilityDifficultySource;
 import net.silentchaos512.scalinghealth.capability.CapabilityPlayerData;
 import net.silentchaos512.scalinghealth.client.gui.DebugOverlay;
+import net.silentchaos512.scalinghealth.client.gui.difficulty.DifficultyMeter;
+import net.silentchaos512.scalinghealth.client.gui.health.HeartDisplayHandler;
 import net.silentchaos512.scalinghealth.command.ModCommands;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.event.BlightHandler;
 import net.silentchaos512.scalinghealth.event.DamageScaling;
 import net.silentchaos512.scalinghealth.event.PetEventHandler;
-import net.silentchaos512.scalinghealth.event.ScalingHealthCommonEvents;
 import net.silentchaos512.scalinghealth.init.*;
 import net.silentchaos512.scalinghealth.utils.gen.GenModels;
 import net.silentchaos512.scalinghealth.utils.gen.GenRecipes;
@@ -38,7 +39,6 @@ class SideProxy {
         FMLModLoadingContext.get().getModEventBus().addListener(ModSounds::registerAll);
 //        FMLModLoadingContext.get().getModEventBus().addListener(ModTileEntities::registerAll);
 
-        MinecraftForge.EVENT_BUS.register(new ScalingHealthCommonEvents());
         MinecraftForge.EVENT_BUS.register(BlightHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(PetEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(DamageScaling.INSTANCE);
@@ -71,8 +71,8 @@ class SideProxy {
         Client() {
             FMLModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
 
-//            MinecraftForge.EVENT_BUS.register(HeartDisplayHandler.INSTANCE);
-//            MinecraftForge.EVENT_BUS.register(DifficultyMeter.INSTANCE);
+            MinecraftForge.EVENT_BUS.register(HeartDisplayHandler.INSTANCE);
+            MinecraftForge.EVENT_BUS.register(DifficultyMeter.INSTANCE);
 //            MinecraftForge.EVENT_BUS.register(KeyTrackerSH.INSTANCE);
 
             DebugOverlay.init();

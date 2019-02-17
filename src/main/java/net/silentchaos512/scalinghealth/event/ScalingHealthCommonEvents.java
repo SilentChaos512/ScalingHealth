@@ -21,7 +21,9 @@ package net.silentchaos512.scalinghealth.event;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.DamageSource;
+import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
@@ -29,16 +31,34 @@ import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
+import net.minecraftforge.fml.network.NetworkDirection;
+import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.network.ClientLoginMessage;
+import net.silentchaos512.scalinghealth.network.Network;
 import net.silentchaos512.scalinghealth.utils.Difficulty;
 import net.silentchaos512.scalinghealth.lib.module.ModuleAprilTricks;
 
 import javax.annotation.Nullable;
 
-public class ScalingHealthCommonEvents {
+@Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID)
+public final class ScalingHealthCommonEvents {
+    private ScalingHealthCommonEvents() {}
+
     @SubscribeEvent
-    public void onLivingDrops(LivingDropsEvent event) {
+    public static void onPlayerLoggedIn(PlayerLoggedInEvent event) {
+        if (!(event.player instanceof EntityPlayerMP)) return;
+        EntityPlayerMP player = (EntityPlayerMP) event.player;
+        World world = player.world;
+        ScalingHealth.LOGGER.info("Sending login packet to player {}", player);
+        ClientLoginMessage msg = new ClientLoginMessage(Difficulty.areaMode(world), (float) Difficulty.maxValue(world));
+        Network.channel.sendTo(msg, player.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
+    }
+
+    @SubscribeEvent
+    public static void onLivingDrops(LivingDropsEvent event) {
         // Handle heart drops.
         // Was a player responsible for the death?
         /*
@@ -47,6 +67,9 @@ public class ScalingHealthCommonEvents {
                 && !Config.FakePlayer.generateHearts)) {
             return;
         }
+
+        // Mob loot disabled?
+        if (!player.world.getGameRules().getBoolean("doMobLoot")) return;
 
         EntityLivingBase killedEntity = event.getEntityLiving();
         if (!killedEntity.world.isRemote) {
@@ -83,7 +106,7 @@ public class ScalingHealthCommonEvents {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onXPDropped(LivingExperienceDropEvent event) {
+    public static void onXPDropped(LivingExperienceDropEvent event) {
         /*
         EntityLivingBase entityLiving = event.getEntityLiving();
 
@@ -111,7 +134,7 @@ public class ScalingHealthCommonEvents {
      * damage.
      */
     @Nullable
-    private EntityPlayer getPlayerThatCausedDeath(DamageSource source) {
+    private static EntityPlayer getPlayerThatCausedDeath(DamageSource source) {
         if (source == null) {
             return null;
         }
@@ -137,7 +160,7 @@ public class ScalingHealthCommonEvents {
     }
 
     @SubscribeEvent
-    public void onPlayerDied(LivingDeathEvent event) {
+    public static void onPlayerDied(LivingDeathEvent event) {
         if (event.getEntity() == null || !(event.getEntity() instanceof EntityPlayer)) {
             return;
         }
@@ -150,7 +173,7 @@ public class ScalingHealthCommonEvents {
     }
 
     @SubscribeEvent
-    public void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
+    public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
         /*
         // Set player health correctly after respawn.
         if (event.player instanceof EntityPlayerMP) {
@@ -188,7 +211,7 @@ public class ScalingHealthCommonEvents {
     }
 
     @SubscribeEvent
-    public void onPlayerJoinedServer(PlayerLoggedInEvent event) {
+    public static void onPlayerJoinedServer(PlayerLoggedInEvent event) {
         /*
         // Sync player data and set health.
         if (event.player instanceof EntityPlayerMP) {
@@ -227,7 +250,7 @@ public class ScalingHealthCommonEvents {
     }
 
     @SubscribeEvent
-    public void onPlayerSleepInBed(PlayerSleepInBedEvent event) {
+    public static void onPlayerSleepInBed(PlayerSleepInBedEvent event) {
         /*
         if (!event.getEntityPlayer().world.isRemote && Config.Client.Difficulty.warnWhenSleeping && Config.Difficulty.forSleeping != 0f) {
             ChatHelper.translate(event.getEntityPlayer(), ScalingHealth.i18n.getKey("misc", "sleepWarning"));
@@ -236,7 +259,7 @@ public class ScalingHealthCommonEvents {
     }
 
     @SubscribeEvent
-    public void onPlayerWakeUp(PlayerWakeUpEvent event) {
+    public static void onPlayerWakeUp(PlayerWakeUpEvent event) {
         if (!event.getEntityPlayer().world.isRemote && !event.updateWorld()) {
             EntityPlayer player = event.getEntityPlayer();
             // TODO: Sleep difficulty change config

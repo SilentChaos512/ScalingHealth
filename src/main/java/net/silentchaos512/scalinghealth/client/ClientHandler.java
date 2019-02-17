@@ -1,7 +1,12 @@
 package net.silentchaos512.scalinghealth.client;
 
 import net.minecraftforge.fml.network.NetworkEvent;
+import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.lib.AreaDifficultyMode;
+import net.silentchaos512.scalinghealth.network.ClientLoginMessage;
 import net.silentchaos512.scalinghealth.network.ClientSyncMessage;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 import java.util.function.Supplier;
 
@@ -10,9 +15,14 @@ import java.util.function.Supplier;
  * be synced. This information will likely not be updated every tick.
  */
 public final class ClientHandler {
+    private static final Marker MARKER = MarkerManager.getMarker("ClientHandler");
+    // Frequent updates (up to once per second)
     public static float playerDifficulty;
     public static float worldDifficulty;
     public static float areaDifficulty;
+    // Infrequent updates (join server/world, travel to new dimension)
+    public static AreaDifficultyMode areaMode;
+    public static float maxDifficultyValue;
 
     private ClientHandler() {}
 
@@ -23,5 +33,18 @@ public final class ClientHandler {
             areaDifficulty = msg.areaDifficulty;
         });
         ctx.get().setPacketHandled(true);
+    }
+
+    public static void onLoginMessage(ClientLoginMessage msg, Supplier<NetworkEvent.Context> ctx) {
+        ctx.get().enqueueWork(() -> handleLoginMessage(msg));
+        ctx.get().setPacketHandled(true);
+    }
+
+    private static void handleLoginMessage(ClientLoginMessage msg) {
+        ScalingHealth.LOGGER.info(MARKER, "Processing login packet");
+        areaMode = msg.areaMode;
+        maxDifficultyValue = msg.maxDifficultyValue;
+        ScalingHealth.LOGGER.info(MARKER, "Server area mode: {}", areaMode.getDisplayName().getFormattedText());
+        ScalingHealth.LOGGER.info(MARKER, "Server max difficulty: {}", maxDifficultyValue);
     }
 }

@@ -24,5 +24,10 @@ public class Network {
                 .encoder(ClientSyncMessage::toBytes)
                 .consumer(ClientHandler::onMessage)
                 .add();
+        channel.messageBuilder(ClientLoginMessage.class, 2)
+                .decoder(ClientLoginMessage::fromBytes)
+                .encoder(ClientLoginMessage::toBytes)
+                .consumer(ClientHandler::onLoginMessage)
+                .add();
     }
 }

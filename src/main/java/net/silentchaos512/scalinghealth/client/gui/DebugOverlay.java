@@ -27,10 +27,11 @@ public class DebugOverlay extends DebugRenderOverlay {
         if (player == null) return ImmutableList.of();
 
         return ImmutableList.of(
-                "Difficulty",
-                "    Player=" + String.format(FLOAT_FORMAT, ClientHandler.playerDifficulty),
-                "    World=" + String.format(FLOAT_FORMAT, ClientHandler.worldDifficulty),
-                "    Area=" + String.format(FLOAT_FORMAT, ClientHandler.areaDifficulty)
+                "Difficulty (/" + ClientHandler.maxDifficultyValue + ")",
+                "....Mode=" + ClientHandler.areaMode.getDisplayName().getFormattedText(),
+                "....Player=" + String.format(FLOAT_FORMAT, ClientHandler.playerDifficulty),
+                "....World=" + String.format(FLOAT_FORMAT, ClientHandler.worldDifficulty),
+                "....Area=" + String.format(FLOAT_FORMAT, ClientHandler.areaDifficulty)
         );
     }
 

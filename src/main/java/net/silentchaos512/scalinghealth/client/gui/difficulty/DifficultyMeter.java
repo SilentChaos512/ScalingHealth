@@ -18,12 +18,24 @@
 
 package net.silentchaos512.scalinghealth.client.gui.difficulty;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.silentchaos512.lib.event.ClientTicks;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.client.ClientHandler;
+import net.silentchaos512.scalinghealth.config.Config;
+import net.silentchaos512.scalinghealth.lib.AreaDifficultyMode;
+import net.silentchaos512.scalinghealth.utils.Difficulty;
+import net.silentchaos512.utils.Anchor;
 
 public class DifficultyMeter extends Gui {
     public static final DifficultyMeter INSTANCE = new DifficultyMeter();
@@ -41,33 +53,31 @@ public class DifficultyMeter extends Gui {
 
     @SubscribeEvent
     public void onRenderOverlay(RenderGameOverlayEvent.Post event) {
-        /*
         DifficultyMeterShow showMode = Config.CLIENT.difficultyMeterShow.get();
-        if (event.getType() != RenderGameOverlayEvent.ElementType.TEXT
-                || showMode == DifficultyMeterShow.NEVER) {
+        if (event.getType() != RenderGameOverlayEvent.ElementType.TEXT|| showMode == DifficultyMeterShow.NEVER) {
             return;
         }
 
         Minecraft mc = Minecraft.getInstance();
         EntityPlayer player = mc.player;
         if (player == null) return;
+        World world = player.world;
 
-        DimensionConfig config = Config.get(player);
-        final double maxDifficulty = config.difficulty.maxValue.get();
+//        DimensionConfig config = Config.get(player);
+        // FIXME: max value probably won't sync?
+        final double maxDifficulty = Difficulty.maxValue(world);
         if (maxDifficulty <= 0) return;
 
-        int width = event.getResolution().getScaledWidth();
-        int height = event.getResolution().getScaledHeight();
+        int width = mc.mainWindow.getScaledWidth();
+        int height = mc.mainWindow.getScaledHeight();
 
-        SHPlayerDataHandler.PlayerData data = SHPlayerDataHandler.get(player);
-        if (data == null) return;
-
-        AreaDifficultyMode areaMode = config.difficulty.areaMode.get();
-        int preClampAreaDifficulty = (int) areaMode.getAreaDifficulty(player.world, player.getPosition());
+        // FIXME: area mode probably won't sync
+        AreaDifficultyMode areaMode = Difficulty.areaMode(world);
+        int preClampAreaDifficulty = (int) ClientHandler.areaDifficulty;
         int areaDifficulty = MathHelper.clamp(preClampAreaDifficulty, 0, (int) maxDifficulty);
         int difficulty = areaMode == AreaDifficultyMode.DIMENSION_WIDE
                 ? areaDifficulty
-                : (int) data.getDifficulty();
+                : (int) ClientHandler.playerDifficulty;
         int timeSinceLastUpdate = ClientTicks.ticksInGame() - lastUpdateTime;
 
         if (difficulty != lastDifficultyDisplayed) {
@@ -88,9 +98,9 @@ public class DifficultyMeter extends Gui {
             GlStateManager.pushMatrix();
             // GlStateManager.scale(1f, 0.5f, 1f);
 
-            HudAnchor anchor = Config.CLIENT.difficultyMeterAnchor.get();
-            int posX = anchor.offsetX(width, Config.CLIENT.difficultyMeterOffsetX.get());
-            int posY = anchor.offsetY(height, Config.CLIENT.difficultyMeterOffsetY.get());
+            Anchor anchor = Config.CLIENT.difficultyMeterAnchor.get();
+            int posX = anchor.getX(width, 66, 5) + Config.CLIENT.difficultyMeterOffsetX.get();
+            int posY = anchor.getY(height, 14, 5) + Config.CLIENT.difficultyMeterOffsetY.get();
 
             // Frame
             drawTexturedModalRect(posX, posY, 190, 0, 66, 14, 0xFFFFFF);
@@ -104,8 +114,8 @@ public class DifficultyMeter extends Gui {
             drawTexturedModalRect(posX + 3, posY + 3, 193, 17, barLength, 2, 0xFFFFFF);
 
             // Text
-            float textScale = 0.6f;
             GlStateManager.pushMatrix();
+            final float textScale = Config.CLIENT.difficultyMeterTextScale.get().floatValue();
             GlStateManager.scalef(textScale, textScale, 1);
             ITextComponent text = new TextComponentTranslation("misc.scalinghealth.difficultyMeterText");
             mc.fontRenderer.drawStringWithShadow(
@@ -126,7 +136,6 @@ public class DifficultyMeter extends Gui {
             GlStateManager.popMatrix();
             GlStateManager.disableBlend();
         }
-        */
     }
 
     private void drawTexturedModalRect(int x, int y, int textureX, int textureY, int width, int height, int color) {

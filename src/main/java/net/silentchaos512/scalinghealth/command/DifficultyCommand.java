@@ -11,6 +11,7 @@ import net.minecraft.command.arguments.EntityArgument;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.WorldServer;
@@ -29,7 +30,7 @@ public final class DifficultyCommand {
                 Commands.literal("get").then(
                         Commands.argument("targets", EntityArgument.multiplePlayers()).executes(
                                 // Run for all targets
-                                DifficultyCommand::runGetHealth
+                                DifficultyCommand::runGetDifficulty
                         )
                 ).then (
                         Commands.literal("world").executes(
@@ -76,7 +77,7 @@ public final class DifficultyCommand {
         dispatcher.register(builder);
     }
 
-    private static int runGetHealth(CommandContext<CommandSource> context) throws CommandSyntaxException {
+    private static int runGetDifficulty(CommandContext<CommandSource> context) throws CommandSyntaxException {
         for (EntityPlayerMP player : EntityArgument.getPlayers(context, "targets")) {
             getDifficultySingle(context, player);
         }
@@ -98,6 +99,12 @@ public final class DifficultyCommand {
             ITextComponent areaValues = ModCommands.valueText(areaDifficulty, maxDifficulty);
             ITextComponent areaText = text("area", areaValues)
                     .applyTextStyle(TextFormatting.YELLOW);
+            // Area mode
+            ITextComponent modeText = new TextComponentString(" (")
+                    .applyTextStyle(TextFormatting.GRAY)
+                    .appendSibling(Difficulty.areaMode(player.world).getDisplayName())
+                    .appendText(")");
+            areaText.appendSibling(modeText);
             context.getSource().sendFeedback(areaText, true);
         });
         return 1;
