@@ -10,6 +10,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.silentchaos512.lib.event.ClientTicks;
 import net.silentchaos512.scalinghealth.event.BlightHandler;
 import net.silentchaos512.scalinghealth.network.Message;
+import scala.collection.parallel.ParIterableLike;
 
 import javax.annotation.Nullable;
 
@@ -30,6 +31,11 @@ public class MessageMarkBlight extends Message {
     @SideOnly(Side.CLIENT)
     public IMessage handleMessage(MessageContext context) {
         ClientTicks.scheduleAction(() -> {
+            Minecraft mc = Minecraft.getMinecraft();
+            // Sometimes MC client instance is null, seems to happen when connecting to servers
+            //noinspection ConstantConditions -- mc can be null, IDEA says otherwise
+            if (mc == null) return;
+
             Entity entity = Minecraft.getMinecraft().world.getEntityByID(entityId);
             if (entity instanceof EntityLivingBase)
                 BlightHandler.markBlight((EntityLivingBase) entity);
