@@ -46,7 +46,7 @@ public class DifficultyMutatorItem extends Item {
     private final Type type;
 
     public DifficultyMutatorItem(Type type) {
-        super(new Item.Builder());
+        super(new Item.Properties());
         this.type = type;
     }
 

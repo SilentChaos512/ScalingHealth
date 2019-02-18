@@ -22,7 +22,7 @@ import java.util.List;
 
 public abstract class StatBoosterItem extends Item {
     public StatBoosterItem() {
-        super(new Builder().group(ItemGroup.MISC));
+        super(new Properties().group(ItemGroup.MISC));
     }
 
     @Override

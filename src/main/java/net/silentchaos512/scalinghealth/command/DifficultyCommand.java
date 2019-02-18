@@ -113,7 +113,7 @@ public final class DifficultyCommand {
     private static int runGetWorldDifficulty(CommandContext<CommandSource> context) {
         WorldServer world = context.getSource().getWorld();
         world.getCapability(CapabilityDifficultySource.INSTANCE).ifPresent(source -> {
-            ITextComponent textWorld = new TextComponentTranslation("command.scalinghealth.worldName", world.dimension.getId())
+            ITextComponent textWorld = new TextComponentTranslation("command.scalinghealth.worldName", world.dimension.getType().getId())
                     .applyTextStyle(TextFormatting.AQUA);
             context.getSource().sendFeedback(textWorld, true);
             // Difficulty

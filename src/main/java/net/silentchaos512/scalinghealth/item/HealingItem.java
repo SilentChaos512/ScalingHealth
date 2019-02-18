@@ -48,7 +48,7 @@ public class HealingItem extends Item {
     private final int effectDuration;
 
     public HealingItem(float healAmount, int healSpeed) {
-        super(new Item.Builder().maxStackSize(16).group(ItemGroup.MISC));
+        super(new Item.Properties().maxStackSize(16).group(ItemGroup.MISC));
         this.healAmount = healAmount;
         this.healSpeed = healSpeed;
         this.effectDuration = (int) (this.healAmount * 100 * 20 * 2 / this.healSpeed);

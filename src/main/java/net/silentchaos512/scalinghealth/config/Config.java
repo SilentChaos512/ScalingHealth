@@ -356,15 +356,15 @@ public final class Config {
     }
 
     public static DimensionConfig get(IWorldReaderBase world) {
-        return get(world.getDimension().getId());
+        return get(world.getDimension().getType().getId());
     }
 
     public static DimensionConfig get(IForgeDimension dimension) {
-        return get(dimension.getId());
+        return get(dimension.getDimension().getType().getId());
     }
 
     public static DimensionConfig get(Entity entity) {
-        return get(entity.dimension);
+        return get(entity.dimension.getId());
     }
 
     public static DimensionConfig get(int dimension) {

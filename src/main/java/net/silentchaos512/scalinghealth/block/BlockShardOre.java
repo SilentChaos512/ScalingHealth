@@ -17,7 +17,7 @@ public class BlockShardOre extends BlockOre {
     private final Supplier<IItemProvider> drop;
 
     public BlockShardOre(Supplier<IItemProvider> drop) {
-        super(Block.Builder.create(Material.ROCK)
+        super(Block.Properties.create(Material.ROCK)
                 .hardnessAndResistance(3f, 15f));
         this.drop = drop;
     }

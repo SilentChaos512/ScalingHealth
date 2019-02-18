@@ -4,7 +4,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.event.lifecycle.*;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
-import net.minecraftforge.fml.javafmlmod.FMLModLoadingContext;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.silentchaos512.lib.util.GameUtil;
 import net.silentchaos512.scalinghealth.capability.CapabilityDifficultyAffected;
 import net.silentchaos512.scalinghealth.capability.CapabilityDifficultySource;
@@ -26,17 +26,17 @@ class SideProxy {
         Config.init();
         ModLoot.init();
         
-        FMLModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
-        FMLModLoadingContext.get().getModEventBus().addListener(this::imcEnqueue);
-        FMLModLoadingContext.get().getModEventBus().addListener(this::imcProcess);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::imcEnqueue);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::imcProcess);
         MinecraftForge.EVENT_BUS.addListener(this::serverAboutToStart);
         MinecraftForge.EVENT_BUS.addListener(this::serverStarted);
 
-        FMLModLoadingContext.get().getModEventBus().addListener(ModBlocks::registerAll);
-        FMLModLoadingContext.get().getModEventBus().addListener(ModEntities::registerAll);
-        FMLModLoadingContext.get().getModEventBus().addListener(ModItems::registerAll);
-        FMLModLoadingContext.get().getModEventBus().addListener(ModPotions::registerAll);
-        FMLModLoadingContext.get().getModEventBus().addListener(ModSounds::registerAll);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(ModBlocks::registerAll);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(ModEntities::registerAll);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(ModItems::registerAll);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(ModPotions::registerAll);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(ModSounds::registerAll);
 //        FMLModLoadingContext.get().getModEventBus().addListener(ModTileEntities::registerAll);
 
         MinecraftForge.EVENT_BUS.register(BlightHandler.INSTANCE);
@@ -69,7 +69,7 @@ class SideProxy {
 
     static class Client extends SideProxy {
         Client() {
-            FMLModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
+            FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
 
             MinecraftForge.EVENT_BUS.register(HeartDisplayHandler.INSTANCE);
             MinecraftForge.EVENT_BUS.register(DifficultyMeter.INSTANCE);
@@ -83,7 +83,7 @@ class SideProxy {
 
     static class Server extends SideProxy {
         Server() {
-            FMLModLoadingContext.get().getModEventBus().addListener(this::serverSetup);
+            FMLJavaModLoadingContext.get().getModEventBus().addListener(this::serverSetup);
         }
 
         private void serverSetup(FMLDedicatedServerSetupEvent event) {

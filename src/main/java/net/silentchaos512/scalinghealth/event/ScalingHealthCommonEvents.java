@@ -59,8 +59,8 @@ public final class ScalingHealthCommonEvents {
 
     @SubscribeEvent
     public static void onPlayerLoggedIn(PlayerLoggedInEvent event) {
-        if (!(event.player instanceof EntityPlayerMP)) return;
-        EntityPlayerMP player = (EntityPlayerMP) event.player;
+        if (!(event.getPlayer() instanceof EntityPlayerMP)) return;
+        EntityPlayerMP player = (EntityPlayerMP) event.getPlayer();
         World world = player.world;
         ScalingHealth.LOGGER.info("Sending login packet to player {}", player);
         ClientLoginMessage msg = new ClientLoginMessage(Difficulty.areaMode(world), (float) Difficulty.maxValue(world));

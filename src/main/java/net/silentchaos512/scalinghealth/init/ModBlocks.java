@@ -70,7 +70,7 @@ public enum ModBlocks implements IBlockProvider {
         block.setRegistryName(registryName);
         ForgeRegistries.BLOCKS.register(block);
 
-        ItemBlock item = new ItemBlock(block, new Item.Builder());
+        ItemBlock item = new ItemBlock(block, new Item.Properties());
         item.setRegistryName(registryName);
         ModItems.blocksToRegister.add(item);
     }
