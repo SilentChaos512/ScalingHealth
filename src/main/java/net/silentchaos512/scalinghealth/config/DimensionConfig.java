@@ -31,6 +31,8 @@ public class DimensionConfig {
         public final DoubleValue heartCrystalHealthRestored;
         public final IntValue heartCrystalLevelCost;
         public final BooleanValue heartCrystalIncreaseHealth;
+        public final IntValue powerCrystalLevelCost;
+        public final DoubleValue powerCrystalDamageIncrease;
 
         Items(ConfigSpecWrapper wrapper) {
             wrapper.comment("items", "Settings for items when used in this dimension");
@@ -57,6 +59,14 @@ public class DimensionConfig {
                     .comment("Do heart crystals increase max health?",
                             "If set to false, they can still be used as a healing item.")
                     .define(true);
+            powerCrystalLevelCost = wrapper
+                    .builder("item.power_crystal.levelCost")
+                    .comment("The number of levels required to use a power crystal (min = 0)")
+                    .defineInRange(3, 0, Integer.MAX_VALUE);
+            powerCrystalDamageIncrease = wrapper
+                    .builder("item.power_crystal.damageBoost")
+                    .comment("How much more damage a player deals after using a power crystal (set 0 to disable)")
+                    .defineInRange(0.5, 0, Double.MAX_VALUE);
         }
     }
 
@@ -80,6 +90,7 @@ public class DimensionConfig {
         public final IntValue startingHealth;
         public final IntValue minHealth;
         public final IntValue maxHealth;
+        public final IntValue maxAttackDamage;
         public final Supplier<Expression> setOnDeath;
 
         // TODO: regen configs
@@ -105,7 +116,13 @@ public class DimensionConfig {
                     .defineInRange(2, 2, Integer.MAX_VALUE);
             maxHealth = wrapper
                     .builder("player.health.maxHealth")
-                    .comment("The highest max health a player can reach, not considering the vanilla health cap and modifiers from other sources. 0 means 'unlimited'.")
+                    .comment("The highest max health a player can reach, not considering the vanilla",
+                            " health cap and modifiers from other sources. 0 means 'unlimited'.")
+                    .defineInRange(0, 0, Integer.MAX_VALUE);
+            maxAttackDamage = wrapper
+                    .builder("player.attackDamage.maxValue")
+                    .comment("The highest attack damage a player can achieve, not considering the vanilla",
+                            "cap and modifiers from other sources. 0 means 'unlimited'.")
                     .defineInRange(0, 0, Integer.MAX_VALUE);
             setOnDeath = defineExpression(wrapper,
                     "setOnDeath",

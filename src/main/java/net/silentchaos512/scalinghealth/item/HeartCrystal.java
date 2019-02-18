@@ -18,82 +18,36 @@
 
 package net.silentchaos512.scalinghealth.item;
 
-import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.item.EnumRarity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.world.World;
 import net.silentchaos512.lib.util.EntityHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.capability.CapabilityPlayerData;
 import net.silentchaos512.scalinghealth.capability.IPlayerData;
 import net.silentchaos512.scalinghealth.utils.Players;
 import net.silentchaos512.utils.MathUtils;
 
-import javax.annotation.Nonnull;
-import java.util.List;
-
-public class HeartCrystal extends Item {
-    public HeartCrystal() {
-        super(new Builder().group(ItemGroup.MISC));
+public class HeartCrystal extends StatBoosterItem {
+    @Override
+    int getLevelCost(EntityPlayer player) {
+        return Players.levelCostToUseHeartCrystal(player);
     }
 
     @Override
-    public void addInformation(ItemStack stack, World world, List<ITextComponent> list, ITooltipFlag flag) {
-        list.add(new TextComponentTranslation("item.scalinghealth.heart_crystal.desc"));
+    boolean isStatIncreaseAllowed(EntityPlayer player, IPlayerData data) {
+        return Players.heartCrystalsIncreaseHealth(player)
+                && data.getExtraHearts() < Players.maxHeartCrystals(player);
     }
 
     @Override
-    public EnumRarity getRarity(ItemStack stack) {
-        return EnumRarity.RARE;
+    boolean shouldConsume(EntityPlayer player) {
+        return Players.heartCrystalHealthRestored(player) > 0
+                && player.getHealth() < player.getMaxHealth();
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
-        ItemStack stack = player.getHeldItem(hand);
-
-        if (!world.isRemote) {
-            IPlayerData data = player.getCapability(CapabilityPlayerData.INSTANCE).orElseThrow(() ->
-                    new IllegalStateException("Player data is null! " + player));
-
-            final boolean healthIncreaseAllowed = isHealthIncreaseAllowed(player, data);
-            final int levelRequirement = Players.levelCostToUseHeartContainer(player);
-
-            // Does player have enough XP?
-            if (player.experienceLevel < levelRequirement) {
-                player.sendMessage(new TextComponentTranslation("item.scalinghealth.heart_crystal.notEnoughXP", levelRequirement));
-                return ActionResult.newResult(EnumActionResult.PASS, stack);
-            }
-
-            // Heal the player (this is separate from the "healing" of the newly added heart, if that's allowed).
-            final boolean consumed = Players.heartContainerHealthRestored(player) > 0 && player.getHealth() < player.getMaxHealth();
-            if (consumed) {
-                doExtraHealing(player);
-            }
-
-            // End here if health increases are not allowed.
-            if (!healthIncreaseAllowed) {
-                return useAsHealingItem(world, player, stack, levelRequirement, consumed);
-            }
-
-            // Increase health, consume heart.
-            useForHealthIncrease(world, player, stack, data, levelRequirement);
-        }
-        return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
-    }
-
-    private static void doExtraHealing(EntityPlayer player) {
+    void extraConsumeEffect(EntityPlayer player) {
         int current = (int) player.getHealth();
-        float healAmount = Players.heartContainerHealthRestored(player);
+        float healAmount = Players.heartCrystalHealthRestored(player);
         EntityHelper.heal(player, healAmount, true);
         int newHealth = (int) player.getHealth();
         if (!MathUtils.doublesEqual(current + healAmount, newHealth)) {
@@ -101,57 +55,8 @@ public class HeartCrystal extends Item {
         }
     }
 
-    private void incrementUseStat(EntityPlayer player) {
-//        StatBase useStat = StatList.getObjectUseStats(this);
-//        if (useStat != null) player.addStat(useStat);
-    }
-
-    @Nonnull
-    private ActionResult<ItemStack> useAsHealingItem(World world, EntityPlayer player, ItemStack stack, int levelRequirement, boolean consumed) {
-        if (consumed) {
-            world.playSound(null, player.getPosition(), SoundEvents.ENTITY_PLAYER_BURP, SoundCategory.PLAYERS,
-                    0.5f, 1.0f + 0.1f * (float) ScalingHealth.random.nextGaussian());
-            stack.shrink(1);
-            consumeLevels(player, levelRequirement);
-            incrementUseStat(player);
-            return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
-        } else {
-            return ActionResult.newResult(EnumActionResult.PASS, stack);
-        }
-    }
-
-    private void useForHealthIncrease(World world, EntityPlayer player, ItemStack stack, IPlayerData data, int levelRequirement) {
+    @Override
+    void increaseStat(EntityPlayer player, ItemStack stack, IPlayerData data) {
         data.addHeart(player);
-        stack.shrink(1);
-        spawnParticlesAndPlaySound(world, player);
-        consumeLevels(player, levelRequirement);
-        incrementUseStat(player);
-//        NetworkHandler.INSTANCE.sendTo(new MessageDataSync(data, player), (EntityPlayerMP) player);
-    }
-
-    private static void consumeLevels(EntityPlayer player, int amount) {
-        player.experienceLevel -= amount;
-    }
-
-    private static boolean isHealthIncreaseAllowed(EntityPlayer player, IPlayerData data) {
-        return Players.heartContainersIncreaseHealth(player)
-                && data.getExtraHearts() < Players.maxHeartContainers(player);
-    }
-
-    private static void spawnParticlesAndPlaySound(World world, EntityPlayer player) {
-        /*
-        double particleX = player.posX;
-        double particleY = player.posY + 0.65f * player.height;
-        double particleZ = player.posZ;
-        for (int i = 0; i < 40 - 10 * ScalingHealth.proxy.getParticleSettings(); ++i) {
-            double xSpeed = 0.08 * ScalingHealth.random.nextGaussian();
-            double ySpeed = 0.05 * ScalingHealth.random.nextGaussian();
-            double zSpeed = 0.08 * ScalingHealth.random.nextGaussian();
-            ScalingHealth.proxy.spawnParticles(EnumModParticles.HEART_CONTAINER,
-                    new Color(1f, 0f, 0f), world, particleX, particleY, particleZ, xSpeed, ySpeed, zSpeed);
-        }
-        ScalingHealth.proxy.playSoundOnClient(player, ModSounds.HEART_CONTAINER_USE,
-                0.5f, 1.0f + 0.1f * (float) ScalingHealth.random.nextGaussian());
-        */
     }
 }

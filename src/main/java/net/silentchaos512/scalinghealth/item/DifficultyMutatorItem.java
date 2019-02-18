@@ -23,6 +23,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumRarity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.stats.StatList;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
@@ -81,6 +82,7 @@ public class DifficultyMutatorItem extends Item {
             float change = getEffectAmount(stack, world);
             source.addDifficulty(change);
             stack.shrink(1);
+            player.addStat(StatList.ITEM_USED.get(this));
         }
 
         switch (this.type) {

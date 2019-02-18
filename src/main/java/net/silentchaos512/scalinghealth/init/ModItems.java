@@ -29,6 +29,7 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.item.DifficultyMutatorItem;
 import net.silentchaos512.scalinghealth.item.HealingItem;
 import net.silentchaos512.scalinghealth.item.HeartCrystal;
+import net.silentchaos512.scalinghealth.item.PowerCrystal;
 import net.silentchaos512.utils.Lazy;
 
 import java.util.ArrayList;
@@ -40,6 +41,8 @@ public enum ModItems implements IItemProvider {
     HEART_CRYSTAL(HeartCrystal::new),
     HEART_CRYSTAL_SHARD(() -> new Item(new Item.Builder().group(ItemGroup.MISC))),
     HEART_DUST(() -> new Item(new Item.Builder().group(ItemGroup.MISC))),
+    POWER_CRYSTAL(PowerCrystal::new),
+    POWER_CRYSTAL_SHARD(() -> new Item(new Item.Builder().group(ItemGroup.MISC))),
     BANDAGES(() -> new HealingItem(0.3f, 1)),
     MEDKIT(() -> new HealingItem(0.7f, 4)),
     CURSED_HEART(() -> new DifficultyMutatorItem(DifficultyMutatorItem.Type.CURSED)),

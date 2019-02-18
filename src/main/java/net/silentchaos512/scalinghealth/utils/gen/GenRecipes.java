@@ -6,6 +6,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.Tags;
 import net.silentchaos512.lib.util.generator.RecipeGenerator;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.init.ModBlocks;
 import net.silentchaos512.scalinghealth.init.ModItems;
 
 public final class GenRecipes {
@@ -34,6 +35,19 @@ public final class GenRecipes {
                 .key('b', ModItems.BANDAGES)
                 .key('p', Items.GLISTERING_MELON_SLICE)
                 .key('t', Blocks.TERRACOTTA));
+        RecipeGenerator.create(id("power_crystal"), RecipeGenerator.ShapedBuilder
+                .create(ModItems.POWER_CRYSTAL)
+                .layout("###", "###", "###")
+                .key('#', ModItems.POWER_CRYSTAL_SHARD));
+
+        RecipeGenerator.create(id("heart_crystal_ore_smelting"), RecipeGenerator.SmeltingBuilder
+                .create(ModItems.HEART_CRYSTAL_SHARD)
+                .ingredient(ModBlocks.HEART_CRYSTAL_ORE)
+                .experience(1.0f));
+        RecipeGenerator.create(id("power_crystal_ore_smelting"), RecipeGenerator.SmeltingBuilder
+                .create(ModItems.POWER_CRYSTAL_SHARD)
+                .ingredient(ModBlocks.POWER_CRYSTAL_ORE)
+                .experience(1.0f));
     }
 
     private static ResourceLocation id(String path) {

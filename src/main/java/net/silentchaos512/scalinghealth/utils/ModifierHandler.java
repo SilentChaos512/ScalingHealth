@@ -52,6 +52,8 @@ public final class ModifierHandler {
         if (newMax > oldMax) {
             float healAmount = (float) (newMax - oldMax);
             EntityHelper.heal(entity, healAmount, false);
+        } else if (entity.getHealth() > newMax) {
+            entity.setHealth((float) newMax);
         }
     }
 

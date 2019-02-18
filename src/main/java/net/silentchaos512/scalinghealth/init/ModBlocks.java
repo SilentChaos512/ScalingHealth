@@ -33,7 +33,8 @@ import java.util.Locale;
 import java.util.function.Supplier;
 
 public enum ModBlocks implements IBlockProvider {
-    HEART_CRYSTAL_ORE(() -> new BlockShardOre(() -> ModItems.HEART_CRYSTAL_SHARD));
+    HEART_CRYSTAL_ORE(() -> new BlockShardOre(() -> ModItems.HEART_CRYSTAL_SHARD)),
+    POWER_CRYSTAL_ORE(() -> new BlockShardOre(() -> ModItems.POWER_CRYSTAL_SHARD));
 
     private final Lazy<Block> block;
 

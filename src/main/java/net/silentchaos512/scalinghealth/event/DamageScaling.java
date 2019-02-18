@@ -53,6 +53,9 @@ public final class DamageScaling {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPlayerHurt(LivingAttackEvent event) {
         EntityLivingBase entity = event.getEntityLiving();
+        // Entity invulnerable?
+        if (entity.hurtResistantTime > 0) return;
+
         // Check entity has already been processed from original event, or is not allowed to be affected
         if (entityAttackedThisTick.contains(entity.getUniqueID())
                 || (entity instanceof IMob && !affectHostileMobs)

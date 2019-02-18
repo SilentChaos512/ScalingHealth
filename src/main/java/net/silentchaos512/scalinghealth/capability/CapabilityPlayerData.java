@@ -29,11 +29,13 @@ public class CapabilityPlayerData implements IPlayerData, ICapabilitySerializabl
     public static Capability<IPlayerData> INSTANCE = null;
     public static ResourceLocation NAME = ScalingHealth.res("player_data");
 
-    private static final String NBT_EXTRA_HEARTS = "ExtraHearts";
+    private static final String NBT_HEART_CRYSTALS = "HeartCrystals";
+    private static final String NBT_POWER_CRYSTALS = "PowerCrystals";
 
     private final LazyOptional<IPlayerData> holder = LazyOptional.of(() -> this);
 
     private int extraHearts;
+    private int powerCrystals;
     private BlockPos lastPos;
 
     @Override
@@ -42,9 +44,20 @@ public class CapabilityPlayerData implements IPlayerData, ICapabilitySerializabl
     }
 
     @Override
-    public void setExtraHearts(EntityPlayer player, int value) {
-        extraHearts = Players.clampExtraHearts(player, value);
-        ModifierHandler.addMaxHealth(player, 2 * extraHearts, 0);
+    public int getPowerCrystals() {
+        return powerCrystals;
+    }
+
+    @Override
+    public void setExtraHearts(EntityPlayer player, int amount) {
+        extraHearts = Players.clampExtraHearts(player, amount);
+        ModifierHandler.addMaxHealth(player, getHealthModifier(player), 0);
+    }
+
+    @Override
+    public void setPowerCrystalCount(EntityPlayer player, int amount) {
+        powerCrystals = Players.clampPowerCrystals(player, amount);
+        ModifierHandler.addAttackDamage(player, getAttackDamageModifier(player), 0);
     }
 
     @Override
@@ -79,13 +92,15 @@ public class CapabilityPlayerData implements IPlayerData, ICapabilitySerializabl
     @Override
     public NBTTagCompound serializeNBT() {
         NBTTagCompound nbt = new NBTTagCompound();
-        nbt.setInt(NBT_EXTRA_HEARTS, extraHearts);
+        nbt.setInt(NBT_HEART_CRYSTALS, extraHearts);
+        nbt.setInt(NBT_POWER_CRYSTALS, powerCrystals);
         return nbt;
     }
 
     @Override
     public void deserializeNBT(NBTTagCompound nbt) {
-        extraHearts = nbt.getInt(NBT_EXTRA_HEARTS);
+        extraHearts = nbt.getInt(NBT_HEART_CRYSTALS);
+        powerCrystals = nbt.getInt(NBT_POWER_CRYSTALS);
     }
 
     public static boolean canAttachTo(Entity entity) {

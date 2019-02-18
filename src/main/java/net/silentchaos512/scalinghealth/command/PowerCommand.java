@@ -8,6 +8,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.arguments.EntityArgument;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.text.ITextComponent;
@@ -16,11 +18,11 @@ import net.minecraft.util.text.TextFormatting;
 import net.silentchaos512.scalinghealth.capability.CapabilityPlayerData;
 import net.silentchaos512.scalinghealth.utils.Players;
 
-public final class HealthCommand {
-    private HealthCommand() {}
+public final class PowerCommand {
+    private PowerCommand() {}
 
     public static void register(CommandDispatcher<CommandSource> dispatcher) {
-        LiteralArgumentBuilder<CommandSource> builder = Commands.literal("sh_health").requires(source ->
+        LiteralArgumentBuilder<CommandSource> builder = Commands.literal("sh_power").requires(source ->
                 source.hasPermissionLevel(2));
 
         // get
@@ -28,11 +30,11 @@ public final class HealthCommand {
                 Commands.literal("get").then(
                         Commands.argument("targets", EntityArgument.multiplePlayers()).executes(
                                 // Run for all targets
-                                HealthCommand::runGetHealth
+                                PowerCommand::runGet
                         )
                 ).executes(context -> {
                     // No target, use sender
-                    return getHealthSingle(context, context.getSource().asPlayer());
+                    return runGetSingle(context, context.getSource().asPlayer());
                 })
         );
         // set
@@ -40,7 +42,7 @@ public final class HealthCommand {
                 Commands.literal("set").then(
                         Commands.argument("targets", EntityArgument.multiplePlayers()).then(
                                 Commands.argument("amount", IntegerArgumentType.integer()).executes(
-                                        HealthCommand::runSetHealth
+                                        PowerCommand::runSet
                                 )
                         )
                 )
@@ -50,7 +52,7 @@ public final class HealthCommand {
                 Commands.literal("add").then(
                         Commands.argument("targets", EntityArgument.multiplePlayers()).then(
                                 Commands.argument("amount", IntegerArgumentType.integer()).executes(
-                                        HealthCommand::runAddHealth
+                                        PowerCommand::runAdd
                                 )
                         )
                 )
@@ -59,55 +61,55 @@ public final class HealthCommand {
         dispatcher.register(builder);
     }
 
-    private static int runGetHealth(CommandContext<CommandSource> context) throws CommandSyntaxException {
+    private static int runGet(CommandContext<CommandSource> context) throws CommandSyntaxException {
         for (EntityPlayerMP player : EntityArgument.getPlayers(context, "targets")) {
-            getHealthSingle(context, player);
+            runGetSingle(context, player);
         }
         return 1;
     }
 
-    private static int getHealthSingle(CommandContext<CommandSource> context, EntityPlayer player) {
+    private static int runGetSingle(CommandContext<CommandSource> context, EntityPlayer player) {
         player.getCapability(CapabilityPlayerData.INSTANCE).ifPresent(data -> {
             context.getSource().sendFeedback(ModCommands.playerNameText(player), true);
-            // Actual health
-            ITextComponent actualValues = ModCommands.valueText(player.getHealth(), player.getMaxHealth());
-            ITextComponent actualText = text("actual", actualValues)
+            // Actual power
+            IAttributeInstance attr = player.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
+            ITextComponent actualText = text("actual", String.format("%.1f", attr.getValue()))
                     .applyTextStyle(TextFormatting.YELLOW);
             context.getSource().sendFeedback(actualText, true);
-            // Heart crystals and health modifier
-            int extraHearts = data.getExtraHearts();
-            String extraHealth = (extraHearts >= 0 ? "+" : "") + (2 * extraHearts);
-            ITextComponent heartsValues = text("heartCrystals.values", extraHearts, extraHealth)
+            // Crystals and modifier
+            int crystals = data.getPowerCrystals();
+            String extraPower = (crystals >= 0 ? "+" : "") + (data.getAttackDamageModifier(player));
+            ITextComponent crystalsValues = text("powerCrystals.values", crystals, extraPower)
                     .applyTextStyle(TextFormatting.WHITE);
-            ITextComponent heartsText = text("heartCrystals", heartsValues)
+            ITextComponent crystalsText = text("powerCrystals", crystalsValues)
                     .applyTextStyle(TextFormatting.YELLOW);
-            context.getSource().sendFeedback(heartsText, true);
+            context.getSource().sendFeedback(crystalsText, true);
         });
         return 1;
     }
 
-    private static int runSetHealth(CommandContext<CommandSource> context) throws CommandSyntaxException {
+    private static int runSet(CommandContext<CommandSource> context) throws CommandSyntaxException {
         int amount = IntegerArgumentType.getInteger(context, "amount");
         for (EntityPlayerMP player : EntityArgument.getPlayers(context, "targets")) {
             player.getCapability(CapabilityPlayerData.INSTANCE).ifPresent(data -> {
-                int intendedExtraHearts = (amount - Players.startingHealth(player)) / 2;
-                data.setExtraHearts(player, intendedExtraHearts);
+                int intendedCrystalCount = (int) ((amount - 1) / Players.powerCrystalIncreaseAmount(player));
+                data.setPowerCrystalCount(player, intendedCrystalCount);
             });
         }
         return 1;
     }
 
-    private static int runAddHealth(CommandContext<CommandSource> context) throws CommandSyntaxException {
+    private static int runAdd(CommandContext<CommandSource> context) throws CommandSyntaxException {
         int amount = IntegerArgumentType.getInteger(context, "amount");
         for (EntityPlayerMP player : EntityArgument.getPlayers(context, "targets")) {
             player.getCapability(CapabilityPlayerData.INSTANCE).ifPresent(data -> {
-                data.addHearts(player, amount);
+                data.addPowerCrystals(player, amount);
             });
         }
         return 1;
     }
 
     private static ITextComponent text(String key, Object... args) {
-        return new TextComponentTranslation("command.scalinghealth.health." + key, args);
+        return new TextComponentTranslation("command.scalinghealth.power." + key, args);
     }
 }

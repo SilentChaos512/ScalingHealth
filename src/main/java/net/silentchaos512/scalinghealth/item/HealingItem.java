@@ -27,6 +27,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.stats.StatList;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumHand;
@@ -79,6 +80,11 @@ public class HealingItem extends Item {
             entityLiving.addPotionEffect(new PotionEffect(ModPotions.BANDAGED.get(),
                     this.effectDuration, this.healSpeed, false, false));
             stack.shrink(1);
+
+            if (entityLiving instanceof EntityPlayer) {
+                EntityPlayer player = (EntityPlayer) entityLiving;
+                player.addStat(StatList.ITEM_USED.get(this));
+            }
         }
         return stack;
     }

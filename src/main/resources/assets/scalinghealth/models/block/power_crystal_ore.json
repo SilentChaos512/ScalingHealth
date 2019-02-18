@@ -1,0 +1,6 @@
+{
+  "parent": "block/cube_all",
+  "textures": {
+    "all": "scalinghealth:block/power_crystal_ore"
+  }
+}

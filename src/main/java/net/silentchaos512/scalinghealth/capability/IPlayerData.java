@@ -1,11 +1,16 @@
 package net.silentchaos512.scalinghealth.capability;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.silentchaos512.scalinghealth.utils.Players;
 
 public interface IPlayerData {
     int getExtraHearts();
 
-    void setExtraHearts(EntityPlayer player, int value);
+    int getPowerCrystals();
+
+    void setExtraHearts(EntityPlayer player, int amount);
+
+    void setPowerCrystalCount(EntityPlayer player, int amount);
 
     void tick(EntityPlayer player);
 
@@ -17,7 +22,19 @@ public interface IPlayerData {
         setExtraHearts(player, getExtraHearts() + amount);
     }
 
-    default int getHealthModifier() {
+    default void addPowerCrystal(EntityPlayer player) {
+        setPowerCrystalCount(player, getPowerCrystals() + 1);
+    }
+
+    default void addPowerCrystals(EntityPlayer player, int amount) {
+        setPowerCrystalCount(player, getPowerCrystals() + amount);
+    }
+
+    default int getHealthModifier(EntityPlayer player) {
         return 2 * getExtraHearts();
+    }
+
+    default double getAttackDamageModifier(EntityPlayer player) {
+        return getPowerCrystals() * Players.powerCrystalIncreaseAmount(player);
     }
 }

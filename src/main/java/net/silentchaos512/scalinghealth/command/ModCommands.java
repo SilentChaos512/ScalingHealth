@@ -13,6 +13,7 @@ public final class ModCommands {
     public static void registerAll(CommandDispatcher<CommandSource> dispatcher) {
         DifficultyCommand.register(dispatcher);
         HealthCommand.register(dispatcher);
+        PowerCommand.register(dispatcher);
         RecalculateCommand.register(dispatcher);
     }
 
