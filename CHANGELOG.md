@@ -8,7 +8,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Config to disable heart color looping [#155]
 ### Fixed
 - Crash when connecting to servers in some cases [#157]
-- Heart container drops not respecting doMobLoot game rule [#156] 
+- Heart container drops not respecting doMobLoot game rule [#156]
+- Should fix damage scaling log spam with certain sources [#152] 
 
 ## [1.3.32] - 2019-01-07
 ### Added

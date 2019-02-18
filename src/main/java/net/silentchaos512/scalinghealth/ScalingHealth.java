@@ -17,6 +17,8 @@ import net.silentchaos512.lib.util.LogHelper;
 import net.silentchaos512.scalinghealth.command.CommandScalingHealth;
 import net.silentchaos512.scalinghealth.init.ModItems;
 import net.silentchaos512.scalinghealth.proxy.ScalingHealthCommonProxy;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.util.Random;
 
@@ -40,7 +42,9 @@ public class ScalingHealth implements IModBase {
     public static final String GAME_RULE_DIFFICULTY = "ScalingHealthDifficulty";
 
     public static final Random random = new Random();
+    @Deprecated
     public static final LogHelper logHelper = new LogHelper(MOD_NAME, BUILD_NUM);
+    public static final Logger LOGGER = LogManager.getLogger(MOD_NAME);
     public static final I18nHelper i18n = new I18nHelper(MOD_ID_LOWER, logHelper, true);
 
     public static SRegistry registry = new SRegistry();

@@ -33,6 +33,8 @@ import net.silentchaos512.lib.config.ConfigMultiValueLineParser;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.api.ScalingHealthAPI;
 import net.silentchaos512.scalinghealth.config.Config;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -40,6 +42,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public final class DamageScaling {
+    private static final Marker MARKER = MarkerManager.getMarker("DamageScaling");
     private static final String[] SOURCES_DEFAULT = {"inFire", "lightningBolt", "onFire", "lava", "hotFloor", "inWall", "cramming", "drown", "starve", "cactus", "fall", "flyIntoWall", "outOfWorld", "generic",
             "magic", "wither", "anvil", "fallingBlock", "dragonBreath", "fireworks"};
     private static final String SOURCES_COMMENT = "Set damage scaling by damage source. All vanilla sources should be included, but set to no scaling. Mod sources can be added too, you'll just need the damage"
@@ -61,6 +64,11 @@ public final class DamageScaling {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPlayerHurt(LivingAttackEvent event) {
         EntityLivingBase entity = event.getEntityLiving();
+        if (entity.world.isRemote) return;
+        // Entity invulnerable?
+        if (entity.isEntityInvulnerable(event.getSource()) || entity.hurtResistantTime > entity.maxHurtResistantTime / 2)
+            return;
+
         // Check entity has already been processed from original event, or is not allowed to be affected
         if (entityAttackedThisTick.contains(entity.getPersistentID())
                 || (entity instanceof IMob && !affectHostileMobs)
@@ -74,42 +82,46 @@ public final class DamageScaling {
         float scale = scalingMap.getOrDefault(source.getDamageType(), genericScale);
 
         // Get the amount of the damage to affect. Can be many times the base value.
-        float affectedAmount = 0f;
-        switch (scaleMode) {
-            case AREA_DIFFICULTY:
-                affectedAmount = (float) ScalingHealthAPI.getAreaDifficulty(entity.world, entity.getPosition());
-                affectedAmount *= difficultyWeight;
-                break;
-            case MAX_HEALTH:
-                double baseHealth = entity instanceof EntityPlayer ? Config.Player.Health.startingHealth
-                        : entity.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue();
-                affectedAmount = (float) ((entity.getMaxHealth() - baseHealth) / baseHealth);
-                break;
-            case PLAYER_DIFFICULTY:
-                affectedAmount = (float) ScalingHealthAPI.getEntityDifficulty(entity);
-                affectedAmount *= difficultyWeight;
-                break;
-        }
+        final float affectedAmount = getEffectScale(entity);
 
         // Calculate damage to add to the original.
-        float original = event.getAmount();
-        float change = scale * affectedAmount * original;
-        float newAmount = event.getAmount() + change;
-
-        // Bounds and error checks
-        if (newAmount < 0f)
-            newAmount = 0f;
-        if (!Float.isFinite(newAmount))
-            newAmount = Float.MAX_VALUE;
+        final float original = event.getAmount();
+        final float change = scale * affectedAmount * original;
+        final float newAmount = makeSane(event.getAmount() + change);
 
         event.setCanceled(true);
         entityAttackedThisTick.add(entity.getPersistentID());
         entity.attackEntityFrom(event.getSource(), newAmount);
 
         if (Config.Debug.debugMode && Config.Debug.logPlayerDamage) {
-            ScalingHealth.logHelper.info("Damage scaling: type={}, scale={}, affected={}, change={}, original={}",
-                    source.damageType, scale, affectedAmount, change, original);
+            ScalingHealth.LOGGER.info(MARKER, "{} on {}: {} -> {} (scale={}, affected={}, change={})",
+                    source.damageType, entity.getName(), original, newAmount, scale, affectedAmount, change);
         }
+    }
+
+    private float getEffectScale(EntityLivingBase entity) {
+        switch (scaleMode) {
+            case AREA_DIFFICULTY:
+                return (float) ScalingHealthAPI.getAreaDifficulty(entity.world, entity.getPosition()) * difficultyWeight;
+            case MAX_HEALTH:
+                float baseHealth = entity instanceof EntityPlayer
+                        ? Config.Player.Health.startingHealth
+                        : (float) entity.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue();
+                return (entity.getMaxHealth() - baseHealth) / baseHealth;
+            case PLAYER_DIFFICULTY:
+                return (float) ScalingHealthAPI.getEntityDifficulty(entity) * difficultyWeight;
+            default:
+                throw new IllegalStateException("Unknown damage scaling mode: " + scaleMode);
+        }
+    }
+
+    private static float makeSane(float scaledAmount) {
+        // Clamp scaled damage to sane values (non-negative and finite)
+        if (scaledAmount < 0)
+            return 0;
+        if (!Float.isFinite(scaledAmount))
+            return Float.MAX_VALUE;
+        return scaledAmount;
     }
 
     @SubscribeEvent
