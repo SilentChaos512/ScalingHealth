@@ -42,8 +42,8 @@ import net.silentchaos512.utils.MathUtils;
 import javax.annotation.Nonnull;
 import java.util.List;
 
-public class ItemHeartContainer extends Item {
-    public ItemHeartContainer() {
+public class HeartCrystal extends Item {
+    public HeartCrystal() {
         super(new Builder().group(ItemGroup.MISC));
     }
 

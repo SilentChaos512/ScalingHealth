@@ -26,9 +26,9 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.item.ItemDifficultyChanger;
-import net.silentchaos512.scalinghealth.item.ItemHealing;
-import net.silentchaos512.scalinghealth.item.ItemHeartContainer;
+import net.silentchaos512.scalinghealth.item.DifficultyMutatorItem;
+import net.silentchaos512.scalinghealth.item.HealingItem;
+import net.silentchaos512.scalinghealth.item.HeartCrystal;
 import net.silentchaos512.utils.Lazy;
 
 import java.util.ArrayList;
@@ -37,13 +37,13 @@ import java.util.Locale;
 import java.util.function.Supplier;
 
 public enum ModItems implements IItemProvider {
-    HEART_CRYSTAL(ItemHeartContainer::new),
+    HEART_CRYSTAL(HeartCrystal::new),
     HEART_CRYSTAL_SHARD(() -> new Item(new Item.Builder().group(ItemGroup.MISC))),
     HEART_DUST(() -> new Item(new Item.Builder().group(ItemGroup.MISC))),
-    BANDAGES(() -> new ItemHealing(0.3f, 1)),
-    MEDKIT(() -> new ItemHealing(0.7f, 4)),
-    CURSED_HEART(() -> new ItemDifficultyChanger(ItemDifficultyChanger.Type.CURSED)),
-    ENCHANTED_HEART(() -> new ItemDifficultyChanger(ItemDifficultyChanger.Type.ENCHANTED));
+    BANDAGES(() -> new HealingItem(0.3f, 1)),
+    MEDKIT(() -> new HealingItem(0.7f, 4)),
+    CURSED_HEART(() -> new DifficultyMutatorItem(DifficultyMutatorItem.Type.CURSED)),
+    ENCHANTED_HEART(() -> new DifficultyMutatorItem(DifficultyMutatorItem.Type.ENCHANTED));
 
     private final Lazy<Item> item;
 

@@ -37,14 +37,14 @@ import net.silentchaos512.scalinghealth.utils.Players;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class ItemDifficultyChanger extends Item {
+public class DifficultyMutatorItem extends Item {
     public enum Type {
         ENCHANTED, CURSED
     }
 
     private final Type type;
 
-    public ItemDifficultyChanger(Type type) {
+    public DifficultyMutatorItem(Type type) {
         super(new Item.Builder());
         this.type = type;
     }
@@ -93,7 +93,7 @@ public class ItemDifficultyChanger extends Item {
                 cursedHeartEffects(world, player, particleX, particleY, particleZ);
                 return new ActionResult<>(EnumActionResult.SUCCESS, stack);
             default:
-                ScalingHealth.LOGGER.error("ItemDifficultyChanger invalid type: {}", this.type);
+                ScalingHealth.LOGGER.error("DifficultyMutatorItem invalid type: {}", this.type);
                 return new ActionResult<>(EnumActionResult.PASS, stack);
         }
     }

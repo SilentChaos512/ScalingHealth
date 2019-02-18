@@ -39,14 +39,14 @@ import net.silentchaos512.scalinghealth.init.ModPotions;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class ItemHealing extends Item {
+public class HealingItem extends Item {
     private static final int USE_TIME = 5 * 20;
 
     private final float healAmount;
     private final int healSpeed;
     private final int effectDuration;
 
-    public ItemHealing(float healAmount, int healSpeed) {
+    public HealingItem(float healAmount, int healSpeed) {
         super(new Item.Builder().maxStackSize(16).group(ItemGroup.MISC));
         this.healAmount = healAmount;
         this.healSpeed = healSpeed;
