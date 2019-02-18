@@ -30,6 +30,8 @@ import net.minecraft.world.storage.loot.functions.SetCount;
 import net.minecraft.world.storage.loot.properties.EntityPropertyManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.LootTableLoadEvent;
+import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.lib.MobType;
 import net.silentchaos512.scalinghealth.loot.properties.PropertyBlight;
 import net.silentchaos512.scalinghealth.loot.properties.PropertyDifficulty;
 
@@ -43,6 +45,13 @@ public final class ModLoot {
 
         EntityPropertyManager.registerProperty(new PropertyBlight.Serializer());
         EntityPropertyManager.registerProperty(new PropertyDifficulty.Serializer());
+
+        for (MobType type : MobType.values()) {
+            type.getBonusDropsLootTable().ifPresent(name -> {
+                ScalingHealth.LOGGER.info("Register loot table {}", name);
+                LootTableList.register(name);
+            });
+        }
     }
 
     private static final List<ResourceLocation> ADD_ITEMS_TO = ImmutableList.of(

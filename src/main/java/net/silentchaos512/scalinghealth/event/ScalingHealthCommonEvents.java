@@ -19,11 +19,18 @@
 package net.silentchaos512.scalinghealth.event;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.passive.EntityTameable;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.ItemStack;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
+import net.minecraft.world.storage.loot.LootContext;
+import net.minecraft.world.storage.loot.LootTable;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
@@ -36,12 +43,15 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.lib.MobType;
+import net.silentchaos512.scalinghealth.lib.module.ModuleAprilTricks;
 import net.silentchaos512.scalinghealth.network.ClientLoginMessage;
 import net.silentchaos512.scalinghealth.network.Network;
 import net.silentchaos512.scalinghealth.utils.Difficulty;
-import net.silentchaos512.scalinghealth.lib.module.ModuleAprilTricks;
 
 import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Optional;
 
 @Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID)
 public final class ScalingHealthCommonEvents {
@@ -59,50 +69,30 @@ public final class ScalingHealthCommonEvents {
 
     @SubscribeEvent
     public static void onLivingDrops(LivingDropsEvent event) {
-        // Handle heart drops.
-        // Was a player responsible for the death?
-        /*
-        EntityPlayer player = getPlayerThatCausedDeath(event.getSource());
-        if (player == null || (player instanceof FakePlayer
-                && !Config.FakePlayer.generateHearts)) {
-            return;
-        }
+        if (!(event.getEntity() instanceof EntityLivingBase)) return;
+
+        EntityLivingBase entity = (EntityLivingBase) event.getEntity();
+        World world = entity.world;
+        if (world.isRemote) return;
+        MinecraftServer server = world.getServer();
+        if (server == null) return;
 
         // Mob loot disabled?
-        if (!player.world.getGameRules().getBoolean("doMobLoot")) return;
+        if (!world.getGameRules().getBoolean("doMobLoot")) return;
 
-        EntityLivingBase killedEntity = event.getEntityLiving();
-        if (!killedEntity.world.isRemote) {
-            Random rand = ScalingHealth.random;
-            int stackSize = 0;
+        EntityPlayer player = getPlayerThatCausedDeath(event.getSource());
 
-            // Different drop rates for hostiles and passives.
-            float dropRate = killedEntity instanceof IMob ? Config.Items.Heart.chanceHostile : Config.Items.Heart.chancePassive;
-            if (killedEntity instanceof EntitySlime) {
-                dropRate /= 6f;
-            }
+        // Get the bonus drops loot table for this mob type
+        Optional<ResourceLocation> tableName = MobType.from(entity, true).getBonusDropsLootTable();
+        if (!tableName.isPresent()) return;
 
-            ScalingHealth.logHelper.debug("heart drop rate for {} is {}", killedEntity.getName(), dropRate);
-
-            // Basic heart drops for all mobs.
-            if (event.isRecentlyHit() && rand.nextFloat() <= dropRate) {
-                stackSize += 1;
-            }
-
-            // Heart drops for bosses.
-            if (!killedEntity.isNonBoss()) {
-                int min = Config.Items.Heart.bossMin;
-                int max = Config.Items.Heart.bossMax;
-                stackSize += min + rand.nextInt(max - min + 1);
-            }
-
-            if (stackSize > 0) {
-                Item itemToDrop = Config.Items.Heart.dropShardsInstead ? ModItems.crystalShard
-                        : ModItems.heart;
-                killedEntity.dropItem(itemToDrop, stackSize);
-            }
-        }
-        */
+        LootTable lootTable = server.getLootTableManager().getLootTableFromLocation(tableName.get());
+        LootContext.Builder contextBuilder = new LootContext.Builder((WorldServer) world)
+                .withDamageSource(event.getSource())
+                .withLootedEntity(entity);
+        if (player != null) contextBuilder.withLuck(player.getLuck()).withPlayer(player);
+        List<ItemStack> list = lootTable.generateLootForPools(ScalingHealth.random, contextBuilder.build());
+        list.forEach(stack -> event.getDrops().add(entity.entityDropItem(stack)));
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

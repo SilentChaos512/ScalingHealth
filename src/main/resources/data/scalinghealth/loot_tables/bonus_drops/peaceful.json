@@ -1,0 +1,128 @@
+{
+    "pools": [
+        {
+            "name": "crystals",
+            "rolls": 1,
+            "entries": [
+                {
+                    "type": "item",
+                    "name": "scalinghealth:heart_crystal_shard",
+                    "weight": 5,
+                    "functions": [
+                        {
+                            "function": "set_count",
+                            "count": {
+                                "min": 1,
+                                "max": 8
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type": "item",
+                    "name": "scalinghealth:power_crystal_shard",
+                    "weight": 1,
+                    "functions": [
+                        {
+                            "function": "set_count",
+                            "count": {
+                                "min": 0,
+                                "max": 5
+                            }
+                        }
+                    ]
+                }
+            ],
+            "conditions": [
+                {
+                    "condition": "killed_by_player"
+                },
+                {
+                    "condition": "random_chance_with_looting",
+                    "chance": 0.025,
+                    "looting_multiplier": 0.0025
+                }
+            ]
+        },
+        {
+            "name": "difficulty_mutators",
+            "rolls": 1,
+            "entries": [
+                {
+                    "type": "item",
+                    "name": "scalinghealth:cursed_heart",
+                    "weight": 1,
+                    "functions": [
+                        {
+                            "function": "set_count",
+                            "count": 1
+                        }
+                    ]
+                }
+            ],
+            "conditions": [
+                {
+                    "condition": "random_chance_with_looting",
+                    "chance": 0.01,
+                    "looting_multiplier": 0.0025
+                },
+                {
+                    "condition": "entity_properties",
+                    "entity": "this",
+                    "properties": {
+                        "scalinghealth:difficulty": {
+                            "min": 0,
+                            "max": 120
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "blights",
+            "rolls": 1,
+            "entries": [
+                {
+                    "type": "item",
+                    "name": "scalinghealth:heart_crystal",
+                    "weight": 5,
+                    "functions": [
+                        {
+                            "function": "set_count",
+                            "count": {
+                                "min": -1,
+                                "max": 1
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type": "item",
+                    "name": "scalinghealth:power_crystal",
+                    "weight": 2,
+                    "functions": [
+                        {
+                            "function": "set_count",
+                            "count": {
+                                "min": -1,
+                                "max": 1
+                            }
+                        }
+                    ]
+                }
+            ],
+            "conditions": [
+                {
+                    "condition": "killed_by_player"
+                },
+                {
+                    "condition": "entity_properties",
+                    "entity": "this",
+                    "properties": {
+                        "scalinghealth:is_blight": true
+                    }
+                }
+            ]
+        }
+    ]
+}
