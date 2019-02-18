@@ -2,21 +2,31 @@
     "cursed_heart_use": {
         "category": "player",
         "subtitle": "scalinghealth.subtitle.cursed_heart_use",
-        "sounds": [ "minecraft:random/fizz" ]
+        "sounds": [
+            "minecraft:random/fizz"
+        ]
     },
     "enchanted_heart_use": {
         "category": "player",
         "subtitle": "scalinghealth.subtitle.enchanted_heart_use",
-        "sounds": [ "minecraft:block/enchantment_table/enchant1" ]
+        "sounds": [
+            "minecraft:block/enchantment_table/enchant1"
+        ]
     },
-    "heart_container_use": {
+    "heart_crystal_use": {
         "category": "player",
-        "subtitle": "scalinghealth.subtitle.heart_container_use",
-        "sounds": [ "scalinghealth:heart_container_use" ]
+        "subtitle": "scalinghealth.subtitle.heart_crystal_use",
+        "sounds": [
+            "scalinghealth:heart_crystal_use"
+        ]
     },
     "player_died": {
         "category": "player",
         "subtitle": "scalinghealth.subtitle.player_died",
-        "sounds": [ "scalinghealth:sadtrombone", "scalinghealth:mlg_airhorn", "scalinghealth:wilhelm" ]
+        "sounds": [
+            "scalinghealth:sadtrombone",
+            "scalinghealth:mlg_airhorn",
+            "scalinghealth:wilhelm"
+        ]
     }
 }
