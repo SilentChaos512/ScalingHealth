@@ -19,6 +19,8 @@
 package net.silentchaos512.scalinghealth.event;
 
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -70,12 +72,22 @@ public final class PlayerBonusRegenHandler {
             // Tick timer, heal player and reset on 0.
             int timer = TIMERS.get(name);
             if (--timer <= 0) {
-                player.heal(1f);
+                player.heal(getRegenTickHealAmount(player));
                 player.addExhaustion(Config.Player.BonusRegen.exhaustion);
                 timer = Config.Player.BonusRegen.delay;
             }
             TIMERS.put(name, timer);
         }
+    }
+
+    private static float getRegenTickHealAmount(EntityLivingBase entity) {
+        if (Config.Player.BonusRegen.scaleWithMaxHealth) {
+            IAttributeInstance attr = entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.MAX_HEALTH);
+            double baseHealth = attr.getBaseValue();
+            double maxHealth = attr.getAttributeValue();
+            return (float) (maxHealth / baseHealth);
+        }
+        return 1;
     }
 
     @SubscribeEvent

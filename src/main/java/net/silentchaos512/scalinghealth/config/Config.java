@@ -226,6 +226,11 @@ public class Config extends ConfigBaseNew {
                     " this just adds extra healing! Vanilla regen can be disabled with the naturalRegeneration gamerule.")
             public static boolean enabled;
 
+            @ConfigOption(name = "Scale With Max Health", category = CAT_PLAYER_REGEN)
+            @ConfigOption.BooleanDefault(false)
+            @ConfigOption.Comment("If enabled, regen will be proportional to max health")
+            public static boolean scaleWithMaxHealth;
+
             @ConfigOption(name = "Food Min", category = CAT_PLAYER_REGEN)
             @ConfigOption.RangeInt(value = 10, min = 0)
             @ConfigOption.Comment("The minimum food level at which bonus regen will be active (vanilla max food is 20).")
