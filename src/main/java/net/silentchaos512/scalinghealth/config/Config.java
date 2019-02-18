@@ -65,6 +65,7 @@ public final class Config {
         public final ColorList heartColors;
         public final BooleanValue lastHeartOutline;
         public final IntValue lastHeartOutlineColor;
+        public final BooleanValue heartColorLooping;
 
         // Health Text
         public final EnumValue<HealthTextStyle> healthTextStyle;
@@ -133,6 +134,11 @@ public final class Config {
                     .builder("hearts.health.icons.lastHeartOutlineColor")
                     .comment("The color of the last heart outline, if enabled (see lastHeartOutline)")
                     .defineColorInt(Color.VALUE_WHITE);
+            heartColorLooping = wrapper
+                    .builder("hearts.health.icons.colorLooping")
+                    .comment("If true, heart colors will 'loop around' to the first color after going through the",
+                            "entire list. Set false to have every row after the last have the same color.")
+                    .define(true);
 
             wrapper.comment("hearts.health.text", "Settings for the text displayed next to the heart rows");
 

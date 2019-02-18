@@ -317,7 +317,10 @@ public final class HeartDisplayHandler extends Gui {
 
     private static int getColorForRow(int row, boolean absorption) {
         List<Integer> colors = absorption ? Config.CLIENT.absorptionHeartColors.get() : Config.CLIENT.heartColors.get();
-        return colors.get(row % colors.size());
+        int index = Config.CLIENT.heartColorLooping.get()
+                ? row % colors.size()
+                : MathUtils.clamp(row, 0, colors.size() - 1);
+        return colors.get(index);
     }
 
     private static boolean showEffectHearts(EntityPlayer player) {
