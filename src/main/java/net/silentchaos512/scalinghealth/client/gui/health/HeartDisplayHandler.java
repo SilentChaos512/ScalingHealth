@@ -263,7 +263,7 @@ public final class HeartDisplayHandler extends Gui {
     }
 
     private void renderHealthText(Minecraft mc, float current, float max, int offsetX, int offsetY, HealthTextStyle style, HealthTextColor styleColor) {
-        final float scale = style.getScale();
+        final double scale = style.getScale();
         final int left = (int) ((info.scaledWindowWidth / 2 + offsetX) / scale);
         // GuiIngameForge.left_height == 59 in normal cases. Making it a constant should fix some issues.
         final int top = (int) ((info.scaledWindowHeight + offsetY + (1 / scale)) / scale);
@@ -297,7 +297,7 @@ public final class HeartDisplayHandler extends Gui {
 
         mc.profiler.startSection("shTextDraw");
         GlStateManager.pushMatrix();
-        GlStateManager.scalef(scale, scale, 1);
+        GlStateManager.scaled(scale, scale, 1);
         fontRenderer.drawStringWithShadow(healthString, left - stringWidth - 2, top, color);
         GlStateManager.popMatrix();
         mc.profiler.endSection();

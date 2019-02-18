@@ -59,6 +59,7 @@ public final class Config {
     public static class Client {
         // Debug
         public final EnumValue<Anchor> debugOverlayAnchor;
+        public final DoubleValue debugOverlayTextScale;
 
         // Health Icons
         public final EnumValue<HeartIconStyle> heartIconStyle;
@@ -69,6 +70,7 @@ public final class Config {
 
         // Health Text
         public final EnumValue<HealthTextStyle> healthTextStyle;
+        public final DoubleValue healthTextScale;
         public final IntValue healthTextOffsetX;
         public final IntValue healthTextOffsetY;
         public final EnumValue<HealthTextColor> healthTextColorStyle;
@@ -97,10 +99,13 @@ public final class Config {
 
         Client(ConfigSpecWrapper wrapper) {
             debugOverlayAnchor = wrapper
-                    .builder("debug")
-                    .comment("Position of debug overlay",
-                            EnumValue.allValuesComment(Anchor.class))
+                    .builder("debug.overlay.anchor")
+                    .comment("Position of debug overlay", EnumValue.allValuesComment(Anchor.class))
                     .defineEnum(Anchor.TOP_RIGHT);
+            debugOverlayTextScale = wrapper
+                    .builder("debug.overlay.textScale")
+                    .comment("Overlay text size, where 1 is standard-sized text")
+                    .defineInRange(0.75, 0.01, Double.MAX_VALUE);
 
             //region Health Hearts
 
@@ -108,6 +113,10 @@ public final class Config {
 
             heartIconStyle = wrapper
                     .builder("hearts.health.icons.style")
+                    .comment("Heart style",
+                            "REPLACE_ALL: All rows replaced with Scaling Health style hearts",
+                            "REPLACE_AFTER_FIRST_ROW: Leave the first row vanilla style, Scaling Health style for additional rows",
+                            "VANILLA: Do not change heart rendering (use this if you want another mod to handle heart rendering)")
                     .defineEnum(HeartIconStyle.REPLACE_ALL);
             heartColors = new ColorList(wrapper, "hearts.health.icons.colors",
                     "The color of each row of hearts. If the player has more rows than colors, it starts over from the beginning.",
@@ -144,7 +153,12 @@ public final class Config {
 
             healthTextStyle = wrapper
                     .builder("hearts.health.text.style")
+                    .comment("Style of health text", EnumValue.allValuesComment(HealthTextStyle.class))
                     .defineEnum(HealthTextStyle.ROWS);
+            healthTextScale = wrapper
+                    .builder("hearts.health.text.scale")
+                    .comment("Health text scale, relative to its normal size (which varies by style)")
+                    .defineInRange(1.0, 0.01, Double.MAX_VALUE);
             healthTextOffsetX = wrapper
                     .builder("hearts.health.text.offsetX")
                     .comment("Fine-tune text position")
@@ -156,10 +170,14 @@ public final class Config {
 
             healthTextColorStyle = wrapper
                     .builder("hearts.health.text.color.style")
+                    .comment("Health text color style.",
+                            "TRANSITION: Gradually goes from full color to empty color as health is lost",
+                            "PSYCHEDELIC: Taste the rainbow!",
+                            "SOLID: Just stays at full color regardless of health")
                     .defineEnum(HealthTextColor.TRANSITION);
             healthTextFullColor = wrapper
                     .builder("hearts.health.text.color.full")
-                    .comment("Color when health is full or style is not TRANSITION")
+                    .comment("Color when health is full or style is SOLID")
                     .defineColorInt(0x4CFF4C);
             healthTextEmptyColor = wrapper
                     .builder("hearts.health.text.color.empty")
@@ -172,8 +190,9 @@ public final class Config {
 
             absorptionIconStyle = wrapper
                     .builder("hearts.absorption.icons.style")
+                    .comment("Style of absorption icons", EnumValue.allValuesComment(AbsorptionIconStyle.class))
                     .defineEnum(AbsorptionIconStyle.SHIELD);
-            absorptionHeartColors = new ColorList(wrapper, "colors",
+            absorptionHeartColors = new ColorList(wrapper, "hearts.absorption.icons.colors",
                     "The color of each row of absorption hearts. If the player has more rows than colors, it starts over from the beginning.",
                     0xBF0000, // 0 red
                     0xE66000, // 25 orange-red
@@ -191,10 +210,13 @@ public final class Config {
                     0xE6E6E6  // 0 white
             );
 
+            EnumSet<HealthTextStyle> absorptionTextStyleValidValues = EnumSet.of(
+                    HealthTextStyle.DISABLED, HealthTextStyle.HEALTH_ONLY, HealthTextStyle.ROWS);
             absorptionTextStyle = wrapper
                     .builder("hearts.absorption.text.style")
-                    .defineEnum(HealthTextStyle.DISABLED,
-                            EnumSet.of(HealthTextStyle.DISABLED, HealthTextStyle.HEALTH_ONLY, HealthTextStyle.ROWS));
+                    .comment("Style for absorption text. Because there is no 'max' value, the options are more limited.",
+                            EnumValue.validValuesComment(absorptionTextStyleValidValues))
+                    .defineEnum(HealthTextStyle.DISABLED, absorptionTextStyleValidValues);
             absorptionTextOffsetX = wrapper
                     .builder("hearts.absorption.text.offsetX")
                     .comment("Fine-tune text position")
@@ -219,6 +241,9 @@ public final class Config {
 
             difficultyMeterShow = wrapper
                     .builder("difficulty.meter.show")
+                    .comment("When to show the difficulty meter.",
+                            " SOMETIMES will show the meter for a few seconds every so often.",
+                            "ALWAYS and NEVER should be obvious enough.")
                     .defineEnum(DifficultyMeterShow.SOMETIMES);
             difficultyMeterShowTime = wrapper
                     .builder("difficulty.meter.showDuration")
@@ -227,15 +252,19 @@ public final class Config {
 
             difficultyMeterAnchor = wrapper
                     .builder("difficulty.meter.position.anchor")
+                    .comment("Position of the difficulty meter.", EnumValue.allValuesComment(Anchor.class))
                     .defineEnum(Anchor.BOTTOM_LEFT);
             difficultyMeterOffsetX = wrapper
                     .builder("difficulty.meter.position.offsetX")
+                    .comment("Fine-tune the difficulty meter's position")
                     .defineInRange(5, Integer.MIN_VALUE, Integer.MAX_VALUE);
             difficultyMeterOffsetY = wrapper
                     .builder("difficulty.meter.position.offsetY")
+                    .comment("Fine-tune the difficulty meter's position")
                     .defineInRange(-30, Integer.MIN_VALUE, Integer.MAX_VALUE);
             difficultyMeterTextScale = wrapper
                     .builder("difficulty.meter.text.scale")
+                    .comment("Scale of text on the difficulty meter")
                     .defineInRange(0.6, 0, Double.MAX_VALUE);
 
             //endregion
@@ -302,6 +331,8 @@ public final class Config {
                 int dimensionID = config.dimensionID();
                 DIMENSIONS.put(dimensionID, config);
                 ScalingHealth.LOGGER.info("Loaded config for dimension {}", dimensionID);
+                config.validate();
+                // FIXME: Why is double validation is needed
                 config.validate();
             }
         } else {

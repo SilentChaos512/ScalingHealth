@@ -42,7 +42,7 @@ public class DebugOverlay extends DebugRenderOverlay {
 
     @Override
     public boolean isHidden() {
-        return false;
+        return !Config.COMMON.debugShowOverlay.get();
     }
 
     @Override

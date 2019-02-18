@@ -114,24 +114,26 @@ public class DifficultyMeter extends Gui {
             drawTexturedModalRect(posX + 3, posY + 3, 193, 17, barLength, 2, 0xFFFFFF);
 
             // Text
-            GlStateManager.pushMatrix();
             final float textScale = Config.CLIENT.difficultyMeterTextScale.get().floatValue();
-            GlStateManager.scalef(textScale, textScale, 1);
-            ITextComponent text = new TextComponentTranslation("misc.scalinghealth.difficultyMeterText");
-            mc.fontRenderer.drawStringWithShadow(
-                    text.getFormattedText(),
-                    posX / textScale + 4,
-                    posY / textScale - 9,
-                    0xFFFFFF);
+            if (textScale > 0) {
+                GlStateManager.pushMatrix();
+                GlStateManager.scalef(textScale, textScale, 1);
+                ITextComponent text = new TextComponentTranslation("misc.scalinghealth.difficultyMeterText");
+                mc.fontRenderer.drawStringWithShadow(
+                        text.getFormattedText(),
+                        posX / textScale + 4,
+                        posY / textScale - 9,
+                        0xFFFFFF);
 
-            // Text Difficulty
-            String str = String.format("%d", areaDifficulty);
-            int strWidth = mc.fontRenderer.getStringWidth(str);
-            mc.fontRenderer.drawStringWithShadow(str,
-                    posX / textScale + 104 - strWidth,
-                    posY / textScale - 9,
-                    0xAAAAAA);
-            GlStateManager.popMatrix();
+                // Text Difficulty
+                String str = String.format("%d", areaDifficulty);
+                int strWidth = mc.fontRenderer.getStringWidth(str);
+                mc.fontRenderer.drawStringWithShadow(str,
+                        posX / textScale + 104 - strWidth,
+                        posY / textScale - 9,
+                        0xAAAAAA);
+                GlStateManager.popMatrix();
+            }
 
             GlStateManager.popMatrix();
             GlStateManager.disableBlend();
