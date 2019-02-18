@@ -78,11 +78,18 @@ repositories {
     mavenLocal()
 }
 
+configurations {
+    // Dependencies to pack into the jar
+    extraLibs
+}
+
 dependencies {
     minecraft "net.minecraftforge:forge:${project.forge_version}"
 
-    compile "com.udojava:EvalEx:2.1"
+    extraLibs "com.udojava:EvalEx:2.1"
     compile "net.silentchaos512:silent-lib:${project.sl_version}"
+
+    configurations.implementation.extendsFrom(configurations.extraLibs)
 }
 
 jar {
@@ -95,6 +102,9 @@ jar {
                     "Implementation-Version": "${version}",
                     "Implementation-Vendor" :"SilentChaos512",
                     "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)
+    }
+    from {
+        configurations.extraLibs.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
 
