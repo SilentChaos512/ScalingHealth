@@ -30,7 +30,7 @@ import java.util.Locale;
 public enum ModSounds {
     CURSED_HEART_USE,
     ENCHANTED_HEART_USE,
-    HEART_CONTAINER_USE,
+    HEART_CRYSTAL_USE,
     PLAYER_DIED;
 
     private final Lazy<SoundEvent> sound;

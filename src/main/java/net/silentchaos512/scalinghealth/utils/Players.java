@@ -37,16 +37,16 @@ public final class Players {
     }
 
     public static boolean heartContainersIncreaseHealth(EntityPlayer player) {
-        return Config.get(player).item.heartContainerIncreaseHealth.get();
+        return Config.get(player).item.heartCrystalIncreaseHealth.get();
     }
 
     public static int levelCostToUseHeartContainer(EntityPlayer player) {
         if (player.abilities.isCreativeMode) return 0;
-        return Config.get(player).item.heartContainerLevelCost.get();
+        return Config.get(player).item.heartCrystalLevelCost.get();
     }
 
     public static float heartContainerHealthRestored(EntityPlayer player) {
-        return Config.get(player).item.heartContainerHealthRestored.get().floatValue();
+        return Config.get(player).item.heartCrystalHealthRestored.get().floatValue();
     }
 
     public static float cursedHeartAffectAmount(World world) {

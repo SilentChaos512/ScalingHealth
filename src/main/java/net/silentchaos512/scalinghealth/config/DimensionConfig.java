@@ -28,33 +28,33 @@ public class DimensionConfig {
     public static class Items {
         public final DoubleValue cursedHeartAffect;
         public final DoubleValue enchantedHeartAffect;
-        public final DoubleValue heartContainerHealthRestored;
-        public final IntValue heartContainerLevelCost;
-        public final BooleanValue heartContainerIncreaseHealth;
+        public final DoubleValue heartCrystalHealthRestored;
+        public final IntValue heartCrystalLevelCost;
+        public final BooleanValue heartCrystalIncreaseHealth;
 
         Items(ConfigSpecWrapper wrapper) {
             wrapper.comment("items", "Settings for items when used in this dimension");
 
             cursedHeartAffect = wrapper
-                    .builder("item.cursedHeart.change")
+                    .builder("item.cursed_heart.change")
                     .comment("Change in difficulty when a cursed heart is used")
                     .defineInRange(10, -Double.MAX_VALUE, Double.MAX_VALUE);
             enchantedHeartAffect = wrapper
-                    .builder("item.enchantedHeart.change")
+                    .builder("item.enchanted_heart.change")
                     .comment("Change in difficulty when an enchanted heart is used")
                     .defineInRange(-10, -Double.MAX_VALUE, Double.MAX_VALUE);
-            heartContainerHealthRestored = wrapper
-                    .builder("item.heartContainer.healthRestored")
-                    .comment("The amount of additional health restored by heart containers (min = 0)",
-                            "Heart containers always restore the amount of health they add, this is a bonus")
+            heartCrystalHealthRestored = wrapper
+                    .builder("item.heart_crystal.healthRestored")
+                    .comment("The amount of additional health restored by heart crystals (min = 0)",
+                            "Heart crystals always restore the amount of health they add, this is a bonus")
                     .defineInRange(4, 0, Double.MAX_VALUE);
-            heartContainerLevelCost = wrapper
-                    .builder("item.heartContainer.levelCost")
-                    .comment("The number of levels required to use a heart container (min = 0)")
+            heartCrystalLevelCost = wrapper
+                    .builder("item.heart_crystal.levelCost")
+                    .comment("The number of levels required to use a heart crystal (min = 0)")
                     .defineInRange(3, 0, Integer.MAX_VALUE);
-            heartContainerIncreaseHealth = wrapper
-                    .builder("item.heartContainer.increaseHealth")
-                    .comment("Do heart containers increase max health?",
+            heartCrystalIncreaseHealth = wrapper
+                    .builder("item.heart_crystal.increaseHealth")
+                    .comment("Do heart crystals increase max health?",
                             "If set to false, they can still be used as a healing item.")
                     .define(true);
         }
@@ -89,7 +89,7 @@ public class DimensionConfig {
 
             allowHealthModification = wrapper
                     .builder("player.health.allowModification")
-                    .comment("Allow Scaling Health to apply health modifiers. Heart Containers will not work if this is disabled.")
+                    .comment("Allow Scaling Health to apply health modifiers. Heart crystals will not work if this is disabled.")
                     .define(true);
             localHealth = wrapper
                     .builder("player.health.localHealth")

@@ -49,6 +49,6 @@
   "misc.scalinghealth.sleepWarning": "[Scaling Health] WARNING: Sleeping will change your difficulty!",
   "scalinghealth.subtitle.cursed_heart_use": "Cursed heart used",
   "scalinghealth.subtitle.enchanted_heart_use": "Enchanted heart used",
-  "scalinghealth.subtitle.heart_container_use": "Heart container used",
+  "scalinghealth.subtitle.heart_crystal_use": "Heart crystal used",
   "scalinghealth.subtitle.player_died": "Somebody died (LOL)"
 }
