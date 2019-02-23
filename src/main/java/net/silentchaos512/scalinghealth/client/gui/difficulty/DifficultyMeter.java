@@ -90,7 +90,7 @@ public class DifficultyMeter extends Gui {
         }
 
         int currentTime = ClientTicks.ticksInGame();
-        if (showMode == DifficultyMeterShow.ALWAYS || currentTime - lastUpdateTime < Config.CLIENT.difficultyMeterShowTime.get()) {
+        if (showMode == DifficultyMeterShow.ALWAYS || currentTime - lastUpdateTime < 20 * Config.CLIENT.difficultyMeterShowTime.get()) {
             GlStateManager.enableBlend();
 
             mc.textureManager.bindTexture(TEXTURE);
