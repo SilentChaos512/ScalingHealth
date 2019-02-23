@@ -18,7 +18,7 @@
                 {
                     "type": "item",
                     "name": "scalinghealth:power_crystal",
-                    "weight": 6,
+                    "weight": 4,
                     "functions": [
                         {
                             "function": "set_count",
