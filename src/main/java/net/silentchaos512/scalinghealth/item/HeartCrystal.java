@@ -23,6 +23,8 @@ import net.minecraft.item.ItemStack;
 import net.silentchaos512.lib.util.EntityHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IPlayerData;
+import net.silentchaos512.scalinghealth.client.particles.ModParticles;
+import net.silentchaos512.scalinghealth.init.ModSounds;
 import net.silentchaos512.scalinghealth.utils.Players;
 import net.silentchaos512.utils.MathUtils;
 
@@ -58,5 +60,15 @@ public class HeartCrystal extends StatBoosterItem {
     @Override
     void increaseStat(EntityPlayer player, ItemStack stack, IPlayerData data) {
         data.addHeart(player);
+    }
+
+    @Override
+    ModParticles getParticleType() {
+        return ModParticles.HEART_CRYSTAL;
+    }
+
+    @Override
+    ModSounds getSoundEffect() {
+        return ModSounds.HEART_CRYSTAL_USE;
     }
 }

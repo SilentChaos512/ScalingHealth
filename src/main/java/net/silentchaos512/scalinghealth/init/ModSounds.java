@@ -18,6 +18,7 @@
 
 package net.silentchaos512.scalinghealth.init;
 
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.event.RegistryEvent;
@@ -48,6 +49,15 @@ public enum ModSounds {
 
     public String getName() {
         return name().toLowerCase(Locale.ROOT);
+    }
+
+    public void play(EntityLivingBase entity) {
+        play(entity, 0.5f, 1 + 0.1f * (float) ScalingHealth.random.nextGaussian());
+    }
+
+    public void play(EntityLivingBase entity, float volume, float pitch) {
+        // FIXME: Playing sounds crashes the game? No crash report either...
+        //entity.world.playSound(null, entity.getPosition(), this.get(), SoundCategory.PLAYERS, volume, pitch);
     }
 
     public static void registerAll(RegistryEvent.Register<SoundEvent> event) {

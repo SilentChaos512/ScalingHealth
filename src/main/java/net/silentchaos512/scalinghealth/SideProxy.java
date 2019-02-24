@@ -12,6 +12,7 @@ import net.silentchaos512.scalinghealth.capability.CapabilityPlayerData;
 import net.silentchaos512.scalinghealth.client.gui.DebugOverlay;
 import net.silentchaos512.scalinghealth.client.gui.difficulty.DifficultyMeter;
 import net.silentchaos512.scalinghealth.client.gui.health.HeartDisplayHandler;
+import net.silentchaos512.scalinghealth.client.particles.ModParticles;
 import net.silentchaos512.scalinghealth.command.ModCommands;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.event.BlightHandler;
@@ -50,7 +51,7 @@ class SideProxy {
         CapabilityPlayerData.register();
     }
 
-    private void imcEnqueue(InterModEnqueueEvent event) { }
+    void imcEnqueue(InterModEnqueueEvent event) {}
 
     private void imcProcess(InterModProcessEvent event) {
         if (GameUtil.isDeobfuscated()) {
@@ -78,7 +79,15 @@ class SideProxy {
             DebugOverlay.init();
         }
 
-        private void clientSetup(FMLClientSetupEvent event) { }
+        private void clientSetup(FMLClientSetupEvent event) {}
+
+        @Override
+        void imcEnqueue(InterModEnqueueEvent event) {
+            super.imcEnqueue(event);
+            // Not sure where this is supposed to go. Seems particle manager is created right
+            // before IMC enqueue/process
+            ModParticles.registerAll();
+        }
     }
 
     static class Server extends SideProxy {
@@ -86,8 +95,6 @@ class SideProxy {
             FMLJavaModLoadingContext.get().getModEventBus().addListener(this::serverSetup);
         }
 
-        private void serverSetup(FMLDedicatedServerSetupEvent event) {
-//            ModCommands.registerAll(event.getServerSupplier().get().getCommandManager().getDispatcher());
-        }
+        private void serverSetup(FMLDedicatedServerSetupEvent event) {}
     }
 }
