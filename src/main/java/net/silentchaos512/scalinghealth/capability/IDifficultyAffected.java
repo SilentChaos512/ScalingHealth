@@ -20,5 +20,7 @@ public interface IDifficultyAffected {
         return (int) (getDifficulty() / 3);
     }
 
+    void setProcessed(boolean value);
+
     void tick(EntityLivingBase entity);
 }

@@ -16,14 +16,15 @@ public final class RecalculateCommand {
 
     public static void register(CommandDispatcher<CommandSource> dispatcher) {
         dispatcher.register(Commands.literal("sh_recalculate").requires(source ->
-                source.hasPermissionLevel(2)).then(
-                Commands.literal("all").executes(context -> {
-                    context.getSource().sendFeedback(new TextComponentTranslation("command.scalinghealth.recalculate.start"), true);
-                    int processed = recalculateAllEntities(context);
-                    context.getSource().sendFeedback(new TextComponentTranslation("command.scalinghealth.recalculate.finish", processed), true);
-                    return 1;
-                })
-        ));
+                source.hasPermissionLevel(2))
+                .then(Commands.literal("all")
+                        .executes(context -> {
+                            context.getSource().sendFeedback(new TextComponentTranslation("command.scalinghealth.recalculate.start"), true);
+                            int processed = recalculateAllEntities(context);
+                            context.getSource().sendFeedback(new TextComponentTranslation("command.scalinghealth.recalculate.finish", processed), true);
+                            return 1;
+                        })
+                ));
     }
 
     private static int recalculateAllEntities(CommandContext<CommandSource> context) {

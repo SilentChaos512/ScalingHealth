@@ -26,37 +26,41 @@ public final class PowerCommand {
                 source.hasPermissionLevel(2));
 
         // get
-        builder.then(
-                Commands.literal("get").then(
-                        Commands.argument("targets", EntityArgument.multiplePlayers()).executes(
-                                // Run for all targets
-                                PowerCommand::runGet
+        builder
+                .then(Commands.literal("get")
+                        .then(Commands.argument("targets", EntityArgument.multiplePlayers())
+                                .executes(
+                                        // Run for all targets
+                                        PowerCommand::runGet
+                                )
                         )
-                ).executes(context -> {
-                    // No target, use sender
-                    return runGetSingle(context, context.getSource().asPlayer());
-                })
-        );
+                        .executes(context -> {
+                            // No target, use sender
+                            return runGetSingle(context, context.getSource().asPlayer());
+                        })
+                );
         // set
-        builder.then(
-                Commands.literal("set").then(
-                        Commands.argument("targets", EntityArgument.multiplePlayers()).then(
-                                Commands.argument("amount", IntegerArgumentType.integer()).executes(
-                                        PowerCommand::runSet
+        builder
+                .then(Commands.literal("set")
+                        .then(Commands.argument("targets", EntityArgument.multiplePlayers())
+                                .then(Commands.argument("amount", IntegerArgumentType.integer())
+                                        .executes(
+                                                PowerCommand::runSet
+                                        )
                                 )
                         )
-                )
-        );
+                );
         // add
-        builder.then(
-                Commands.literal("add").then(
-                        Commands.argument("targets", EntityArgument.multiplePlayers()).then(
-                                Commands.argument("amount", IntegerArgumentType.integer()).executes(
-                                        PowerCommand::runAdd
+        builder
+                .then(Commands.literal("add")
+                        .then(Commands.argument("targets", EntityArgument.multiplePlayers())
+                                .then(Commands.argument("amount", IntegerArgumentType.integer())
+                                        .executes(
+                                                PowerCommand::runAdd
+                                        )
                                 )
                         )
-                )
-        );
+                );
 
         dispatcher.register(builder);
     }

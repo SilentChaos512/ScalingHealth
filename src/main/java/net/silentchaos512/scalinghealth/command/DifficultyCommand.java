@@ -26,53 +26,60 @@ public final class DifficultyCommand {
                 source.hasPermissionLevel(2));
 
         // get
-        builder.then(
-                Commands.literal("get").then(
-                        Commands.argument("targets", EntityArgument.multiplePlayers()).executes(
-                                // Run for all targets
-                                DifficultyCommand::runGetDifficulty
+        builder
+                .then(Commands.literal("get")
+                        .then(Commands.argument("targets", EntityArgument.multiplePlayers())
+                                .executes(
+                                        // Run for all targets
+                                        DifficultyCommand::runGetDifficulty
+                                )
                         )
-                ).then (
-                        Commands.literal("world").executes(
-                                DifficultyCommand::runGetWorldDifficulty
+                        .then(Commands.literal("world")
+                                .executes(
+                                        DifficultyCommand::runGetWorldDifficulty
+                                )
                         )
-                ).executes(context -> {
-                    // No target, use sender
-                    return getDifficultySingle(context, context.getSource().asPlayer());
-                })
-        );
+                        .executes(context -> {
+                            // No target, use sender
+                            return getDifficultySingle(context, context.getSource().asPlayer());
+                        })
+                );
         // set
-        builder.then(
-                Commands.literal("set").then(
-                        Commands.argument("targets", EntityArgument.multiplePlayers()).then(
-                                Commands.argument("amount", FloatArgumentType.floatArg()).executes(
-                                        DifficultyCommand::runSetDifficulty
+        builder
+                .then(Commands.literal("set")
+                        .then(Commands.argument("targets", EntityArgument.multiplePlayers())
+                                .then(Commands.argument("amount", FloatArgumentType.floatArg())
+                                        .executes(
+                                                DifficultyCommand::runSetDifficulty
+                                        )
                                 )
                         )
-                ).then(
-                        Commands.literal("world").then(
-                                Commands.argument("amount", FloatArgumentType.floatArg()).executes(
-                                        DifficultyCommand::runSetWorldDifficulty
+                        .then(Commands.literal("world")
+                                .then(Commands.argument("amount", FloatArgumentType.floatArg())
+                                        .executes(
+                                                DifficultyCommand::runSetWorldDifficulty
+                                        )
                                 )
                         )
-                )
-        );
+                );
         // add
-        builder.then(
-                Commands.literal("add").then(
-                        Commands.argument("targets", EntityArgument.multiplePlayers()).then(
-                                Commands.argument("amount", FloatArgumentType.floatArg()).executes(
-                                        DifficultyCommand::runAddDifficulty
+        builder
+                .then(Commands.literal("add")
+                        .then(Commands.argument("targets", EntityArgument.multiplePlayers())
+                                .then(Commands.argument("amount", FloatArgumentType.floatArg())
+                                        .executes(
+                                                DifficultyCommand::runAddDifficulty
+                                        )
                                 )
                         )
-                ).then(
-                        Commands.literal("world").then(
-                                Commands.argument("amount", FloatArgumentType.floatArg()).executes(
-                                        DifficultyCommand::runAddWorldDifficulty
+                        .then(Commands.literal("world")
+                                .then(Commands.argument("amount", FloatArgumentType.floatArg())
+                                        .executes(
+                                                DifficultyCommand::runAddWorldDifficulty
+                                        )
                                 )
                         )
-                )
-        );
+                );
 
         dispatcher.register(builder);
     }

@@ -24,37 +24,41 @@ public final class HealthCommand {
                 source.hasPermissionLevel(2));
 
         // get
-        builder.then(
-                Commands.literal("get").then(
-                        Commands.argument("targets", EntityArgument.multiplePlayers()).executes(
-                                // Run for all targets
-                                HealthCommand::runGetHealth
+        builder
+                .then(Commands.literal("get")
+                        .then(Commands.argument("targets", EntityArgument.multiplePlayers())
+                                .executes(
+                                        // Run for all targets
+                                        HealthCommand::runGetHealth
+                                )
                         )
-                ).executes(context -> {
-                    // No target, use sender
-                    return getHealthSingle(context, context.getSource().asPlayer());
-                })
-        );
+                        .executes(context -> {
+                            // No target, use sender
+                            return getHealthSingle(context, context.getSource().asPlayer());
+                        })
+                );
         // set
-        builder.then(
-                Commands.literal("set").then(
-                        Commands.argument("targets", EntityArgument.multiplePlayers()).then(
-                                Commands.argument("amount", IntegerArgumentType.integer()).executes(
-                                        HealthCommand::runSetHealth
+        builder
+                .then(Commands.literal("set")
+                        .then(Commands.argument("targets", EntityArgument.multiplePlayers())
+                                .then(Commands.argument("amount", IntegerArgumentType.integer())
+                                        .executes(
+                                                HealthCommand::runSetHealth
+                                        )
                                 )
                         )
-                )
-        );
+                );
         // add
-        builder.then(
-                Commands.literal("add").then(
-                        Commands.argument("targets", EntityArgument.multiplePlayers()).then(
-                                Commands.argument("amount", IntegerArgumentType.integer()).executes(
-                                        HealthCommand::runAddHealth
+        builder
+                .then(Commands.literal("add")
+                        .then(Commands.argument("targets", EntityArgument.multiplePlayers())
+                                .then(Commands.argument("amount", IntegerArgumentType.integer())
+                                        .executes(
+                                                HealthCommand::runAddHealth
+                                        )
                                 )
                         )
-                )
-        );
+                );
 
         dispatcher.register(builder);
     }

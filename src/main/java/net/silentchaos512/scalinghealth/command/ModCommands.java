@@ -15,6 +15,7 @@ public final class ModCommands {
         HealthCommand.register(dispatcher);
         PowerCommand.register(dispatcher);
         RecalculateCommand.register(dispatcher);
+        SummonCommand.register(dispatcher);
     }
 
     static ITextComponent playerNameText(EntityPlayer player) {

@@ -12,11 +12,9 @@ import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.DimensionConfig;
 import net.silentchaos512.scalinghealth.config.EvalVars;
-import net.silentchaos512.scalinghealth.event.DifficultyEvents;
 import net.silentchaos512.scalinghealth.lib.MobHealthMode;
 import net.silentchaos512.scalinghealth.lib.MobType;
-
-import java.util.Random;
+import net.silentchaos512.utils.MathUtils;
 
 public final class MobDifficultyHandler {
     private MobDifficultyHandler() {}
@@ -25,12 +23,7 @@ public final class MobDifficultyHandler {
         // Already dead?
         if (entity.removed) return;
 
-        World world = entity.world;
-
         float difficulty = data.getDifficulty();
-
-        Random rand = ScalingHealth.random;
-        boolean isHostile = entity instanceof IMob;
 
         // Lunar phase multipliers?
 //        if (Config.Difficulty.DIFFICULTY_LUNAR_MULTIPLIERS_ENABLED && world.getWorldTime() % 24000 > 12000) {
@@ -40,14 +33,29 @@ public final class MobDifficultyHandler {
 //        }
 
         // Make blight?
+        boolean makeBlight = shouldBecomeBlight(entity, difficulty);
+        setEntityProperties(entity, data, difficulty, makeBlight);
+    }
+
+    public static boolean shouldBecomeBlight(EntityLivingBase entity, float difficulty) {
         if (Difficulty.canBecomeBlight(entity)) {
             double chance = getBlightChance(entity);
-            if (rand.nextFloat() < chance) {
-                difficulty *= getBlightDifficultyMultiplier(world);
-                data.setIsBlight(true);
-                ScalingHealth.LOGGER.debug(DifficultyEvents.MARKER, "Set {} as blight", entity);
-            }
+            return MathUtils.tryPercentage(ScalingHealth.random, chance);
         }
+        return false;
+    }
+
+    public static void setEntityProperties(EntityLivingBase entity, IDifficultyAffected data, float difficulty, boolean makeBlight) {
+        if (entity.removed) return;
+
+        World world = entity.world;
+        boolean isHostile = entity instanceof IMob;
+
+        if (makeBlight) {
+            difficulty *= getBlightDifficultyMultiplier(world);
+            data.setIsBlight(true);
+        }
+
         final float totalDifficulty = difficulty;
 
         double healthBoost = difficulty;
@@ -62,13 +70,13 @@ public final class MobDifficultyHandler {
         healthBoost *= healthMultiplier;
 
         if (difficulty > 0) {
-            double diffIncrease = 2 * healthMultiplier * difficulty * rand.nextFloat();
+            double diffIncrease = 2 * healthMultiplier * difficulty * ScalingHealth.random.nextFloat();
             healthBoost += diffIncrease;
         }
 
         // Increase attack damage.
         if (difficulty > 0) {
-            float diffIncrease = difficulty * rand.nextFloat();
+            float diffIncrease = difficulty * ScalingHealth.random.nextFloat();
             damageBoost = diffIncrease * Difficulty.damageBoostScale(entity);
             // Clamp the value so it doesn't go over the maximum config.
             double max = Difficulty.maxDamageBoost(entity);
@@ -88,8 +96,8 @@ public final class MobDifficultyHandler {
     }
 
     private static double getBlightChance(EntityLivingBase entity) {
+        // FIXME: May not line up with actual entity difficulty, need to pass in difficulty
         DimensionConfig config = Config.get(entity);
-        // TODO: Pull from dimension config
         Expression expr = new Expression("0.0625 * areaDifficulty / maxDifficulty");
         return EvalVars.apply(config, entity.world, entity.getPosition(), null, expr);
     }

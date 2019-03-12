@@ -52,6 +52,11 @@ public class CapabilityDifficultyAffected implements IDifficultyAffected, ICapab
     }
 
     @Override
+    public void setProcessed(boolean value) {
+        this.processed = value;
+    }
+
+    @Override
     public void tick(EntityLivingBase entity) {
         if (!processed /*&& difficulty == 0*/ && entity.ticksExisted > 20) {
             difficulty = (float) Difficulty.areaDifficulty(entity.world, entity.getPosition());
