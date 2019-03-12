@@ -1,6 +1,5 @@
 package net.silentchaos512.scalinghealth.capability;
 
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.INBTBase;
@@ -8,10 +7,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.ICapabilitySerializable;
+import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -103,9 +99,20 @@ public class CapabilityPlayerData implements IPlayerData, ICapabilitySerializabl
         powerCrystals = nbt.getInt(NBT_POWER_CRYSTALS);
     }
 
-    public static boolean canAttachTo(Entity entity) {
-        if (entity.getCapability(INSTANCE).isPresent()) return false;
-        return entity instanceof EntityPlayer;
+    public static boolean canAttachTo(ICapabilityProvider entity) {
+        if (!(entity instanceof EntityPlayer)) {
+            return false;
+        }
+        try {
+            if (entity.getCapability(INSTANCE).isPresent()) {
+                return false;
+            }
+        } catch (NullPointerException ex) {
+            // Forge seems to be screwing up somewhere?
+            ScalingHealth.LOGGER.error("Failed to get capabilities from {}", entity);
+            return false;
+        }
+        return true;
     }
 
     public static void register() {

@@ -91,7 +91,7 @@ public class DimensionConfig {
         public final IntValue minHealth;
         public final IntValue maxHealth;
         public final IntValue maxAttackDamage;
-        public final Supplier<Expression> setOnDeath;
+        public final Supplier<Expression> setHealthOnDeath;
 
         // TODO: regen configs
 
@@ -119,16 +119,16 @@ public class DimensionConfig {
                     .comment("The highest max health a player can reach, not considering the vanilla",
                             " health cap and modifiers from other sources. 0 means 'unlimited'.")
                     .defineInRange(0, 0, Integer.MAX_VALUE);
+            setHealthOnDeath = defineExpression(wrapper,
+                    "player.health.setOnDeath",
+                    EvalVars.MAX_HEALTH.varName(),
+                    EvalVars.MAX_HEALTH,
+                    "On death, set the player's max health to this value. By default, there is no change.");
             maxAttackDamage = wrapper
                     .builder("player.attackDamage.maxValue")
                     .comment("The highest attack damage a player can achieve, not considering the vanilla",
                             "cap and modifiers from other sources. 0 means 'unlimited'.")
                     .defineInRange(0, 0, Integer.MAX_VALUE);
-            setOnDeath = defineExpression(wrapper,
-                    "setOnDeath",
-                    EvalVars.MAX_HEALTH.varName(),
-                    EvalVars.MAX_HEALTH,
-                    "On death, set the player's max health to this value. By default, there is no change.");
         }
     }
 
@@ -139,6 +139,8 @@ public class DimensionConfig {
         public final DoubleValue damageBoostScale;
         public final DoubleValue maxDamageBoost;
         public final MobPotionConfig randomPotions;
+        // Blights
+//        public final Supplier<Expression> blightChance;
 
         Mobs(ConfigSpecWrapper wrapper) {
             wrapper.comment("mob.health", "Mob health settings");
@@ -165,6 +167,9 @@ public class DimensionConfig {
                     .defineInRange(10, 0, Double.MAX_VALUE);
 
             randomPotions = MobPotionConfig.init(wrapper, "mob.randomPotionEffects");
+
+            // Blights
+            // TODO
         }
     }
 

@@ -87,7 +87,9 @@ dependencies {
     minecraft "net.minecraftforge:forge:${project.forge_version}"
 
     extraLibs "com.udojava:EvalEx:2.1"
-    compile "net.silentchaos512:silent-lib:${project.sl_version}"
+    compile("net.silentchaos512:silent-lib:${project.sl_version}") {
+        exclude module: "forge"
+    }
 
     configurations.implementation.extendsFrom(configurations.extraLibs)
 }

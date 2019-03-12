@@ -20,6 +20,7 @@ package net.silentchaos512.scalinghealth.config;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.world.IWorldReaderBase;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.extensions.IForgeDimension;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -361,6 +362,10 @@ public final class Config {
 
     public static DimensionConfig get(IForgeDimension dimension) {
         return get(dimension.getDimension().getType().getId());
+    }
+
+    public static DimensionConfig get(DimensionType dimension) {
+        return get(dimension.getId());
     }
 
     public static DimensionConfig get(Entity entity) {

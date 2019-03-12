@@ -53,7 +53,15 @@ public class CapabilityDifficultySource implements IDifficultySource, ICapabilit
     }
 
     public static boolean canAttachTo(ICapabilityProvider obj) {
-        if (obj.getCapability(INSTANCE).isPresent()) return false;
+        try {
+            if (obj.getCapability(INSTANCE).isPresent()) {
+                return false;
+            }
+        } catch (NullPointerException ex) {
+            // Forge seems to be screwing up somewhere?
+            ScalingHealth.LOGGER.error("Failed to get capabilities from {}", obj);
+            return false;
+        }
         return obj instanceof EntityPlayer || obj instanceof World;
     }
 

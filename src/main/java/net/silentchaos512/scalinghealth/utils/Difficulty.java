@@ -8,6 +8,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IWorldReaderBase;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.silentchaos512.scalinghealth.capability.CapabilityDifficultyAffected;
 import net.silentchaos512.scalinghealth.capability.CapabilityDifficultySource;
@@ -103,6 +104,10 @@ public final class Difficulty {
         return Config.get(world).difficulty.maxValue.get();
     }
 
+    public static double changePerSecond(IWorldReaderBase world) {
+        return Config.get(world).difficulty.changePerSecond.get();
+    }
+
     public static boolean allowsDifficultyChanges(EntityLivingBase entity) {
         return true;
     }
@@ -123,5 +128,10 @@ public final class Difficulty {
 
     public static double maxDamageBoost(EntityLivingBase entity) {
         return Config.get(entity).mobs.maxDamageBoost.get();
+    }
+
+    public static double getDifficultyAfterDeath(EntityPlayer player, DimensionType deathDimension) {
+        DimensionConfig config = Config.get(deathDimension);
+        return EvalVars.apply(config, player.world, player.getPosition(), player, config.difficulty.onPlayerDeath.get());
     }
 }
