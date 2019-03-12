@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
 public class CapabilityDifficultySource implements IDifficultySource, ICapabilitySerializable<NBTTagCompound> {
     @CapabilityInject(IDifficultySource.class)
     public static Capability<IDifficultySource> INSTANCE = null;
-    public static ResourceLocation NAME = ScalingHealth.res("difficulty_source");
+    public static ResourceLocation NAME = ScalingHealth.getId("difficulty_source");
 
     private static final String NBT_DIFFICULTY = "Difficulty";
 

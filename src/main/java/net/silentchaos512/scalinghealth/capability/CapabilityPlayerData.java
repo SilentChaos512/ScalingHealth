@@ -23,7 +23,7 @@ import javax.annotation.Nullable;
 public class CapabilityPlayerData implements IPlayerData, ICapabilitySerializable<NBTTagCompound> {
     @CapabilityInject(IPlayerData.class)
     public static Capability<IPlayerData> INSTANCE = null;
-    public static ResourceLocation NAME = ScalingHealth.res("player_data");
+    public static ResourceLocation NAME = ScalingHealth.getId("player_data");
 
     private static final String NBT_HEART_CRYSTALS = "HeartCrystals";
     private static final String NBT_POWER_CRYSTALS = "PowerCrystals";

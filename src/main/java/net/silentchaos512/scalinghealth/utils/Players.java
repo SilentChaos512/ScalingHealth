@@ -2,7 +2,10 @@ package net.silentchaos512.scalinghealth.utils;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
 import net.silentchaos512.scalinghealth.config.Config;
+import net.silentchaos512.scalinghealth.config.DimensionConfig;
+import net.silentchaos512.scalinghealth.config.EvalVars;
 import net.silentchaos512.utils.MathUtils;
 
 /**
@@ -50,6 +53,15 @@ public final class Players {
                 0,
                 maxPowerCrystals(player)
         );
+    }
+
+    public static int getCrystalCountFromHealth(EntityPlayer player, float health) {
+        return (int) ((health - startingHealth(player)) / 2);
+    }
+
+    public static float getHealthAfterDeath(EntityPlayer player, DimensionType deathDimension) {
+        DimensionConfig config = Config.get(deathDimension);
+        return (float) EvalVars.apply(config, player.world, player.getPosition(), player, config.player.setHealthOnDeath.get());
     }
 
     public static boolean heartCrystalsIncreaseHealth(EntityPlayer player) {

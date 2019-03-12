@@ -12,6 +12,7 @@ import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.DimensionConfig;
 import net.silentchaos512.scalinghealth.config.EvalVars;
+import net.silentchaos512.scalinghealth.event.DifficultyEvents;
 import net.silentchaos512.scalinghealth.lib.MobHealthMode;
 import net.silentchaos512.scalinghealth.lib.MobType;
 
@@ -44,6 +45,7 @@ public final class MobDifficultyHandler {
             if (rand.nextFloat() < chance) {
                 difficulty *= getBlightDifficultyMultiplier(world);
                 data.setIsBlight(true);
+                ScalingHealth.LOGGER.debug(DifficultyEvents.MARKER, "Set {} as blight", entity);
             }
         }
         final float totalDifficulty = difficulty;

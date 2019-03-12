@@ -9,7 +9,7 @@ import net.silentchaos512.scalinghealth.client.ClientHandler;
 import java.util.Objects;
 
 public class Network {
-    private static final ResourceLocation NAME = ScalingHealth.res("network");
+    private static final ResourceLocation NAME = ScalingHealth.getId("network");
 
     public static SimpleChannel channel;
     static {

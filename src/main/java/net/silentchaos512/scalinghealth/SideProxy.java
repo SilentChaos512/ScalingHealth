@@ -5,7 +5,6 @@ import net.minecraftforge.fml.event.lifecycle.*;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.silentchaos512.lib.util.GameUtil;
 import net.silentchaos512.scalinghealth.capability.CapabilityDifficultyAffected;
 import net.silentchaos512.scalinghealth.capability.CapabilityDifficultySource;
 import net.silentchaos512.scalinghealth.capability.CapabilityPlayerData;
@@ -54,7 +53,7 @@ class SideProxy {
     void imcEnqueue(InterModEnqueueEvent event) {}
 
     private void imcProcess(InterModProcessEvent event) {
-        if (GameUtil.isDeobfuscated()) {
+        if (ScalingHealth.RUN_GENERATORS && ScalingHealth.isDevBuild()) {
             GenModels.generate();
             GenRecipes.generate();
         }

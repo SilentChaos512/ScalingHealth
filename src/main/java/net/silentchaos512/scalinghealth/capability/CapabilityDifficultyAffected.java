@@ -20,7 +20,7 @@ import javax.annotation.Nullable;
 public class CapabilityDifficultyAffected implements IDifficultyAffected, ICapabilitySerializable<NBTTagCompound> {
     @CapabilityInject(IDifficultyAffected.class)
     public static Capability<IDifficultyAffected> INSTANCE = null;
-    public static ResourceLocation NAME = ScalingHealth.res("difficulty_affected");
+    public static ResourceLocation NAME = ScalingHealth.getId("difficulty_affected");
 
     private static final String NBT_BLIGHT = "Blight";
     private static final String NBT_DIFFICULTY = "Difficulty";
