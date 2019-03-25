@@ -45,11 +45,12 @@ import net.silentchaos512.scalinghealth.world.ScalingHealthSavedData;
 import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public final class SHPlayerDataHandler {
     private static final String NBT_ROOT = ScalingHealth.MOD_ID_LOWER + "_data";
 
-    private static final Map<Integer, PlayerData> playerData = new HashMap<>();
+    private static final Map<Integer, PlayerData> playerData = new ConcurrentHashMap<>();
 
     private SHPlayerDataHandler() {}
 
