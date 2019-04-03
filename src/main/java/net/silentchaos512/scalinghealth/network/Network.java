@@ -8,10 +8,11 @@ import net.silentchaos512.scalinghealth.client.ClientHandler;
 
 import java.util.Objects;
 
-public class Network {
+public final class Network {
     private static final ResourceLocation NAME = ScalingHealth.getId("network");
 
     public static SimpleChannel channel;
+
     static {
         channel = NetworkRegistry.ChannelBuilder.named(NAME)
                 .clientAcceptedVersions(s -> Objects.equals(s, "1"))
@@ -30,4 +31,8 @@ public class Network {
                 .consumer(ClientHandler::onLoginMessage)
                 .add();
     }
+
+    private Network() {}
+
+    public static void init() { }
 }

@@ -18,12 +18,14 @@ import net.silentchaos512.scalinghealth.event.BlightHandler;
 import net.silentchaos512.scalinghealth.event.DamageScaling;
 import net.silentchaos512.scalinghealth.event.PetEventHandler;
 import net.silentchaos512.scalinghealth.init.*;
+import net.silentchaos512.scalinghealth.network.Network;
 import net.silentchaos512.scalinghealth.utils.gen.GenModels;
 import net.silentchaos512.scalinghealth.utils.gen.GenRecipes;
 
 class SideProxy {
     SideProxy() {
         Config.init();
+        Network.init();
         ModLoot.init();
         
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
