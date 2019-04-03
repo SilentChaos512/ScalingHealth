@@ -88,8 +88,8 @@ public class CapabilityPlayerData implements IPlayerData, ICapabilitySerializabl
     @Override
     public NBTTagCompound serializeNBT() {
         NBTTagCompound nbt = new NBTTagCompound();
-        nbt.setInt(NBT_HEART_CRYSTALS, extraHearts);
-        nbt.setInt(NBT_POWER_CRYSTALS, powerCrystals);
+        nbt.putInt(NBT_HEART_CRYSTALS, extraHearts);
+        nbt.putInt(NBT_POWER_CRYSTALS, powerCrystals);
         return nbt;
     }
 

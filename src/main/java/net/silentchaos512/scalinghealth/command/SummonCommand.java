@@ -91,7 +91,7 @@ public final class SummonCommand {
                                                                 IntegerArgumentType.getInteger(source, "difficulty"),
                                                                 BoolArgumentType.getBool(source, "forceBlight"),
                                                                 Vec3Argument.getVec3(source, "pos"),
-                                                                NBTArgument.func_197130_a(source, "nbt"),
+                                                                NBTArgument.getNBT(source, "nbt"),
                                                                 false
                                                         )
                                                 )
@@ -107,7 +107,7 @@ public final class SummonCommand {
     // Mostly a copy of vanilla summon command
     private static int summonEntity(CommandSource source, ResourceLocation id, int difficulty, boolean forceBlight, Vec3d pos, NBTTagCompound tags, boolean p_198737_4_) throws CommandSyntaxException {
         NBTTagCompound nbttagcompound = tags.copy();
-        nbttagcompound.setString("id", id.toString());
+        nbttagcompound.putString("id", id.toString());
         if (EntityType.getId(EntityType.LIGHTNING_BOLT).equals(id)) {
             Entity entity1 = new EntityLightningBolt(source.getWorld(), pos.x, pos.y, pos.z, false);
             source.getWorld().addWeatherEffect(entity1);

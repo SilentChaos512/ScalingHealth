@@ -47,7 +47,7 @@ public class EntityBlightFire extends Entity implements IEntityAdditionalSpawnDa
     @Override
     public void tick() {
         // Server side only, blight fire must have a parent.
-        if (!world.isRemote && (parent == null || parent.removed)) {
+        if (!world.isRemote && (parent == null || !parent.isAlive())) {
             remove();
             return;
         }
@@ -72,7 +72,7 @@ public class EntityBlightFire extends Entity implements IEntityAdditionalSpawnDa
 
     @Override
     protected void readAdditional(NBTTagCompound compound) {
-        if (compound.hasKey(NBT_PARENT)) {
+        if (compound.contains(NBT_PARENT)) {
             int id = compound.getInt(NBT_PARENT);
             Entity entity = world.getEntityByID(id);
             if (entity instanceof EntityLivingBase)
@@ -83,7 +83,7 @@ public class EntityBlightFire extends Entity implements IEntityAdditionalSpawnDa
     @Override
     protected void writeAdditional(NBTTagCompound compound) {
         if (parent != null) {
-            compound.setInt(NBT_PARENT, parent.getEntityId());
+            compound.putInt(NBT_PARENT, parent.getEntityId());
         }
     }
 

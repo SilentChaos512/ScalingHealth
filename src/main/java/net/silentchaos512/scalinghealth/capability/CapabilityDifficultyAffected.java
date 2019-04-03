@@ -78,8 +78,8 @@ public class CapabilityDifficultyAffected implements IDifficultyAffected, ICapab
     @Override
     public NBTTagCompound serializeNBT() {
         NBTTagCompound nbt = new NBTTagCompound();
-        nbt.setBoolean(NBT_BLIGHT, blight);
-        nbt.setFloat(NBT_DIFFICULTY, difficulty);
+        nbt.putBoolean(NBT_BLIGHT, blight);
+        nbt.putFloat(NBT_DIFFICULTY, difficulty);
         return nbt;
     }
 

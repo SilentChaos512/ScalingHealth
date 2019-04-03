@@ -43,7 +43,7 @@ public class CapabilityDifficultySource implements IDifficultySource, ICapabilit
     @Override
     public NBTTagCompound serializeNBT() {
         NBTTagCompound nbt = new NBTTagCompound();
-        nbt.setFloat(NBT_DIFFICULTY, difficulty);
+        nbt.putFloat(NBT_DIFFICULTY, difficulty);
         return nbt;
     }
 

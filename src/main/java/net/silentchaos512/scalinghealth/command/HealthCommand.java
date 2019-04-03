@@ -26,7 +26,7 @@ public final class HealthCommand {
         // get
         builder
                 .then(Commands.literal("get")
-                        .then(Commands.argument("targets", EntityArgument.multiplePlayers())
+                        .then(Commands.argument("targets", EntityArgument.players())
                                 .executes(
                                         // Run for all targets
                                         HealthCommand::runGetHealth
@@ -40,7 +40,7 @@ public final class HealthCommand {
         // set
         builder
                 .then(Commands.literal("set")
-                        .then(Commands.argument("targets", EntityArgument.multiplePlayers())
+                        .then(Commands.argument("targets", EntityArgument.players())
                                 .then(Commands.argument("amount", IntegerArgumentType.integer())
                                         .executes(
                                                 HealthCommand::runSetHealth
@@ -51,7 +51,7 @@ public final class HealthCommand {
         // add
         builder
                 .then(Commands.literal("add")
-                        .then(Commands.argument("targets", EntityArgument.multiplePlayers())
+                        .then(Commands.argument("targets", EntityArgument.players())
                                 .then(Commands.argument("amount", IntegerArgumentType.integer())
                                         .executes(
                                                 HealthCommand::runAddHealth

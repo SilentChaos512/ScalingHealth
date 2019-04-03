@@ -109,7 +109,7 @@ public class MobPotionConfig {
         @Nullable
         static PotionEntry from(CommentedConfig config) {
             String nameRaw = config.get("potion");
-            ResourceLocation name = ResourceLocation.makeResourceLocation(nameRaw);
+            ResourceLocation name = ResourceLocation.tryCreate(nameRaw);
             if (name == null) {
                 ScalingHealth.LOGGER.error(MARKER, "Invalid ID {}", nameRaw);
                 return null;

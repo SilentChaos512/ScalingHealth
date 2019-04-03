@@ -28,7 +28,7 @@ public final class DifficultyCommand {
         // get
         builder
                 .then(Commands.literal("get")
-                        .then(Commands.argument("targets", EntityArgument.multiplePlayers())
+                        .then(Commands.argument("targets", EntityArgument.players())
                                 .executes(
                                         // Run for all targets
                                         DifficultyCommand::runGetDifficulty
@@ -47,7 +47,7 @@ public final class DifficultyCommand {
         // set
         builder
                 .then(Commands.literal("set")
-                        .then(Commands.argument("targets", EntityArgument.multiplePlayers())
+                        .then(Commands.argument("targets", EntityArgument.players())
                                 .then(Commands.argument("amount", FloatArgumentType.floatArg())
                                         .executes(
                                                 DifficultyCommand::runSetDifficulty
@@ -65,7 +65,7 @@ public final class DifficultyCommand {
         // add
         builder
                 .then(Commands.literal("add")
-                        .then(Commands.argument("targets", EntityArgument.multiplePlayers())
+                        .then(Commands.argument("targets", EntityArgument.players())
                                 .then(Commands.argument("amount", FloatArgumentType.floatArg())
                                         .executes(
                                                 DifficultyCommand::runAddDifficulty

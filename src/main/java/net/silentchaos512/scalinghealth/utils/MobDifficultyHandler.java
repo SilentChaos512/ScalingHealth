@@ -21,7 +21,7 @@ public final class MobDifficultyHandler {
 
     public static void process(EntityLivingBase entity, IDifficultyAffected data) {
         // Already dead?
-        if (entity.removed) return;
+        if (!entity.isAlive()) return;
 
         float difficulty = data.getDifficulty();
 
@@ -46,7 +46,7 @@ public final class MobDifficultyHandler {
     }
 
     public static void setEntityProperties(EntityLivingBase entity, IDifficultyAffected data, float difficulty, boolean makeBlight) {
-        if (entity.removed) return;
+        if (!entity.isAlive()) return;
 
         World world = entity.world;
         boolean isHostile = entity instanceof IMob;

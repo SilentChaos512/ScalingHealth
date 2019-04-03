@@ -28,7 +28,7 @@ public final class PowerCommand {
         // get
         builder
                 .then(Commands.literal("get")
-                        .then(Commands.argument("targets", EntityArgument.multiplePlayers())
+                        .then(Commands.argument("targets", EntityArgument.players())
                                 .executes(
                                         // Run for all targets
                                         PowerCommand::runGet
@@ -42,7 +42,7 @@ public final class PowerCommand {
         // set
         builder
                 .then(Commands.literal("set")
-                        .then(Commands.argument("targets", EntityArgument.multiplePlayers())
+                        .then(Commands.argument("targets", EntityArgument.players())
                                 .then(Commands.argument("amount", IntegerArgumentType.integer())
                                         .executes(
                                                 PowerCommand::runSet
@@ -53,7 +53,7 @@ public final class PowerCommand {
         // add
         builder
                 .then(Commands.literal("add")
-                        .then(Commands.argument("targets", EntityArgument.multiplePlayers())
+                        .then(Commands.argument("targets", EntityArgument.players())
                                 .then(Commands.argument("amount", IntegerArgumentType.integer())
                                         .executes(
                                                 PowerCommand::runAdd

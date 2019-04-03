@@ -40,7 +40,7 @@ public enum ModParticles {
             double motionX = motionScaleX * ScalingHealth.random.nextGaussian();
             double motionY = motionScaleY * ScalingHealth.random.nextGaussian();
             double motionZ = motionScaleZ * ScalingHealth.random.nextGaussian();
-            world.spawnParticle(particleType, posX, posY, posZ, motionX, motionY, motionZ);
+            world.addParticle(particleType, posX, posY, posZ, motionX, motionY, motionZ);
         }
     }
 
