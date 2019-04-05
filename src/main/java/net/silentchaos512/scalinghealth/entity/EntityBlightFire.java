@@ -25,7 +25,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
+import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.init.ModEntities;
+
+import javax.annotation.Nullable;
 
 public class EntityBlightFire extends Entity implements IEntityAdditionalSpawnData {
     private static final String NBT_PARENT = "ParentBlight";
@@ -48,12 +51,16 @@ public class EntityBlightFire extends Entity implements IEntityAdditionalSpawnDa
     public void tick() {
         // Server side only, blight fire must have a parent.
         if (!world.isRemote && (parent == null || !parent.isAlive())) {
+            if (ScalingHealth.LOGGER.isDebugEnabled()) {
+                ScalingHealth.LOGGER.debug("Removed blight fire (parent missing or dead)");
+            }
             remove();
             return;
         }
 
         // Occasionally players get a blight fire... what?
         if (parent instanceof EntityPlayer) {
+            ScalingHealth.LOGGER.warn("Removed blight fire from player (wat?)");
             remove();
         }
 
@@ -87,6 +94,7 @@ public class EntityBlightFire extends Entity implements IEntityAdditionalSpawnDa
         }
     }
 
+    @Nullable
     public EntityLivingBase getParent() {
         return parent;
     }

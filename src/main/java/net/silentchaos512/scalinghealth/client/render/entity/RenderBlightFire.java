@@ -29,9 +29,11 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
+import net.silentchaos512.lib.event.ClientTicks;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.entity.EntityBlightFire;
 import net.silentchaos512.scalinghealth.lib.module.ModuleAprilTricks;
+import net.silentchaos512.utils.Color;
 
 import javax.annotation.Nonnull;
 
@@ -72,8 +74,7 @@ public final class RenderBlightFire extends Render<EntityBlightFire> {
     @Override
     public void doRender(EntityBlightFire fire, double x, double y, double z, float entityYaw, float partialTicks) {
         EntityLivingBase parent = fire.getParent();
-        if (parent == null)
-            return;
+        if (parent == null) return;
 
         GlStateManager.disableLighting();
         GlStateManager.pushMatrix();
@@ -81,7 +82,7 @@ public final class RenderBlightFire extends Render<EntityBlightFire> {
         float f = parent.width * FIRE_SCALE;
         GlStateManager.scalef(f, f, f);
         Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder vertexbuffer = tessellator.getBuffer();
+        BufferBuilder buffer = tessellator.getBuffer();
 
         float f1 = 0.5F;
         float f2 = 0.0F;
@@ -92,11 +93,10 @@ public final class RenderBlightFire extends Render<EntityBlightFire> {
         GlStateManager.translatef(0, 0, f3 * 0.02f);
 
         if (ModuleAprilTricks.instance.isRightDay() && ModuleAprilTricks.instance.isEnabled()) {
-//            float changeRate = 40f + parent.getEntityId() % 80f;
-//            Color color = new Color();
-//            float hue = ((ClientTicks.ticksInGame + parent.getEntityId()) % changeRate / changeRate);
-//            color.fromHSB(hue, 1f, 1f);
-//            GlStateManager.color4f(color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, 1.0F);
+            float changeRate = 40f + parent.getEntityId() % 80f;
+            float hue = ((ClientTicks.ticksInGame() + parent.getEntityId()) % changeRate / changeRate);
+            Color color = new Color(java.awt.Color.HSBtoRGB(hue, 1, 1));
+            GlStateManager.color4f(color.getRed(), color.getGreen(), color.getBlue(), 1.0F);
         } else {
             GlStateManager.color4f(1, 1, 1, 1);
         }
@@ -104,13 +104,12 @@ public final class RenderBlightFire extends Render<EntityBlightFire> {
         float f5 = 0.0F;
         int i = 0;
 
-        vertexbuffer.begin(7, DefaultVertexFormats.POSITION_TEX);
+        buffer.begin(7, DefaultVertexFormats.POSITION_TEX);
         this.bindTexture(getEntityTexture(fire));
 
         while (f3 > 0.0F) {
             boolean flag = i % 2 == 0;
-            // FIXME
-            int frame = 0; //= ClientTicks.ticksInGame % 32;
+            int frame = ClientTicks.ticksInGame() % 32;
             float minU = flag ? 0.5f : 0.0f;
             float minV = frame / 32f;
             float maxU = flag ? 1.0f : 0.5f;
@@ -122,13 +121,13 @@ public final class RenderBlightFire extends Render<EntityBlightFire> {
                 minU = f10;
             }
 
-            vertexbuffer.pos((double) (f1 - f2), (double) (0.0F - f4), (double) f5)
+            buffer.pos((double) (f1 - f2), (double) (0.0F - f4), (double) f5)
                     .tex((double) maxU, (double) maxV).endVertex();
-            vertexbuffer.pos((double) (-f1 - f2), (double) (0.0F - f4), (double) f5)
+            buffer.pos((double) (-f1 - f2), (double) (0.0F - f4), (double) f5)
                     .tex((double) minU, (double) maxV).endVertex();
-            vertexbuffer.pos((double) (-f1 - f2), (double) (1.4F - f4), (double) f5)
+            buffer.pos((double) (-f1 - f2), (double) (1.4F - f4), (double) f5)
                     .tex((double) minU, (double) minV).endVertex();
-            vertexbuffer.pos((double) (f1 - f2), (double) (1.4F - f4), (double) f5)
+            buffer.pos((double) (f1 - f2), (double) (1.4F - f4), (double) f5)
                     .tex((double) maxU, (double) minV).endVertex();
             f3 -= 0.45F;
             f4 -= 0.45F;
@@ -143,8 +142,6 @@ public final class RenderBlightFire extends Render<EntityBlightFire> {
     }
 
     public static class Factory implements IRenderFactory<EntityBlightFire> {
-        public static final Factory INSTANCE = new Factory();
-
         @Override
         public Render<EntityBlightFire> createRenderFor(RenderManager manager) {
             return new RenderBlightFire(manager);

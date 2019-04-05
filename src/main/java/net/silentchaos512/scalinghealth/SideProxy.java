@@ -14,7 +14,6 @@ import net.silentchaos512.scalinghealth.client.gui.health.HeartDisplayHandler;
 import net.silentchaos512.scalinghealth.client.particles.ModParticles;
 import net.silentchaos512.scalinghealth.command.ModCommands;
 import net.silentchaos512.scalinghealth.config.Config;
-import net.silentchaos512.scalinghealth.event.BlightHandler;
 import net.silentchaos512.scalinghealth.event.DamageScaling;
 import net.silentchaos512.scalinghealth.event.PetEventHandler;
 import net.silentchaos512.scalinghealth.init.*;
@@ -41,7 +40,6 @@ class SideProxy {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(ModSounds::registerAll);
 //        FMLModLoadingContext.get().getModEventBus().addListener(ModTileEntities::registerAll);
 
-        MinecraftForge.EVENT_BUS.register(BlightHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(PetEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(DamageScaling.INSTANCE);
     }
@@ -71,7 +69,7 @@ class SideProxy {
 
     static class Client extends SideProxy {
         Client() {
-            FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
+            FMLJavaModLoadingContext.get().getModEventBus().addListener(Client::clientSetup);
 
             MinecraftForge.EVENT_BUS.register(HeartDisplayHandler.INSTANCE);
             MinecraftForge.EVENT_BUS.register(DifficultyMeter.INSTANCE);
@@ -80,7 +78,9 @@ class SideProxy {
             DebugOverlay.init();
         }
 
-        private void clientSetup(FMLClientSetupEvent event) {}
+        private static void clientSetup(FMLClientSetupEvent event) {
+            ModEntities.registerRenderers(event);
+        }
 
         @Override
         void imcEnqueue(InterModEnqueueEvent event) {

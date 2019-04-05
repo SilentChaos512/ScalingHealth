@@ -3,7 +3,6 @@ package net.silentchaos512.scalinghealth.config;
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.ConfigSpec;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.init.MobEffects;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ResourceLocation;
@@ -22,7 +21,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 public class MobPotionConfig {
@@ -34,7 +32,6 @@ public class MobPotionConfig {
         double chance = MobType.from(entity).getPotionChance(entity);
         if (!MathUtils.tryPercentage(chance)) return;
 
-        debug(() -> "tryApply " + entity);
         temp.clear();
         for (PotionEntry entry : potions.get()) {
             if (entry.cost < difficulty) {
@@ -43,31 +40,26 @@ public class MobPotionConfig {
         }
         if (!temp.isEmpty()) {
             PotionEntry entry = temp.get(MathUtils.nextInt(temp.size()));
-            debug(() -> "selected " + entry + " from " + temp.size() + " entries");
             entry.applyTo(entity);
+            if (ScalingHealth.LOGGER.isDebugEnabled()) {
+                ScalingHealth.LOGGER.debug(MARKER, "Applied {} from {} effects to {}", entry, temp.size(), entity.getScoreboardName());
+            }
         }
     }
 
-    private static void debug(Supplier<?> message) {
+    public void applyAll(EntityLivingBase entity) {
+        this.potions.get().forEach(entry -> entry.applyTo(entity));
         if (ScalingHealth.LOGGER.isDebugEnabled()) {
-            ScalingHealth.LOGGER.debug(MARKER, message.get());
+            ScalingHealth.LOGGER.debug(MARKER, "Applied all {} effects to {}", potions.get().size(), entity.getScoreboardName());
         }
     }
 
-    public static MobPotionConfig init(ConfigSpecWrapper wrapper, String path) {
+    public static MobPotionConfig init(ConfigSpecWrapper wrapper, String path, boolean includeCost, List<CommentedConfig> defaultSettings) {
         ConfigSpec spec = new ConfigSpec();
         spec.define("potion", "minecraft:unknown", ConfigValue.IS_NONEMPTY_STRING);
         spec.defineInRange("level", 1, 1, 10);
         spec.defineInRange("minDifficulty", 0, 0, Integer.MAX_VALUE);
         spec.defineInRange("durationInMinutes", 10.0, 0.0, Double.MAX_VALUE);
-
-        List<CommentedConfig> defaultSettings = new ArrayList<>();
-        defaultSettings.add(from(MobEffects.SPEED, 1, 15));
-        defaultSettings.add(from(MobEffects.SPEED, 2, 50));
-        defaultSettings.add(from(MobEffects.STRENGTH, 1, 30));
-        defaultSettings.add(from(MobEffects.FIRE_RESISTANCE, 1, 10));
-        defaultSettings.add(from(MobEffects.INVISIBILITY, 1, 35));
-        defaultSettings.add(from(MobEffects.RESISTANCE, 1, 40));
 
         ConfigValue<List<? extends CommentedConfig>> config = wrapper
                 .builder(path)
@@ -78,18 +70,18 @@ public class MobPotionConfig {
         MobPotionConfig result = new MobPotionConfig();
         result.potions = Lazy.of(() -> config.get()
                 .stream()
-                .map(PotionEntry::from)
+                .map(c -> PotionEntry.from(c, includeCost))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList()));
         return result;
     }
 
-    private static CommentedConfig from(Potion potion, int level, int cost) {
+    static CommentedConfig from(Potion potion, int level, double durationInMinutes, int cost) {
         CommentedConfig config = CommentedConfig.inMemory();
-        config.set("potion", potion.getRegistryName().toString());
+        config.set("potion", Objects.requireNonNull(potion.getRegistryName()).toString());
         config.set("level", level);
         config.set("minDifficulty", cost);
-        config.set("durationInMinutes", 10.0);
+        config.set("durationInMinutes", durationInMinutes);
         return config;
     }
 
@@ -98,6 +90,7 @@ public class MobPotionConfig {
         final int level;
         final int cost;
         final int duration;
+        // TODO: Include refresh boolean?
 
         PotionEntry(Potion potion, int level, int cost, int duration) {
             this.potion = potion;
@@ -107,7 +100,7 @@ public class MobPotionConfig {
         }
 
         @Nullable
-        static PotionEntry from(CommentedConfig config) {
+        static PotionEntry from(CommentedConfig config, boolean includeCost) {
             String nameRaw = config.get("potion");
             ResourceLocation name = ResourceLocation.tryCreate(nameRaw);
             if (name == null) {
@@ -121,7 +114,7 @@ public class MobPotionConfig {
             }
             int level = config.getOrElse("level", 1);
             if (level < 1) return null;
-            int cost = config.getOrElse("minDifficulty", 10);
+            int cost = includeCost ? config.getOrElse("minDifficulty", 10) : 0;
             float durationInMinutes = config.getOrElse("durationInMinutes", 10.0).floatValue();
             int duration = TimeUtils.ticksFromMinutes(durationInMinutes);
 

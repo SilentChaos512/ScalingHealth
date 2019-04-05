@@ -21,8 +21,11 @@ package net.silentchaos512.scalinghealth.init;
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.client.render.entity.RenderBlightFire;
 import net.silentchaos512.scalinghealth.entity.EntityBlightFire;
 import net.silentchaos512.utils.Lazy;
 
@@ -44,5 +47,9 @@ public final class ModEntities {
         ResourceLocation id = new ResourceLocation(ScalingHealth.MOD_ID, name);
         entityType.setRegistryName(id);
         ForgeRegistries.ENTITIES.register(entityType);
+    }
+
+    public static void registerRenderers(FMLClientSetupEvent event) {
+        RenderingRegistry.registerEntityRenderingHandler(EntityBlightFire.class, new RenderBlightFire.Factory());
     }
 }

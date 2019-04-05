@@ -30,6 +30,11 @@ public final class Network {
                 .encoder(ClientLoginMessage::toBytes)
                 .consumer(ClientHandler::onLoginMessage)
                 .add();
+        channel.messageBuilder(SpawnBlightFirePacket.class, 3)
+                .decoder(SpawnBlightFirePacket::fromBytes)
+                .encoder(SpawnBlightFirePacket::toBytes)
+                .consumer(SpawnBlightFirePacket::handle)
+                .add();
     }
 
     private Network() {}

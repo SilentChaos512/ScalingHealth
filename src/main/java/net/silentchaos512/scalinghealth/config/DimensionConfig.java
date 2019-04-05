@@ -8,6 +8,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.IAnimal;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.MobEffects;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.lib.AreaDifficultyMode;
 import net.silentchaos512.scalinghealth.lib.MobHealthMode;
@@ -141,6 +142,7 @@ public class DimensionConfig {
         public final MobPotionConfig randomPotions;
         // Blights
 //        public final Supplier<Expression> blightChance;
+        public final MobPotionConfig blightPotions;
 
         Mobs(ConfigSpecWrapper wrapper) {
             wrapper.comment("mob.health", "Mob health settings");
@@ -165,11 +167,22 @@ public class DimensionConfig {
                     .builder("mob.damage.maxBoost")
                     .comment("The maximum extra attack damage a mob can receive")
                     .defineInRange(10, 0, Double.MAX_VALUE);
-
-            randomPotions = MobPotionConfig.init(wrapper, "mob.randomPotionEffects");
+            randomPotions = MobPotionConfig.init(wrapper, "mob.randomPotionEffects", true, ImmutableList.<CommentedConfig>builder()
+                    .add(MobPotionConfig.from(MobEffects.SPEED, 1, 10, 15))
+                    .add(MobPotionConfig.from(MobEffects.SPEED, 2, 10, 50))
+                    .add(MobPotionConfig.from(MobEffects.STRENGTH, 1, 10, 30))
+                    .add(MobPotionConfig.from(MobEffects.FIRE_RESISTANCE, 1, 10, 10))
+                    .add(MobPotionConfig.from(MobEffects.INVISIBILITY, 1, 10, 35))
+                    .add(MobPotionConfig.from(MobEffects.RESISTANCE, 1, 10, 40))
+                    .build());
 
             // Blights
-            // TODO
+            blightPotions = MobPotionConfig.init(wrapper, "mob.blight.potionEffects", false, ImmutableList.<CommentedConfig>builder()
+                    .add(MobPotionConfig.from(MobEffects.FIRE_RESISTANCE, 1, 5, 0))
+                    .add(MobPotionConfig.from(MobEffects.RESISTANCE, 1, 5, 0))
+                    .add(MobPotionConfig.from(MobEffects.SPEED, 4, 5, 0))
+                    .add(MobPotionConfig.from(MobEffects.STRENGTH, 2, 5, 0))
+                    .build());
         }
     }
 

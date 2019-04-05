@@ -4,6 +4,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.INBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.*;
@@ -58,7 +59,7 @@ public class CapabilityDifficultyAffected implements IDifficultyAffected, ICapab
 
     @Override
     public void tick(EntityLivingBase entity) {
-        if (!processed /*&& difficulty == 0*/ && entity.ticksExisted > 20) {
+        if (!processed && entity.isAlive() && entity.ticksExisted > 2) {
             difficulty = (float) Difficulty.areaDifficulty(entity.world, entity.getPosition());
             MobDifficultyHandler.process(entity, this);
             processed = true;
@@ -87,6 +88,19 @@ public class CapabilityDifficultyAffected implements IDifficultyAffected, ICapab
     public void deserializeNBT(NBTTagCompound nbt) {
         blight = nbt.getBoolean(NBT_BLIGHT);
         difficulty = nbt.getFloat(NBT_DIFFICULTY);
+    }
+
+    public static CapabilityDifficultyAffected read(PacketBuffer buffer) {
+        CapabilityDifficultyAffected cap = new CapabilityDifficultyAffected();
+        cap.blight = buffer.getBoolean(0);
+        cap.difficulty = buffer.readFloat();
+        cap.processed = true;
+        return cap;
+    }
+
+    public void write(PacketBuffer buffer) {
+        buffer.writeBoolean(blight);
+        buffer.writeFloat(difficulty);
     }
 
     public static boolean canAttachTo(ICapabilityProvider entity) {
