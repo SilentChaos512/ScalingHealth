@@ -24,7 +24,7 @@ import net.minecraft.entity.ai.attributes.RangedAttribute;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.fml.relauncher.ReflectionHelper;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.silentchaos512.lib.config.ConfigBaseNew;
 import net.silentchaos512.lib.config.ConfigMultiValueLineParser;
 import net.silentchaos512.lib.config.ConfigOption;
@@ -643,7 +643,7 @@ public class Config extends ConfigBaseNew {
                     "Max health cap for all entities, players and mobs (vanilla is 1024)");
             try {
                 ScalingHealth.logHelper.info("Trying to change max health cap to {}", maxHealthCap);
-                Field field = ReflectionHelper.findField(RangedAttribute.class, "maximumValue", "field_111118_b");
+                Field field = ObfuscationReflectionHelper.findField(RangedAttribute.class, "field_111118_b");
                 field.setDouble(SharedMonsterAttributes.MAX_HEALTH, maxHealthCap);
             } catch (Exception ex) {
                 ScalingHealth.logHelper.warn(ex, "Failed to change max health cap");
