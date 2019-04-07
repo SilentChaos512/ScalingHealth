@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [1.3.34] - 2019-04-07
 Set minimum Forge version to 2779 to stop the crashes
+### Added
+- Config to override the sleep warning message with a custom one [#164]
 
 ## [1.3.33] - 2019-02-17
 ### Added

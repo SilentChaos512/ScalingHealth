@@ -28,6 +28,8 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.Item;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -241,8 +243,14 @@ public class ScalingHealthCommonEvents {
 
     @SubscribeEvent
     public void onPlayerSleepInBed(PlayerSleepInBedEvent event) {
-        if (!event.getEntityPlayer().world.isRemote && Config.Client.Difficulty.warnWhenSleeping && Config.Difficulty.forSleeping != 0f) {
-            ChatHelper.translate(event.getEntityPlayer(), ScalingHealth.i18n.getKey("misc", "sleepWarning"));
+        EntityPlayer player = event.getEntityPlayer();
+        if (!player.world.isRemote && Config.Client.Difficulty.warnWhenSleeping && Config.Difficulty.forSleeping != 0f) {
+            String override = Config.Client.Difficulty.sleepMessageOverride;
+            if (!override.isEmpty()) {
+                player.sendMessage(new TextComponentString(override));
+            } else {
+                player.sendMessage(new TextComponentTranslation("misc.scalinghealth.sleepWarning"));
+            }
         }
     }
 

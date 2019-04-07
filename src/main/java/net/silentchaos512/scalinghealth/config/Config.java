@@ -182,6 +182,8 @@ public class Config extends ConfigBaseNew {
             @ConfigOption.BooleanDefault(true)
             @ConfigOption.Comment("If difficulty is set to change when the player sleeps, they will be warned when they get in bed.")
             public static boolean warnWhenSleeping;
+
+            public static String sleepMessageOverride;
         }
     }
 
@@ -745,6 +747,9 @@ public class Config extends ConfigBaseNew {
                 Items.Heart.blightMax = Items.Heart.blightMin;
 
             // Difficulty
+            // Sleep message
+            Client.Difficulty.sleepMessageOverride = config.getString("Warn When Sleeping - Message", "main.client", "",
+                    "If not empty, this replaces the default 'warn when sleeping' message. Leaving this empty will pull the usual message from the lang file.");
             // Player exemptions
             Difficulty.DIFFICULTY_EXEMPT_PLAYERS.clear();
             for (String name : config.getStringList("Exempt Players", CAT_DIFFICULTY, new String[0],
