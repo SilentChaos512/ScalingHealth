@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.3.34] - 2019-04-07
 Set minimum Forge version to 2779 to stop the crashes
 ### Added
+- Config to set blights immune to suffocation damage (enabled by default)
 - Config to override the sleep warning message with a custom one [#164]
 - Health text style SOLID, which can be set to any color
 ### Fixed

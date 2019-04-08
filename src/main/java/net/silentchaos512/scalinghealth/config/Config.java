@@ -381,6 +381,10 @@ public class Config extends ConfigBaseNew {
             @ConfigOption.BooleanDefault(true)
             @ConfigOption.Comment("Should blights have the fire resistance potion effect?")
             public static boolean fireResist;
+            @ConfigOption(name = "Immune To Suffocation", category = CAT_MOB_BLIGHT)
+            @ConfigOption.BooleanDefault(true)
+            @ConfigOption.Comment("If true, blights will not take suffocation (inside a block) damage")
+            public static boolean immuneToSuffocation;
             @ConfigOption(name = "Invisibility", category = CAT_MOB_BLIGHT)
             @ConfigOption.BooleanDefault(false)
             @ConfigOption.Comment("Should blights have the invisibility potion effect?")

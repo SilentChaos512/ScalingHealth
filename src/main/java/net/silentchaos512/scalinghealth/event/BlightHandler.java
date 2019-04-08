@@ -25,12 +25,15 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.MobEffects;
 import net.minecraft.item.Item;
 import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.DamageSource;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
@@ -207,6 +210,16 @@ public final class BlightHandler {
 
                 // Refresh potion effects
                 applyBlightPotionEffects(entityLiving);
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onBlightAttack(LivingAttackEvent event) {
+        EntityLivingBase entity = event.getEntityLiving();
+        if (entity != null && !entity.world.isRemote && isBlight(entity)) {
+            if (Config.Mob.Blight.immuneToSuffocation && event.getSource() == DamageSource.IN_WALL) {
+                event.setCanceled(true);
             }
         }
     }
