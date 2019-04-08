@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 Set minimum Forge version to 2779 to stop the crashes
 ### Added
 - Config to override the sleep warning message with a custom one [#164]
+- Health text style SOLID, which can be set to any color
+### Fixed
+- (Maybe) ConcurrentModificationException in [#162]
 
 ## [1.3.33] - 2019-02-17
 ### Added

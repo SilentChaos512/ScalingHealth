@@ -88,9 +88,9 @@ public final class HeartDisplayHandler extends Gui {
     }
 
     public enum TextColor {
-        GREEN_TO_RED, WHITE, PSYCHEDELIC;
+        GREEN_TO_RED, WHITE, PSYCHEDELIC, SOLID;
 
-        public static final String COMMENT = "Determines the color of the text next to your hearts. GREEN_TO_RED displays green at full health, and moves to red as you lose health (does not work with absorption). WHITE will just be good old fashioned white text. Set to PSYCHEDELIC if you want to taste the rainbow.";
+        public static final String COMMENT = "Determines the color of the text next to your hearts. GREEN_TO_RED displays green at full health, and moves to red as you lose health (does not work with absorption). WHITE will just be good old fashioned white text. Set to PSYCHEDELIC if you want to taste the rainbow. SOLID is a fixed color";
 
         public static TextColor loadFromConfig(ConfigBase config, String name, TextColor defaultValue) {
             return config.loadEnum(name, Config.CAT_CLIENT, TextColor.class, defaultValue, COMMENT);
@@ -398,6 +398,9 @@ public final class HeartDisplayHandler extends Gui {
                 color = Color.HSBtoRGB(
                         (ClientTicks.ticksInGame % COLOR_CHANGE_PERIOD) / COLOR_CHANGE_PERIOD,
                         0.55f * current / divisor, 1.0f);
+                break;
+            case SOLID:
+                color = Config.Client.Hearts.textSolidColor;
                 break;
             case WHITE:
             default:

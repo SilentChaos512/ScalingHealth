@@ -29,6 +29,7 @@ import net.silentchaos512.lib.config.ConfigBaseNew;
 import net.silentchaos512.lib.config.ConfigMultiValueLineParser;
 import net.silentchaos512.lib.config.ConfigOption;
 import net.silentchaos512.lib.event.Greetings;
+import net.silentchaos512.lib.util.Color;
 import net.silentchaos512.lib.util.I18nHelper;
 import net.silentchaos512.lib.util.LogHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -109,6 +110,7 @@ public class Config extends ConfigBaseNew {
 
             public static HeartDisplayHandler.TextStyle textStyle;
             public static HeartDisplayHandler.TextColor textColor;
+            public static int textSolidColor;
             public static HeartDisplayHandler.AbsorptionHeartStyle absorptionStyle;
             public static HeartDisplayHandler.TextStyle absorbTextStyle;
             public static HeartDisplayHandler.TextColor absorbTextColor;
@@ -654,6 +656,7 @@ public class Config extends ConfigBaseNew {
             // Client
             Client.Hearts.textStyle = HeartDisplayHandler.TextStyle.loadFromConfig(this, "Health Text Style", HeartDisplayHandler.TextStyle.ROWS);
             Client.Hearts.textColor = HeartDisplayHandler.TextColor.loadFromConfig(this, "Health Text Color", HeartDisplayHandler.TextColor.GREEN_TO_RED);
+            Client.Hearts.textSolidColor = Color.parse(config.getString("Health Text Solid Color", CAT_CLIENT, "FFFFFF", "Text color is color style is SOLID")).getColor();
             Client.Hearts.absorptionStyle = HeartDisplayHandler.AbsorptionHeartStyle.loadDromConfig(this);
             Client.Hearts.absorbTextStyle = HeartDisplayHandler.TextStyle.loadFromConfig(this, "Absorption Text Style", HeartDisplayHandler.TextStyle.DISABLED);
             Client.Hearts.absorbTextColor = HeartDisplayHandler.TextColor.loadFromConfig(this, "Absorption Text Color", HeartDisplayHandler.TextColor.WHITE);
