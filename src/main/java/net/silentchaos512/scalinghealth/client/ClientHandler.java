@@ -20,6 +20,7 @@ public final class ClientHandler {
     public static float playerDifficulty;
     public static float worldDifficulty;
     public static float areaDifficulty;
+    public static int regenTimer;
     // Infrequent updates (join server/world, travel to new dimension)
     public static AreaDifficultyMode areaMode;
     public static float maxDifficultyValue;
@@ -27,10 +28,12 @@ public final class ClientHandler {
     private ClientHandler() {}
 
     public static void onMessage(ClientSyncMessage msg, Supplier<NetworkEvent.Context> ctx) {
+        //noinspection OverlyLongLambda
         ctx.get().enqueueWork(() -> {
             playerDifficulty = msg.playerDifficulty;
             worldDifficulty = msg.worldDifficulty;
             areaDifficulty = msg.areaDifficulty;
+            regenTimer = msg.regenTimer;
         });
         ctx.get().setPacketHandled(true);
     }

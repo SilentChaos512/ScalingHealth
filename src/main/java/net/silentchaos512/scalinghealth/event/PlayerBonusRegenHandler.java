@@ -18,12 +18,16 @@
 
 package net.silentchaos512.scalinghealth.event;
 
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.config.Config;
+import net.silentchaos512.scalinghealth.config.RegenConfig;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +39,7 @@ public final class PlayerBonusRegenHandler {
 
     private PlayerBonusRegenHandler() {}
 
-    static int getTimerForPlayer(EntityPlayer player) {
+    public static int getTimerForPlayer(EntityPlayer player) {
         if (player == null) return -1;
 
         UUID uuid = player.getUniqueID();
@@ -44,45 +48,36 @@ public final class PlayerBonusRegenHandler {
 
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent event) {
-        // FIXME
-        /*
-        if (event.side == LogicalSide.CLIENT || !Config.Player.BonusRegen.enabled)
-            return;
+        if (event.side == LogicalSide.CLIENT) return;
 
         EntityPlayer player = event.player;
-        int health = (int) Math.ceil(player.getHealth());
-        if (health >= player.getMaxHealth()) return;
+        RegenConfig config = Config.get(player).player.regen;
 
         UUID uuid = player.getUniqueID();
 
         // Add player timer if needed.
-        if (!TIMERS.containsKey(uuid))
-            TIMERS.put(uuid, Config.Player.BonusRegen.initialDelay);
+        if (!TIMERS.containsKey(uuid)) {
+            TIMERS.put(uuid, config.getInitialDelay());
+        }
 
-        int foodLevel = player.getFoodStats().getFoodLevel();
-
-        boolean foodLevelOk = MathUtils.inRangeInclusive(foodLevel,
-                Config.Player.BonusRegen.minFood, Config.Player.BonusRegen.maxFood);
-        boolean healthLevelOk = MathUtils.inRangeExclusive(health,
-                Config.Player.BonusRegen.minHealth, Config.Player.BonusRegen.maxHealth);
-
-        if (foodLevelOk && healthLevelOk) {
+        if (config.isActive(player)) {
             // Tick timer, heal player and reset on 0.
             int timer = TIMERS.get(uuid);
             if (--timer <= 0) {
-                player.heal(1f);
-                player.addExhaustion(Config.Player.BonusRegen.exhaustion);
-                timer = Config.Player.BonusRegen.delay;
+                player.heal(config.getHealTickAmount(player));
+                player.addExhaustion(config.getExhaustion());
+                timer = config.getTickDelay();
             }
             TIMERS.put(uuid, timer);
         }
-        */
     }
 
     @SubscribeEvent
     public static void onPlayerHurt(LivingHurtEvent event) {
-//        EntityLivingBase entityLiving = event.getEntityLiving();
-//        if (!entityLiving.world.isRemote && entityLiving instanceof EntityPlayer)
-//            TIMERS.put(entityLiving.getName(), Config.Player.BonusRegen.initialDelay);
+        EntityLivingBase entity = event.getEntityLiving();
+        if (!entity.world.isRemote && entity instanceof EntityPlayer) {
+            RegenConfig config = Config.get(entity).player.regen;
+            TIMERS.put(entity.getUniqueID(), config.getInitialDelay());
+        }
     }
 }

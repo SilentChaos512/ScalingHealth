@@ -93,8 +93,7 @@ public class DimensionConfig {
         public final IntValue maxHealth;
         public final IntValue maxAttackDamage;
         public final Supplier<Expression> setHealthOnDeath;
-
-        // TODO: regen configs
+        public final RegenConfig regen;
 
         Player(ConfigSpecWrapper wrapper) {
             wrapper.comment("player", "Settings for players");
@@ -130,6 +129,8 @@ public class DimensionConfig {
                     .comment("The highest attack damage a player can achieve, not considering the vanilla",
                             "cap and modifiers from other sources. 0 means 'unlimited'.")
                     .defineInRange(0, 0, Integer.MAX_VALUE);
+
+            regen = RegenConfig.init(wrapper, "player.regen", true);
         }
     }
 

@@ -11,6 +11,7 @@ import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.event.PlayerBonusRegenHandler;
 import net.silentchaos512.scalinghealth.network.ClientSyncMessage;
 import net.silentchaos512.scalinghealth.network.Network;
 import net.silentchaos512.scalinghealth.utils.Difficulty;
@@ -73,7 +74,8 @@ public class CapabilityPlayerData implements IPlayerData, ICapabilitySerializabl
         ClientSyncMessage msg = new ClientSyncMessage(
                 Difficulty.source(player).getDifficulty(),
                 Difficulty.source(player.world).getDifficulty(),
-                (float) Difficulty.areaDifficulty(player.world, player.getPosition())
+                (float) Difficulty.areaDifficulty(player.world, player.getPosition()),
+                PlayerBonusRegenHandler.getTimerForPlayer(player)
         );
         EntityPlayerMP playerMP = (EntityPlayerMP) player;
         Network.channel.sendTo(msg, playerMP.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
