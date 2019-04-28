@@ -222,6 +222,8 @@ public class DimensionConfig {
 
         // Multipliers
         private final ConfigValue<List<? extends CommentedConfig>> locationMultipliers;
+        public final BooleanValue lunarCyclesEnabled;
+        public final ConfigValue<List<? extends Double>> lunarCycleMultipliers;
 
         private final ConfigSpec byEntitySpec = new ConfigSpec();
         private final ConfigSpec locationMultipliersSpec = new ConfigSpec();
@@ -346,6 +348,8 @@ public class DimensionConfig {
                         if (!(o instanceof CommentedConfig)) return false;
                         return byEntitySpec.isCorrect((CommentedConfig) o);
                     });
+
+            // Multipliers
             wrapper.comment("difficulty.multipliers.byLocation",
                     "Set difficulty multipliers based on location. You can match dimensions, biomes, or both.",
                     "If either the biomes or dimensions array is empty, it is ignored (matching all)");
@@ -355,6 +359,16 @@ public class DimensionConfig {
                         if (!(o instanceof CommentedConfig)) return false;
                         return locationMultipliersSpec.isCorrect((CommentedConfig) o);
                     });
+            wrapper.comment("difficulty.multipliers.lunarCycles",
+                    "Allows difficulty to be changed based on the moon phase. values must have 8 elements.",
+                    "The first is full moon, the fifth is new moon.",
+                    "'enabled' must be set to true for this to work.");
+            lunarCyclesEnabled = wrapper
+                    .builder("difficulty.multipliers.lunarCycles.enabled")
+                    .define(false);
+            lunarCycleMultipliers = wrapper
+                    .builder("difficulty.multipliers.lunarCycles.values")
+                    .defineList(ImmutableList.of(1.5, 1.3, 1.2, 1.0, 0.8, 1.0, 1.2, 1.3), o -> o instanceof Number);
         }
 
         /**

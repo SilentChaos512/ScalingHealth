@@ -22,6 +22,7 @@ import net.silentchaos512.scalinghealth.lib.AreaDifficultyMode;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Master utility class for difficulty-related stuff. Any calls should be done through this class
@@ -70,6 +71,15 @@ public final class Difficulty {
 
     public static double locationMultiplier(IWorldReaderBase world, BlockPos pos) {
         return Config.get(world).difficulty.getLocationMultiplier(world, pos);
+    }
+
+    public static double lunarMultiplier(World world) {
+        DimensionConfig config = Config.get(world);
+        if (!config.difficulty.lunarCyclesEnabled.get()) return 1.0;
+        List<? extends Double> values = config.difficulty.lunarCycleMultipliers.get();
+        if (values.isEmpty()) return 1.0;
+        int phase = world.getDimension().getMoonPhase(world.getGameTime());
+        return values.get(MathHelper.clamp(phase, 0, values.size() - 1));
     }
 
     public static double withGroupBonus(World world, BlockPos pos, double difficulty) {

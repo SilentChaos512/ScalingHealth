@@ -25,13 +25,6 @@ public final class MobDifficultyHandler {
 
         float difficulty = data.getDifficulty();
 
-        // Lunar phase multipliers?
-//        if (Config.Difficulty.DIFFICULTY_LUNAR_MULTIPLIERS_ENABLED && world.getWorldTime() % 24000 > 12000) {
-//            int moonPhase = world.provider.getMoonPhase(world.getWorldTime()) % 8;
-//            float multi = Config.Difficulty.DIFFICULTY_LUNAR_MULTIPLIERS[moonPhase];
-//            difficulty *= multi;
-//        }
-
         // Make blight?
         boolean makeBlight = shouldBecomeBlight(entity, difficulty);
         setEntityProperties(entity, data, difficulty, makeBlight);

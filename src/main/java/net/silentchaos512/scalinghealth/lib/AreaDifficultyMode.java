@@ -25,8 +25,6 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.silentchaos512.scalinghealth.capability.IDifficultySource;
-import net.silentchaos512.scalinghealth.config.Config;
-import net.silentchaos512.scalinghealth.config.DimensionConfig;
 import net.silentchaos512.scalinghealth.utils.Difficulty;
 
 import java.util.Collection;
@@ -121,9 +119,9 @@ public enum AreaDifficultyMode {
 
         final int radius = Difficulty.searchRadius(world);
         final double baseAreaDifficulty = getBaseAreaDifficulty(world, pos, radius);
-        DimensionConfig config = Config.get(world);
-        final double locationMultiplier = config.difficulty.getLocationMultiplier(world, pos);
-        final double clampedDifficulty = Difficulty.clamp(world, baseAreaDifficulty * locationMultiplier);
+        final double locationMultiplier = Difficulty.locationMultiplier(world, pos);
+        final double lunarMultiplier = Difficulty.lunarMultiplier(world);
+        final double clampedDifficulty = Difficulty.clamp(world, baseAreaDifficulty * locationMultiplier * lunarMultiplier);
 
         return groupBonus ? Difficulty.withGroupBonus(world, pos, clampedDifficulty) : clampedDifficulty;
     }

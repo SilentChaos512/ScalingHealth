@@ -6,6 +6,7 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.silentchaos512.lib.client.gui.DebugRenderOverlay;
 import net.silentchaos512.scalinghealth.client.ClientHandler;
 import net.silentchaos512.scalinghealth.config.Config;
+import net.silentchaos512.scalinghealth.utils.Difficulty;
 import net.silentchaos512.utils.Anchor;
 
 import javax.annotation.Nonnull;
@@ -31,9 +32,10 @@ public class DebugOverlay extends DebugRenderOverlay {
                 "- Mode=" + ClientHandler.areaMode.getDisplayName().getFormattedText(),
                 "- Player=" + String.format(FLOAT_FORMAT, ClientHandler.playerDifficulty),
                 "- World=" + String.format(FLOAT_FORMAT, ClientHandler.worldDifficulty),
-                "- Area=" + String.format(FLOAT_FORMAT + " (x%.1f)",
+                "- Area=" + String.format(FLOAT_FORMAT + " (x%.1f, ☽x%.1f)",
                         ClientHandler.areaDifficulty,
-                        ClientHandler.locationMultiPercent / 100f),
+                        ClientHandler.locationMultiPercent / 100f,
+                        Difficulty.lunarMultiplier(player.world)),
                 "Health",
                 "- Health=" + String.format("%.5f / %.1f", player.getHealth(), player.getMaxHealth()),
                 "- Regen=" + String.format("%ds", ClientHandler.regenTimer / 20)
