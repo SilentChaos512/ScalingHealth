@@ -9,6 +9,13 @@ import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.IAnimal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.MobEffects;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorldReaderBase;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.dimension.DimensionType;
+import net.silentchaos512.lib.util.BiomeUtils;
+import net.silentchaos512.lib.util.DimensionUtils;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.lib.AreaDifficultyMode;
 import net.silentchaos512.scalinghealth.lib.MobHealthMode;
@@ -213,12 +220,19 @@ public class DimensionConfig {
         public final Supplier<Expression> onPlayerSleep;
         private final ConfigValue<List<? extends CommentedConfig>> byEntityMutators;
 
+        // Multipliers
+        private final ConfigValue<List<? extends CommentedConfig>> locationMultipliers;
+
         private final ConfigSpec byEntitySpec = new ConfigSpec();
-        private final CommentedConfig byEntityDefault = CommentedConfig.inMemory();
+        private final ConfigSpec locationMultipliersSpec = new ConfigSpec();
 
         Difficulty(ConfigSpecWrapper wrapper) {
-            byEntitySpec.defineList("types", ImmutableList.of("minecraft:villager"), o -> o instanceof String);
+            byEntitySpec.defineList("types", ImmutableList.of("minecraft:villager"), DimensionConfig::validateId);
             byEntitySpec.define("onKilled", "difficulty + 0.01", o -> validateExpression(o, "onKilled", EvalVars.PLAYER_DIFFICULTY));
+
+            locationMultipliersSpec.defineList("biomes", ImmutableList.of("modid:example"), DimensionConfig::validateId);
+            locationMultipliersSpec.defineList("dimensions", ImmutableList.of("overworld"), ConfigValue.IS_NONEMPTY_STRING);
+            locationMultipliersSpec.define("scale", 1.0, o -> o instanceof Number && ((Number) o).doubleValue() >= 0);
 
             wrapper.comment("difficulty", "Settings related to difficulty. Difficulty determines various things, such as how much health mobs have.");
 
@@ -320,7 +334,10 @@ public class DimensionConfig {
                     EvalVars.PLAYER_DIFFICULTY,
                     "A player sleeps in a bed");
 
+            CommentedConfig byEntityDefault = CommentedConfig.inMemory();
             byEntitySpec.correct(byEntityDefault);
+            CommentedConfig multipliersDefault = CommentedConfig.inMemory();
+            locationMultipliersSpec.correct(multipliersDefault);
 
             // byEntity table list
             byEntityMutators = wrapper
@@ -328,6 +345,15 @@ public class DimensionConfig {
                     .defineList(ImmutableList.of(byEntityDefault), o -> {
                         if (!(o instanceof CommentedConfig)) return false;
                         return byEntitySpec.isCorrect((CommentedConfig) o);
+                    });
+            wrapper.comment("difficulty.multipliers.byLocation",
+                    "Set difficulty multipliers based on location. You can match dimensions, biomes, or both.",
+                    "If either the biomes or dimensions array is empty, it is ignored (matching all)");
+            locationMultipliers = wrapper
+                    .builder("difficulty.multipliers.byLocation")
+                    .defineList(ImmutableList.of(multipliersDefault), o -> {
+                        if (!(o instanceof CommentedConfig)) return false;
+                        return locationMultipliersSpec.isCorrect((CommentedConfig) o);
                     });
         }
 
@@ -355,6 +381,24 @@ public class DimensionConfig {
                     .findFirst()
                     .map(c -> new Expression(c.get("onKilled")))
                     .orElseGet(() -> getDefaultKillMutator(entity));
+        }
+
+        public double getLocationMultiplier(IWorldReaderBase world, BlockPos pos) {
+            DimensionType type = world.getDimension().getType();
+            Biome biome = world.getBiome(pos);
+            //noinspection OverlyLongLambda
+            return locationMultipliers.get().stream()
+                    .filter(c -> {
+                        List<? extends String> dimensions = c.get("dimensions");
+                        List<? extends String> biomes = c.get("biomes");
+                        if (dimensions.isEmpty() && biomes.isEmpty()) {
+                            return false;
+                        }
+                        return DimensionUtils.containedInList(type, dimensions, true) && BiomeUtils.containedInList(biome, biomes, true);
+                    })
+                    .findFirst()
+                    .map(c -> c.<Double>get("scale"))
+                    .orElse(1.0);
         }
 
         @SuppressWarnings("ChainOfInstanceofChecks")
@@ -398,6 +442,10 @@ public class DimensionConfig {
 
         // TODO: What else can we do here?
         return true;
+    }
+
+    private static boolean validateId(Object obj) {
+        return obj instanceof String && ResourceLocation.tryCreate((String) obj) != null;
     }
 
     private final ConfigSpecWrapper wrapper;

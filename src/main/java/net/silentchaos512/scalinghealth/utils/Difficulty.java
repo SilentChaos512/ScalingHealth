@@ -68,6 +68,10 @@ public final class Difficulty {
         return areaMode(world).getAreaDifficulty(world, pos, groupBonus);
     }
 
+    public static double locationMultiplier(IWorldReaderBase world, BlockPos pos) {
+        return Config.get(world).difficulty.getLocationMultiplier(world, pos);
+    }
+
     public static double withGroupBonus(World world, BlockPos pos, double difficulty) {
         DimensionConfig config = Config.get(world);
         Expression expression = config.difficulty.groupAreaBonus.get();

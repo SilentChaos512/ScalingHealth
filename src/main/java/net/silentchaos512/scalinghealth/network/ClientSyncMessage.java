@@ -7,14 +7,16 @@ public class ClientSyncMessage {
     public float worldDifficulty;
     public float areaDifficulty;
     public int regenTimer;
+    public int locationMultiPercent;
 
     public ClientSyncMessage() {}
 
-    public ClientSyncMessage(float playerDifficulty, float worldDifficulty, float areaDifficulty, int regenTimer) {
+    public ClientSyncMessage(float playerDifficulty, float worldDifficulty, float areaDifficulty, int regenTimer, double locationMultiplier) {
         this.playerDifficulty = playerDifficulty;
         this.worldDifficulty = worldDifficulty;
         this.areaDifficulty = areaDifficulty;
         this.regenTimer = regenTimer;
+        this.locationMultiPercent = (int) (100 * locationMultiplier);
     }
 
     public static ClientSyncMessage fromBytes(PacketBuffer buf) {
@@ -23,6 +25,7 @@ public class ClientSyncMessage {
         msg.worldDifficulty = buf.readFloat();
         msg.areaDifficulty = buf.readFloat();
         msg.regenTimer = buf.readVarInt();
+        msg.locationMultiPercent = buf.readVarInt();
         return msg;
     }
 
@@ -31,5 +34,6 @@ public class ClientSyncMessage {
         buf.writeFloat(worldDifficulty);
         buf.writeFloat(areaDifficulty);
         buf.writeVarInt(regenTimer);
+        buf.writeVarInt(locationMultiPercent);
     }
 }

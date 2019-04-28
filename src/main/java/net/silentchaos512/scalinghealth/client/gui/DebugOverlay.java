@@ -31,7 +31,9 @@ public class DebugOverlay extends DebugRenderOverlay {
                 "- Mode=" + ClientHandler.areaMode.getDisplayName().getFormattedText(),
                 "- Player=" + String.format(FLOAT_FORMAT, ClientHandler.playerDifficulty),
                 "- World=" + String.format(FLOAT_FORMAT, ClientHandler.worldDifficulty),
-                "- Area=" + String.format(FLOAT_FORMAT, ClientHandler.areaDifficulty),
+                "- Area=" + String.format(FLOAT_FORMAT + " (x%.1f)",
+                        ClientHandler.areaDifficulty,
+                        ClientHandler.locationMultiPercent / 100f),
                 "Health",
                 "- Health=" + String.format("%.5f / %.1f", player.getHealth(), player.getMaxHealth()),
                 "- Regen=" + String.format("%ds", ClientHandler.regenTimer / 20)

@@ -7,6 +7,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.NetworkDirection;
@@ -71,11 +72,14 @@ public class CapabilityPlayerData implements IPlayerData, ICapabilitySerializabl
     }
 
     private static void sendUpdatePacketTo(EntityPlayer player) {
+        World world = player.world;
+        BlockPos pos = player.getPosition();
         ClientSyncMessage msg = new ClientSyncMessage(
                 Difficulty.source(player).getDifficulty(),
-                Difficulty.source(player.world).getDifficulty(),
-                (float) Difficulty.areaDifficulty(player.world, player.getPosition()),
-                PlayerBonusRegenHandler.getTimerForPlayer(player)
+                Difficulty.source(world).getDifficulty(),
+                (float) Difficulty.areaDifficulty(world, pos),
+                PlayerBonusRegenHandler.getTimerForPlayer(player),
+                Difficulty.locationMultiplier(world, pos)
         );
         EntityPlayerMP playerMP = (EntityPlayerMP) player;
         Network.channel.sendTo(msg, playerMP.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
