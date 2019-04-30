@@ -194,6 +194,70 @@ public class DimensionConfig {
         }
     }
 
+    public static class DamageScaling {
+        public final DoubleValue difficultyWeight;
+        public final DoubleValue genericScale;
+        public final BooleanValue affectPlayers;
+        public final BooleanValue affectHostiles;
+        public final BooleanValue affectPeacefuls;
+        public final EnumValue<net.silentchaos512.scalinghealth.event.DamageScaling.Mode> mode;
+        private final ConfigSpec scalesSpec = new ConfigSpec();
+        private final ConfigValue<List<? extends CommentedConfig>> scales;
+
+        DamageScaling(ConfigSpecWrapper wrapper) {
+            wrapper.comment("damageScaling",
+                    "Set damage scaling by damage source. No scaling is done by default.",
+                    "Mod sources can be added too, you'll just need the damage type string. The number represents how steeply the damage scales.",
+                    "0 means no scaling (vanilla), 1 means it will be proportional to difficulty/max health (whichever you set).",
+                    "The scale can be any non-negative number, including numbers greater than one.");
+
+            difficultyWeight = wrapper
+                    .builder("damageScaling.difficultyWeight")
+                    .comment("How sharply damage scales with difficulty")
+                    .defineInRange(0.04, 0, Double.MAX_VALUE);
+            genericScale = wrapper
+                    .builder("damageScaling.genericScale")
+                    .comment("Scale for all damage types which does not have a specific scale defined")
+                    .defineInRange(1.0, 0, Double.MAX_VALUE);
+            affectPlayers = wrapper
+                    .builder("damageScaling.affectPlayers")
+                    .comment("Does damage scaling affect players?")
+                    .define(true);
+            affectHostiles = wrapper
+                    .builder("damageScaling.affectHostiles")
+                    .comment("Does damage scaling affect hostile mobs?")
+                    .define(true);
+            affectPeacefuls = wrapper
+                    .builder("damageScaling.affectPeacefuls")
+                    .comment("Does damage scaling affect peaceful mobs (animals)?")
+                    .define(false);
+            mode = wrapper
+                    .builder("damageScaling.mode")
+                    .comment("Damage scaling mode",
+                            EnumValue.allValuesComment(net.silentchaos512.scalinghealth.event.DamageScaling.Mode.class))
+                    .defineEnum(net.silentchaos512.scalinghealth.event.DamageScaling.Mode.MAX_HEALTH);
+
+            scalesSpec.defineList("types", ImmutableList.of("cactus"), ConfigValue.IS_NONEMPTY_STRING);
+            scalesSpec.define("scale", 0.0, o -> o instanceof Number && ((Number) o).doubleValue() >= 0);
+            CommentedConfig scalesDefault = CommentedConfig.inMemory();
+            scalesSpec.correct(scalesDefault);
+            scales = wrapper
+                    .builder("damageScaling.damageTypes")
+                    .defineList(ImmutableList.of(scalesDefault), o -> {
+                        if (!(o instanceof CommentedConfig)) return false;
+                        return scalesSpec.isCorrect((CommentedConfig) o);
+                    });
+        }
+
+        public double getScale(String damageType) {
+            return scales.get().stream()
+                    .filter(c -> c.<List<? extends String>>get("types").contains(damageType))
+                    .findFirst()
+                    .map(c -> c.<Double>get("scale"))
+                    .orElseGet(genericScale::get);
+        }
+    }
+
     public static class Difficulty {
         // Standard options
         final ConfigValue<List<? extends String>> difficultyExempt;
@@ -470,6 +534,7 @@ public class DimensionConfig {
     public final Player player;
     public final Pets pets;
     public final Difficulty difficulty;
+    public final DamageScaling damageScaling;
 
     private final String configFileName;
     private final int dimensionId;
@@ -483,6 +548,7 @@ public class DimensionConfig {
         player = new Player(wrapper);
         pets = new Pets(wrapper);
         difficulty = new Difficulty(wrapper);
+        damageScaling = new DamageScaling(wrapper);
 
         configFileName = path.getFileName().toString();
         String trimmed = configFileName

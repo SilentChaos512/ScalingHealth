@@ -20,7 +20,6 @@ package net.silentchaos512.scalinghealth.event;
 
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
@@ -28,24 +27,23 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.config.Config;
+import net.silentchaos512.scalinghealth.config.DimensionConfig;
+import net.silentchaos512.scalinghealth.lib.MobType;
+import net.silentchaos512.scalinghealth.utils.Difficulty;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 import java.util.*;
 
 public final class DamageScaling {
-    private static final String[] SOURCES_DEFAULT = {"inFire", "lightningBolt", "onFire", "lava", "hotFloor", "inWall", "cramming", "drown", "starve", "cactus", "fall", "flyIntoWall", "outOfWorld", "generic",
-            "magic", "wither", "anvil", "fallingBlock", "dragonBreath", "fireworks"};
-    private static final String SOURCES_COMMENT = "Set damage scaling by damage source. All vanilla sources should be included, but set to no scaling. Mod sources can be added too, you'll just need the damage"
-            + " type string. The number represents how steeply the damage scales. 0 means no scaling (vanilla), 1 means it will be proportional to difficulty/max health (whichever you set). The scaling"
-            + " number can be anything, although I recommend a non-negative number.";
+    private static final Marker MARKER = MarkerManager.getMarker("DamageScaling");
+    private static final String[] SOURCES_DEFAULT = {"inFire", "lightningBolt", "onFire", "lava", "hotFloor", "inWall",
+            "cramming", "drown", "starve", "cactus", "fall", "flyIntoWall", "outOfWorld", "generic", "magic", "wither",
+            "anvil", "fallingBlock", "dragonBreath", "fireworks"};
 
     public static final DamageScaling INSTANCE = new DamageScaling();
 
-    private float genericScale;
-    private float difficultyWeight;
-    private boolean affectHostileMobs;
-    private boolean affectPassiveMobs;
-    private Mode scaleMode;
-    private final Map<String, Float> scalingMap = new HashMap<>();
     private final Set<UUID> entityAttackedThisTick = new HashSet<>();
 
     private DamageScaling() {}
@@ -53,67 +51,64 @@ public final class DamageScaling {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPlayerHurt(LivingAttackEvent event) {
         EntityLivingBase entity = event.getEntityLiving();
+        if (entity.world.isRemote) return;
         // Entity invulnerable?
-        if (entity.hurtResistantTime > 0) return;
+        if (entity.isInvulnerableTo(event.getSource()) || entity.hurtResistantTime > entity.maxHurtResistantTime / 2)
+            return;
 
         // Check entity has already been processed from original event, or is not allowed to be affected
-        if (entityAttackedThisTick.contains(entity.getUniqueID())
-                || (entity instanceof IMob && !affectHostileMobs)
-                || (!(entity instanceof EntityPlayer) && !affectPassiveMobs))
+        if (entityAttackedThisTick.contains(entity.getUniqueID()) || !MobType.from(entity).isAffectedByDamageScaling(entity))
             return;
 
         DamageSource source = event.getSource();
         if (source == null) return;
 
         // Get scaling factor from map, if it exists. Otherwise, use the generic scale.
-        float scale = scalingMap.getOrDefault(source.getDamageType(), genericScale);
+        float scale = (float) Config.get(entity).damageScaling.getScale(source.getDamageType());
 
         // Get the amount of the damage to affect. Can be many times the base value.
-        float affectedAmount = 0f;
-
-        if (scaleMode == null) {
-            // FIXME: Damage scaling!
-            ScalingHealth.LOGGER.warn("Uh-oh, damage scaling is broken! Plz fix!");
-            return;
-        }
-        switch (scaleMode) {
-            case AREA_DIFFICULTY:
-//                affectedAmount = (float) ScalingHealthAPI.getAreaDifficulty(entity.world, entity.getPosition());
-//                affectedAmount *= difficultyWeight;
-                break;
-            case MAX_HEALTH:
-                double baseHealth = entity instanceof EntityPlayer
-                        // FIXME
-                        ? 20 //Config.Player.Health.startingHealth
-                        : entity.getAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue();
-                affectedAmount = (float) ((entity.getMaxHealth() - baseHealth) / baseHealth);
-                break;
-            case PLAYER_DIFFICULTY:
-//                affectedAmount = (float) ScalingHealthAPI.getEntityDifficulty(entity);
-//                affectedAmount *= difficultyWeight;
-                break;
-        }
+        final float affectedAmount = (float) getEffectScale(entity);
 
         // Calculate damage to add to the original.
-        float original = event.getAmount();
-        float change = scale * affectedAmount * original;
-        float newAmount = event.getAmount() + change;
-
-        // Bounds and error checks
-        if (newAmount < 0f)
-            newAmount = 0f;
-        if (!Float.isFinite(newAmount))
-            newAmount = Float.MAX_VALUE;
+        final float original = event.getAmount();
+        final float change = scale * affectedAmount * original;
+        final float newAmount = makeSane(event.getAmount() + change);
 
         event.setCanceled(true);
         entityAttackedThisTick.add(entity.getUniqueID());
         entity.attackEntityFrom(event.getSource(), newAmount);
 
-        // FIXME
-//        if (Config.Debug.debugMode && Config.Debug.logPlayerDamage) {
-//            ScalingHealth.logHelper.info("Damage scaling: type={}, scale={}, affected={}, change={}, original={}",
-//                    source.damageType, scale, affectedAmount, change, original);
-//        }
+        if (Config.COMMON.debugLogScaledDamage.get()) {
+            ScalingHealth.LOGGER.info(MARKER, "{} on {}: {} -> {} (scale={}, affected={}, change={})",
+                    source.damageType, entity.getScoreboardName(), original, newAmount, scale, affectedAmount, change);
+        }
+    }
+
+    private static double getEffectScale(EntityLivingBase entity) {
+        DimensionConfig config = Config.get(entity);
+        Mode mode = config.damageScaling.mode.get();
+        switch (mode) {
+            case AREA_DIFFICULTY:
+                return Difficulty.areaDifficulty(entity.world, entity.getPosition()) * config.damageScaling.difficultyWeight.get();
+            case MAX_HEALTH:
+                double baseHealth = entity instanceof EntityPlayer
+                        ? config.player.startingHealth.get()
+                        : entity.getAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue();
+                return (entity.getMaxHealth() - baseHealth) / baseHealth;
+            case DIFFICULTY:
+                return Difficulty.ofEntity(entity) * config.damageScaling.difficultyWeight.get();
+            default:
+                throw new IllegalStateException("Unknown damage scaling mode: " + mode);
+        }
+    }
+
+    private static float makeSane(float scaledAmount) {
+        // Clamp scaled damage to sane values (non-negative and finite)
+        if (scaledAmount < 0)
+            return 0;
+        if (!Float.isFinite(scaledAmount))
+            return Float.MAX_VALUE;
+        return scaledAmount;
     }
 
     @SubscribeEvent
@@ -121,41 +116,7 @@ public final class DamageScaling {
         entityAttackedThisTick.clear();
     }
 
-    /*
-    public void loadConfig(Configuration config) {
-        final String category = Config.CAT_PLAYER_DAMAGE;
-
-        genericScale = config.getFloat("Generic Scale", category, 0f, -Float.MAX_VALUE, Float.MAX_VALUE,
-                "If the damage source is not in the \"Scale By Source\" list, this value is used instead.");
-        difficultyWeight = config.getFloat("Difficulty Weight", category, 0.04f, 0f, 1000f,
-                "How much each point of difficulty affects damage scaling. With the default value of 0.04 (1/25th) and max difficulty of 250, that's up to a 10x multiplier on added damage. So player's would"
-                        + " take 11x damage at max difficulty, if the source scale is set to 1.0.");
-        scaleMode = Config.INSTANCE.loadEnum("Scaling Mode", Config.CAT_PLAYER_DAMAGE, Mode.class, Mode.MAX_HEALTH, "Set what value we scale against. MAX_HEALTH scales to player's max health MINUS starting health. Defaults to MAX_HEALTH if an invalid string is entered.");
-
-        affectHostileMobs = config.getBoolean("Affect Hostile Mobs", category, false, "Also apply damage scaling to hostile mobs when they take damage.");
-        affectPassiveMobs = config.getBoolean("Affect Passive Mobs", category, false, "Also apply damage scaling to passive mobs when they take damage.");
-
-        // The parser is used to extract multiple values of different types from a single string. Parsing returns an Object
-        // array if successful, or null if anything goes wrong. The parser also handles error logging.
-        ConfigMultiValueLineParser parser = new ConfigMultiValueLineParser("Scale By Source", ScalingHealth.logHelper, "\\s", String.class, Float.class);
-        scalingMap.clear();
-
-        // Construct a default values array. Just SOURCES_DEFAULT with 0.0 appended to each element.
-        String[] defaults = new String[SOURCES_DEFAULT.length];
-        for (int i = 0; i < defaults.length; ++i) {
-            defaults[i] = SOURCES_DEFAULT[i] + " 0.0";
-        }
-
-        for (String str : config.getStringList("Scale By Source", category, defaults, SOURCES_COMMENT)) {
-            Object[] values = parser.parse(str);
-            // If not null, the values are guaranteed to be the correct types.
-            if (values != null)
-                scalingMap.put((String) values[0], (Float) values[1]);
-        }
-    }
-    */
-
     public enum Mode {
-        MAX_HEALTH, PLAYER_DIFFICULTY, AREA_DIFFICULTY
+        MAX_HEALTH, DIFFICULTY, AREA_DIFFICULTY;
     }
 }

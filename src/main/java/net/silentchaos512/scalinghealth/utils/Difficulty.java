@@ -1,6 +1,7 @@
 package net.silentchaos512.scalinghealth.utils;
 
 import com.udojava.evalex.Expression;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.Tuple;
@@ -39,6 +40,13 @@ public final class Difficulty {
     public static IDifficultySource source(ICapabilityProvider source) {
         return source.getCapability(CapabilityDifficultySource.INSTANCE)
                 .orElseGet(CapabilityDifficultySource::new);
+    }
+
+    @SuppressWarnings("TypeMayBeWeakened")
+    public static double ofEntity(Entity entity) {
+        if (entity instanceof EntityPlayer)
+            return source(entity).getDifficulty();
+        return affected(entity).getDifficulty();
     }
 
     public static Collection<Tuple<BlockPos, IDifficultySource>> sources(World world, BlockPos center, long radius) {

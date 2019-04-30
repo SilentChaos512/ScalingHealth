@@ -55,4 +55,15 @@ public enum MobType {
     public Optional<ResourceLocation> getBonusDropsLootTable() {
         return Optional.ofNullable(bonusDropsLootTable);
     }
+
+    public boolean isAffectedByDamageScaling(EntityLivingBase entity) {
+        switch (this) {
+            case PLAYER:
+                return Config.get(entity).damageScaling.affectPlayers.get();
+            case PEACEFUL:
+                return Config.get(entity).damageScaling.affectPeacefuls.get();
+            default:
+                return Config.get(entity).damageScaling.affectHostiles.get();
+        }
+    }
 }
