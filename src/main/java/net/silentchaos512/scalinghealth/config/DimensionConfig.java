@@ -296,7 +296,7 @@ public class DimensionConfig {
             byEntitySpec.defineList("types", ImmutableList.of("minecraft:villager"), DimensionConfig::validateId);
             byEntitySpec.define("onKilled", "difficulty + 0.01", o -> validateExpression(o, "onKilled", EvalVars.PLAYER_DIFFICULTY));
 
-            locationMultipliersSpec.defineList("biomes", ImmutableList.of("modid:example"), DimensionConfig::validateId);
+            locationMultipliersSpec.defineList("biomes", ImmutableList.of("modid:example"), ConfigValue.IS_NONEMPTY_STRING);
             locationMultipliersSpec.defineList("dimensions", ImmutableList.of("overworld"), ConfigValue.IS_NONEMPTY_STRING);
             locationMultipliersSpec.define("scale", 1.0, o -> o instanceof Number && ((Number) o).doubleValue() >= 0);
 
