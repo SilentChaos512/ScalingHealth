@@ -214,8 +214,8 @@ public final class SHPlayerDataHandler {
                     return;
                 }
                 // Multiplier for this dimension?
-                if (Config.Difficulty.DIFFICULTY_DIMENSION_MULTIPLIER.containsKey(player.dimension)) {
-                    amount *= Config.Difficulty.DIFFICULTY_DIMENSION_MULTIPLIER.get(player.dimension);
+                if (Config.Difficulty.DIMENSION_INCREASE_MULTIPLIER.containsKey(player.dimension)) {
+                    amount *= Config.Difficulty.DIMENSION_INCREASE_MULTIPLIER.get(player.dimension);
                 }
             }
 

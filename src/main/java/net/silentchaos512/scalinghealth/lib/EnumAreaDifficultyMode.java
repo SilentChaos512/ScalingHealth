@@ -172,6 +172,11 @@ public enum EnumAreaDifficultyMode {
         if (addGroupBonus)
             ret *= 1 + Config.Difficulty.groupAreaBonus * (players.size() - 1);
 
+        // Dimension value factor
+        SimpleExpression dimensionFactor = Config.Difficulty.DIMENSION_VALUE_FACTOR.get(world.provider.getDimension());
+        if (dimensionFactor != null)
+            ret = dimensionFactor.apply(ret);
+
         return ret;
     }
 }

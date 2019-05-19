@@ -18,7 +18,6 @@
 
 package net.silentchaos512.scalinghealth.config;
 
-import gnu.trove.map.hash.THashMap;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.RangedAttribute;
 import net.minecraft.util.text.TextComponentString;
@@ -38,6 +37,7 @@ import net.silentchaos512.scalinghealth.event.DamageScaling;
 import net.silentchaos512.scalinghealth.lib.EnumAreaDifficultyMode;
 import net.silentchaos512.scalinghealth.lib.EnumHealthModMode;
 import net.silentchaos512.scalinghealth.lib.EnumResetTime;
+import net.silentchaos512.scalinghealth.lib.SimpleExpression;
 import net.silentchaos512.scalinghealth.lib.module.ModuleAprilTricks;
 import net.silentchaos512.scalinghealth.utils.EntityDifficultyChangeList;
 import net.silentchaos512.scalinghealth.utils.EntityMatchList;
@@ -571,7 +571,8 @@ public class Config extends ConfigBaseNew {
                 "1.5", "1.3", "1.2", "1.0", "0.8", "1.0", "1.2", "1.3"};
         public static PlayerMatchList DIFFICULTY_EXEMPT_PLAYERS = new PlayerMatchList();
         public static EntityDifficultyChangeList DIFFICULTY_PER_KILL_BY_MOB = new EntityDifficultyChangeList();
-        public static Map<Integer, Float> DIFFICULTY_DIMENSION_MULTIPLIER = new THashMap<Integer, Float>();
+        public static Map<Integer, Float> DIMENSION_INCREASE_MULTIPLIER = new HashMap<>();
+        public static Map<Integer, SimpleExpression> DIMENSION_VALUE_FACTOR = new HashMap<>();
         public static EnumAreaDifficultyMode AREA_DIFFICULTY_MODE = EnumAreaDifficultyMode.WEIGHTED_AVERAGE;
         public static EnumResetTime DIFFFICULTY_RESET_TIME = EnumResetTime.NONE;
         public static boolean DIFFICULTY_LUNAR_MULTIPLIERS_ENABLED = false;
@@ -790,9 +791,22 @@ public class Config extends ConfigBaseNew {
                             + " make difficulty increase 1.5x faster in the Nether.")) {
                 Object[] values = parser.parse(str);
                 if (values != null) {
-                    Difficulty.DIFFICULTY_DIMENSION_MULTIPLIER.put((int) values[0], (float) values[1]);
+                    Difficulty.DIMENSION_INCREASE_MULTIPLIER.put((int) values[0], (float) values[1]);
                 }
             }
+            // Dimension value factor
+            parser = new ConfigMultiValueLineParser("Dimension Value Factor", ScalingHealth.logHelper, "\\s", Integer.class, String.class);
+            for (String str : config.getStringList("Dimension Value Factor", CAT_DIFFICULTY, new String[]{},
+                    "Apply a simple change to the area difficulty in a given dimension. Use the dimension ID, then a" +
+                            " space, then an operator (+-*/) followed by a number. For example, \"-1 *2.0\" would" +
+                            " make difficulty 2x higher in the Nether. \"1 +20\" would increase difficulty by 20 in The End")) {
+                Object[] values = parser.parse(str);
+                if (values != null) {
+                    SimpleExpression.from((String) values[1]).ifPresent(exp ->
+                            Difficulty.DIMENSION_VALUE_FACTOR.put((int) values[0], exp));
+                }
+            }
+            // Lunar cycles
             Difficulty.DIFFICULTY_LUNAR_MULTIPLIERS_ENABLED = loadBoolean("Lunar Phases Enabled", CAT_DIFFICULTY_LUNAR_PHASES, false,
                     "Enable lunar phase difficulty multipliers. Difficulty will receive a multiplier based"
                             + " on the phase of the moon.");
