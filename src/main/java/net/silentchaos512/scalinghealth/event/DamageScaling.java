@@ -87,15 +87,17 @@ public final class DamageScaling {
         // Calculate damage to add to the original.
         final float original = event.getAmount();
         final float change = scale * affectedAmount * original;
-        final float newAmount = makeSane(event.getAmount() + change);
+        if (change != 0) {
+            final float newAmount = makeSane(event.getAmount() + change);
 
-        event.setCanceled(true);
-        entityAttackedThisTick.add(entity.getPersistentID());
-        entity.attackEntityFrom(event.getSource(), newAmount);
+            event.setCanceled(true);
+            entityAttackedThisTick.add(entity.getPersistentID());
+            entity.attackEntityFrom(event.getSource(), newAmount);
 
-        if (Config.Debug.debugMode && Config.Debug.logPlayerDamage) {
-            ScalingHealth.LOGGER.info(MARKER, "{} on {}: {} -> {} (scale={}, affected={}, change={})",
-                    source.damageType, entity.getName(), original, newAmount, scale, affectedAmount, change);
+            if (Config.Debug.debugMode && Config.Debug.logPlayerDamage) {
+                ScalingHealth.LOGGER.info(MARKER, "{} on {}: {} -> {} (scale={}, affected={}, change={})",
+                        source.damageType, entity.getName(), original, newAmount, scale, affectedAmount, change);
+            }
         }
     }
 

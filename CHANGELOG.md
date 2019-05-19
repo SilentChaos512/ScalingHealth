@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Copied es_VE.lang to other Spanish regions
 ### Fixed
+- Cave spiders not poisoning players [#171]. This will still be broken if any extra scaling is applied to mob damage (does not include increases from difficulty)
 - Difficulty meter not showing area difficulty values beyond the max
 
 ## [1.3.34] - 2019-04-08
