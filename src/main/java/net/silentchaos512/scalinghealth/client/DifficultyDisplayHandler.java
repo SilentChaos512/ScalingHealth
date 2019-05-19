@@ -50,7 +50,6 @@ public class DifficultyDisplayHandler extends Gui {
 
     @SubscribeEvent
     public void onRenderOverlay(RenderGameOverlayEvent.Post event) {
-
         if (event.getType() != ElementType.TEXT || Config.Difficulty.maxValue <= 0 || !Config.Client.Difficulty.renderMeter)
             return;
 
@@ -65,8 +64,8 @@ public class DifficultyDisplayHandler extends Gui {
             return;
 
         int difficulty = (int) data.getDifficulty();
-        int areaDifficulty = MathHelper.clamp((int) Config.Difficulty.AREA_DIFFICULTY_MODE.getAreaDifficulty(player.world, player.getPosition()), 0,
-                (int) Config.Difficulty.maxValue);
+        int areaDifficultyUnclamped = (int) Config.Difficulty.AREA_DIFFICULTY_MODE.getAreaDifficulty(player.world, player.getPosition());
+        int areaDifficulty = MathHelper.clamp(areaDifficultyUnclamped, 0, (int) Config.Difficulty.maxValue);
         if (Config.Difficulty.AREA_DIFFICULTY_MODE == EnumAreaDifficultyMode.SERVER_WIDE) {
             difficulty = areaDifficulty;
         }
@@ -109,13 +108,13 @@ public class DifficultyDisplayHandler extends Gui {
             drawTexturedModalRect(posX + 3, posY + 3, 193, 17, barLength, 2, 0xFFFFFF);
 
             // Text
-            float textScale = 0.6f;
             GlStateManager.pushMatrix();
+            float textScale = 0.6f;
             GlStateManager.scale(textScale, textScale, 1.0f);
             String localizedString = ScalingHealth.i18n.miscText("difficultyMeterText");
             mc.fontRenderer.drawStringWithShadow(localizedString, posX / textScale + 4, posY / textScale - 9, 0xFFFFFF);
             // Text Difficulty
-            String str = String.format("%d", areaDifficulty);
+            String str = String.format("%d", areaDifficultyUnclamped);
             int strWidth = mc.fontRenderer.getStringWidth(str);
             mc.fontRenderer.drawStringWithShadow(str, posX / textScale + 104 - strWidth, posY / textScale - 9, 0xAAAAAA);
             GlStateManager.popMatrix();

@@ -3,9 +3,13 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.3.35] - 2019-05-19
+### Added
+- Config to add fixed values or multipliers to specific dimensions (Dimension Value Factor under difficulty category) [#154]
 ### Changed
 - Copied es_VE.lang to other Spanish regions
+### Fixed
+- Difficulty meter not showing area difficulty values beyond the max
 
 ## [1.3.34] - 2019-04-08
 Set minimum Forge version to 2779 to stop the crashes
