@@ -3,7 +3,11 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.3.34] - 2019-04-07
+## [Unreleased]
+### Changed
+- Copied es_VE.lang to other Spanish regions
+
+## [1.3.34] - 2019-04-08
 Set minimum Forge version to 2779 to stop the crashes
 ### Added
 - Config to set blights immune to suffocation damage (enabled by default)
