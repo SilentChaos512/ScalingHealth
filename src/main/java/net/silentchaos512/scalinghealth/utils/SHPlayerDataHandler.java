@@ -18,10 +18,12 @@
 
 package net.silentchaos512.scalinghealth.utils;
 
+import mcp.MethodsReturnNonnullByDefault;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
@@ -30,6 +32,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.silentchaos512.lib.util.AttributeHelper;
 import net.silentchaos512.lib.util.EntityHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -43,10 +46,13 @@ import net.silentchaos512.scalinghealth.scoreboard.SHScoreCriteria;
 import net.silentchaos512.scalinghealth.world.ScalingHealthSavedData;
 
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
 public final class SHPlayerDataHandler {
     private static final String NBT_ROOT = ScalingHealth.MOD_ID_LOWER + "_data";
 
@@ -71,6 +77,7 @@ public final class SHPlayerDataHandler {
             data.writeToNBT(tags);
             playerData.remove(key);
             data = get(player);
+            assert data != null;
             data.readFromNBT(tags);
         }
 
@@ -122,20 +129,30 @@ public final class SHPlayerDataHandler {
         public void onPlayerTick(LivingUpdateEvent event) {
             if (event.getEntityLiving() instanceof EntityPlayer) {
                 EntityPlayer player = (EntityPlayer) event.getEntityLiving();
-                SHPlayerDataHandler.get(player).tick();
+                PlayerData data = get(player);
+                if (data != null) {
+                    data.tick();
+                }
 
                 // Get data from nearby players.
-                if (!player.world.isRemote
-                        && player.world.getTotalWorldTime() % 5 * Config.PACKET_DELAY == 0) {
-                    int radius = Config.Difficulty.searchRadius;
-                    int radiusSquared = radius <= 0 ? Integer.MAX_VALUE : radius * radius;
-                    for (EntityPlayer p : player.world.getPlayers(EntityPlayer.class,
-                            p -> !p.equals(player) && p.getDistanceSq(player.getPosition()) < radiusSquared)) {
-                        MessageDataSync message = new MessageDataSync(get(p), p);
-                        NetworkHandler.INSTANCE.sendTo(message, (EntityPlayerMP) player);
+                if (!player.world.isRemote && player.world.getTotalWorldTime() % 5 * Config.PACKET_DELAY == 0) {
+                    for (EntityPlayer p : getNearbyPlayers(player)) {
+                        PlayerData data1 = get(p);
+                        if (data1 != null) {
+                            IMessage message = new MessageDataSync(data1, p);
+                            NetworkHandler.INSTANCE.sendTo(message, (EntityPlayerMP) player);
+                        }
                     }
                 }
             }
+        }
+
+        private static Collection<EntityPlayer> getNearbyPlayers(EntityPlayer center) {
+            int radius = Config.Difficulty.searchRadius;
+            int radiusSquared = radius <= 0 ? Integer.MAX_VALUE : radius * radius;
+            BlockPos centerPos = center.getPosition();
+            return center.world.getPlayers(EntityPlayer.class, p ->
+                    p != null && !p.equals(center) && p.getDistanceSq(centerPos) < radiusSquared);
         }
 
         @SubscribeEvent
@@ -143,12 +160,16 @@ public final class SHPlayerDataHandler {
             if (event.player instanceof EntityPlayerMP) {
                 EntityPlayerMP playerMP = (EntityPlayerMP) event.player;
 
-                MessageDataSync message = new MessageDataSync(get(event.player), event.player);
-                NetworkHandler.INSTANCE.sendTo(message, playerMP);
+                PlayerData data = get(event.player);
+                if (data != null) {
+                    IMessage message = new MessageDataSync(data, event.player);
+                    NetworkHandler.INSTANCE.sendTo(message, playerMP);
+                } else {
+                    ScalingHealth.LOGGER.error("Player data for '{}' not found!", event.player.getName());
+                }
 
                 if (Config.Difficulty.AREA_DIFFICULTY_MODE == EnumAreaDifficultyMode.SERVER_WIDE) {
-                    MessageWorldDataSync message2 = new MessageWorldDataSync(
-                            ScalingHealthSavedData.get(event.player.world));
+                    IMessage message2 = new MessageWorldDataSync(ScalingHealthSavedData.get(event.player.world));
                     NetworkHandler.INSTANCE.sendTo(message2, playerMP);
                 }
             }
@@ -166,11 +187,13 @@ public final class SHPlayerDataHandler {
         double difficulty = 0.0D;
         float health = 20;
         float maxHealth = Config.Player.Health.startingHealth;
+        @SuppressWarnings("UseOfObsoleteDateTimeApi") // Removed in 1.13
         Calendar lastTimePlayed = Calendar.getInstance();
 
         WeakReference<EntityPlayer> playerWR;
         private final boolean client;
         private int lastPosX = 0;
+        @SuppressWarnings({"FieldCanBeLocal", "unused"}) // Leaving alone for compatibility
         private int lastPosY = 0;
         private int lastPosZ = 0;
 
@@ -221,7 +244,7 @@ public final class SHPlayerDataHandler {
 
             setDifficulty(difficulty + amount);
 
-            if (alsoAffectWorldDifficulty) {
+            if (alsoAffectWorldDifficulty && player != null) {
                 ScalingHealthSavedData data = ScalingHealthSavedData.get(player.world);
                 if (data != null) {
                     data.difficulty += amount;
@@ -244,8 +267,7 @@ public final class SHPlayerDataHandler {
             if (!Config.Player.Health.allowModify)
                 return;
 
-            int configMax = Config.Player.Health.maxHealth;
-            configMax = configMax <= 0 ? Integer.MAX_VALUE : configMax;
+            int configMax = Config.Player.Health.maxHealth <= 0 ? Integer.MAX_VALUE : Config.Player.Health.maxHealth;
 
             maxHealth = MathHelper.clamp(value, 2, configMax);
 
@@ -272,7 +294,9 @@ public final class SHPlayerDataHandler {
             }
         }
 
+        @SuppressWarnings("UseOfObsoleteDateTimeApi")
         public Calendar getLastTimePlayed() {
+            //noinspection AssignmentOrReturnOfFieldWithMutableType
             return lastTimePlayed;
         }
 
@@ -329,15 +353,20 @@ public final class SHPlayerDataHandler {
         private void sendUpdateMessage() {
             if (!client) {
                 EntityPlayer player = playerWR.get();
-                EntityPlayerMP playerMP = (EntityPlayerMP) player;
 
-                MessageDataSync message = new MessageDataSync(get(player), player);
-                NetworkHandler.INSTANCE.sendTo(message, playerMP);
+                if (player != null) {
+                    EntityPlayerMP playerMP = (EntityPlayerMP) player;
+                    PlayerData data = get(player);
 
-                if (Config.Difficulty.AREA_DIFFICULTY_MODE == EnumAreaDifficultyMode.SERVER_WIDE) {
-                    MessageWorldDataSync message2 = new MessageWorldDataSync(
-                            ScalingHealthSavedData.get(player.world));
-                    NetworkHandler.INSTANCE.sendTo(message2, playerMP);
+                    if (data != null) {
+                        IMessage message = new MessageDataSync(data, player);
+                        NetworkHandler.INSTANCE.sendTo(message, playerMP);
+
+                        if (Config.Difficulty.AREA_DIFFICULTY_MODE == EnumAreaDifficultyMode.SERVER_WIDE) {
+                            IMessage message2 = new MessageWorldDataSync(ScalingHealthSavedData.get(player.world));
+                            NetworkHandler.INSTANCE.sendTo(message2, playerMP);
+                        }
+                    }
                 }
             }
         }
@@ -386,6 +415,7 @@ public final class SHPlayerDataHandler {
                     int year = Integer.parseInt(dateParts[0]);
                     int month = Integer.parseInt(dateParts[1]) - 1;
                     int date = Integer.parseInt(dateParts[2]);
+                    //noinspection MagicConstant
                     lastTimePlayed.set(year, month, date);
                 } catch (NumberFormatException ex) {
                     ScalingHealth.logHelper.warn("Could not parse player's last login time.");
