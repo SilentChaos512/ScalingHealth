@@ -4,8 +4,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- The "all mobs are blights" config will now work even if max difficulty is zero
 ### Fixed
 - Should prevent random crash [#172]
+- Creepers losing health when becoming blights
 
 ## [1.3.35] - 2019-05-19
 ### Added

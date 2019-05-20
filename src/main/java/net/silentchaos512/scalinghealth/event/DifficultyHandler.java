@@ -123,15 +123,20 @@ public class DifficultyHandler {
 
     @SubscribeEvent
     public void onMobSpawn(LivingUpdateEvent event) {
-        if (!(Config.Difficulty.maxValue <= 0) && !event.getEntity().world.isRemote && event.getEntity() instanceof EntityLiving) {
-            EntityLiving entityLiving = (EntityLiving) event.getEntity();
+        boolean difficultyEnabled = Config.Difficulty.maxValue > 0;
 
-            if (canIncreaseEntityHealth(entityLiving) && !entityBlacklistedFromHealthIncrease(entityLiving)) {
-//                ScalingHealth.logHelper.debug("{}, {}", entityLiving.getEntityData().getShort(NBT_ENTITY_DIFFICULTY), entityLiving);
+        if (!event.getEntity().world.isRemote && event.getEntity() instanceof EntityLiving) {
+            EntityLiving entity = (EntityLiving) event.getEntity();
 
-                boolean makeBlight = increaseEntityHealth(entityLiving);
-                if (makeBlight && !BlightHandler.isBlight(entityLiving))
-                    makeEntityBlight(entityLiving, ScalingHealth.random);
+            if (difficultyEnabled && canIncreaseEntityHealth(entity) && !entityBlacklistedFromHealthIncrease(entity)) {
+                // Apply difficulty, possibly create a blight
+                boolean makeBlight = increaseEntityHealth(entity);
+                if (makeBlight && !BlightHandler.isBlight(entity)) {
+                    makeEntityBlight(entity, ScalingHealth.random);
+                }
+            } else if (!difficultyEnabled && Config.Mob.Blight.blightAlways && !entityBlacklistedFromBecomingBlight(entity)) {
+                // Difficulty system is "disabled", but we want all entities to be blights anyway
+                makeEntityBlight(entity, ScalingHealth.random);
             }
         }
     }
@@ -357,6 +362,7 @@ public class DifficultyHandler {
             entityLiving.onStruckByLightning(new EntityLightningBolt(entityLiving.world,
                     entityLiving.posX, entityLiving.posY, entityLiving.posZ, true));
             entityLiving.extinguish();
+            entityLiving.heal(5);
         }
 
         // Notify clients
@@ -402,7 +408,9 @@ public class DifficultyHandler {
     }
 
     private boolean entityBlacklistedFromBecomingBlight(EntityLivingBase entityLiving) {
-        if (entityLiving == null) return true;
+        if (entityLiving == null || BlightHandler.isBlight(entityLiving)) {
+            return true;
+        }
 
         EntityMatchList blacklist = Config.Mob.Blight.blacklist;
         boolean isBoss = !entityLiving.isNonBoss();
