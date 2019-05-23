@@ -14,6 +14,7 @@ import net.silentchaos512.lib.base.IModBase;
 import net.silentchaos512.lib.registry.SRegistry;
 import net.silentchaos512.lib.util.I18nHelper;
 import net.silentchaos512.lib.util.LogHelper;
+import net.silentchaos512.scalinghealth.command.CommandRecalculate;
 import net.silentchaos512.scalinghealth.command.CommandScalingHealth;
 import net.silentchaos512.scalinghealth.init.ModItems;
 import net.silentchaos512.scalinghealth.proxy.ScalingHealthCommonProxy;
@@ -33,7 +34,7 @@ public class ScalingHealth implements IModBase {
     public static final String MOD_ID_OLD = "ScalingHealth";
     public static final String MOD_ID_LOWER = "scalinghealth";
     public static final String MOD_NAME = "Scaling Health";
-    public static final String VERSION = "1.3.35";
+    public static final String VERSION = "1.3.36";
     public static final String VERSION_SILENTLIB = "3.0.13";
     public static final int BUILD_NUM = 0;
     public static final String DEPENDENCIES = "required-after:forge@[14.23.5.2779,);required-after:silentlib@[" + VERSION_SILENTLIB + ",);after:morpheus";
@@ -77,6 +78,7 @@ public class ScalingHealth implements IModBase {
     @EventHandler
     public void onServerLoad(FMLServerStartingEvent event) {
         event.registerServerCommand(new CommandScalingHealth());
+        event.registerServerCommand(new CommandRecalculate());
     }
 
     @EventHandler

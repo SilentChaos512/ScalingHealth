@@ -76,24 +76,24 @@ public class CommandScalingHealth extends CommandBaseSL {
         double value = isGet ? -1D : parseDouble(args[2]);
         List<EntityPlayerMP> targets = getTargetPlayers(server, sender, isGet, args);
 
-        if (command.equals("difficulty"))
+        if ("difficulty".equals(command))
             executeDifficulty(server, sender, subCommand, value, targets);
-        else if (command.equals("health"))
+        else if ("health".equals(command))
             executeHealth(server, sender, subCommand, value, targets);
-        else if (command.equals("world_difficulty"))
+        else if ("world_difficulty".equals(command))
             executeWorldDifficulty(server, sender, subCommand, value, sender.getEntityWorld());
         else
             tell(sender, getUsage(sender), false);
     }
 
-    private List<EntityPlayerMP> getTargetPlayers(MinecraftServer server, ICommandSender sender, boolean isGet, String[] args) throws PlayerNotFoundException, CommandException {
+    private static List<EntityPlayerMP> getTargetPlayers(MinecraftServer server, ICommandSender sender, boolean isGet, String[] args) throws PlayerNotFoundException, CommandException {
         int index = isGet ? 2 : 3;
         return args.length < index + 1
                 ? ImmutableList.of(getCommandSenderAsPlayer(sender))
                 : getPlayers(server, sender, args[index]);
     }
 
-    private void executeDifficulty(MinecraftServer server, ICommandSender sender, @Nonnull SubCommand subCommand, double value, List<EntityPlayerMP> targets) {
+    private static void executeDifficulty(MinecraftServer server, ICommandSender sender, @Nonnull SubCommand subCommand, double value, List<EntityPlayerMP> targets) {
         if (targets.isEmpty())
             return;
 
@@ -119,7 +119,7 @@ public class CommandScalingHealth extends CommandBaseSL {
                 double max = getMaxValue(subCommand, current, Config.Difficulty.minValue, Config.Difficulty.maxValue);
 
                 // Bounds check
-                if (!checkBounds(subCommand, value, toSet, current, min, max)) {
+                if (!checkBounds(value, min, max)) {
                     tell(sender, TextFormatting.RED, "outOfBounds", true, String.format(NUMFORMAT, min), String.format(NUMFORMAT, max));
                     return;
                 }
@@ -131,7 +131,7 @@ public class CommandScalingHealth extends CommandBaseSL {
         }
     }
 
-    private void executeWorldDifficulty(MinecraftServer server, ICommandSender sender, @Nonnull SubCommand subCommand, double value, World world) {
+    private static void executeWorldDifficulty(MinecraftServer server, ICommandSender sender, @Nonnull SubCommand subCommand, double value, World world) {
         ScalingHealthSavedData data = ScalingHealthSavedData.get(world);
         if (data == null) {
             tell(sender, "World data is null!", false);
@@ -152,7 +152,7 @@ public class CommandScalingHealth extends CommandBaseSL {
             double max = getMaxValue(subCommand, current, Config.Difficulty.minValue, Config.Difficulty.maxValue);
 
             // Bounds check
-            if (!checkBounds(subCommand, value, toSet, current, min, max)) {
+            if (!checkBounds(value, min, max)) {
                 tell(sender, TextFormatting.RED, "outOfBounds", true, String.format(NUMFORMAT, min), String.format(NUMFORMAT, max));
                 return;
             }
@@ -164,7 +164,7 @@ public class CommandScalingHealth extends CommandBaseSL {
         }
     }
 
-    private void executeHealth(MinecraftServer server, ICommandSender sender, @Nonnull SubCommand subCommand, double value, List<EntityPlayerMP> targets) {
+    private static void executeHealth(MinecraftServer server, ICommandSender sender, @Nonnull SubCommand subCommand, double value, List<EntityPlayerMP> targets) {
         if (targets.isEmpty())
             return;
 
@@ -195,7 +195,7 @@ public class CommandScalingHealth extends CommandBaseSL {
                 double max = getMaxValue(subCommand, current, 2, hardMax);
 
                 // Bounds check
-                if (!checkBounds(subCommand, value, toSet, current, min, max)) {
+                if (!checkBounds(value, min, max)) {
                     tell(sender, TextFormatting.RED, "outOfBounds", true, min, max);
                     return;
                 }
@@ -212,7 +212,7 @@ public class CommandScalingHealth extends CommandBaseSL {
         }
     }
 
-    private void executeConfigReload(ICommandSender sender) {
+    private static void executeConfigReload(ICommandSender sender) {
         sender.sendMessage(new TextComponentString("Attempting to reload config, check log for details"));
         Config.INSTANCE.load();
     }
@@ -223,10 +223,9 @@ public class CommandScalingHealth extends CommandBaseSL {
      * @param subCommand The subcommand (most likely SET/ADD/SUB)
      * @param current    The current value ({@link PlayerData#getMaxHealth()}, {@link
      *                   PlayerData#getDifficulty()}, etc.)
-     * @param current    The current value (data.getMaxHealth(), data.getDifficulty(), etc)
      * @return The value that will be set, assuming it is valid.
      */
-    private double getValueToSet(SubCommand subCommand, double value, double current) {
+    private static double getValueToSet(SubCommand subCommand, double value, double current) {
         double toSet = value;
         if (subCommand == SubCommand.ADD)
             toSet = current + value;
@@ -245,7 +244,7 @@ public class CommandScalingHealth extends CommandBaseSL {
      * @param max        The maximum allowed absolute value.
      * @return The minimum value that can be entered, adjusted for the subcommand.
      */
-    private double getMinValue(SubCommand subCommand, double current, double min, double max) {
+    private static double getMinValue(SubCommand subCommand, double current, double min, double max) {
         if (subCommand == SubCommand.ADD)
             return min - current;
         else if (subCommand == SubCommand.SUB)
@@ -264,7 +263,7 @@ public class CommandScalingHealth extends CommandBaseSL {
      * @param max        The maximum allowed absolute value.
      * @return The maximum value that can be entered, adjusted for the subcommand.
      */
-    private double getMaxValue(SubCommand subCommand, double current, double min, double max) {
+    private static double getMaxValue(SubCommand subCommand, double current, double min, double max) {
         if (subCommand == SubCommand.ADD)
             return max - current;
         else if (subCommand == SubCommand.SUB)
@@ -273,12 +272,12 @@ public class CommandScalingHealth extends CommandBaseSL {
             return max;
     }
 
-    private boolean checkBounds(SubCommand subCommand, double value, double toSet, double current, double min, double max) {
+    private static boolean checkBounds(double value, double min, double max) {
         return !(value < min || value > max);
     }
 
     @Override
-    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, BlockPos pos) {
+    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos pos) {
         if (args.length == 1)
             return getListOfStringsMatchingLastWord(args, "difficulty", "health", "world_difficulty");
         else if (args.length == 2)
@@ -291,17 +290,17 @@ public class CommandScalingHealth extends CommandBaseSL {
 
     @Override
     public boolean isUsernameIndex(String[] args, int index) {
-        return args.length > 2 && args[1].equals("get") ? index == 3 : index == 4;
+        return args.length > 2 && "get".equals(args[1]) ? index == 3 : index == 4;
     }
 
-    private void tell(ICommandSender sender, String key, boolean fromLocalizationFile, Object... args) {
+    private static void tell(ICommandSender sender, String key, boolean fromLocalizationFile, Object... args) {
         tell(sender, TextFormatting.RESET, key, fromLocalizationFile, args);
     }
 
-    private void tell(ICommandSender sender, TextFormatting format, String key, boolean fromLocalizationFile, Object... args) {
+    private static void tell(ICommandSender sender, TextFormatting format, String key, boolean fromLocalizationFile, Object... args) {
         key = "command." + ScalingHealth.MOD_ID_LOWER + "." + key;
         if (fromLocalizationFile)
-            sender.sendMessage(new TextComponentString("" + format).appendSibling(new TextComponentTranslation(key, args)));
+            sender.sendMessage(new TextComponentString(String.valueOf(format)).appendSibling(new TextComponentTranslation(key, args)));
         else
             sender.sendMessage(new TextComponentString(format + String.format(key, args)));
     }

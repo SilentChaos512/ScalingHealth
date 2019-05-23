@@ -123,22 +123,35 @@ public class DifficultyHandler {
 
     @SubscribeEvent
     public void onMobSpawn(LivingUpdateEvent event) {
+        process(event.getEntityLiving());
+    }
+
+    private boolean process(EntityLivingBase entity) {
         boolean difficultyEnabled = Config.Difficulty.maxValue > 0;
 
-        if (!event.getEntity().world.isRemote && event.getEntity() instanceof EntityLiving) {
-            EntityLiving entity = (EntityLiving) event.getEntity();
-
+        if (!entity.world.isRemote && entity instanceof EntityLiving) {
             if (difficultyEnabled && canIncreaseEntityHealth(entity) && !entityBlacklistedFromHealthIncrease(entity)) {
                 // Apply difficulty, possibly create a blight
                 boolean makeBlight = increaseEntityHealth(entity);
                 if (makeBlight && !BlightHandler.isBlight(entity)) {
-                    makeEntityBlight(entity, ScalingHealth.random);
+                    makeEntityBlight((EntityLiving) entity, ScalingHealth.random);
                 }
+                return true;
             } else if (!difficultyEnabled && Config.Mob.Blight.blightAlways && !entityBlacklistedFromBecomingBlight(entity)) {
                 // Difficulty system is "disabled", but we want all entities to be blights anyway
-                makeEntityBlight(entity, ScalingHealth.random);
+                makeEntityBlight((EntityLiving) entity, ScalingHealth.random);
+                return true;
             }
         }
+
+        return false;
+    }
+
+    public boolean recalculate(EntityLivingBase entity) {
+        entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.MAX_HEALTH).removeModifier(ModifierHandler.MODIFIER_ID_DAMAGE);
+        entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.MAX_HEALTH).removeModifier(ModifierHandler.MODIFIER_ID_HEALTH);
+        entity.getEntityData().setShort(NBT_ENTITY_DIFFICULTY, (short) 0);
+        return process(entity);
     }
 
     @SubscribeEvent
@@ -282,7 +295,7 @@ public class DifficultyHandler {
         // Someone canceled the "blightification"?
         if (MinecraftForge.EVENT_BUS.post(event)) return;
 
-        BlightHandler.markBlight(entityLiving);
+        BlightHandler.markBlight(entityLiving, true);
         BlightHandler.spawnBlightFire(entityLiving);
 
         // ==============
@@ -366,7 +379,7 @@ public class DifficultyHandler {
         }
 
         // Notify clients
-        MessageMarkBlight message = new MessageMarkBlight(entityLiving);
+        MessageMarkBlight message = new MessageMarkBlight(entityLiving, true);
         NetworkHandler.INSTANCE.sendToAllAround(message, new TargetPoint(entityLiving.dimension,
                 entityLiving.posX, entityLiving.posY, entityLiving.posZ, 128));
 

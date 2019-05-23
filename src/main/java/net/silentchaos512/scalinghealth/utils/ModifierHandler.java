@@ -62,14 +62,14 @@ public class ModifierHandler {
         if (entity instanceof EntityPlayer && !Config.Player.Health.allowModify) {
             // It's a player, but the user has disallowed Scaling Health from modifying the player's health.
             ScalingHealth.logHelper.info(String.format(
-                    "Would have set player %s's health to %.1f, but modified player health has been disabled"
-                            + " in the config!",
+                    "Would have set player %s's health to %.1f, but modified player health has been disabled in the config!",
                     entity.getName(), amount));
             return;
         }
 
         float originalHealth = entity.getHealth();
         IAttributeInstance attr = entity.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH);
+        //noinspection ConstantConditions
         if (attr != null) {
             setModifier(attr, MODIFIER_ID_HEALTH, MODIFIER_NAME_HEALTH, amount, op);
             entity.setHealth(originalHealth);
@@ -78,9 +78,30 @@ public class ModifierHandler {
 
     public static void addAttackDamage(EntityLivingBase entity, double amount, int op) {
         IAttributeInstance attr = entity.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
+        //noinspection ConstantConditions
         if (attr != null) {
             amount += attr.getBaseValue();
             setModifier(attr, MODIFIER_ID_DAMAGE, MODIFIER_NAME_DAMAGE, amount, op);
         }
+    }
+
+    public static double getHealthModifier(EntityLivingBase entity) {
+        IAttributeInstance attr = entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.MAX_HEALTH);
+        //noinspection ConstantConditions
+        if (attr == null) {
+            return 0;
+        }
+        AttributeModifier mod = attr.getModifier(MODIFIER_ID_HEALTH);
+        return mod != null ? mod.getAmount() : 0;
+    }
+
+    public static double getDamageModifier(EntityLivingBase entity) {
+        IAttributeInstance attr = entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.ATTACK_DAMAGE);
+        //noinspection ConstantConditions
+        if (attr == null) {
+            return 0;
+        }
+        AttributeModifier mod = attr.getModifier(MODIFIER_ID_DAMAGE);
+        return mod != null ? mod.getAmount() : 0;
     }
 }

@@ -33,7 +33,6 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
-import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
@@ -63,9 +62,23 @@ public final class BlightHandler {
         return entityLiving != null && entityLiving.getEntityData().getBoolean(NBT_BLIGHT);
     }
 
+    @Deprecated
     public static void markBlight(EntityLivingBase entityLiving) {
-        if (entityLiving != null)
-            entityLiving.getEntityData().setBoolean(NBT_BLIGHT, true);
+        markBlight(entityLiving, true);
+    }
+
+    public static void markBlight(EntityLivingBase entityLiving, boolean isBlight) {
+        if (entityLiving != null) {
+            entityLiving.getEntityData().setBoolean(NBT_BLIGHT, isBlight);
+
+            if (!isBlight) {
+                // Kill the blight's fire
+                EntityBlightFire blightFire = getBlightFire(entityLiving);
+                if (blightFire != null) {
+                    blightFire.setDead();
+                }
+            }
+        }
     }
 
     static void spawnBlightFire(EntityLivingBase blight) {
@@ -100,20 +113,16 @@ public final class BlightHandler {
 
         // Invisibility
         if (Config.Mob.Blight.invisibility)
-            entityLiving
-                    .addPotionEffect(new PotionEffect(MobEffects.INVISIBILITY, duration, 0, true, false));
+            entityLiving.addPotionEffect(new PotionEffect(MobEffects.INVISIBILITY, duration, 0, true, false));
         // Fire Resistance
         if (Config.Mob.Blight.fireResist)
-            entityLiving
-                    .addPotionEffect(new PotionEffect(MobEffects.FIRE_RESISTANCE, duration, 0, true, false));
+            entityLiving.addPotionEffect(new PotionEffect(MobEffects.FIRE_RESISTANCE, duration, 0, true, false));
         // Speed
         if (Config.Mob.Blight.speedAmp > -1)
-            entityLiving.addPotionEffect(new PotionEffect(MobEffects.SPEED, duration,
-                    Config.Mob.Blight.speedAmp, true, false));
+            entityLiving.addPotionEffect(new PotionEffect(MobEffects.SPEED, duration, Config.Mob.Blight.speedAmp, true, false));
         // Strength
         if (Config.Mob.Blight.strengthAmp > -1)
-            entityLiving.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, duration,
-                    Config.Mob.Blight.strengthAmp, true, false));
+            entityLiving.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, duration, Config.Mob.Blight.strengthAmp, true, false));
     }
 
     // **********
@@ -199,7 +208,7 @@ public final class BlightHandler {
             // Add in entity ID so not all blights update on the same tick
             if ((world.getTotalWorldTime() + entityLiving.getEntityId()) % UPDATE_DELAY == 0) {
                 // Send message to clients to make sure they know the entity is a blight.
-                MessageMarkBlight message = new MessageMarkBlight(entityLiving);
+                MessageMarkBlight message = new MessageMarkBlight(entityLiving, true);
                 NetworkHandler.INSTANCE.sendToAllAround(message, new TargetPoint(entityLiving.dimension,
                         entityLiving.posX, entityLiving.posY, entityLiving.posZ, 128));
 

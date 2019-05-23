@@ -10,7 +10,6 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.silentchaos512.lib.event.ClientTicks;
 import net.silentchaos512.scalinghealth.event.BlightHandler;
 import net.silentchaos512.scalinghealth.network.Message;
-import scala.collection.parallel.ParIterableLike;
 
 import javax.annotation.Nullable;
 
@@ -18,18 +17,27 @@ import javax.annotation.Nullable;
 public class MessageMarkBlight extends Message {
     @SuppressWarnings("WeakerAccess")
     public int entityId;
+    @SuppressWarnings("WeakerAccess")
+    public boolean isBlight;
 
     @SuppressWarnings("unused")
     public MessageMarkBlight() { }
 
+    @Deprecated
     public MessageMarkBlight(EntityLivingBase entity) {
-        entityId = entity.getEntityId();
+        this(entity, true);
+    }
+
+    public MessageMarkBlight(EntityLivingBase entity, boolean isBlight) {
+        this.entityId = entity.getEntityId();
+        this.isBlight = isBlight;
     }
 
     @Override
     @Nullable
     @SideOnly(Side.CLIENT)
     public IMessage handleMessage(MessageContext context) {
+        //noinspection OverlyLongLambda
         ClientTicks.scheduleAction(() -> {
             Minecraft mc = Minecraft.getMinecraft();
             // Sometimes MC client instance is null, seems to happen when connecting to servers
@@ -38,7 +46,7 @@ public class MessageMarkBlight extends Message {
 
             Entity entity = Minecraft.getMinecraft().world.getEntityByID(entityId);
             if (entity instanceof EntityLivingBase)
-                BlightHandler.markBlight((EntityLivingBase) entity);
+                BlightHandler.markBlight((EntityLivingBase) entity, this.isBlight);
         });
 
         return null;
