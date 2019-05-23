@@ -144,7 +144,7 @@ public final class BlightHandler {
                 ScalingHealth.logHelper.info("Blight {} was killed by {}", blight.getName(), actualKiller.getName());
                 for (EntityPlayer p : player.world.getPlayers(EntityPlayer.class, e -> true)) {
                     // FIXME: blight name translation
-                    ChatHelper.translate(p, ScalingHealth.i18n.getKey("blight", "killedByPlayer"), "Blight " + blight.getName(), actualKiller.getName());
+                    ChatHelper.translate(p, ScalingHealth.i18n.getKey("blight", "killedByPlayer"), blight.getName(), actualKiller.getName());
                 }
             }
 
