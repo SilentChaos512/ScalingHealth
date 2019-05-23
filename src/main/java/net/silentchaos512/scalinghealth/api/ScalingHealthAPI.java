@@ -26,6 +26,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.silentchaos512.scalinghealth.config.Config;
+import net.silentchaos512.scalinghealth.event.BlightHandler;
 import net.silentchaos512.scalinghealth.event.DifficultyHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
@@ -85,6 +86,10 @@ public class ScalingHealthAPI {
     // **************************************************************************
     // Blights
     // **************************************************************************
+
+    public static boolean isBlight(EntityLivingBase entity) {
+        return BlightHandler.isBlight(entity);
+    }
 
     /**
      * Adds equipment that blights can randomly spawn with. The tier must be between 0 and 4,
