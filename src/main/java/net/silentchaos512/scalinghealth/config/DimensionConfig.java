@@ -217,8 +217,9 @@ public class DimensionConfig {
                     .defineInRange(0.04, 0, Double.MAX_VALUE);
             genericScale = wrapper
                     .builder("damageScaling.genericScale")
-                    .comment("Scale for all damage types which does not have a specific scale defined")
-                    .defineInRange(1.0, 0, Double.MAX_VALUE);
+                    .comment("Scale for all damage types which does not have a specific scale defined.",
+                            "This can have unintended side effects, so it's recommended to leave this at 0.")
+                    .defineInRange(0.0, 0, Double.MAX_VALUE);
             affectPlayers = wrapper
                     .builder("damageScaling.affectPlayers")
                     .comment("Does damage scaling affect players?")
@@ -273,6 +274,7 @@ public class DimensionConfig {
         public final BooleanValue ignoreYAxis;
         public final Supplier<Expression> groupAreaBonus;
         public final Supplier<Expression> idleMultiplier;
+        public final StringValue sleepWarningMessage;
 
         // Mutators
         public final Supplier<Expression> onBlightKilled;
@@ -360,6 +362,11 @@ public class DimensionConfig {
                     "0.75",
                     null,
                     "Multiplier for changePerSecond when the player is not moving.");
+            sleepWarningMessage = wrapper
+                    .builder("difficulty.sleepWarningMessage")
+                    .comment("Message displayed to the player when sleeping, assuming it would change their difficulty.",
+                            "If left empty, the default message is pulled from the translation file.")
+                    .defineString("");
 
             // Mutators
             wrapper.comment("difficulty.mutators", "Change difficulty when certain things happen");

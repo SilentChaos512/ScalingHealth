@@ -27,6 +27,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.loot.LootContext;
@@ -43,11 +46,16 @@ import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.capability.IDifficultySource;
+import net.silentchaos512.scalinghealth.config.Config;
+import net.silentchaos512.scalinghealth.config.DimensionConfig;
+import net.silentchaos512.scalinghealth.config.EvalVars;
 import net.silentchaos512.scalinghealth.lib.MobType;
 import net.silentchaos512.scalinghealth.lib.module.ModuleAprilTricks;
 import net.silentchaos512.scalinghealth.network.ClientLoginMessage;
 import net.silentchaos512.scalinghealth.network.Network;
 import net.silentchaos512.scalinghealth.utils.Difficulty;
+import net.silentchaos512.utils.MathUtils;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -241,19 +249,34 @@ public final class ScalingHealthCommonEvents {
 
     @SubscribeEvent
     public static void onPlayerSleepInBed(PlayerSleepInBedEvent event) {
-        /*
-        if (!event.getEntityPlayer().world.isRemote && Config.Client.Difficulty.warnWhenSleeping && Config.Difficulty.forSleeping != 0f) {
-            ChatHelper.translate(event.getEntityPlayer(), ScalingHealth.i18n.getKey("misc", "sleepWarning"));
+        EntityPlayer player = event.getEntityPlayer();
+        if (!player.world.isRemote && Config.CLIENT.warnWhenSleeping.get()) {
+            DimensionConfig config = Config.get(player);
+            double newDifficulty = EvalVars.apply(config, player, config.difficulty.onPlayerSleep.get());
+
+            if (!MathUtils.doublesEqual(Difficulty.ofEntity(player), newDifficulty)) {
+                // Difficulty would change (doesn't change until onPlayerWakeUp)
+                String configMsg = config.difficulty.sleepWarningMessage.get();
+                ITextComponent text = configMsg.isEmpty()
+                        ? new TextComponentTranslation("misc.scalinghealth.sleepWarning")
+                        : new TextComponentString(configMsg);
+                player.sendMessage(text);
+            }
         }
-        */
     }
 
     @SubscribeEvent
     public static void onPlayerWakeUp(PlayerWakeUpEvent event) {
-        if (!event.getEntityPlayer().world.isRemote && !event.updateWorld()) {
-            EntityPlayer player = event.getEntityPlayer();
-            // TODO: Sleep difficulty change config
-            Difficulty.source(player).addDifficulty(0);
+        EntityPlayer player = event.getEntityPlayer();
+        if (!player.world.isRemote && !event.updateWorld()) {
+            DimensionConfig config = Config.get(player);
+            IDifficultySource source = Difficulty.source(player);
+            double newDifficulty = EvalVars.apply(config, player, config.difficulty.onPlayerSleep.get());
+
+            if (!MathUtils.doublesEqual(source.getDifficulty(), newDifficulty)) {
+                // Update difficulty after sleeping
+                source.setDifficulty((float) newDifficulty);
+            }
 
             // TODO: World difficulty increase?
         }

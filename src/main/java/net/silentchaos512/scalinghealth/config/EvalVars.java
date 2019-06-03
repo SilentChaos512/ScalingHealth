@@ -48,6 +48,10 @@ public enum EvalVars {
         return name;
     }
 
+    public static double apply(DimensionConfig config, EntityPlayer player, Expression expression) {
+        return apply(config, player.world, player.getPosition(), player, expression);
+    }
+
     public static double apply(DimensionConfig config, World world, BlockPos pos, @Nullable EntityPlayer player, Expression expression) {
         Context context = new Context(config, world, pos, player);
         for (EvalVars variable : values()) {
@@ -57,7 +61,7 @@ public enum EvalVars {
         return expression.eval().doubleValue();
     }
 
-    private static class Context {
+    private static final class Context {
         private final DimensionConfig config;
         private final World world;
         private final BlockPos pos;
