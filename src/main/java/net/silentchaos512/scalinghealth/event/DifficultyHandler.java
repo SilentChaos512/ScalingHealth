@@ -440,13 +440,14 @@ public class DifficultyHandler {
         if (entityLiving == null || !entityLiving.world.getGameRules().getBoolean(ScalingHealth.GAME_RULE_DIFFICULTY))
             return false;
 
-        AttributeModifier modifier = entityLiving.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH)
-                .getModifier(ModifierHandler.MODIFIER_ID_HEALTH);
+        short difficulty = entityLiving.getEntityData().getShort(NBT_ENTITY_DIFFICULTY);
+        if (difficulty != 0)
+            return false;
+
+        AttributeModifier modifier = entityLiving.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getModifier(ModifierHandler.MODIFIER_ID_HEALTH);
         // The tickExisted > 1 kinda helps with Lycanites, but checking for a modifier amount of 0 should catch issues with
         // some mobs not receiving health increases.
-        // ScalingHealth.logHelper.debug(modifier != null ? modifier.getAmount() : null);
-        return entityLiving.ticksExisted > 1 && entityLiving.getEntityData().getShort(NBT_ENTITY_DIFFICULTY) < 1
-                && (modifier == null || modifier.getAmount() == 0.0 || Double.isNaN(modifier.getAmount()));
+        return entityLiving.ticksExisted > 1 && (modifier == null || modifier.getAmount() == 0.0 || Double.isNaN(modifier.getAmount()));
     }
 
     private boolean entityBlacklistedFromBecomingBlight(EntityLivingBase entityLiving) {

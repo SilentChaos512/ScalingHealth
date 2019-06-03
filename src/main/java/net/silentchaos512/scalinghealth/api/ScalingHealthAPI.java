@@ -32,7 +32,16 @@ import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 import net.silentchaos512.scalinghealth.utils.StackProducer;
 
-public class ScalingHealthAPI {
+@SuppressWarnings("unused")
+public final class ScalingHealthAPI {
+    private ScalingHealthAPI() {
+        throw new IllegalAccessError("Utility class");
+    }
+
+    public static void spawnWithoutDifficulty(World world, EntityLivingBase entity) {
+        entity.getEntityData().setShort(DifficultyHandler.NBT_ENTITY_DIFFICULTY, (short) -1);
+        world.spawnEntity(entity);
+    }
 
     // **************************************************************************
     // Difficulty
