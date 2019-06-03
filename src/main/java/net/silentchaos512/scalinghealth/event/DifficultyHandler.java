@@ -41,12 +41,14 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.api.event.BlightSpawnEvent;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.network.NetworkHandler;
+import net.silentchaos512.scalinghealth.network.message.MessageDebugData;
 import net.silentchaos512.scalinghealth.network.message.MessageMarkBlight;
 import net.silentchaos512.scalinghealth.utils.EntityDifficultyChangeList.DifficultyChanges;
 import net.silentchaos512.scalinghealth.utils.*;
@@ -69,6 +71,9 @@ public class DifficultyHandler {
             "minecraft:invisibility,25,1",
             "minecraft:resistance,30,1"
     };
+
+    private int debugMobsProcessed;
+    private int serverTicks;
 
     public MobPotionMap potionMap = new MobPotionMap();
 
@@ -123,13 +128,15 @@ public class DifficultyHandler {
 
     @SubscribeEvent
     public void onMobSpawn(LivingUpdateEvent event) {
-        process(event.getEntityLiving());
+        if (process(event.getEntityLiving())) {
+            ++debugMobsProcessed;
+        }
     }
 
     private boolean process(EntityLivingBase entity) {
-        boolean difficultyEnabled = Config.Difficulty.maxValue > 0;
-
         if (!entity.world.isRemote && entity instanceof EntityLiving) {
+            boolean difficultyEnabled = Config.Difficulty.maxValue > 0;
+
             if (difficultyEnabled && canIncreaseEntityHealth(entity) && !entityBlacklistedFromHealthIncrease(entity)) {
                 // Apply difficulty, possibly create a blight
                 boolean makeBlight = increaseEntityHealth(entity);
@@ -174,6 +181,28 @@ public class DifficultyHandler {
                 data.incrementDifficulty(amount, true);
             }
         }
+    }
+
+    @SubscribeEvent
+    public void onServerTick(TickEvent.ServerTickEvent event) {
+        if ((++serverTicks) % 20 == 0) {
+            // Send debug data to clients, if debug mode is enabled on the server
+            if (Config.Debug.debugMode) {
+                NetworkHandler.INSTANCE.sendToAll(new MessageDebugData());
+            }
+        }
+    }
+
+    public static int debugGetMobsProcessed() {
+        return INSTANCE.debugMobsProcessed;
+    }
+
+    public static float debugGetMobsProcessedRate() {
+        return INSTANCE.debugMobsProcessed / (INSTANCE.serverTicks / 20f);
+    }
+
+    public static void debugHandleSyncMessage(MessageDebugData message) {
+        INSTANCE.debugMobsProcessed = message.mobsProcessed;
     }
 
     private boolean increaseEntityHealth(EntityLivingBase entityLiving) {

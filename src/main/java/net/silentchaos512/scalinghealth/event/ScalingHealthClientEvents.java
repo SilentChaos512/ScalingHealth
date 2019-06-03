@@ -61,7 +61,7 @@ public final class ScalingHealthClientEvents {
                 String[] array = line.split("=");
                 if (array.length == 2) {
                     fontRender.drawString(array[0].trim(), 3, y, Color.VALUE_WHITE);
-                    fontRender.drawString(array[1].trim(), 90, y, Color.VALUE_WHITE);
+                    fontRender.drawString(array[1].trim(), 100, y, Color.VALUE_WHITE);
                 } else {
                     fontRender.drawString(line, 3, y, Color.VALUE_WHITE);
                 }
@@ -105,7 +105,12 @@ public final class ScalingHealthClientEvents {
         // Blight count
         int blightCount = world.getEntities(EntityLivingBase.class, BlightHandler::isBlight).size();
         int blightFires = world.getEntities(EntityBlightFire.class, e -> true).size();
-        ret.append(String.format("Blights (Fires) = %d (%d)", blightCount, blightFires));
+        ret.append(String.format("Blights (Fires) = %d (%d)", blightCount, blightFires)).append("\n");
+
+        // Mob process count
+        int mobsProcessed = DifficultyHandler.debugGetMobsProcessed();
+        float mobsProcessedRate = DifficultyHandler.debugGetMobsProcessedRate();
+        ret.append(String.format("Mobs processed = %d (%.1f/s avg)", mobsProcessed, mobsProcessedRate)).append("\n");
 
         return ret.toString();
     }

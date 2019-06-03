@@ -5,6 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Mobs processed counter to debug overlay
+
+## [1.3.36] - 2019-05-23
+### Added
+- Command to recalculate difficulty and blight status on all entities (`sh_recalculate`)
 - (API) Method to check if an entity is a blight
 ### Changed
 - The "all mobs are blights" config will now work even if max difficulty is zero
