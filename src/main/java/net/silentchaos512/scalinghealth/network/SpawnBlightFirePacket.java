@@ -1,14 +1,14 @@
 package net.silentchaos512.scalinghealth.network;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.network.NetworkEvent;
+import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.entity.EntityBlightFire;
 
+import javax.annotation.Nullable;
 import java.util.function.Supplier;
 
 public class SpawnBlightFirePacket {
@@ -31,14 +31,20 @@ public class SpawnBlightFirePacket {
         buffer.writeVarInt(this.parentId);
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static void handle(SpawnBlightFirePacket packet, Supplier<NetworkEvent.Context> context) {
         context.get().enqueueWork(() -> {
-            Entity entity = Minecraft.getInstance().world.getEntityByID(packet.parentId);
+            Entity entity = getTargetEntity(packet.parentId);
             if (entity != null && entity instanceof EntityLivingBase) {
                 entity.world.spawnEntity(new EntityBlightFire((EntityLivingBase) entity));
             }
         });
         context.get().setPacketHandled(true);
+    }
+
+    @Nullable
+    private static Entity getTargetEntity(int entityId) {
+        EntityPlayer clientPlayer = ScalingHealth.PROXY.getClientPlayer();
+        if (clientPlayer == null) return null;
+        return clientPlayer.world.getEntityByID(entityId);
     }
 }

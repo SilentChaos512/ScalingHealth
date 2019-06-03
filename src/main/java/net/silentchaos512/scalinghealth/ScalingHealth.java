@@ -13,17 +13,16 @@ import java.util.Random;
 
 @Mod(ScalingHealth.MOD_ID)
 public class ScalingHealth {
-    public static final String MOD_ID_OLD = "ScalingHealth";
     public static final String MOD_ID = "scalinghealth";
     public static final String MOD_NAME = "Scaling Health";
-    public static final String VERSION = "2.0.3";
+    public static final String VERSION = "2.0.4";
     public static final boolean RUN_GENERATORS = false;
     public static final String RESOURCE_PREFIX = MOD_ID + ":";
 
     public static final Random random = new Random();
 
     private static ScalingHealth INSTANCE;
-    private static SideProxy PROXY;
+    public static SideProxy PROXY;
 
     public static final Logger LOGGER = LogManager.getLogger(MOD_NAME);
 

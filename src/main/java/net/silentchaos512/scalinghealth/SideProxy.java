@@ -1,5 +1,7 @@
 package net.silentchaos512.scalinghealth;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.event.lifecycle.*;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
@@ -21,7 +23,9 @@ import net.silentchaos512.scalinghealth.network.Network;
 import net.silentchaos512.scalinghealth.utils.gen.GenModels;
 import net.silentchaos512.scalinghealth.utils.gen.GenRecipes;
 
-class SideProxy {
+import javax.annotation.Nullable;
+
+public class SideProxy {
     SideProxy() {
         Config.init();
         Network.init();
@@ -67,6 +71,11 @@ class SideProxy {
         ModGameRules.registerAll(event.getServer());
     }
 
+    @Nullable
+    public EntityPlayer getClientPlayer() {
+        return null;
+    }
+
     static class Client extends SideProxy {
         Client() {
             FMLJavaModLoadingContext.get().getModEventBus().addListener(Client::clientSetup);
@@ -88,6 +97,12 @@ class SideProxy {
             // Not sure where this is supposed to go. Seems particle manager is created right
             // before IMC enqueue/process
             ModParticles.registerAll();
+        }
+
+        @Nullable
+        @Override
+        public EntityPlayer getClientPlayer() {
+            return Minecraft.getInstance().player;
         }
     }
 
