@@ -1,0 +1,77 @@
+itemGroup.scalinghealth=Scaling Health
+
+##########
+# Blocks #
+##########
+
+tile.scalinghealth.crystalore.name=Cuore di Cristallo Grezzo
+
+
+
+#########
+# Items #
+#########
+
+item.scalinghealth.crystalshard.name=Scheggia di Cuore di Cristallo
+item.scalinghealth.enchanted_heart.name=Cuore Incantato
+item.scalinghealth.cursed_heart.name=Cuore Maledetto
+item.scalinghealth.difficultychanger.effectDesc=Difficoltà %s
+item.scalinghealth.heartcontainer.name=Contieni-Cuore
+item.scalinghealth.heartcontainer.desc=Aumenta la Vita Massima
+item.scalinghealth.heartcontainer.notEnoughXP=Hai bisogno di %d livelli di Esperienza per usarlo
+item.scalinghealth.heartdust.name=Polvere di Cuore
+item.scalinghealth.bandage.name=Bende
+item.scalinghealth.medkit.name=Medikit
+item.scalinghealth.healingitem.healingValue=Fa recuperare il %d%% della tua vita in %d secondi.
+item.scalinghealth.healingitem.howToUse=Usa per %d secondi per applicare.
+
+
+###########
+# Potions #
+###########
+
+effect.scalinghealth.bandaged=Fasciato
+
+
+
+###########
+# Blights #
+###########
+
+blight.scalinghealth.name=%s Blight
+blight.scalinghealth.killedByPlayer=%s Blight è stato ucciso da %s!
+
+
+
+############
+# Commands #
+############
+
+command.scalinghealth.outOfBounds=Il valore deve essere tra %s e %s.
+command.scalinghealth.recalculate.result=Difficoltà e Statistiche ricalcolate per %d entità, controlla i log per maggiori dettagli
+command.scalinghealth.showDifficulty=Difficoltà di %s: %s / %s
+command.scalinghealth.setDifficulty=Impostata la difficoltà del giocatore %s a %s.
+command.scalinghealth.showHealth=Vita di %s: %s / %s (%s)
+command.scalinghealth.setHealth=Imposta la vita del giocatore %s a %d.
+command.scalinghealth.showWorldDifficulty=Difficoltà del mondo: %s / %s
+command.scalinghealth.setWorldDifficulty=Imposta la difficoltà del mondo a %s.
+
+
+
+########
+# Misc #
+########
+
+misc.scalinghealth.sleepWarning=[Scaling Health] ATTENZIONE: Dormire modificherà la difficoltà!
+misc.scalinghealth.difficultyMeterText=DIFFICOLTA'
+
+
+
+# Sound effect subtitles
+
+scalinghealth.subtitle.cursed_heart_use=Utilizzato Cuore Maledetto
+scalinghealth.subtitle.enchanted_heart_use=Utilizzato Cuore Incantato
+scalinghealth.subtitle.heart_container_use=Utilizzato Contieni-Cuore
+
+# April Fool's sounds
+scalinghealth.subtitle.player_died=Qualcuno è morto (LOL)
