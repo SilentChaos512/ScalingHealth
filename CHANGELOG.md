@@ -4,8 +4,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+Update zh_cn translation (XuyuEre)
 ### Added
+- Config for fixed blight chance. When enabled, blight spawn chances will be a fixed rate, instead of scaling with difficulty. Works even if difficulty is disabled.
 - Mobs processed counter to debug overlay
+- Mods can now spawn difficulty-exempt mobs by setting the `scalinghealth:difficulty` NBT short tag to -1 [#176]
+- (API) Method to spawn difficulty-exempt mobs, which does the same as the above item
 
 ## [1.3.36] - 2019-05-23
 ### Added

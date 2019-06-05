@@ -366,6 +366,11 @@ public class Config extends ConfigBaseNew {
                     + "\"blightChanceMulti * currentDifficulty / maxDifficulty\". Setting to 0 will disable blights." +
                     " Setting to 1 will guarantee blights at max difficulty.")
             public static float chanceMultiplier;
+            @ConfigOption(name = "Fixed Chance", category = CAT_MOB_BLIGHT)
+            @ConfigOption.BooleanDefault(false)
+            @ConfigOption.Comment("If true, blights will have a fixed chance of spawning, regardless of difficulty." +
+                    " Set the chance in \"Blight Chance Multiplier\".")
+            public static boolean fixedBlightChance;
             @ConfigOption(name = "Blight Difficulty Multiplier", category = CAT_MOB_BLIGHT)
             @ConfigOption.RangeFloat(value = 3, min = 1)
             @ConfigOption.Comment("When an entity spawns as a blight, their calculated difficulty is multiplied by" +

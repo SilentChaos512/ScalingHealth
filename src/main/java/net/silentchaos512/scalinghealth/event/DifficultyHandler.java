@@ -44,6 +44,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
+import net.silentchaos512.lib.util.AttributeHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.api.event.BlightSpawnEvent;
 import net.silentchaos512.scalinghealth.config.Config;
@@ -54,6 +55,7 @@ import net.silentchaos512.scalinghealth.utils.EntityDifficultyChangeList.Difficu
 import net.silentchaos512.scalinghealth.utils.*;
 import net.silentchaos512.scalinghealth.utils.SHPlayerDataHandler.PlayerData;
 import net.silentchaos512.scalinghealth.world.ScalingHealthSavedData;
+import net.silentchaos512.utils.MathUtils;
 
 import java.util.List;
 import java.util.Random;
@@ -134,7 +136,7 @@ public class DifficultyHandler {
     }
 
     private boolean process(EntityLivingBase entity) {
-        if (!entity.world.isRemote && entity instanceof EntityLiving) {
+        if (!entity.world.isRemote && !isProcessed(entity) && entity instanceof EntityLiving) {
             boolean difficultyEnabled = Config.Difficulty.maxValue > 0;
 
             if (difficultyEnabled && canIncreaseEntityHealth(entity) && !entityBlacklistedFromHealthIncrease(entity)) {
@@ -144,9 +146,19 @@ public class DifficultyHandler {
                     makeEntityBlight((EntityLiving) entity, ScalingHealth.random);
                 }
                 return true;
-            } else if (!difficultyEnabled && Config.Mob.Blight.blightAlways && !entityBlacklistedFromBecomingBlight(entity)) {
-                // Difficulty system is "disabled", but we want all entities to be blights anyway
-                makeEntityBlight((EntityLiving) entity, ScalingHealth.random);
+            } else if (!difficultyEnabled && !entityBlacklistedFromBecomingBlight(entity)) {
+                // Difficulty system is "disabled", but we may want entities to be blights anyway
+                if (isAlwaysBlight(entity)) {
+                    // Always make blights
+                    makeEntityBlight((EntityLiving) entity, ScalingHealth.random);
+                } else if (Config.Mob.Blight.fixedBlightChance && MathUtils.tryPercentage(Config.Mob.Blight.chanceMultiplier)) {
+                    // Fixed rate
+                    makeEntityBlight((EntityLiving) entity, ScalingHealth.random);
+                }
+
+                // Set difficulty to -1 to prevent infinite reprocessing
+                entity.getEntityData().setShort(NBT_ENTITY_DIFFICULTY, (short) -1);
+
                 return true;
             }
         }
@@ -159,6 +171,14 @@ public class DifficultyHandler {
         AttributeHelper.remove(entity, SharedMonsterAttributes.MAX_HEALTH, ModifierHandler.MODIFIER_ID_HEALTH);
         entity.getEntityData().setShort(NBT_ENTITY_DIFFICULTY, (short) 0);
         return process(entity);
+    }
+
+    private static boolean isProcessed(EntityLivingBase entity) {
+        return entity.getEntityData().getShort(NBT_ENTITY_DIFFICULTY) != 0;
+    }
+
+    private static boolean isAlwaysBlight(EntityLivingBase entity) {
+        return Config.Mob.Blight.blightAlways && Config.Mob.Blight.blightAllList.matches(entity);
     }
 
     @SubscribeEvent
@@ -213,7 +233,6 @@ public class DifficultyHandler {
         float originalDifficulty = difficulty;
         float originalMaxHealth = entityLiving.getMaxHealth();
         Random rand = ScalingHealth.random;
-        boolean makeBlight = false;
         boolean isHostile = entityLiving instanceof IMob;
 
         // Lunar phase multipliers?
@@ -224,9 +243,12 @@ public class DifficultyHandler {
         }
 
         // Make blight?
+        boolean makeBlight = false;
         if (!entityBlacklistedFromBecomingBlight(entityLiving)) {
-            float chance = difficulty / Config.Difficulty.maxValue * Config.Mob.Blight.chanceMultiplier;
-            if ((Config.Mob.Blight.blightAlways && Config.Mob.Blight.blightAllList.matches(entityLiving)) || rand.nextFloat() < chance) {
+            float chance = Config.Mob.Blight.fixedBlightChance
+                    ? Config.Mob.Blight.chanceMultiplier
+                    : difficulty / Config.Difficulty.maxValue * Config.Mob.Blight.chanceMultiplier;
+            if (isAlwaysBlight(entityLiving) || rand.nextFloat() < chance) {
                 makeBlight = true;
                 difficulty *= Config.Mob.Blight.difficultyMultiplier;
             }
@@ -237,7 +259,6 @@ public class DifficultyHandler {
         float totalDifficulty = difficulty;
 
         float genAddedHealth = difficulty;
-        float genAddedDamage = 0;
         float baseMaxHealth = (float) entityLiving
                 .getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue();
         float healthMultiplier = isHostile ? Config.Mob.Health.hostileHealthMultiplier
@@ -254,6 +275,7 @@ public class DifficultyHandler {
         }
 
         // Increase attack damage.
+        float genAddedDamage = 0;
         if (difficulty > 0) {
             float diffIncrease = difficulty * rand.nextFloat();
             genAddedDamage = diffIncrease * Config.Mob.damageMultiplier;
@@ -416,7 +438,7 @@ public class DifficultyHandler {
                 (float) entityLiving.posX, (float) entityLiving.posY, (float) entityLiving.posZ));
     }
 
-    private boolean entityBlacklistedFromHealthIncrease(EntityLivingBase entityLiving) {
+    private static boolean entityBlacklistedFromHealthIncrease(EntityLivingBase entityLiving) {
         if (entityLiving == null) return true;
 
         boolean isBoss = !entityLiving.isNonBoss();
@@ -436,21 +458,17 @@ public class DifficultyHandler {
         return blacklist.contains(entityLiving) || dimBlacklist.contains(entityLiving.dimension);
     }
 
-    private boolean canIncreaseEntityHealth(EntityLivingBase entityLiving) {
-        if (entityLiving == null || !entityLiving.world.getGameRules().getBoolean(ScalingHealth.GAME_RULE_DIFFICULTY))
+    private static boolean canIncreaseEntityHealth(EntityLivingBase entity) {
+        if (entity == null || isProcessed(entity) || !entity.world.getGameRules().getBoolean(ScalingHealth.GAME_RULE_DIFFICULTY))
             return false;
 
-        short difficulty = entityLiving.getEntityData().getShort(NBT_ENTITY_DIFFICULTY);
-        if (difficulty != 0)
-            return false;
-
-        AttributeModifier modifier = entityLiving.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getModifier(ModifierHandler.MODIFIER_ID_HEALTH);
+        AttributeModifier modifier = entity.getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getModifier(ModifierHandler.MODIFIER_ID_HEALTH);
         // The tickExisted > 1 kinda helps with Lycanites, but checking for a modifier amount of 0 should catch issues with
         // some mobs not receiving health increases.
-        return entityLiving.ticksExisted > 1 && (modifier == null || modifier.getAmount() == 0.0 || Double.isNaN(modifier.getAmount()));
+        return entity.ticksExisted > 1 && (modifier == null || modifier.getAmount() == 0.0 || Double.isNaN(modifier.getAmount()));
     }
 
-    private boolean entityBlacklistedFromBecomingBlight(EntityLivingBase entityLiving) {
+    private static boolean entityBlacklistedFromBecomingBlight(EntityLivingBase entityLiving) {
         if (entityLiving == null || BlightHandler.isBlight(entityLiving)) {
             return true;
         }
