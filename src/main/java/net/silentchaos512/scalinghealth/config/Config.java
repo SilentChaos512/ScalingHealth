@@ -312,6 +312,7 @@ public class Config extends ConfigBaseNew {
         @ConfigOption.Comment("Additional XP (as percentage) per point of difficulty. For example, if this is 0.01, a"
                 + " mob will drop 2x (+1.0x) XP at 100 difficulty and 3x (+2.0x) at 200")
         public static float xpBoost;
+        public static EntityMatchList damageBonusBlacklist = new EntityMatchList();
 
         public static final class Health {
             @ConfigOption(name = "Allow Boss Extra Health", category = CAT_MOB_HEALTH)
@@ -696,6 +697,12 @@ public class Config extends ConfigBaseNew {
             DamageScaling.INSTANCE.loadConfig(config);
 
             // Mobs
+            Mob.damageBonusBlacklist.clear();
+            for (String str : config.getStringList("Damage Bonus Blacklist", CAT_MOB,
+                    new String[0],
+                    "Mobs listed here will not receive extra attack damage, but can still get extra health or become blights")) {
+                Mob.damageBonusBlacklist.add(str);
+            }
             // Health
             Mob.Health.healthScalingMode = EnumHealthModMode.loadFromConfig(config, Mob.Health.healthScalingMode);
             String[] dimList = config.getStringList("Dimension Blacklist", CAT_MOB_HEALTH, new String[0],

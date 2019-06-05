@@ -276,7 +276,7 @@ public class DifficultyHandler {
 
         // Increase attack damage.
         float genAddedDamage = 0;
-        if (difficulty > 0) {
+        if (difficulty > 0 && !Config.Mob.damageBonusBlacklist.contains(entityLiving)) {
             float diffIncrease = difficulty * rand.nextFloat();
             genAddedDamage = diffIncrease * Config.Mob.damageMultiplier;
             // Clamp the value so it doesn't go over the maximum config.
