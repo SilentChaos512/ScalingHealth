@@ -155,8 +155,8 @@ public class DifficultyHandler {
     }
 
     public boolean recalculate(EntityLivingBase entity) {
-        entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.MAX_HEALTH).removeModifier(ModifierHandler.MODIFIER_ID_DAMAGE);
-        entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.MAX_HEALTH).removeModifier(ModifierHandler.MODIFIER_ID_HEALTH);
+        AttributeHelper.remove(entity, SharedMonsterAttributes.ATTACK_DAMAGE, ModifierHandler.MODIFIER_ID_DAMAGE);
+        AttributeHelper.remove(entity, SharedMonsterAttributes.MAX_HEALTH, ModifierHandler.MODIFIER_ID_HEALTH);
         entity.getEntityData().setShort(NBT_ENTITY_DIFFICULTY, (short) 0);
         return process(entity);
     }
