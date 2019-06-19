@@ -3,7 +3,12 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.3.38] - 2019-06-19
+### Added
+- Config to disable WIT compatibility [#178]
+- Copied needed WIT API classes into this mod, which should prevent crashes if another mod uses the "wit" mod ID. Disable the config if needed. [#178]
+
+## [1.3.37] - 2019-06-05
 Update zh_cn translation (XuyuEre)
 ### Added
 - Config for fixed blight chance. When enabled, blight spawn chances will be a fixed rate, instead of scaling with difficulty. Works even if difficulty is disabled.

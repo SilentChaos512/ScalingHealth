@@ -29,10 +29,12 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.silentchaos512.lib.registry.SRegistry;
 import net.silentchaos512.lib.util.Color;
+import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.client.DifficultyDisplayHandler;
 import net.silentchaos512.scalinghealth.client.HeartDisplayHandler;
 import net.silentchaos512.scalinghealth.client.key.KeyTrackerSH;
 import net.silentchaos512.scalinghealth.client.render.particle.ParticleSH;
+import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.event.WitEventHandler;
 import net.silentchaos512.scalinghealth.init.ModEntities;
 import net.silentchaos512.scalinghealth.lib.EnumModParticles;
@@ -47,8 +49,10 @@ public class ScalingHealthClientProxy extends ScalingHealthCommonProxy {
         MinecraftForge.EVENT_BUS.register(DifficultyDisplayHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(KeyTrackerSH.INSTANCE);
 
-        if (Loader.isModLoaded("wit"))
+        if (Loader.isModLoaded("wit") && Config.Client.enableWitSupport) {
+            ScalingHealth.LOGGER.info("Registering WIT event handler (can be disabled in the config)");
             MinecraftForge.EVENT_BUS.register(new WitEventHandler());
+        }
 
         registry.clientPreInit(event);
 

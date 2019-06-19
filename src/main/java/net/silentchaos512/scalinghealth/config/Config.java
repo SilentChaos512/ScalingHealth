@@ -78,6 +78,12 @@ public class Config extends ConfigBaseNew {
 
     // TODO: 1.13 - Split client category into client.hearts and client.difficulty
     public static final class Client {
+        @ConfigOption(name = "Enable WIT Support", category = CAT_CLIENT_WIT)
+        @ConfigOption.Comment("If true, additional information on entities will be added to WIT. Disable this if" +
+                " another mod is using the \"wit\" mod ID and causing the game to crash as a result.")
+        @ConfigOption.BooleanDefault(true)
+        public static boolean enableWitSupport;
+
         public static final class Hearts {
             @ConfigOption(name = "Custom Heart Rendering", category = CAT_CLIENT)
             @ConfigOption.BooleanDefault(true)
@@ -604,6 +610,7 @@ public class Config extends ConfigBaseNew {
     public static final String CAT_MAIN = "main";
     public static final String CAT_DEBUG = CAT_MAIN + split + "debug";
     public static final String CAT_CLIENT = CAT_MAIN + split + "client";
+    public static final String CAT_CLIENT_WIT = CAT_CLIENT + split + "wit";
     public static final String CAT_PLAYER = CAT_MAIN + split + "player";
     public static final String CAT_FAKE_PLAYER = CAT_MAIN + split + "fake_players";
     public static final String CAT_PLAYER_DAMAGE = CAT_PLAYER + split + "damage";
@@ -650,6 +657,8 @@ public class Config extends ConfigBaseNew {
     public void load() {
         try {
             super.load();
+
+            config.setCategoryRequiresMcRestart(CAT_CLIENT_WIT, true);
 
             ConfigMultiValueLineParser parser;
 
