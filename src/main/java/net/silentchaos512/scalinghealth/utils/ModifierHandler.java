@@ -18,7 +18,7 @@
 
 package net.silentchaos512.scalinghealth.utils;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttribute;
@@ -35,7 +35,7 @@ public final class ModifierHandler {
 
     private ModifierHandler() {throw new IllegalAccessError("Utility class");}
 
-    public static void setModifier(EntityLivingBase entity, IAttribute attribute, UUID uuid, String name, double amount, int op) {
+    public static void setModifier(LivingEntity entity, IAttribute attribute, UUID uuid, String name, double amount, AttributeModifier.Operation op) {
         IAttributeInstance instance = entity.getAttribute(attribute);
         //noinspection ConstantConditions -- instance CAN be null!
         if (instance == null) return;
@@ -44,7 +44,7 @@ public final class ModifierHandler {
         instance.applyModifier(new AttributeModifier(uuid, name, amount, op));
     }
 
-    public static void addMaxHealth(EntityLivingBase entity, double amount, int op) {
+    public static void addMaxHealth(LivingEntity entity, double amount, AttributeModifier.Operation op) {
         double oldMax = entity.getMaxHealth();
         setModifier(entity, SharedMonsterAttributes.MAX_HEALTH, MODIFIER_ID_HEALTH, MODIFIER_NAME_HEALTH, amount, op);
         double newMax = entity.getMaxHealth();
@@ -57,7 +57,7 @@ public final class ModifierHandler {
         }
     }
 
-    public static void addAttackDamage(EntityLivingBase entity, double amount, int op) {
+    public static void addAttackDamage(LivingEntity entity, double amount, AttributeModifier.Operation op) {
         setModifier(entity, SharedMonsterAttributes.ATTACK_DAMAGE, MODIFIER_ID_DAMAGE, MODIFIER_NAME_DAMAGE, amount, op);
     }
 }

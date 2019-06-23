@@ -18,8 +18,8 @@
 
 package net.silentchaos512.scalinghealth.init;
 
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.util.IItemProvider;
 import net.minecraft.util.ResourceLocation;
@@ -63,7 +63,7 @@ public enum ModItems implements IItemProvider {
         return name().toLowerCase(Locale.ROOT);
     }
 
-    static final Collection<ItemBlock> blocksToRegister = new ArrayList<>();
+    static final Collection<BlockItem> blocksToRegister = new ArrayList<>();
 
     public static void registerAll(RegistryEvent.Register<Item> event) {
         // Workaround for Forge event bus bug

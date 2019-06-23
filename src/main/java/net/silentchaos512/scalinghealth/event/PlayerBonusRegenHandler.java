@@ -18,8 +18,8 @@
 
 package net.silentchaos512.scalinghealth.event;
 
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
@@ -39,7 +39,7 @@ public final class PlayerBonusRegenHandler {
 
     private PlayerBonusRegenHandler() {}
 
-    public static int getTimerForPlayer(EntityPlayer player) {
+    public static int getTimerForPlayer(PlayerEntity player) {
         if (player == null) return -1;
 
         UUID uuid = player.getUniqueID();
@@ -50,7 +50,7 @@ public final class PlayerBonusRegenHandler {
     public static void onPlayerTick(PlayerTickEvent event) {
         if (event.side == LogicalSide.CLIENT) return;
 
-        EntityPlayer player = event.player;
+        PlayerEntity player = event.player;
         RegenConfig config = Config.get(player).player.regen;
 
         UUID uuid = player.getUniqueID();
@@ -74,8 +74,8 @@ public final class PlayerBonusRegenHandler {
 
     @SubscribeEvent
     public static void onPlayerHurt(LivingHurtEvent event) {
-        EntityLivingBase entity = event.getEntityLiving();
-        if (!entity.world.isRemote && entity instanceof EntityPlayer) {
+        LivingEntity entity = event.getEntityLiving();
+        if (!entity.world.isRemote && entity instanceof PlayerEntity) {
             RegenConfig config = Config.get(entity).player.regen;
             TIMERS.put(entity.getUniqueID(), config.getInitialDelay());
         }

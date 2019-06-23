@@ -5,7 +5,6 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleType;
-import net.minecraft.util.ResourceLocation;
 
 public class ModParticleType extends ParticleType<ModParticleType> implements IParticleData {
     private static final IParticleData.IDeserializer<ModParticleType> DESERIALIZER = new IDeserializer<ModParticleType>() {
@@ -20,8 +19,8 @@ public class ModParticleType extends ParticleType<ModParticleType> implements IP
         }
     };
 
-    ModParticleType(ResourceLocation resourceLocationIn, boolean alwaysRender) {
-        super(resourceLocationIn, alwaysRender, DESERIALIZER);
+    ModParticleType(boolean alwaysRender) {
+        super(alwaysRender, DESERIALIZER);
     }
 
     @Override
@@ -34,6 +33,6 @@ public class ModParticleType extends ParticleType<ModParticleType> implements IP
 
     @Override
     public String getParameters() {
-        return this.getId().toString();
+        return "";
     }
 }

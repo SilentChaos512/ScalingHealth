@@ -18,27 +18,29 @@
 
 package net.silentchaos512.scalinghealth.lib;
 
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+
 public enum MobHealthMode {
-    ADD(0) {
+    ADD(AttributeModifier.Operation.ADDITION) {
         @Override
         public double getModifierValue(double baseHealthBoost, double baseMaxHealth) {
             return baseHealthBoost;
         }
     },
-    MULTI(1) {
+    MULTI(AttributeModifier.Operation.MULTIPLY_BASE) {
         @Override
         public double getModifierValue(double baseHealthBoost, double baseMaxHealth) {
             return baseHealthBoost / 20.0;
         }
     },
-    MULTI_HALF(1) {
+    MULTI_HALF(AttributeModifier.Operation.MULTIPLY_BASE) {
         @Override
         public double getModifierValue(double baseHealthBoost, double baseMaxHealth) {
             double healthScaleDiff = Math.max(0, baseMaxHealth - 20f);
             return baseHealthBoost / (20.0 + healthScaleDiff * 0.5);
         }
     },
-    MULTI_QUARTER(1) {
+    MULTI_QUARTER(AttributeModifier.Operation.MULTIPLY_BASE) {
         @Override
         public double getModifierValue(double baseHealthBoost, double baseMaxHealth) {
             double healthScaleDiff = Math.max(0, baseMaxHealth - 20f);
@@ -46,15 +48,15 @@ public enum MobHealthMode {
         }
     };
 
-    public final int operator;
+    public final AttributeModifier.Operation operator;
 
-    MobHealthMode(int operator) {
+    MobHealthMode(AttributeModifier.Operation operator) {
         this.operator = operator;
     }
 
     public abstract double getModifierValue(double baseHealthBoost, double baseMaxHealth);
 
-    public int getOperator() {
+    public AttributeModifier.Operation getOperator() {
         return operator;
     }
 }

@@ -19,10 +19,11 @@
 package net.silentchaos512.scalinghealth.entity;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.IPacket;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.play.server.SSpawnObjectPacket;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -30,16 +31,16 @@ import net.silentchaos512.scalinghealth.init.ModEntities;
 
 import javax.annotation.Nullable;
 
-public class EntityBlightFire extends Entity implements IEntityAdditionalSpawnData {
+public class BlightFireEntity extends Entity implements IEntityAdditionalSpawnData {
     private static final String NBT_PARENT = "ParentBlight";
 
-    private EntityLivingBase parent;
+    private MobEntity parent;
 
-    public EntityBlightFire(World worldIn) {
-        super(ModEntities.BLIGHT_FIRE.get(), worldIn);
+    public BlightFireEntity(World worldIn) {
+        super(ModEntities.BLIGHT_FIRE.type(), worldIn);
     }
 
-    public EntityBlightFire(EntityLivingBase parent) {
+    public BlightFireEntity(MobEntity parent) {
         this(parent.world);
         this.parent = parent;
     }
@@ -58,16 +59,10 @@ public class EntityBlightFire extends Entity implements IEntityAdditionalSpawnDa
             return;
         }
 
-        // Occasionally players get a blight fire... what?
-        if (parent instanceof EntityPlayer) {
-            ScalingHealth.LOGGER.warn("Removed blight fire from player (wat?)");
-            remove();
-        }
-
         // Update position manually in case fire is not riding the blight.
         if (parent != null) {
             this.posX = parent.posX;
-            this.posY = parent.posY + parent.height / 1.5;
+            this.posY = parent.posY + parent.getHeight() / 1.5;
             this.posZ = parent.posZ;
         }
     }
@@ -78,24 +73,29 @@ public class EntityBlightFire extends Entity implements IEntityAdditionalSpawnDa
     }
 
     @Override
-    protected void readAdditional(NBTTagCompound compound) {
+    protected void readAdditional(CompoundNBT compound) {
         if (compound.contains(NBT_PARENT)) {
             int id = compound.getInt(NBT_PARENT);
             Entity entity = world.getEntityByID(id);
-            if (entity instanceof EntityLivingBase)
-                parent = (EntityLivingBase) entity;
+            if (entity instanceof MobEntity)
+                parent = (MobEntity) entity;
         }
     }
 
     @Override
-    protected void writeAdditional(NBTTagCompound compound) {
+    protected void writeAdditional(CompoundNBT compound) {
         if (parent != null) {
             compound.putInt(NBT_PARENT, parent.getEntityId());
         }
     }
 
+    @Override
+    public IPacket<?> createSpawnPacket() {
+        return new SSpawnObjectPacket(this);
+    }
+
     @Nullable
-    public EntityLivingBase getParent() {
+    public MobEntity getParent() {
         return parent;
     }
 
@@ -109,8 +109,8 @@ public class EntityBlightFire extends Entity implements IEntityAdditionalSpawnDa
         int id = additionalData.readInt();
         if (id != -1) {
             Entity entity = world.getEntityByID(id);
-            if (entity instanceof EntityLivingBase)
-                parent = (EntityLivingBase) entity;
+            if (entity instanceof MobEntity)
+                parent = (MobEntity) entity;
         }
     }
 }

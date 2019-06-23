@@ -1,13 +1,12 @@
 package net.silentchaos512.scalinghealth.event;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.INBTBase;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.INBT;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityDispatcher;
-import net.minecraftforge.common.capabilities.CapabilityProvider;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -24,7 +23,6 @@ import net.silentchaos512.scalinghealth.utils.Players;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
-import java.lang.reflect.Field;
 import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID)
@@ -65,18 +63,21 @@ public final class DifficultyEvents {
 
     @SubscribeEvent
     public static void onLivingUpdate(LivingEvent.LivingUpdateEvent event) {
-        EntityLivingBase entity = event.getEntityLiving();
+        LivingEntity entity = event.getEntityLiving();
         if (entity.world.isRemote) return;
 
         // Tick mobs, which will calculate difficulty when appropriate and apply changes
-        entity.getCapability(CapabilityDifficultyAffected.INSTANCE).ifPresent(affected -> affected.tick(entity));
+        if (entity instanceof MobEntity) {
+            entity.getCapability(CapabilityDifficultyAffected.INSTANCE).ifPresent(affected -> {
+                affected.tick((MobEntity) entity);
+            });
+        }
 
         // Tick difficulty source, such as players
         if (entity.world.getGameTime() % 20 == 0) {
             entity.getCapability(CapabilityDifficultySource.INSTANCE).ifPresent(source -> {
                 float change = (float) Difficulty.changePerSecond(entity.world);
                 source.setDifficulty(source.getDifficulty() + change);
-//                debug(() -> String.format("Source %s difficulty is now %.5f", entity, source.getDifficulty()));
             });
         }
     }
@@ -91,14 +92,13 @@ public final class DifficultyEvents {
             world.getCapability(CapabilityDifficultySource.INSTANCE).ifPresent(source -> {
                 float change = (float) Difficulty.changePerSecond(world);
                 source.setDifficulty(source.getDifficulty() + change);
-//                debug(() -> String.format("World %s difficulty is now %.5f", world, source.getDifficulty()));
             });
         }
     }
 
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        EntityPlayer player = event.player;
+        PlayerEntity player = event.player;
         if (player.world.isRemote) return;
         player.getCapability(CapabilityPlayerData.INSTANCE).ifPresent(data -> data.tick(player));
     }
@@ -109,8 +109,8 @@ public final class DifficultyEvents {
         if (!event.isWasDeath()) return;
 
         // Player died. Copy capabilities and apply health/difficulty changes.
-        EntityPlayer original = event.getOriginal();
-        EntityPlayer clone = event.getEntityPlayer();
+        PlayerEntity original = event.getOriginal();
+        PlayerEntity clone = event.getEntityPlayer();
         debug(() -> "onPlayerClone");
         copyCapability(CapabilityPlayerData.INSTANCE, original, clone);
         copyCapability(CapabilityDifficultySource.INSTANCE, original, clone);
@@ -128,7 +128,7 @@ public final class DifficultyEvents {
         });
     }
 
-    private static void notifyOfChanges(EntityPlayer player, String valueName, float oldValue, float newValue) {
+    private static void notifyOfChanges(PlayerEntity player, String valueName, float oldValue, float newValue) {
         // TODO: Could also notify player in chat?
 //        if (MathUtils.doublesEqual(oldValue, newValue)) return;
         float diff = newValue - oldValue;
@@ -138,26 +138,25 @@ public final class DifficultyEvents {
 
     private static <T> void copyCapability(Capability<T> capability, ICapabilityProvider original, ICapabilityProvider clone) {
         // Temporary hack to work around Forge bug
-        try {
+/*        try {
             Field field = CapabilityProvider.class.getDeclaredField("capabilities");
             field.setAccessible(true);
             CapabilityDispatcher caps = (CapabilityDispatcher) field.get(original);
             caps.getCapability(capability).ifPresent(t -> {
                 T tClone = clone.getCapability(capability).orElseThrow(IllegalStateException::new);
-                INBTBase nbt = capability.getStorage().writeNBT(capability, t, null);
+                INBT nbt = capability.getStorage().writeNBT(capability, t, null);
                 capability.getStorage().readNBT(capability, tClone, null, nbt);
             });
         } catch (NoSuchFieldException | IllegalAccessException e) {
             e.printStackTrace();
-        }
+        }*/
 
-        // FIXME: Does not work because caps are invalidated
-//        original.getCapability(capability).ifPresent(dataOriginal -> {
-//            clone.getCapability(capability).ifPresent(dataClone -> {
-//                INBTBase nbt = capability.getStorage().writeNBT(capability, dataOriginal, null);
-//                capability.getStorage().readNBT(capability, dataClone, null, nbt);
-//            });
-//        });
+        original.getCapability(capability).ifPresent(dataOriginal -> {
+            clone.getCapability(capability).ifPresent(dataClone -> {
+                INBT nbt = capability.getStorage().writeNBT(capability, dataOriginal, null);
+                capability.getStorage().readNBT(capability, dataClone, null, nbt);
+            });
+        });
     }
 
     private static void debug(Supplier<?> msg) {

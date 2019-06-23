@@ -1,8 +1,15 @@
 package net.silentchaos512.scalinghealth;
 
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.particles.ParticleType;
+import net.minecraft.potion.Effect;
+import net.minecraft.util.SoundEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.event.lifecycle.*;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
@@ -20,8 +27,7 @@ import net.silentchaos512.scalinghealth.event.DamageScaling;
 import net.silentchaos512.scalinghealth.event.PetEventHandler;
 import net.silentchaos512.scalinghealth.init.*;
 import net.silentchaos512.scalinghealth.network.Network;
-import net.silentchaos512.scalinghealth.utils.gen.GenModels;
-import net.silentchaos512.scalinghealth.utils.gen.GenRecipes;
+import net.silentchaos512.scalinghealth.world.SHWorldFeatures;
 
 import javax.annotation.Nullable;
 
@@ -37,11 +43,12 @@ public class SideProxy {
         MinecraftForge.EVENT_BUS.addListener(this::serverAboutToStart);
         MinecraftForge.EVENT_BUS.addListener(this::serverStarted);
 
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(ModBlocks::registerAll);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(ModEntities::registerAll);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(ModItems::registerAll);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(ModPotions::registerAll);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(ModSounds::registerAll);
+        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Block.class, ModBlocks::registerAll);
+        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(EntityType.class, ModEntities::registerAll);
+        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Item.class, ModItems::registerAll);
+        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(ParticleType.class, ModParticles::registerAll);
+        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Effect.class, ModPotions::registerAll);
+        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(SoundEvent.class, ModSounds::registerAll);
 //        FMLModLoadingContext.get().getModEventBus().addListener(ModTileEntities::registerAll);
 
         MinecraftForge.EVENT_BUS.register(PetEventHandler.INSTANCE);
@@ -52,27 +59,24 @@ public class SideProxy {
         CapabilityDifficultyAffected.register();
         CapabilityDifficultySource.register();
         CapabilityPlayerData.register();
+        ModGameRules.registerDefinitions();
+        DeferredWorkQueue.runLater(SHWorldFeatures::addFeaturesToBiomes);
     }
 
-    void imcEnqueue(InterModEnqueueEvent event) {}
+    private void imcEnqueue(InterModEnqueueEvent event) {}
 
-    private void imcProcess(InterModProcessEvent event) {
-        if (ScalingHealth.RUN_GENERATORS && ScalingHealth.isDevBuild()) {
-            GenModels.generate();
-            GenRecipes.generate();
-        }
-    }
+    private void imcProcess(InterModProcessEvent event) {}
 
     private void serverAboutToStart(FMLServerAboutToStartEvent event) {
         ModCommands.registerAll(event.getServer().getCommandManager().getDispatcher());
     }
 
     private void serverStarted(FMLServerStartedEvent event) {
-        ModGameRules.registerAll(event.getServer());
+        ModGameRules.setRules(event.getServer());
     }
 
     @Nullable
-    public EntityPlayer getClientPlayer() {
+    public PlayerEntity getClientPlayer() {
         return null;
     }
 
@@ -91,17 +95,9 @@ public class SideProxy {
             ModEntities.registerRenderers(event);
         }
 
-        @Override
-        void imcEnqueue(InterModEnqueueEvent event) {
-            super.imcEnqueue(event);
-            // Not sure where this is supposed to go. Seems particle manager is created right
-            // before IMC enqueue/process
-            ModParticles.registerAll();
-        }
-
         @Nullable
         @Override
-        public EntityPlayer getClientPlayer() {
+        public PlayerEntity getClientPlayer() {
             return Minecraft.getInstance().player;
         }
     }

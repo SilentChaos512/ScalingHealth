@@ -18,7 +18,8 @@
 
 package net.silentchaos512.scalinghealth.event;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
@@ -29,7 +30,7 @@ import net.minecraftforge.fml.network.PacketDistributor;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.DimensionConfig;
-import net.silentchaos512.scalinghealth.entity.EntityBlightFire;
+import net.silentchaos512.scalinghealth.entity.BlightFireEntity;
 import net.silentchaos512.scalinghealth.network.Network;
 import net.silentchaos512.scalinghealth.network.SpawnBlightFirePacket;
 import net.silentchaos512.scalinghealth.utils.Difficulty;
@@ -48,21 +49,21 @@ public final class BlightHandler {
     // ******************
 
     @SuppressWarnings("TypeMayBeWeakened")
-    public static boolean isBlight(EntityLivingBase entityLiving) {
+    public static boolean isBlight(MobEntity entityLiving) {
         return Difficulty.affected(entityLiving).isBlight();
     }
 
-    public static void markBlight(EntityLivingBase entityLiving) {
+    public static void markBlight(MobEntity entityLiving) {
 //        if (entityLiving != null)
 //            entityLiving.getEntityData().setBoolean(NBT_BLIGHT, true);
     }
 
-    private static void spawnBlightFire(EntityLivingBase blight) {
+    private static void spawnBlightFire(MobEntity blight) {
         if (blight.world.isRemote || getBlightFire(blight) != null) return;
 
-        EntityBlightFire fire = new EntityBlightFire(blight);
+        BlightFireEntity fire = new BlightFireEntity(blight);
         fire.setPosition(blight.posX, blight.posY, blight.posZ);
-        blight.world.spawnEntity(fire);
+        blight.world.addEntity(fire);
 
         SpawnBlightFirePacket packet = new SpawnBlightFirePacket(blight);
         Supplier<PacketDistributor.TargetPoint> target = PacketDistributor.TargetPoint.p(blight.posX, blight.posY, blight.posZ, 128, blight.dimension);
@@ -74,8 +75,8 @@ public final class BlightHandler {
     }
 
     @Nullable
-    private static EntityBlightFire getBlightFire(EntityLivingBase blight) {
-        for (EntityBlightFire fire : blight.world.getEntities(EntityBlightFire.class, e -> true)) {
+    private static BlightFireEntity getBlightFire(MobEntity blight) {
+        for (BlightFireEntity fire : blight.world.getEntitiesWithinAABB(BlightFireEntity.class, blight.getBoundingBox().grow(5))) {
             if (blight.equals(fire.getParent())) {
                 return fire;
             }
@@ -84,7 +85,7 @@ public final class BlightHandler {
         return null;
     }
 
-    private static void applyBlightPotionEffects(EntityLivingBase entityLiving) {
+    private static void applyBlightPotionEffects(MobEntity entityLiving) {
         DimensionConfig config = Config.get(entityLiving);
         config.mobs.blightPotions.applyAll(entityLiving);
     }
@@ -103,12 +104,12 @@ public final class BlightHandler {
         boolean isTamedAnimal = entitySource instanceof EntityTameable && ((EntityTameable) entitySource).isTamed();
         if (entitySource instanceof EntityPlayer || isTamedAnimal) {
             // Killed by a player or a player's pet.
-            EntityLivingBase blight = event.getEntityLiving();
+            MobEntity blight = event.getEntityLiving();
             EntityPlayer player;
-            EntityLivingBase actualKiller;
+            MobEntity actualKiller;
             if (isTamedAnimal) {
                 player = (EntityPlayer) ((EntityTameable) entitySource).getOwner();
-                actualKiller = (EntityLivingBase) entitySource;
+                actualKiller = (MobEntity) entitySource;
             } else {
                 actualKiller = player = (EntityPlayer) entitySource;
             }
@@ -134,7 +135,7 @@ public final class BlightHandler {
             }
         } else {
             // Killed by something else.
-            EntityLivingBase blight = event.getEntityLiving();
+            MobEntity blight = event.getEntityLiving();
 
             // Tell all players that the blight died.
             if (Config.Mob.Blight.notifyOnDeath) {
@@ -167,8 +168,11 @@ public final class BlightHandler {
 
     @SubscribeEvent
     public static void onBlightUpdate(LivingUpdateEvent event) {
-        EntityLivingBase entity = event.getEntityLiving();
-        if (entity != null && !entity.world.isRemote && isBlight(entity)) {
+        LivingEntity livingEntity = event.getEntityLiving();
+        if (!(livingEntity instanceof MobEntity)) return;
+
+        MobEntity entity = (MobEntity) livingEntity;
+        if (!entity.world.isRemote && isBlight(entity)) {
             World world = entity.world;
 
             // Add in entity ID so not all blights update on the same tick

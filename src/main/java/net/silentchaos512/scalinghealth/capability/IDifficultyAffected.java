@@ -1,6 +1,6 @@
 package net.silentchaos512.scalinghealth.capability;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MobEntity;
 
 public interface IDifficultyAffected {
     float getDifficulty();
@@ -22,5 +22,5 @@ public interface IDifficultyAffected {
 
     void setProcessed(boolean value);
 
-    void tick(EntityLivingBase entity);
+    void tick(MobEntity entity);
 }

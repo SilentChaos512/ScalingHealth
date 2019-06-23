@@ -19,7 +19,7 @@
 package net.silentchaos512.scalinghealth.config;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.world.IWorldReaderBase;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.extensions.IForgeDimension;
 import net.minecraftforge.fml.loading.FMLPaths;
@@ -352,11 +352,11 @@ public final class Config {
         return parent.resolve(path);
     }
 
-    public static DimensionConfig getOrDefault(@Nullable IWorldReaderBase world) {
+    public static DimensionConfig getOrDefault(@Nullable IWorldReader world) {
         return world != null ? get(world) : DEFAULT;
     }
 
-    public static DimensionConfig get(IWorldReaderBase world) {
+    public static DimensionConfig get(IWorldReader world) {
         return get(world.getDimension().getType().getId());
     }
 

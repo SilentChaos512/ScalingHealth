@@ -18,14 +18,15 @@
 
 package net.silentchaos512.scalinghealth.client.gui.difficulty;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -37,14 +38,18 @@ import net.silentchaos512.scalinghealth.lib.AreaDifficultyMode;
 import net.silentchaos512.scalinghealth.utils.Difficulty;
 import net.silentchaos512.utils.Anchor;
 
-public class DifficultyMeter extends Gui {
-    public static final DifficultyMeter INSTANCE = new DifficultyMeter();
+public class DifficultyMeter extends Screen {
+    public static final DifficultyMeter INSTANCE = new DifficultyMeter(new StringTextComponent(""));
 
     private static final ResourceLocation TEXTURE = new ResourceLocation(ScalingHealth.MOD_ID, "textures/gui/hud.png");
 
     private int lastDifficultyDisplayed = -100;
     private int lastAreaDifficultyDisplayed = -100;
     private int lastUpdateTime = Integer.MIN_VALUE;
+
+    protected DifficultyMeter(ITextComponent title) {
+        super(title);
+    }
 
     public void showBar() {
         this.lastUpdateTime = Integer.MIN_VALUE;
@@ -59,7 +64,7 @@ public class DifficultyMeter extends Gui {
         }
 
         Minecraft mc = Minecraft.getInstance();
-        EntityPlayer player = mc.player;
+        PlayerEntity player = mc.player;
         if (player == null) return;
         World world = player.world;
 
@@ -103,24 +108,23 @@ public class DifficultyMeter extends Gui {
             int posY = anchor.getY(height, 14, 5) + Config.CLIENT.difficultyMeterOffsetY.get();
 
             // Frame
-            drawTexturedModalRect(posX, posY, 190, 0, 66, 14, 0xFFFFFF);
+            blitWithColor(posX, posY, 190, 0, 66, 14, 0xFFFFFF);
 
             // Area Difficulty
             int barLength = (int) (60 * areaDifficulty / maxDifficulty);
-            drawTexturedModalRect(posX + 3, posY + 5, 193, 19, barLength, 6, 0xFFFFFF);
+            blitWithColor(posX + 3, posY + 5, 193, 19, barLength, 6, 0xFFFFFF);
 
             // Player Difficulty
             barLength = (int) (60 * difficulty / maxDifficulty);
-            drawTexturedModalRect(posX + 3, posY + 3, 193, 17, barLength, 2, 0xFFFFFF);
+            blitWithColor(posX + 3, posY + 3, 193, 17, barLength, 2, 0xFFFFFF);
 
             // Text
             final float textScale = Config.CLIENT.difficultyMeterTextScale.get().floatValue();
             if (textScale > 0) {
                 GlStateManager.pushMatrix();
                 GlStateManager.scalef(textScale, textScale, 1);
-                ITextComponent text = new TextComponentTranslation("misc.scalinghealth.difficultyMeterText");
                 mc.fontRenderer.drawStringWithShadow(
-                        text.getFormattedText(),
+                        I18n.format("misc.scalinghealth.difficultyMeterText"),
                         posX / textScale + 4,
                         posY / textScale - 9,
                         0xFFFFFF);
@@ -140,12 +144,12 @@ public class DifficultyMeter extends Gui {
         }
     }
 
-    private void drawTexturedModalRect(int x, int y, int textureX, int textureY, int width, int height, int color) {
+    private void blitWithColor(int x, int y, int textureX, int textureY, int width, int height, int color) {
         float r = ((color >> 16) & 255) / 255f;
         float g = ((color >> 8) & 255) / 255f;
         float b = (color & 255) / 255f;
         GlStateManager.color3f(r, g, b);
-        drawTexturedModalRect(x, y, textureX, textureY, width, height);
+        blit(x, y, textureX, textureY, width, height);
         GlStateManager.color3f(1, 1, 1);
     }
 }

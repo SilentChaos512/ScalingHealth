@@ -10,11 +10,11 @@ import net.minecraft.command.Commands;
 import net.minecraft.command.arguments.EntityArgument;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.silentchaos512.scalinghealth.capability.CapabilityPlayerData;
 import net.silentchaos512.scalinghealth.utils.Players;
 
@@ -66,13 +66,13 @@ public final class PowerCommand {
     }
 
     private static int runGet(CommandContext<CommandSource> context) throws CommandSyntaxException {
-        for (EntityPlayerMP player : EntityArgument.getPlayers(context, "targets")) {
+        for (ServerPlayerEntity player : EntityArgument.getPlayers(context, "targets")) {
             runGetSingle(context, player);
         }
         return 1;
     }
 
-    private static int runGetSingle(CommandContext<CommandSource> context, EntityPlayer player) {
+    private static int runGetSingle(CommandContext<CommandSource> context, PlayerEntity player) {
         player.getCapability(CapabilityPlayerData.INSTANCE).ifPresent(data -> {
             context.getSource().sendFeedback(ModCommands.playerNameText(player), true);
             // Actual power
@@ -94,7 +94,7 @@ public final class PowerCommand {
 
     private static int runSet(CommandContext<CommandSource> context) throws CommandSyntaxException {
         int amount = IntegerArgumentType.getInteger(context, "amount");
-        for (EntityPlayerMP player : EntityArgument.getPlayers(context, "targets")) {
+        for (ServerPlayerEntity player : EntityArgument.getPlayers(context, "targets")) {
             player.getCapability(CapabilityPlayerData.INSTANCE).ifPresent(data -> {
                 int intendedCrystalCount = (int) ((amount - 1) / Players.powerCrystalIncreaseAmount(player));
                 data.setPowerCrystalCount(player, intendedCrystalCount);
@@ -105,7 +105,7 @@ public final class PowerCommand {
 
     private static int runAdd(CommandContext<CommandSource> context) throws CommandSyntaxException {
         int amount = IntegerArgumentType.getInteger(context, "amount");
-        for (EntityPlayerMP player : EntityArgument.getPlayers(context, "targets")) {
+        for (ServerPlayerEntity player : EntityArgument.getPlayers(context, "targets")) {
             player.getCapability(CapabilityPlayerData.INSTANCE).ifPresent(data -> {
                 data.addPowerCrystals(player, amount);
             });
@@ -114,6 +114,6 @@ public final class PowerCommand {
     }
 
     private static ITextComponent text(String key, Object... args) {
-        return new TextComponentTranslation("command.scalinghealth.power." + key, args);
+        return new TranslationTextComponent("command.scalinghealth.power." + key, args);
     }
 }

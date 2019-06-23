@@ -8,11 +8,11 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.arguments.EntityArgument;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.silentchaos512.scalinghealth.capability.CapabilityPlayerData;
 import net.silentchaos512.scalinghealth.utils.Players;
 
@@ -64,13 +64,13 @@ public final class HealthCommand {
     }
 
     private static int runGetHealth(CommandContext<CommandSource> context) throws CommandSyntaxException {
-        for (EntityPlayerMP player : EntityArgument.getPlayers(context, "targets")) {
+        for (ServerPlayerEntity player : EntityArgument.getPlayers(context, "targets")) {
             getHealthSingle(context, player);
         }
         return 1;
     }
 
-    private static int getHealthSingle(CommandContext<CommandSource> context, EntityPlayer player) {
+    private static int getHealthSingle(CommandContext<CommandSource> context, PlayerEntity player) {
         player.getCapability(CapabilityPlayerData.INSTANCE).ifPresent(data -> {
             context.getSource().sendFeedback(ModCommands.playerNameText(player), true);
             // Actual health
@@ -92,7 +92,7 @@ public final class HealthCommand {
 
     private static int runSetHealth(CommandContext<CommandSource> context) throws CommandSyntaxException {
         int amount = IntegerArgumentType.getInteger(context, "amount");
-        for (EntityPlayerMP player : EntityArgument.getPlayers(context, "targets")) {
+        for (ServerPlayerEntity player : EntityArgument.getPlayers(context, "targets")) {
             player.getCapability(CapabilityPlayerData.INSTANCE).ifPresent(data -> {
                 int intendedExtraHearts = (amount - Players.startingHealth(player)) / 2;
                 data.setExtraHearts(player, intendedExtraHearts);
@@ -103,7 +103,7 @@ public final class HealthCommand {
 
     private static int runAddHealth(CommandContext<CommandSource> context) throws CommandSyntaxException {
         int amount = IntegerArgumentType.getInteger(context, "amount");
-        for (EntityPlayerMP player : EntityArgument.getPlayers(context, "targets")) {
+        for (ServerPlayerEntity player : EntityArgument.getPlayers(context, "targets")) {
             player.getCapability(CapabilityPlayerData.INSTANCE).ifPresent(data -> {
                 data.addHearts(player, amount);
             });
@@ -112,6 +112,6 @@ public final class HealthCommand {
     }
 
     private static ITextComponent text(String key, Object... args) {
-        return new TextComponentTranslation("command.scalinghealth.health." + key, args);
+        return new TranslationTextComponent("command.scalinghealth.health." + key, args);
     }
 }

@@ -67,13 +67,10 @@
                     "looting_multiplier": 0.0025
                 },
                 {
-                    "condition": "entity_properties",
+                    "condition": "scalinghealth:mob_properties",
                     "entity": "this",
-                    "properties": {
-                        "scalinghealth:difficulty": {
-                            "min": 0,
-                            "max": 120
-                        }
+                    "difficulty": {
+                        "max": 120
                     }
                 }
             ]
@@ -116,11 +113,9 @@
                     "condition": "killed_by_player"
                 },
                 {
-                    "condition": "entity_properties",
+                    "condition": "scalinghealth:mob_properties",
                     "entity": "this",
-                    "properties": {
-                        "scalinghealth:is_blight": true
-                    }
+                    "is_blight": true
                 }
             ]
         }

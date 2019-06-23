@@ -1,8 +1,8 @@
 package net.silentchaos512.scalinghealth.lib;
 
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.IMob;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.Config;
@@ -11,7 +11,7 @@ import net.silentchaos512.scalinghealth.utils.Difficulty;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-public enum MobType {
+public enum EntityGroup {
     PEACEFUL("peaceful"),
     HOSTILE("hostile"),
     BOSS("boss"),
@@ -20,35 +20,36 @@ public enum MobType {
 
     @Nullable private final ResourceLocation bonusDropsLootTable;
 
-    MobType(@Nullable String bonusDropsTable) {
+    EntityGroup(@Nullable String bonusDropsTable) {
         bonusDropsLootTable = bonusDropsTable != null
                 ? new ResourceLocation(ScalingHealth.MOD_ID, "bonus_drops/" + bonusDropsTable)
                 : null;
     }
 
-    public static MobType from(EntityLivingBase entity) {
+    public static EntityGroup from(LivingEntity entity) {
         return from(entity, false);
     }
 
-    public static MobType from(EntityLivingBase entity, boolean ignoreBlightStatus) {
-        if (entity instanceof EntityPlayer)
+    public static EntityGroup from(LivingEntity entity, boolean ignoreBlightStatus) {
+        if (entity instanceof PlayerEntity)
             return PLAYER;
         if (!entity.isNonBoss())
             return BOSS;
-        if (!ignoreBlightStatus && Difficulty.isBlight(entity))
-            return BLIGHT;
-        if (entity instanceof IMob)
+        if (entity instanceof MobEntity) {
+            if (!ignoreBlightStatus && Difficulty.isBlight((MobEntity) entity))
+                return BLIGHT;
             return HOSTILE;
+        }
         return PEACEFUL;
     }
 
-    public double getPotionChance(EntityLivingBase entity) {
+    public double getPotionChance(LivingEntity entity) {
         if (this == PEACEFUL)
             return Config.get(entity).mobs.peacefulPotionChance.get();
         return Config.get(entity).mobs.hostilePotionChance.get();
     }
 
-    public MobHealthMode getHealthMode(EntityLivingBase entity) {
+    public MobHealthMode getHealthMode(LivingEntity entity) {
         return Config.get(entity).mobs.healthMode.get();
     }
 
@@ -56,7 +57,7 @@ public enum MobType {
         return Optional.ofNullable(bonusDropsLootTable);
     }
 
-    public boolean isAffectedByDamageScaling(EntityLivingBase entity) {
+    public boolean isAffectedByDamageScaling(LivingEntity entity) {
         switch (this) {
             case PLAYER:
                 return Config.get(entity).damageScaling.affectPlayers.get();

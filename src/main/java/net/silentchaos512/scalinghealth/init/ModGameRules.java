@@ -2,6 +2,7 @@ package net.silentchaos512.scalinghealth.init;
 
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import org.apache.commons.lang3.StringUtils;
@@ -19,8 +20,8 @@ public enum ModGameRules implements IStringSerializable {
 
     public boolean getBoolean(World world) {
         // FIXME: Game rules are not being registered?
-//        return world.getGameRules().getBoolean(getName());
-        return true;
+        return world.getGameRules().getBoolean(getName());
+//        return true;
     }
 
     @Override
@@ -28,7 +29,13 @@ public enum ModGameRules implements IStringSerializable {
         return ScalingHealth.RESOURCE_PREFIX + StringUtils.lowerCase(name());
     }
 
-    public static void registerAll(MinecraftServer server) {
+    public static void registerDefinitions() {
+        for (ModGameRules rule : values()) {
+            GameRules.getDefinitions().put(rule.getName(), new GameRules.ValueDefinition(rule.defaultValue.get(), GameRules.ValueType.BOOLEAN_VALUE));
+        }
+    }
+
+    public static void setRules(MinecraftServer server) {
         for (ModGameRules rule : values()) {
             server.getGameRules().setOrCreateGameRule(rule.getName(), rule.defaultValue.get(), server);
         }

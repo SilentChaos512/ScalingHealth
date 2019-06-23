@@ -18,7 +18,7 @@
 
 package net.silentchaos512.scalinghealth.scoreboard;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.scoreboard.Score;
 import net.minecraft.scoreboard.ScoreCriteria;
 import net.minecraft.scoreboard.ScoreObjective;
@@ -27,7 +27,7 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 public class SHScoreCriteria {
     public static ScoreCriteria difficulty = new ScoreCriteria(ScalingHealth.RESOURCE_PREFIX + "difficulty");
 
-    public static void updateScore(EntityPlayer player, int amount) {
+    public static void updateScore(PlayerEntity player, int amount) {
         ScoreObjective scoreObjective = player.getWorldScoreboard().getObjective(difficulty.getName());
         if (scoreObjective == null) return;
         Score score = player.getWorldScoreboard().getOrCreateScore(player.getName().getFormattedText(), scoreObjective);

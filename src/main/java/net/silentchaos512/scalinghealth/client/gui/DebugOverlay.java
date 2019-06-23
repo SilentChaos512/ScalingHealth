@@ -2,7 +2,7 @@ package net.silentchaos512.scalinghealth.client.gui;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.silentchaos512.lib.client.gui.DebugRenderOverlay;
 import net.silentchaos512.scalinghealth.client.ClientHandler;
 import net.silentchaos512.scalinghealth.config.Config;
@@ -24,7 +24,7 @@ public class DebugOverlay extends DebugRenderOverlay {
     @Nonnull
     @Override
     public List<String> getDebugText() {
-        EntityPlayerSP player = Minecraft.getInstance().player;
+        ClientPlayerEntity player = Minecraft.getInstance().player;
         if (player == null) return ImmutableList.of();
 
         return ImmutableList.of(

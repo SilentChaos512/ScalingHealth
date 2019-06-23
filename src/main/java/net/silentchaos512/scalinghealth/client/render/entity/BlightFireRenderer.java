@@ -18,75 +18,76 @@
 
 package net.silentchaos512.scalinghealth.client.render.entity;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.culling.ICamera;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.silentchaos512.lib.event.ClientTicks;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.entity.EntityBlightFire;
+import net.silentchaos512.scalinghealth.entity.BlightFireEntity;
 import net.silentchaos512.scalinghealth.lib.module.ModuleAprilTricks;
 import net.silentchaos512.utils.Color;
 
 import javax.annotation.Nonnull;
 
-public final class RenderBlightFire extends Render<EntityBlightFire> {
+public final class BlightFireRenderer extends EntityRenderer<BlightFireEntity> {
     private static final float FIRE_SCALE = 1.8F;
 
-    private static final ResourceLocation TEXTURE = new ResourceLocation(ScalingHealth.MOD_ID, "textures/entity/blightfire.png");
-    private static final ResourceLocation TEXTURE_GRAY = new ResourceLocation(ScalingHealth.MOD_ID, "textures/entity/blightfire_gray.png");
+    private static final ResourceLocation TEXTURE = ScalingHealth.getId("textures/entity/blightfire.png");
+    private static final ResourceLocation TEXTURE_GRAY = ScalingHealth.getId("textures/entity/blightfire_gray.png");
 
-    private RenderBlightFire(RenderManager renderManager) {
+    private BlightFireRenderer(EntityRendererManager renderManager) {
         super(renderManager);
     }
 
     @Nonnull
     @Override
-    protected ResourceLocation getEntityTexture(EntityBlightFire entity) {
+    protected ResourceLocation getEntityTexture(BlightFireEntity entity) {
         return ModuleAprilTricks.instance.isRightDay() && ModuleAprilTricks.instance.isEnabled()
                 ? TEXTURE_GRAY : TEXTURE;
     }
 
     @Override
-    public boolean shouldRender(EntityBlightFire fire, ICamera camera, double camX, double camY, double camZ) {
-        EntityLivingBase parent = fire.getParent();
+    public boolean shouldRender(BlightFireEntity fire, ICamera camera, double camX, double camY, double camZ) {
+        MobEntity parent = fire.getParent();
         if (parent == null)
             return false;
 
-        AxisAlignedBB axisalignedbb = parent.getRenderBoundingBox().grow(0.5D);
+        AxisAlignedBB boundingBox = parent.getRenderBoundingBox().grow(0.5D);
 
-        if (axisalignedbb.hasNaN() || axisalignedbb.getAverageEdgeLength() == 0.0D) {
-            axisalignedbb = new AxisAlignedBB(parent.posX - 2.0D, parent.posY - 2.0D, parent.posZ - 2.0D,
+        if (boundingBox.hasNaN() || boundingBox.getAverageEdgeLength() == 0.0D) {
+            boundingBox = new AxisAlignedBB(
+                    parent.posX - 2.0D, parent.posY - 2.0D, parent.posZ - 2.0D,
                     parent.posX + 2.0D, parent.posY + 2.0D, parent.posZ + 2.0D);
         }
 
         return parent.isInRangeToRender3d(camX, camY, camZ)
-                && (parent.ignoreFrustumCheck || camera.isBoundingBoxInFrustum(axisalignedbb));
+                && (parent.ignoreFrustumCheck || camera.isBoundingBoxInFrustum(boundingBox));
     }
 
     @Override
-    public void doRender(EntityBlightFire fire, double x, double y, double z, float entityYaw, float partialTicks) {
-        EntityLivingBase parent = fire.getParent();
+    public void doRender(BlightFireEntity fire, double x, double y, double z, float entityYaw, float partialTicks) {
+        MobEntity parent = fire.getParent();
         if (parent == null) return;
 
         GlStateManager.disableLighting();
         GlStateManager.pushMatrix();
-        GlStateManager.translated(x, y - parent.height + 0.5, z);
-        float f = parent.width * FIRE_SCALE;
+        GlStateManager.translated(x, y - parent.getHeight() + 0.5, z);
+        float f = parent.getWidth() * FIRE_SCALE;
         GlStateManager.scalef(f, f, f);
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
 
         float f1 = 0.5F;
         float f2 = 0.0F;
-        float f3 = parent.height / f;
+        float f3 = parent.getHeight() / f;
         float f4 = (float) (parent.posY - parent.getBoundingBox().minY);
 
         GlStateManager.rotatef(-this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
@@ -121,14 +122,10 @@ public final class RenderBlightFire extends Render<EntityBlightFire> {
                 minU = f10;
             }
 
-            buffer.pos((double) (f1 - f2), (double) (0.0F - f4), (double) f5)
-                    .tex((double) maxU, (double) maxV).endVertex();
-            buffer.pos((double) (-f1 - f2), (double) (0.0F - f4), (double) f5)
-                    .tex((double) minU, (double) maxV).endVertex();
-            buffer.pos((double) (-f1 - f2), (double) (1.4F - f4), (double) f5)
-                    .tex((double) minU, (double) minV).endVertex();
-            buffer.pos((double) (f1 - f2), (double) (1.4F - f4), (double) f5)
-                    .tex((double) maxU, (double) minV).endVertex();
+            buffer.pos(f1 - f2, 0.0F - f4, f5).tex(maxU, maxV).endVertex();
+            buffer.pos(-f1 - f2, 0.0F - f4, f5).tex(minU, maxV).endVertex();
+            buffer.pos(-f1 - f2, 1.4F - f4, f5).tex(minU, minV).endVertex();
+            buffer.pos(f1 - f2, 1.4F - f4, f5).tex(maxU, minV).endVertex();
             f3 -= 0.45F;
             f4 -= 0.45F;
             f1 *= 0.9F;
@@ -141,10 +138,10 @@ public final class RenderBlightFire extends Render<EntityBlightFire> {
         GlStateManager.enableLighting();
     }
 
-    public static class Factory implements IRenderFactory<EntityBlightFire> {
+    public static class Factory implements IRenderFactory<BlightFireEntity> {
         @Override
-        public Render<EntityBlightFire> createRenderFor(RenderManager manager) {
-            return new RenderBlightFire(manager);
+        public EntityRenderer<? super BlightFireEntity> createRenderFor(EntityRendererManager manager) {
+            return new BlightFireRenderer(manager);
         }
     }
 }

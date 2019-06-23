@@ -18,27 +18,27 @@
 
 package net.silentchaos512.scalinghealth.init;
 
-import net.minecraft.potion.Potion;
+import net.minecraft.potion.Effect;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.potion.PotionBandaged;
+import net.silentchaos512.scalinghealth.potion.BandagedEffect;
 import net.silentchaos512.utils.Lazy;
 
 import java.util.Locale;
 import java.util.function.Supplier;
 
 public enum ModPotions {
-    BANDAGED(PotionBandaged::new);
+    BANDAGED(BandagedEffect::new);
 
-    private final Lazy<Potion> potion;
+    private final Lazy<Effect> potion;
 
-    ModPotions(Supplier<Potion> factory) {
+    ModPotions(Supplier<Effect> factory) {
         this.potion = Lazy.of(factory);
     }
 
-    public Potion get() {
+    public Effect get() {
         return potion.get();
     }
 
@@ -46,7 +46,7 @@ public enum ModPotions {
         return name().toLowerCase(Locale.ROOT);
     }
 
-    public static void registerAll(RegistryEvent.Register<Potion> event) {
+    public static void registerAll(RegistryEvent.Register<Effect> event) {
         // Workaround for Forge event bus bug
         if (!event.getName().equals(ForgeRegistries.POTIONS.getRegistryName())) return;
 
@@ -55,8 +55,8 @@ public enum ModPotions {
         }
     }
 
-    private static void register(String name, Potion potion) {
-        ResourceLocation registryName = new ResourceLocation(ScalingHealth.MOD_ID, name);
+    private static void register(String name, Effect potion) {
+        ResourceLocation registryName = ScalingHealth.getId(name);
         potion.setRegistryName(registryName);
         ForgeRegistries.POTIONS.register(potion);
     }

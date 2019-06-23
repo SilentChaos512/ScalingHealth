@@ -1,10 +1,11 @@
 package net.silentchaos512.scalinghealth.capability;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.INBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -22,7 +23,7 @@ import net.silentchaos512.scalinghealth.utils.Players;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class CapabilityPlayerData implements IPlayerData, ICapabilitySerializable<NBTTagCompound> {
+public class CapabilityPlayerData implements IPlayerData, ICapabilitySerializable<CompoundNBT> {
     @CapabilityInject(IPlayerData.class)
     public static Capability<IPlayerData> INSTANCE = null;
     public static ResourceLocation NAME = ScalingHealth.getId("player_data");
@@ -47,31 +48,31 @@ public class CapabilityPlayerData implements IPlayerData, ICapabilitySerializabl
     }
 
     @Override
-    public void setExtraHearts(EntityPlayer player, int amount) {
+    public void setExtraHearts(PlayerEntity player, int amount) {
         extraHearts = Players.clampExtraHearts(player, amount);
-        ModifierHandler.addMaxHealth(player, getHealthModifier(player), 0);
+        ModifierHandler.addMaxHealth(player, getHealthModifier(player), AttributeModifier.Operation.ADDITION);
     }
 
     @Override
-    public void setPowerCrystalCount(EntityPlayer player, int amount) {
+    public void setPowerCrystalCount(PlayerEntity player, int amount) {
         powerCrystals = Players.clampPowerCrystals(player, amount);
-        ModifierHandler.addAttackDamage(player, getAttackDamageModifier(player), 0);
+        ModifierHandler.addAttackDamage(player, getAttackDamageModifier(player), AttributeModifier.Operation.ADDITION);
     }
 
     @Override
-    public void tick(EntityPlayer player) {
+    public void tick(PlayerEntity player) {
         // TODO: Position tracking for idle multiplier?
 
         // TODO: Difficulty by Game Stages
 
         // TODO: Health by XP
 
-        if (player.world.getGameTime() % 20 == 0 && player instanceof EntityPlayerMP) {
+        if (player.world.getGameTime() % 20 == 0 && player instanceof ServerPlayerEntity) {
             sendUpdatePacketTo(player);
         }
     }
 
-    private static void sendUpdatePacketTo(EntityPlayer player) {
+    private static void sendUpdatePacketTo(PlayerEntity player) {
         World world = player.world;
         BlockPos pos = player.getPosition();
         ClientSyncMessage msg = new ClientSyncMessage(
@@ -81,32 +82,32 @@ public class CapabilityPlayerData implements IPlayerData, ICapabilitySerializabl
                 PlayerBonusRegenHandler.getTimerForPlayer(player),
                 Difficulty.locationMultiplier(world, pos)
         );
-        EntityPlayerMP playerMP = (EntityPlayerMP) player;
+        ServerPlayerEntity playerMP = (ServerPlayerEntity) player;
         Network.channel.sendTo(msg, playerMP.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
     }
 
     @Nonnull
     @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable EnumFacing side) {
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
         return INSTANCE.orEmpty(cap, holder);
     }
 
     @Override
-    public NBTTagCompound serializeNBT() {
-        NBTTagCompound nbt = new NBTTagCompound();
+    public CompoundNBT serializeNBT() {
+        CompoundNBT nbt = new CompoundNBT();
         nbt.putInt(NBT_HEART_CRYSTALS, extraHearts);
         nbt.putInt(NBT_POWER_CRYSTALS, powerCrystals);
         return nbt;
     }
 
     @Override
-    public void deserializeNBT(NBTTagCompound nbt) {
+    public void deserializeNBT(CompoundNBT nbt) {
         extraHearts = nbt.getInt(NBT_HEART_CRYSTALS);
         powerCrystals = nbt.getInt(NBT_POWER_CRYSTALS);
     }
 
     public static boolean canAttachTo(ICapabilityProvider entity) {
-        if (!(entity instanceof EntityPlayer)) {
+        if (!(entity instanceof PlayerEntity)) {
             return false;
         }
         try {
@@ -128,17 +129,17 @@ public class CapabilityPlayerData implements IPlayerData, ICapabilitySerializabl
     private static class Storage implements Capability.IStorage<IPlayerData> {
         @Nullable
         @Override
-        public INBTBase writeNBT(Capability<IPlayerData> capability, IPlayerData instance, EnumFacing side) {
+        public INBT writeNBT(Capability<IPlayerData> capability, IPlayerData instance, Direction side) {
             if (instance instanceof CapabilityPlayerData) {
                 return ((CapabilityPlayerData) instance).serializeNBT();
             }
-            return new NBTTagCompound();
+            return new CompoundNBT();
         }
 
         @Override
-        public void readNBT(Capability<IPlayerData> capability, IPlayerData instance, EnumFacing side, INBTBase nbt) {
+        public void readNBT(Capability<IPlayerData> capability, IPlayerData instance, Direction side, INBT nbt) {
             if (instance instanceof CapabilityPlayerData) {
-                ((CapabilityPlayerData) instance).deserializeNBT((NBTTagCompound) nbt);
+                ((CapabilityPlayerData) instance).deserializeNBT((CompoundNBT) nbt);
             }
         }
     }

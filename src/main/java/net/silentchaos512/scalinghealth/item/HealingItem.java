@@ -19,20 +19,20 @@
 package net.silentchaos512.scalinghealth.item;
 
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.item.EnumAction;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.stats.StatList;
+import net.minecraft.item.UseAction;
+import net.minecraft.potion.EffectInstance;
+import net.minecraft.stats.Stats;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.init.ModPotions;
@@ -55,8 +55,8 @@ public class HealingItem extends Item {
     }
 
     @Override
-    public EnumAction getUseAction(ItemStack stack) {
-        return EnumAction.BOW;
+    public UseAction getUseAction(ItemStack stack) {
+        return UseAction.BOW;
     }
 
     @Override
@@ -65,32 +65,32 @@ public class HealingItem extends Item {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer player, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getHeldItem(hand);
         if (player.getHealth() < player.getMaxHealth() && !player.isPotionActive(ModPotions.BANDAGED.get())) {
             player.setActiveHand(hand);
-            return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
+            return ActionResult.newResult(ActionResultType.SUCCESS, stack);
         }
-        return ActionResult.newResult(EnumActionResult.FAIL, stack);
+        return ActionResult.newResult(ActionResultType.FAIL, stack);
     }
 
     @Override
-    public ItemStack onItemUseFinish(ItemStack stack, World world, EntityLivingBase entityLiving) {
+    public ItemStack onItemUseFinish(ItemStack stack, World world, LivingEntity entityLiving) {
         if (!world.isRemote) {
-            entityLiving.addPotionEffect(new PotionEffect(ModPotions.BANDAGED.get(),
+            entityLiving.addPotionEffect(new EffectInstance(ModPotions.BANDAGED.get(),
                     this.effectDuration, this.healSpeed, false, false));
             stack.shrink(1);
 
-            if (entityLiving instanceof EntityPlayer) {
-                EntityPlayer player = (EntityPlayer) entityLiving;
-                player.addStat(StatList.ITEM_USED.get(this));
+            if (entityLiving instanceof PlayerEntity) {
+                PlayerEntity player = (PlayerEntity) entityLiving;
+                player.addStat(Stats.ITEM_USED.get(this));
             }
         }
         return stack;
     }
 
     @Override
-    public void onUsingTick(ItemStack stack, EntityLivingBase player, int count) {
+    public void onUsingTick(ItemStack stack, LivingEntity player, int count) {
         if (count % 10 == 0) {
             player.playSound(SoundEvents.ITEM_ARMOR_EQUIP_LEATHER,
                     1.25f, (float) (1.1f + 0.05f * ScalingHealth.random.nextGaussian()));
@@ -99,10 +99,10 @@ public class HealingItem extends Item {
 
     @Override
     public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
-        tooltip.add(new TextComponentTranslation("item.scalinghealth.healing_item.value",
+        tooltip.add(new TranslationTextComponent("item.scalinghealth.healing_item.value",
                 (int) (this.healAmount * 100),
                 this.effectDuration / 20));
-        tooltip.add(new TextComponentTranslation("item.scalinghealth.healing_item.howToUse",
+        tooltip.add(new TranslationTextComponent("item.scalinghealth.healing_item.howToUse",
                 USE_TIME / 20));
     }
 }

@@ -20,20 +20,12 @@ package net.silentchaos512.scalinghealth.init;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.storage.loot.LootEntryItem;
-import net.minecraft.world.storage.loot.LootPool;
-import net.minecraft.world.storage.loot.LootTableList;
-import net.minecraft.world.storage.loot.RandomValueRange;
-import net.minecraft.world.storage.loot.conditions.LootCondition;
-import net.minecraft.world.storage.loot.functions.LootFunction;
+import net.minecraft.world.storage.loot.*;
+import net.minecraft.world.storage.loot.conditions.LootConditionManager;
 import net.minecraft.world.storage.loot.functions.SetCount;
-import net.minecraft.world.storage.loot.properties.EntityPropertyManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.LootTableLoadEvent;
-import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.lib.MobType;
-import net.silentchaos512.scalinghealth.loot.properties.PropertyBlight;
-import net.silentchaos512.scalinghealth.loot.properties.PropertyDifficulty;
+import net.silentchaos512.scalinghealth.loot.conditions.SHMobProperties;
 
 import java.util.List;
 
@@ -43,42 +35,46 @@ public final class ModLoot {
     public static void init() {
         MinecraftForge.EVENT_BUS.addListener(ModLoot::onLootTableLoad);
 
-        EntityPropertyManager.registerProperty(new PropertyBlight.Serializer());
-        EntityPropertyManager.registerProperty(new PropertyDifficulty.Serializer());
-
-        for (MobType type : MobType.values()) {
-            type.getBonusDropsLootTable().ifPresent(name -> {
-                ScalingHealth.LOGGER.info("Register loot table {}", name);
-                LootTableList.register(name);
-            });
-        }
+        LootConditionManager.registerCondition(SHMobProperties.SERIALIZER);
     }
 
     private static final List<ResourceLocation> ADD_ITEMS_TO = ImmutableList.of(
-            LootTableList.CHESTS_ABANDONED_MINESHAFT,
-            LootTableList.CHESTS_BURIED_TREASURE,
-            LootTableList.CHESTS_NETHER_BRIDGE,
-            LootTableList.CHESTS_SIMPLE_DUNGEON,
-            LootTableList.CHESTS_STRONGHOLD_LIBRARY,
-            LootTableList.CHESTS_UNDERWATER_RUIN_BIG,
-            LootTableList.CHESTS_WOODLAND_MANSION
+            LootTables.CHESTS_ABANDONED_MINESHAFT,
+            LootTables.CHESTS_BURIED_TREASURE,
+            LootTables.CHESTS_NETHER_BRIDGE,
+            LootTables.CHESTS_SIMPLE_DUNGEON,
+            LootTables.CHESTS_STRONGHOLD_LIBRARY,
+            LootTables.CHESTS_UNDERWATER_RUIN_BIG,
+            LootTables.CHESTS_WOODLAND_MANSION
     );
 
     private static void onLootTableLoad(LootTableLoadEvent event) {
         if (ADD_ITEMS_TO.contains(event.getName())) {
-            LootPool main = event.getTable().getPool("main");
-            //noinspection ConstantConditions -- pool can be null
-            if (main != null) {
-                main.addEntry(new LootEntryItem(ModItems.HEART_CRYSTAL.asItem(), 3, 2, new LootFunction[]{
-                        new SetCount(new LootCondition[0], new RandomValueRange(1, 2))
-                }, new LootCondition[0], "sh_heart_container"));
-                main.addEntry(new LootEntryItem(ModItems.CURSED_HEART.asItem(), 1, 5, new LootFunction[]{
-                        new SetCount(new LootCondition[0], new RandomValueRange(1, 3))
-                }, new LootCondition[0], "sh_cursed_heart"));
-                main.addEntry(new LootEntryItem(ModItems.ENCHANTED_HEART.asItem(), 1, 5, new LootFunction[]{
-                        new SetCount(new LootCondition[0], new RandomValueRange(1, 3))
-                }, new LootCondition[0], "sh_enchanted_heart"));
-            }
+            event.getTable().addPool((new LootPool.Builder())
+                    .name("scalinghealth_added")
+                    .rolls(new RandomValueRange(1))
+                    .addEntry(ItemLootEntry.func_216168_a(ModItems.HEART_CRYSTAL)
+                            .weight(3)
+                            .quality(2)
+                            .acceptFunction(SetCount.func_215932_a(new RandomValueRange(1, 2)))
+                    )
+                    .addEntry(ItemLootEntry.func_216168_a(ModItems.POWER_CRYSTAL)
+                            .weight(2)
+                            .quality(7)
+                            .acceptFunction(SetCount.func_215932_a(new RandomValueRange(1, 2)))
+                    )
+                    .addEntry(ItemLootEntry.func_216168_a(ModItems.CURSED_HEART)
+                            .weight(1)
+                            .quality(5)
+                            .acceptFunction(SetCount.func_215932_a(new RandomValueRange(1, 3)))
+                    )
+                    .addEntry(ItemLootEntry.func_216168_a(ModItems.ENCHANTED_HEART)
+                            .weight(1)
+                            .quality(5)
+                            .acceptFunction(SetCount.func_215932_a(new RandomValueRange(1, 3)))
+                    )
+                    .addEntry(EmptyLootEntry.func_216167_a().weight(10))
+                    .build());
         }
     }
 }

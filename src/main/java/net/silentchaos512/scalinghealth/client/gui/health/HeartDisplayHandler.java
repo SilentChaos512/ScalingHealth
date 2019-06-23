@@ -18,15 +18,17 @@
 
 package net.silentchaos512.scalinghealth.client.gui.health;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.MobEffects;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
-import net.minecraftforge.client.GuiIngameForge;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraftforge.client.ForgeIngameGui;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.silentchaos512.lib.event.ClientTicks;
@@ -39,59 +41,61 @@ import java.util.List;
 
 /**
  * Handles display of regular and absorption hearts.
- * <p>For future reference, much of the vanilla code can be found in {@link GuiIngameForge}.
+ * <p>For future reference, much of the vanilla code can be found in {@link ForgeIngameGui}.
  */
-public final class HeartDisplayHandler extends Gui {
-    public static final HeartDisplayHandler INSTANCE = new HeartDisplayHandler();
+public final class HeartDisplayHandler extends Screen {
+    public static final HeartDisplayHandler INSTANCE = new HeartDisplayHandler(new StringTextComponent(""));
 
     private static final float COLOR_CHANGE_PERIOD = 150;
     private static final ResourceLocation TEXTURE = new ResourceLocation(ScalingHealth.MOD_ID, "textures/gui/hud.png");
 
     private final HeartsInfo info = new HeartsInfo();
 
-    private HeartDisplayHandler() {}
+    private HeartDisplayHandler(ITextComponent title) {
+        super(title);
+    }
 
     @SubscribeEvent(receiveCanceled = true)
     public void onHealthBar(RenderGameOverlayEvent.Pre event) {
         if (info.heartStyle == HeartIconStyle.VANILLA) return;
 
         Minecraft mc = Minecraft.getInstance();
-        EntityPlayer player = mc.player;
+        PlayerEntity player = mc.player;
 
         // Health text
         if (event.getType() == RenderGameOverlayEvent.ElementType.TEXT && mc.playerController.gameIsSurvivalOrAdventure()) {
             // Draw health string?
             if (Config.CLIENT.healthTextStyle.get() != HealthTextStyle.DISABLED) {
-                mc.profiler.startSection("scalinghealthRenderHealthText");
+                mc.getProfiler().startSection("scalinghealthRenderHealthText");
                 renderHealthText(mc, info.health, info.maxHealth,
                         -91 + Config.CLIENT.healthTextOffsetX.get(),
                         -38 + Config.CLIENT.healthTextOffsetY.get(),
                         Config.CLIENT.healthTextStyle.get(),
                         Config.CLIENT.healthTextColorStyle.get());
-                mc.profiler.endSection();
+                mc.getProfiler().endSection();
             }
             // Draw absorption amount string?
             if (Config.CLIENT.absorptionTextStyle.get() != HealthTextStyle.DISABLED && player.getAbsorptionAmount() > 0) {
-                mc.profiler.startSection("scalinghealthRenderAbsorptionText");
+                mc.getProfiler().startSection("scalinghealthRenderAbsorptionText");
                 renderHealthText(mc, player.getAbsorptionAmount(), 0,
                         -91 + Config.CLIENT.absorptionTextOffsetX.get(),
                         -49 + Config.CLIENT.absorptionTextOffsetY.get(),
                         Config.CLIENT.absorptionTextStyle.get(),
                         HealthTextColor.SOLID);
-                mc.profiler.endSection();
+                mc.getProfiler().endSection();
             }
         }
 
         // Hearts
         if (event.getType() == RenderGameOverlayEvent.ElementType.HEALTH && info.heartStyle != HeartIconStyle.VANILLA) {
             event.setCanceled(true);
-            mc.profiler.startSection("scalinghealthRenderHearts");
+            mc.getProfiler().startSection("scalinghealthRenderHearts");
             renderHearts(event, mc, player);
-            mc.profiler.endSection();
+            mc.getProfiler().endSection();
         }
     }
 
-    private void renderHearts(RenderGameOverlayEvent event, Minecraft mc, EntityPlayer player) {
+    private void renderHearts(RenderGameOverlayEvent event, Minecraft mc, PlayerEntity player) {
         info.update();
 
         GlStateManager.enableBlend();
@@ -99,10 +103,10 @@ public final class HeartDisplayHandler extends Gui {
         float absorb = MathHelper.ceil(player.getAbsorptionAmount());
 
         final int left = info.scaledWindowWidth / 2 - 91;
-        final int top = info.scaledWindowHeight - GuiIngameForge.left_height;
-        GuiIngameForge.left_height += info.rowsUsedInHud * info.rowHeight;
+        final int top = info.scaledWindowHeight - ForgeIngameGui.left_height;
+        ForgeIngameGui.left_height += info.rowsUsedInHud * info.rowHeight;
         if (info.rowHeight != 10)
-            GuiIngameForge.left_height += 10 - info.rowHeight;
+            ForgeIngameGui.left_height += 10 - info.rowHeight;
 
         // Draw vanilla hearts
         drawVanillaHearts(left, top);
@@ -123,14 +127,14 @@ public final class HeartDisplayHandler extends Gui {
             int j;
             for (j = 0; j < renderHearts; ++j) {
                 int y = info.offsetHeartPosY(j, top);
-                drawTexturedModalRect(left + 8 * j, y, 0, potionOffset, 9, 9, rowColor);
+                blitWithColor(left + 8 * j, y, 0, potionOffset, 9, 9, rowColor);
             }
             boolean anythingDrawn = j > 0;
 
             // Half heart on the end?
             if (info.healthInt % 2 == 1 && renderHearts < 10) {
                 int y = info.offsetHeartPosY(j, top);
-                drawTexturedModalRect(left + 8 * renderHearts, y, 9, potionOffset, 9, 9, rowColor);
+                blitWithColor(left + 8 * renderHearts, y, 9, potionOffset, 9, 9, rowColor);
                 anythingDrawn = true;
             }
 
@@ -141,7 +145,7 @@ public final class HeartDisplayHandler extends Gui {
                 if (j < 0) j += 10;
                 int y = info.offsetHeartPosY(j, top);
                 int color = Config.CLIENT.lastHeartOutlineColor.get();
-                drawTexturedModalRect(left + 8 * j, y, 17, 9, 9, 9, color);
+                blitWithColor(left + 8 * j, y, 17, 9, 9, 9, color);
             }
         }
 
@@ -150,11 +154,11 @@ public final class HeartDisplayHandler extends Gui {
             // Effect hearts (poison, wither)
             if (showEffectHearts(player)) {
                 int color = effectHeartColor(player);
-                drawTexturedModalRect(left + 8 * i, y, 0, 54, 9, 9, color);
+                blitWithColor(left + 8 * i, y, 0, 54, 9, 9, color);
             }
             // Shiny glint on top of the hearts, a single white pixel in the upper left <3
             if (!info.hardcoreMode) {
-                drawTexturedModalRect(left + 8 * i, y, 17, 0, 9, 9, 0xCCFFFFFF);
+                blitWithColor(left + 8 * i, y, 17, 0, 9, 9, 0xCCFFFFFF);
             }
         }
 
@@ -172,7 +176,7 @@ public final class HeartDisplayHandler extends Gui {
             int texY = absorptionIconStyle == AbsorptionIconStyle.SHIELD ? 45 : 54;
             for (int i = 0; i < 10 && i < absorb / 2; ++i) {
                 int y = info.offsetAbsorptionPosY(i, top);
-                drawTexturedModalRect(left + 8 * i, y, texX, texY, 9, 9, 0xFFFFFF);
+                blitWithColor(left + 8 * i, y, texX, texY, 9, 9, 0xFFFFFF);
             }
 
             // Draw the top two absorption rows, just the basic "hearts"
@@ -187,14 +191,14 @@ public final class HeartDisplayHandler extends Gui {
                 int x;
                 for (x = 0; x < renderHearts; ++x) {
                     int y = info.offsetAbsorptionPosY(x, top);
-                    drawTexturedModalRect(left + 8 * x, y, texX, texY, 9, 9, rowColor);
+                    blitWithColor(left + 8 * x, y, texX, texY, 9, 9, rowColor);
                 }
                 anythingDrawn = x > 0;
 
                 // Half heart on the end?
                 if (absorbCeil % 2 == 1 && renderHearts < 10) {
                     int y = info.offsetAbsorptionPosY(x, top);
-                    drawTexturedModalRect(left + 8 * renderHearts, y, texX + 9, texY, 9, 9, rowColor);
+                    blitWithColor(left + 8 * renderHearts, y, texX + 9, texY, 9, 9, rowColor);
                     anythingDrawn = true;
                 }
             }
@@ -204,20 +208,20 @@ public final class HeartDisplayHandler extends Gui {
                 int y = info.offsetAbsorptionPosY(i, top);
                 if (absorptionIconStyle == AbsorptionIconStyle.SHIELD) {
                     // Golden hearts in center (shield style only)
-                    drawTexturedModalRect(left + 8 * i, y, 17, 36, 9, 9, 0xFFFFFF);
+                    blitWithColor(left + 8 * i, y, 17, 36, 9, 9, 0xFFFFFF);
                 } else if (absorptionIconStyle == AbsorptionIconStyle.GOLD_OUTLINE) {
                     // Golden outline
-                    drawTexturedModalRect(left + 8 * i, y, 17, 27, 9, 9, 0xFFFFFF);
+                    blitWithColor(left + 8 * i, y, 17, 27, 9, 9, 0xFFFFFF);
                 }
                 // Shiny glint on top, same as hearts.
                 if (!info.hardcoreMode || absorptionIconStyle == AbsorptionIconStyle.SHIELD) {
-                    drawTexturedModalRect(left + 8 * i, y, 17, 0, 9, 9, 0xCCFFFFFF);
+                    blitWithColor(left + 8 * i, y, 17, 0, 9, 9, 0xCCFFFFFF);
                 }
             }
         }
 
         GlStateManager.disableBlend();
-        mc.textureManager.bindTexture(Gui.ICONS);
+        mc.textureManager.bindTexture(Screen.GUI_ICONS_LOCATION);
     }
 
     private void drawVanillaHearts(int left, int top) {
@@ -235,29 +239,29 @@ public final class HeartDisplayHandler extends Gui {
             int x = left + i % 10 * 8;
             int y = info.offsetHeartPosY(i, top - row * info.rowHeight);
 
-            drawTexturedModalRect(x, y, textureX, textureY, 9, 9);
+            blit(x, y, textureX, textureY, 9, 9);
 
             if (info.recentlyHurtHighlight) {
                 if (i * 2 + 1 < info.previousHealthInt)
-                    drawTexturedModalRect(x, y, margin + 54, textureY, 9, 9);
+                    blit(x, y, margin + 54, textureY, 9, 9);
                 else if (i * 2 + 1 == info.previousHealthInt)
-                    drawTexturedModalRect(x, y, margin + 63, textureY, 9, 9);
+                    blit(x, y, margin + 63, textureY, 9, 9);
             }
 
             if (absorbRemaining > 0f && info.absorptionStyle == AbsorptionIconStyle.VANILLA) {
                 if (MathUtils.doublesEqual(absorbRemaining, info.absorption) && MathUtils.doublesEqual(info.absorption % 2f, 1f)) {
-                    drawTexturedModalRect(x, y, margin + 153, textureY, 9, 9);
+                    blit(x, y, margin + 153, textureY, 9, 9);
                     absorbRemaining -= 1f;
                 } else {
                     if (i * 2 + 1 < healthTotal)
-                        drawTexturedModalRect(x, y, margin + 144, textureY, 9, 9);
+                        blit(x, y, margin + 144, textureY, 9, 9);
                     absorbRemaining -= 2f;
                 }
             } else {
                 if (i * 2 + 1 < info.healthInt)
-                    drawTexturedModalRect(x, y, margin + 36, textureY, 9, 9);
+                    blit(x, y, margin + 36, textureY, 9, 9);
                 else if (i * 2 + 1 == info.healthInt)
-                    drawTexturedModalRect(x, y, margin + 45, textureY, 9, 9);
+                    blit(x, y, margin + 45, textureY, 9, 9);
             }
         }
     }
@@ -269,7 +273,7 @@ public final class HeartDisplayHandler extends Gui {
         final int top = (int) ((info.scaledWindowHeight + offsetY + (1 / scale)) / scale);
 
         // Draw health string
-        mc.profiler.startSection("shTextPreDraw");
+        mc.getProfiler().startSection("shTextPreDraw");
         String healthString = style.textFor(current, max);
         FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
         int stringWidth = fontRenderer.getStringWidth(healthString);
@@ -293,17 +297,17 @@ public final class HeartDisplayHandler extends Gui {
                 color = Config.CLIENT.healthTextFullColor.get();
                 break;
         }
-        mc.profiler.endSection();
+        mc.getProfiler().endSection();
 
-        mc.profiler.startSection("shTextDraw");
+        mc.getProfiler().startSection("shTextDraw");
         GlStateManager.pushMatrix();
         GlStateManager.scaled(scale, scale, 1);
         fontRenderer.drawStringWithShadow(healthString, left - stringWidth - 2, top, color);
         GlStateManager.popMatrix();
-        mc.profiler.endSection();
+        mc.getProfiler().endSection();
     }
 
-    private void drawTexturedModalRect(int x, int y, int textureX, int textureY, int width, int height, int color) {
+    private void blitWithColor(int x, int y, int textureX, int textureY, int width, int height, int color) {
         float a = ((color >> 24) & 255) / 255f;
         if (a <= 0f)
             a = 1f;
@@ -311,7 +315,7 @@ public final class HeartDisplayHandler extends Gui {
         float g = ((color >> 8) & 255) / 255f;
         float b = (color & 255) / 255f;
         GlStateManager.color4f(r, g, b, a);
-        drawTexturedModalRect(x, y, textureX, textureY, width, height);
+        blit(x, y, textureX, textureY, width, height);
         GlStateManager.color4f(1, 1, 1, 1);
     }
 
@@ -323,14 +327,14 @@ public final class HeartDisplayHandler extends Gui {
         return colors.get(index);
     }
 
-    private static boolean showEffectHearts(EntityPlayer player) {
-        return player.isPotionActive(MobEffects.POISON) || player.isPotionActive(MobEffects.WITHER);
+    private static boolean showEffectHearts(PlayerEntity player) {
+        return player.isPotionActive(Effects.POISON) || player.isPotionActive(Effects.WITHER);
     }
 
-    private static int effectHeartColor(EntityPlayer player) {
-        if (player.isPotionActive(MobEffects.WITHER))
+    private static int effectHeartColor(PlayerEntity player) {
+        if (player.isPotionActive(Effects.WITHER))
             return 0x663E47;
-        if (player.isPotionActive(MobEffects.POISON))
+        if (player.isPotionActive(Effects.POISON))
             return 0x4E9331;
         return 0xFFFFFF;
     }

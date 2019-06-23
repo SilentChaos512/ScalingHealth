@@ -1,6 +1,6 @@
 package net.silentchaos512.scalinghealth.utils;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.silentchaos512.scalinghealth.config.Config;
@@ -15,78 +15,78 @@ import net.silentchaos512.utils.MathUtils;
 public final class Players {
     private Players() {throw new IllegalAccessError("Utility class");}
 
-    public static int startingHealth(EntityPlayer player) {
+    public static int startingHealth(PlayerEntity player) {
         return Config.get(player).player.startingHealth.get();
     }
 
-    public static int minHealth(EntityPlayer player) {
+    public static int minHealth(PlayerEntity player) {
         return Config.get(player).player.minHealth.get();
     }
 
-    public static int maxHealth(EntityPlayer player) {
+    public static int maxHealth(PlayerEntity player) {
         int value = Config.get(player).player.maxHealth.get();
         return value <= 0 ? Integer.MAX_VALUE : value;
     }
 
-    public static int maxHeartCrystals(EntityPlayer player) {
+    public static int maxHeartCrystals(PlayerEntity player) {
         return (maxHealth(player) - startingHealth(player)) / 2;
     }
 
-    public static int maxAttackDamage(EntityPlayer player) {
+    public static int maxAttackDamage(PlayerEntity player) {
         int value = Config.get(player).player.maxAttackDamage.get();
         return value <= 0 ? Integer.MAX_VALUE : value;
     }
 
-    public static int maxPowerCrystals(EntityPlayer player) {
+    public static int maxPowerCrystals(PlayerEntity player) {
         return (int) ((maxAttackDamage(player) - 1) / powerCrystalIncreaseAmount(player));
     }
 
-    public static int clampExtraHearts(EntityPlayer player, int value) {
+    public static int clampExtraHearts(PlayerEntity player, int value) {
         return MathUtils.clamp(value,
                 (minHealth(player) - startingHealth(player)) / 2,
                 (maxHealth(player) - startingHealth(player)) / 2
         );
     }
 
-    public static int clampPowerCrystals(EntityPlayer player, int value) {
+    public static int clampPowerCrystals(PlayerEntity player, int value) {
         return MathUtils.clamp(value,
                 0,
                 maxPowerCrystals(player)
         );
     }
 
-    public static int getCrystalCountFromHealth(EntityPlayer player, float health) {
+    public static int getCrystalCountFromHealth(PlayerEntity player, float health) {
         return (int) ((health - startingHealth(player)) / 2);
     }
 
-    public static float getHealthAfterDeath(EntityPlayer player, DimensionType deathDimension) {
+    public static float getHealthAfterDeath(PlayerEntity player, DimensionType deathDimension) {
         DimensionConfig config = Config.get(deathDimension);
         return (float) EvalVars.apply(config, player, config.player.setHealthOnDeath.get());
     }
 
-    public static boolean heartCrystalsIncreaseHealth(EntityPlayer player) {
+    public static boolean heartCrystalsIncreaseHealth(PlayerEntity player) {
         return Config.get(player).item.heartCrystalIncreaseHealth.get();
     }
 
-    public static double powerCrystalIncreaseAmount(EntityPlayer player) {
+    public static double powerCrystalIncreaseAmount(PlayerEntity player) {
         return Config.get(player).item.powerCrystalDamageIncrease.get();
     }
 
-    public static boolean powerCrystalsIncreaseDamage(EntityPlayer player) {
+    public static boolean powerCrystalsIncreaseDamage(PlayerEntity player) {
         return powerCrystalIncreaseAmount(player) > 0;
     }
 
-    public static int levelCostToUseHeartCrystal(EntityPlayer player) {
+    public static int levelCostToUseHeartCrystal(PlayerEntity player) {
         if (player.abilities.isCreativeMode) return 0;
         return Config.get(player).item.heartCrystalLevelCost.get();
     }
 
-    public static int levelCostToUsePowerCrystal(EntityPlayer player) {
+    public static int levelCostToUsePowerCrystal(PlayerEntity player) {
         if (player.abilities.isCreativeMode) return 0;
         return Config.get(player).item.powerCrystalLevelCost.get();
     }
 
-    public static float heartCrystalHealthRestored(EntityPlayer player) {
+    public static float heartCrystalHealthRestored(PlayerEntity player) {
         return Config.get(player).item.heartCrystalHealthRestored.get().floatValue();
     }
 

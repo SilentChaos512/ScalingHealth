@@ -9,24 +9,25 @@ import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.arguments.EntitySummonArgument;
-import net.minecraft.command.arguments.NBTArgument;
+import net.minecraft.command.arguments.NBTCompoundTagArgument;
 import net.minecraft.command.arguments.SuggestionProviders;
 import net.minecraft.command.arguments.Vec3Argument;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.effect.EntityLightningBolt;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.SpawnReason;
+import net.minecraft.entity.effect.LightningBoltEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.world.chunk.storage.AnvilChunkLoader;
+import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.ServerWorld;
 import net.silentchaos512.scalinghealth.capability.CapabilityDifficultyAffected;
 import net.silentchaos512.scalinghealth.utils.MobDifficultyHandler;
 
 public final class SummonCommand {
-    private static final SimpleCommandExceptionType field_198741_a = new SimpleCommandExceptionType(new TextComponentTranslation("commands.summon.failed"));
+    private static final SimpleCommandExceptionType SUMMON_FAILED = new SimpleCommandExceptionType(new TranslationTextComponent("commands.summon.failed"));
 
     private SummonCommand() {}
 
@@ -44,7 +45,7 @@ public final class SummonCommand {
                                 -1,
                                 false,
                                 source.getSource().getPos(),
-                                new NBTTagCompound(),
+                                new CompoundNBT(),
                                 true
                         )
                 )
@@ -56,7 +57,7 @@ public final class SummonCommand {
                                         IntegerArgumentType.getInteger(source, "difficulty"),
                                         false,
                                         source.getSource().getPos(),
-                                        new NBTTagCompound(),
+                                        new CompoundNBT(),
                                         true
                                 )
                         )
@@ -68,7 +69,7 @@ public final class SummonCommand {
                                                 IntegerArgumentType.getInteger(source, "difficulty"),
                                                 BoolArgumentType.getBool(source, "forceBlight"),
                                                 source.getSource().getPos(),
-                                                new NBTTagCompound(),
+                                                new CompoundNBT(),
                                                 true
                                         )
                                 )
@@ -80,10 +81,10 @@ public final class SummonCommand {
                                                         IntegerArgumentType.getInteger(source, "difficulty"),
                                                         BoolArgumentType.getBool(source, "forceBlight"),
                                                         Vec3Argument.getVec3(source, "pos"),
-                                                        new NBTTagCompound(),
+                                                        new CompoundNBT(),
                                                         true
                                                 )
-                                        ).then(Commands.argument("nbt", NBTArgument.nbt())
+                                        ).then(Commands.argument("nbt", NBTCompoundTagArgument.func_218043_a())
                                                 .executes(source ->
                                                         summonEntity(
                                                                 source.getSource(),
@@ -91,7 +92,7 @@ public final class SummonCommand {
                                                                 IntegerArgumentType.getInteger(source, "difficulty"),
                                                                 BoolArgumentType.getBool(source, "forceBlight"),
                                                                 Vec3Argument.getVec3(source, "pos"),
-                                                                NBTArgument.getNBT(source, "nbt"),
+                                                                NBTCompoundTagArgument.func_218042_a(source, "nbt"),
                                                                 false
                                                         )
                                                 )
@@ -105,34 +106,38 @@ public final class SummonCommand {
     }
 
     // Mostly a copy of vanilla summon command
-    private static int summonEntity(CommandSource source, ResourceLocation id, int difficulty, boolean forceBlight, Vec3d pos, NBTTagCompound tags, boolean p_198737_4_) throws CommandSyntaxException {
-        NBTTagCompound nbttagcompound = tags.copy();
-        nbttagcompound.putString("id", id.toString());
-        if (EntityType.getId(EntityType.LIGHTNING_BOLT).equals(id)) {
-            Entity entity1 = new EntityLightningBolt(source.getWorld(), pos.x, pos.y, pos.z, false);
-            source.getWorld().addWeatherEffect(entity1);
-            source.sendFeedback(new TextComponentTranslation("commands.summon.success", entity1.getDisplayName()), true);
+    private static int summonEntity(CommandSource source, ResourceLocation id, int difficulty, boolean forceBlight, Vec3d pos, CompoundNBT tags, boolean randomizeProperties) throws CommandSyntaxException {
+        CompoundNBT nbt = tags.copy();
+        nbt.putString("id", id.toString());
+        if (EntityType.getKey(EntityType.LIGHTNING_BOLT).equals(id)) {
+            LightningBoltEntity lightningBolt = new LightningBoltEntity(source.getWorld(), pos.x, pos.y, pos.z, false);
+            source.getWorld().addLightningBolt(lightningBolt);
+            source.sendFeedback(new TranslationTextComponent("commands.summon.success", lightningBolt.getDisplayName()), true);
             return 1;
         } else {
-            Entity entity = AnvilChunkLoader.readWorldEntityPos(nbttagcompound, source.getWorld(), pos.x, pos.y, pos.z, true);
+            ServerWorld world = source.getWorld();
+            Entity entity = EntityType.func_220335_a(nbt, world, e -> {
+                e.setLocationAndAngles(pos.x, pos.y, pos.z, e.rotationYaw, e.rotationPitch);
+                //noinspection ReturnOfNull
+                return !world.summonEntity(e) ? null : e;
+            });
             if (entity == null) {
-                throw field_198741_a.create();
+                throw SUMMON_FAILED.create();
             } else {
-                entity.setLocationAndAngles(pos.x, pos.y, pos.z, entity.rotationYaw, entity.rotationPitch);
-                if (p_198737_4_ && entity instanceof EntityLiving) {
-                    EntityLiving entityLiving = (EntityLiving) entity;
-                    entityLiving.onInitialSpawn(source.getWorld().getDifficultyForLocation(new BlockPos(entity)), null, null);
+                if (randomizeProperties && entity instanceof MobEntity) {
+                    MobEntity mob = (MobEntity) entity;
+                    mob.onInitialSpawn(world, world.getDifficultyForLocation(new BlockPos(entity)), SpawnReason.COMMAND, null, null);
 
                     if (difficulty > 0) {
                         entity.getCapability(CapabilityDifficultyAffected.INSTANCE).ifPresent(affected -> {
-                            boolean blight = forceBlight || MobDifficultyHandler.shouldBecomeBlight(entityLiving, difficulty);
-                            MobDifficultyHandler.setEntityProperties(entityLiving, affected, difficulty, blight);
+                            boolean blight = forceBlight || MobDifficultyHandler.shouldBecomeBlight(mob, difficulty);
+                            MobDifficultyHandler.setEntityProperties(mob, affected, difficulty, blight);
                             affected.setProcessed(true);
                         });
                     }
                 }
 
-                source.sendFeedback(new TextComponentTranslation("commands.summon.success", entity.getDisplayName()), true);
+                source.sendFeedback(new TranslationTextComponent("commands.summon.success", entity.getDisplayName()), true);
                 return 1;
             }
         }

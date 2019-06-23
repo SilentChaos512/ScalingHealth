@@ -2,15 +2,18 @@ package net.silentchaos512.scalinghealth.utils;
 
 import com.udojava.evalex.Expression;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.IWorldReaderBase;
+import net.minecraft.util.math.Vec3i;
+import net.minecraft.world.IEntityReader;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.silentchaos512.lib.util.MCMathUtils;
 import net.silentchaos512.scalinghealth.capability.CapabilityDifficultyAffected;
 import net.silentchaos512.scalinghealth.capability.CapabilityDifficultySource;
 import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
@@ -24,6 +27,7 @@ import net.silentchaos512.scalinghealth.lib.AreaDifficultyMode;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * Master utility class for difficulty-related stuff. Any calls should be done through this class
@@ -44,24 +48,29 @@ public final class Difficulty {
 
     @SuppressWarnings("TypeMayBeWeakened")
     public static double ofEntity(Entity entity) {
-        if (entity instanceof EntityPlayer)
+        if (entity instanceof PlayerEntity)
             return source(entity).getDifficulty();
         return affected(entity).getDifficulty();
     }
 
-    public static Collection<Tuple<BlockPos, IDifficultySource>> sources(World world, BlockPos center, long radius) {
-        long rsq = radius * radius;
+    public static Collection<Tuple<BlockPos, IDifficultySource>> sources(IEntityReader world, Vec3i center, long radius) {
         Collection<Tuple<BlockPos, IDifficultySource>> list = new ArrayList<>();
 
         // Get players
-        for (EntityPlayer player : world.getPlayers(EntityPlayer.class, p -> rsq == 0 || p.getDistanceSq(center) < rsq)) {
-            player.getCapability(CapabilityDifficultySource.INSTANCE).ifPresent(source ->
-                    list.add(new Tuple<>(player.getPosition(), source)));
-        }
+        playersInRange(world, center, radius).forEach(player -> {
+            player.getCapability(CapabilityDifficultySource.INSTANCE).ifPresent(source -> {
+                list.add(new Tuple<>(player.getPosition(), source));
+            });
+        });
 
         // TODO: Tile entities that provide difficulty?
 
         return list;
+    }
+
+    public static Stream<? extends PlayerEntity> playersInRange(IEntityReader world, Vec3i center, long radius) {
+        long radiusSquared = radius * radius;
+        return world.getPlayers().stream().filter(p -> radius <= 0 || MCMathUtils.distanceSq(p, center) < radiusSquared);
     }
 
     public static boolean enabledIn(World world) {
@@ -77,7 +86,7 @@ public final class Difficulty {
         return areaMode(world).getAreaDifficulty(world, pos, groupBonus);
     }
 
-    public static double locationMultiplier(IWorldReaderBase world, BlockPos pos) {
+    public static double locationMultiplier(IWorldReader world, BlockPos pos) {
         return Config.get(world).difficulty.getLocationMultiplier(world, pos);
     }
 
@@ -96,63 +105,63 @@ public final class Difficulty {
         return difficulty * EvalVars.apply(config, world, pos, null, expression);
     }
 
-    public static AreaDifficultyMode areaMode(IWorldReaderBase world) {
+    public static AreaDifficultyMode areaMode(IWorldReader world) {
         return Config.get(world).difficulty.areaMode.get();
     }
 
-    public static double clamp(IWorldReaderBase world, double difficulty) {
+    public static double clamp(IWorldReader world, double difficulty) {
         return MathHelper.clamp(difficulty, minValue(world), maxValue(world));
     }
 
-    public static int searchRadius(IWorldReaderBase world) {
+    public static int searchRadius(IWorldReader world) {
         final int radius = Config.get(world).difficulty.searchRadius.get();
         return radius <= 0 ? Integer.MAX_VALUE : radius;
     }
 
-    public static long searchRadiusSquared(IWorldReaderBase world) {
+    public static long searchRadiusSquared(IWorldReader world) {
         final long radius = searchRadius(world);
         return radius * radius;
     }
 
-    public static double distanceFactor(IWorldReaderBase world) {
+    public static double distanceFactor(IWorldReader world) {
         return Config.get(world).difficulty.distanceFactor.get();
     }
 
-    public static double minValue(IWorldReaderBase world) {
+    public static double minValue(IWorldReader world) {
         return Config.get(world).difficulty.minValue.get();
     }
 
-    public static double maxValue(IWorldReaderBase world) {
+    public static double maxValue(IWorldReader world) {
         return Config.get(world).difficulty.maxValue.get();
     }
 
-    public static double changePerSecond(IWorldReaderBase world) {
+    public static double changePerSecond(IWorldReader world) {
         return Config.get(world).difficulty.changePerSecond.get();
     }
 
-    public static boolean allowsDifficultyChanges(EntityLivingBase entity) {
+    public static boolean allowsDifficultyChanges(MobEntity entity) {
         return true;
     }
 
-    public static boolean canBecomeBlight(EntityLivingBase entity) {
+    public static boolean canBecomeBlight(MobEntity entity) {
         return true;
     }
 
-    public static boolean isBlight(EntityLivingBase entity) {
-        IDifficultyAffected affected = entity.getCapability(CapabilityDifficultyAffected.INSTANCE)
-                .orElseGet(CapabilityDifficultyAffected::new);
-        return affected.isBlight();
+    public static boolean isBlight(MobEntity entity) {
+        return entity.getCapability(CapabilityDifficultyAffected.INSTANCE)
+                .orElseGet(CapabilityDifficultyAffected::new)
+                .isBlight();
     }
 
-    public static double damageBoostScale(EntityLivingBase entity) {
+    public static double damageBoostScale(MobEntity entity) {
         return Config.get(entity).mobs.damageBoostScale.get();
     }
 
-    public static double maxDamageBoost(EntityLivingBase entity) {
+    public static double maxDamageBoost(MobEntity entity) {
         return Config.get(entity).mobs.maxDamageBoost.get();
     }
 
-    public static double getDifficultyAfterDeath(EntityPlayer player, DimensionType deathDimension) {
+    public static double getDifficultyAfterDeath(PlayerEntity player, DimensionType deathDimension) {
         DimensionConfig config = Config.get(deathDimension);
         return EvalVars.apply(config, player.world, player.getPosition(), player, config.difficulty.onPlayerDeath.get());
     }

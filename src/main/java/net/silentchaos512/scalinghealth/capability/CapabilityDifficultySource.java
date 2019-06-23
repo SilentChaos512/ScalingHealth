@@ -1,9 +1,9 @@
 package net.silentchaos512.scalinghealth.capability;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.INBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.*;
@@ -13,7 +13,7 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class CapabilityDifficultySource implements IDifficultySource, ICapabilitySerializable<NBTTagCompound> {
+public class CapabilityDifficultySource implements IDifficultySource, ICapabilitySerializable<CompoundNBT> {
     @CapabilityInject(IDifficultySource.class)
     public static Capability<IDifficultySource> INSTANCE = null;
     public static ResourceLocation NAME = ScalingHealth.getId("difficulty_source");
@@ -36,19 +36,19 @@ public class CapabilityDifficultySource implements IDifficultySource, ICapabilit
 
     @Nonnull
     @Override
-    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable EnumFacing side) {
+    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
         return INSTANCE.orEmpty(cap, holder);
     }
 
     @Override
-    public NBTTagCompound serializeNBT() {
-        NBTTagCompound nbt = new NBTTagCompound();
+    public CompoundNBT serializeNBT() {
+        CompoundNBT nbt = new CompoundNBT();
         nbt.putFloat(NBT_DIFFICULTY, difficulty);
         return nbt;
     }
 
     @Override
-    public void deserializeNBT(NBTTagCompound nbt) {
+    public void deserializeNBT(CompoundNBT nbt) {
         difficulty = nbt.getFloat(NBT_DIFFICULTY);
     }
 
@@ -62,7 +62,7 @@ public class CapabilityDifficultySource implements IDifficultySource, ICapabilit
             ScalingHealth.LOGGER.error("Failed to get capabilities from {}", obj);
             return false;
         }
-        return obj instanceof EntityPlayer || obj instanceof World;
+        return obj instanceof PlayerEntity || obj instanceof World;
     }
 
     public static void register() {
@@ -72,17 +72,17 @@ public class CapabilityDifficultySource implements IDifficultySource, ICapabilit
     private static class Storage implements Capability.IStorage<IDifficultySource> {
         @Nullable
         @Override
-        public INBTBase writeNBT(Capability<IDifficultySource> capability, IDifficultySource instance, EnumFacing side) {
+        public INBT writeNBT(Capability<IDifficultySource> capability, IDifficultySource instance, Direction side) {
             if (instance instanceof CapabilityDifficultySource) {
                 return ((CapabilityDifficultySource) instance).serializeNBT();
             }
-            return new NBTTagCompound();
+            return new CompoundNBT();
         }
 
         @Override
-        public void readNBT(Capability<IDifficultySource> capability, IDifficultySource instance, EnumFacing side, INBTBase nbt) {
+        public void readNBT(Capability<IDifficultySource> capability, IDifficultySource instance, Direction side, INBT nbt) {
             if (instance instanceof CapabilityDifficultySource) {
-                ((CapabilityDifficultySource) instance).deserializeNBT((NBTTagCompound) nbt);
+                ((CapabilityDifficultySource) instance).deserializeNBT((CompoundNBT) nbt);
             }
         }
     }

@@ -22,8 +22,9 @@ import net.minecraft.util.Tuple;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.silentchaos512.lib.util.MCMathUtils;
 import net.silentchaos512.scalinghealth.capability.IDifficultySource;
 import net.silentchaos512.scalinghealth.utils.Difficulty;
 
@@ -39,7 +40,7 @@ public enum AreaDifficultyMode {
             for (Tuple<BlockPos, IDifficultySource> tuple : Difficulty.sources(world, pos, radius)) {
                 BlockPos sourcePos = tuple.getA();
                 IDifficultySource source = tuple.getB();
-                int distance = (int) pos.getDistance(sourcePos);
+                int distance = (int) MCMathUtils.distance(pos, sourcePos);
                 int weight = (radius - distance) / 16 + 1;
                 total += weight * source.getDifficulty();
                 totalWeight += weight;
@@ -127,7 +128,7 @@ public enum AreaDifficultyMode {
     }
 
     public ITextComponent getDisplayName() {
-        return new TextComponentTranslation("config.scalinghealth.area_mode." + name().toLowerCase(Locale.ROOT));
+        return new TranslationTextComponent("config.scalinghealth.area_mode." + name().toLowerCase(Locale.ROOT));
     }
 
     public static AreaDifficultyMode fromOrdinal(int ordinal) {

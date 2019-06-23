@@ -19,29 +19,28 @@
 package net.silentchaos512.scalinghealth.potion;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Potion;
+import net.minecraft.potion.Effect;
+import net.minecraft.potion.EffectType;
 import net.silentchaos512.lib.util.EntityHelper;
 
 import java.util.List;
 
-public class PotionBandaged extends Potion {
+public class BandagedEffect extends Effect {
     private static final float BASE_HEAL_RATE = 0.005f;
     private static final double SPEED_MODIFIER = -0.25;
+    public static final String MOD_UUID = "732486d8-f730-41a2-868f-eb988738986f";
 
-    public PotionBandaged() {
-        super(false, 0xf7dcad);
-//        setPotionName("effect." + ScalingHealth.MOD_ID + ".bandaged");
-        setBeneficial();
-        registerPotionAttributeModifier(SharedMonsterAttributes.MOVEMENT_SPEED,
-                "732486d8-f730-41a2-868f-eb988738986f", SPEED_MODIFIER, 2);
+    public BandagedEffect() {
+        super(EffectType.NEUTRAL, 0xf7dcad);
+        this.addAttributesModifier(SharedMonsterAttributes.MOVEMENT_SPEED, MOD_UUID, SPEED_MODIFIER, AttributeModifier.Operation.MULTIPLY_TOTAL);
     }
 
     @Override
-    public void performEffect(EntityLivingBase entityLiving, int amplifier) {
+    public void performEffect(LivingEntity entityLiving, int amplifier) {
         // Remove effect if fully healed.
         if (entityLiving.getHealth() >= entityLiving.getMaxHealth()) {
             entityLiving.removePotionEffect(this);

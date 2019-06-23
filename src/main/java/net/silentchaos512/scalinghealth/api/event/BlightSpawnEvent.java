@@ -18,7 +18,7 @@
 
 package net.silentchaos512.scalinghealth.api.event;
 
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 
@@ -32,20 +32,20 @@ import net.minecraftforge.event.entity.living.LivingSpawnEvent;
  * @since 1.2.0
  */
 public class BlightSpawnEvent extends LivingSpawnEvent {
-    private BlightSpawnEvent(EntityLiving entity, World world, float x, float y, float z) {
+    private BlightSpawnEvent(MobEntity entity, World world, float x, float y, float z) {
         super(entity, world, x, y, z);
     }
 
     public static class Pre extends BlightSpawnEvent {
 
-        public Pre(EntityLiving entity, World world, float x, float y, float z) {
+        public Pre(MobEntity entity, World world, float x, float y, float z) {
             super(entity, world, x, y, z);
         }
     }
 
     public static class Post extends BlightSpawnEvent {
 
-        public Post(EntityLiving entity, World world, float x, float y, float z) {
+        public Post(MobEntity entity, World world, float x, float y, float z) {
             super(entity, world, x, y, z);
         }
 

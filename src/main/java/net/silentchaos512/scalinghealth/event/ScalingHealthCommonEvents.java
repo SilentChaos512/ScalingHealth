@@ -19,20 +19,22 @@
 package net.silentchaos512.scalinghealth.event;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.passive.EntityTameable;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.passive.TameableEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.ServerWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
 import net.minecraft.world.storage.loot.LootContext;
+import net.minecraft.world.storage.loot.LootParameterSets;
+import net.minecraft.world.storage.loot.LootParameters;
 import net.minecraft.world.storage.loot.LootTable;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
@@ -50,7 +52,7 @@ import net.silentchaos512.scalinghealth.capability.IDifficultySource;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.DimensionConfig;
 import net.silentchaos512.scalinghealth.config.EvalVars;
-import net.silentchaos512.scalinghealth.lib.MobType;
+import net.silentchaos512.scalinghealth.lib.EntityGroup;
 import net.silentchaos512.scalinghealth.lib.module.ModuleAprilTricks;
 import net.silentchaos512.scalinghealth.network.ClientLoginMessage;
 import net.silentchaos512.scalinghealth.network.Network;
@@ -67,8 +69,8 @@ public final class ScalingHealthCommonEvents {
 
     @SubscribeEvent
     public static void onPlayerLoggedIn(PlayerLoggedInEvent event) {
-        if (!(event.getPlayer() instanceof EntityPlayerMP)) return;
-        EntityPlayerMP player = (EntityPlayerMP) event.getPlayer();
+        if (!(event.getPlayer() instanceof ServerPlayerEntity)) return;
+        ServerPlayerEntity player = (ServerPlayerEntity) event.getPlayer();
         World world = player.world;
         ScalingHealth.LOGGER.info("Sending login packet to player {}", player);
         ClientLoginMessage msg = new ClientLoginMessage(Difficulty.areaMode(world), (float) Difficulty.maxValue(world));
@@ -77,9 +79,9 @@ public final class ScalingHealthCommonEvents {
 
     @SubscribeEvent
     public static void onLivingDrops(LivingDropsEvent event) {
-        if (!(event.getEntity() instanceof EntityLivingBase)) return;
+        if (!(event.getEntity() instanceof LivingEntity)) return;
 
-        EntityLivingBase entity = (EntityLivingBase) event.getEntity();
+        LivingEntity entity = (LivingEntity) event.getEntity();
         World world = entity.world;
         if (world.isRemote) return;
         MinecraftServer server = world.getServer();
@@ -88,25 +90,29 @@ public final class ScalingHealthCommonEvents {
         // Mob loot disabled?
         if (!world.getGameRules().getBoolean("doMobLoot")) return;
 
-        EntityPlayer player = getPlayerThatCausedDeath(event.getSource());
+        PlayerEntity player = getPlayerThatCausedDeath(event.getSource());
 
         // Get the bonus drops loot table for this mob type
-        Optional<ResourceLocation> tableName = MobType.from(entity, true).getBonusDropsLootTable();
+        Optional<ResourceLocation> tableName = EntityGroup.from(entity, true).getBonusDropsLootTable();
         if (!tableName.isPresent()) return;
 
         LootTable lootTable = server.getLootTableManager().getLootTableFromLocation(tableName.get());
-        LootContext.Builder contextBuilder = new LootContext.Builder((WorldServer) world)
-                .withDamageSource(event.getSource())
-                .withLootedEntity(entity);
-        if (player != null) contextBuilder.withLuck(player.getLuck()).withPlayer(player);
-        List<ItemStack> list = lootTable.generateLootForPools(ScalingHealth.random, contextBuilder.build());
+        LootContext.Builder contextBuilder = new LootContext.Builder((ServerWorld) world)
+                .withParameter(LootParameters.THIS_ENTITY, entity)
+                .withParameter(LootParameters.POSITION, entity.getPosition())
+                .withParameter(LootParameters.DAMAGE_SOURCE, event.getSource())
+                .withNullableParameter(LootParameters.KILLER_ENTITY, player)
+                .withNullableParameter(LootParameters.DIRECT_KILLER_ENTITY, player)
+                .withNullableParameter(LootParameters.LAST_DAMAGE_PLAYER, player);
+        if (player != null) contextBuilder.withLuck(player.getLuck());
+        List<ItemStack> list = lootTable.generate(contextBuilder.build(LootParameterSets.ENTITY));
         list.forEach(stack -> event.getDrops().add(entity.entityDropItem(stack)));
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onXPDropped(LivingExperienceDropEvent event) {
         /*
-        EntityLivingBase entityLiving = event.getEntityLiving();
+        LivingEntity entityLiving = event.getEntityLiving();
 
         // Additional XP from all mobs.
         short difficulty = entityLiving.getEntityData()
@@ -132,24 +138,24 @@ public final class ScalingHealthCommonEvents {
      * damage.
      */
     @Nullable
-    private static EntityPlayer getPlayerThatCausedDeath(DamageSource source) {
+    private static PlayerEntity getPlayerThatCausedDeath(DamageSource source) {
         if (source == null) {
             return null;
         }
 
         // Player is true source.
         Entity entitySource = source.getTrueSource();
-        if (entitySource instanceof EntityPlayer) {
-            return (EntityPlayer) entitySource;
+        if (entitySource instanceof PlayerEntity) {
+            return (PlayerEntity) entitySource;
         }
 
         // Player's pet is true source.
-        boolean isTamedAnimal = entitySource instanceof EntityTameable
-                && ((EntityTameable) entitySource).isTamed();
-        if (entitySource instanceof EntityTameable) {
-            EntityTameable tamed = (EntityTameable) entitySource;
-            if (tamed.isTamed() && tamed.getOwner() instanceof EntityPlayer) {
-                return (EntityPlayer) tamed.getOwner();
+        boolean isTamedAnimal = entitySource instanceof TameableEntity
+                && ((TameableEntity) entitySource).isTamed();
+        if (entitySource instanceof TameableEntity) {
+            TameableEntity tamed = (TameableEntity) entitySource;
+            if (tamed.isTamed() && tamed.getOwner() instanceof PlayerEntity) {
+                return (PlayerEntity) tamed.getOwner();
             }
         }
 
@@ -159,11 +165,11 @@ public final class ScalingHealthCommonEvents {
 
     @SubscribeEvent
     public static void onPlayerDied(LivingDeathEvent event) {
-        if (event.getEntity() == null || !(event.getEntity() instanceof EntityPlayer)) {
+        if (event.getEntity() == null || !(event.getEntity() instanceof PlayerEntity)) {
             return;
         }
 
-        EntityPlayer player = (EntityPlayer) event.getEntity();
+        PlayerEntity player = (PlayerEntity) event.getEntity();
 
         if (ModuleAprilTricks.instance.isEnabled() && ModuleAprilTricks.instance.isRightDay()) {
 //            ScalingHealth.proxy.playSoundOnClient(player, ModSounds.PLAYER_DIED, 0.6f, 1f);
@@ -174,8 +180,8 @@ public final class ScalingHealthCommonEvents {
     public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
         /*
         // Set player health correctly after respawn.
-        if (event.player instanceof EntityPlayerMP) {
-            EntityPlayerMP player = (EntityPlayerMP) event.player;
+        if (event.player instanceof ServerPlayerEntity) {
+            ServerPlayerEntity player = (ServerPlayerEntity) event.player;
             PlayerData data = SHPlayerDataHandler.get(player);
             if (data == null) return;
 
@@ -212,8 +218,8 @@ public final class ScalingHealthCommonEvents {
     public static void onPlayerJoinedServer(PlayerLoggedInEvent event) {
         /*
         // Sync player data and set health.
-        if (event.player instanceof EntityPlayerMP) {
-            EntityPlayerMP player = (EntityPlayerMP) event.player;
+        if (event.player instanceof ServerPlayerEntity) {
+            ServerPlayerEntity player = (ServerPlayerEntity) event.player;
             PlayerData data = SHPlayerDataHandler.get(player);
 
             // Resets, based on config?
@@ -249,7 +255,7 @@ public final class ScalingHealthCommonEvents {
 
     @SubscribeEvent
     public static void onPlayerSleepInBed(PlayerSleepInBedEvent event) {
-        EntityPlayer player = event.getEntityPlayer();
+        PlayerEntity player = event.getEntityPlayer();
         if (!player.world.isRemote && Config.CLIENT.warnWhenSleeping.get()) {
             DimensionConfig config = Config.get(player);
             double newDifficulty = EvalVars.apply(config, player, config.difficulty.onPlayerSleep.get());
@@ -258,8 +264,8 @@ public final class ScalingHealthCommonEvents {
                 // Difficulty would change (doesn't change until onPlayerWakeUp)
                 String configMsg = config.difficulty.sleepWarningMessage.get();
                 ITextComponent text = configMsg.isEmpty()
-                        ? new TextComponentTranslation("misc.scalinghealth.sleepWarning")
-                        : new TextComponentString(configMsg);
+                        ? new TranslationTextComponent("misc.scalinghealth.sleepWarning")
+                        : new StringTextComponent(configMsg);
                 player.sendMessage(text);
             }
         }
@@ -267,7 +273,7 @@ public final class ScalingHealthCommonEvents {
 
     @SubscribeEvent
     public static void onPlayerWakeUp(PlayerWakeUpEvent event) {
-        EntityPlayer player = event.getEntityPlayer();
+        PlayerEntity player = event.getEntityPlayer();
         if (!player.world.isRemote && !event.updateWorld()) {
             DimensionConfig config = Config.get(player);
             IDifficultySource source = Difficulty.source(player);

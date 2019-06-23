@@ -18,7 +18,7 @@
 
 package net.silentchaos512.scalinghealth.item;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.silentchaos512.lib.util.EntityHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -30,24 +30,24 @@ import net.silentchaos512.utils.MathUtils;
 
 public class HeartCrystal extends StatBoosterItem {
     @Override
-    int getLevelCost(EntityPlayer player) {
+    int getLevelCost(PlayerEntity player) {
         return Players.levelCostToUseHeartCrystal(player);
     }
 
     @Override
-    boolean isStatIncreaseAllowed(EntityPlayer player, IPlayerData data) {
+    boolean isStatIncreaseAllowed(PlayerEntity player, IPlayerData data) {
         return Players.heartCrystalsIncreaseHealth(player)
                 && data.getExtraHearts() < Players.maxHeartCrystals(player);
     }
 
     @Override
-    boolean shouldConsume(EntityPlayer player) {
+    boolean shouldConsume(PlayerEntity player) {
         return Players.heartCrystalHealthRestored(player) > 0
                 && player.getHealth() < player.getMaxHealth();
     }
 
     @Override
-    void extraConsumeEffect(EntityPlayer player) {
+    void extraConsumeEffect(PlayerEntity player) {
         int current = (int) player.getHealth();
         float healAmount = Players.heartCrystalHealthRestored(player);
         EntityHelper.heal(player, healAmount, true);
@@ -58,7 +58,7 @@ public class HeartCrystal extends StatBoosterItem {
     }
 
     @Override
-    void increaseStat(EntityPlayer player, ItemStack stack, IPlayerData data) {
+    void increaseStat(PlayerEntity player, ItemStack stack, IPlayerData data) {
         data.addHeart(player);
     }
 

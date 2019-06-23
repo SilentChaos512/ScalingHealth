@@ -18,6 +18,7 @@
 
 package net.silentchaos512.scalinghealth.init;
 
+import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
@@ -25,31 +26,46 @@ import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.client.render.entity.RenderBlightFire;
-import net.silentchaos512.scalinghealth.entity.EntityBlightFire;
+import net.silentchaos512.scalinghealth.client.render.entity.BlightFireRenderer;
+import net.silentchaos512.scalinghealth.entity.BlightFireEntity;
 import net.silentchaos512.utils.Lazy;
 
-public final class ModEntities {
-    public static final Lazy<EntityType<EntityBlightFire>> BLIGHT_FIRE = Lazy.of(() ->
-            EntityType.Builder.create(EntityBlightFire.class, EntityBlightFire::new)
-                    .build(ScalingHealth.RESOURCE_PREFIX + "blight_fire"));
+import java.util.Locale;
+import java.util.function.Supplier;
 
-    private ModEntities() {}
+public enum ModEntities {
+    BLIGHT_FIRE(() -> EntityType.Builder.create((type, world) -> new BlightFireEntity(world), EntityClassification.AMBIENT));
+
+    private final Lazy<EntityType<?>> type;
+
+    ModEntities(Supplier<EntityType.Builder<?>> factory) {
+        this.type = Lazy.of(() -> {
+            ResourceLocation id = ScalingHealth.getId(this.getName());
+            return factory.get().build(id.toString());
+        });
+    }
+
+    public EntityType<?> type() {
+        return type.get();
+    }
+
+    private String getName() {
+        return name().toLowerCase(Locale.ROOT);
+    }
 
     public static void registerAll(RegistryEvent.Register<EntityType<?>> event) {
-        // Workaround for Forge event bus bug
-        if (!event.getName().equals(ForgeRegistries.ENTITIES.getRegistryName())) return;
+        for (ModEntities entity : values()) {
+            register(entity.getName(), entity.type());
+        }
+    }
 
-        register("blight_fire", BLIGHT_FIRE.get());
+    public static void registerRenderers(FMLClientSetupEvent event) {
+        RenderingRegistry.registerEntityRenderingHandler(BlightFireEntity.class, new BlightFireRenderer.Factory());
     }
 
     private static void register(String name, EntityType<?> entityType) {
         ResourceLocation id = new ResourceLocation(ScalingHealth.MOD_ID, name);
         entityType.setRegistryName(id);
         ForgeRegistries.ENTITIES.register(entityType);
-    }
-
-    public static void registerRenderers(FMLClientSetupEvent event) {
-        RenderingRegistry.registerEntityRenderingHandler(EntityBlightFire.class, new RenderBlightFire.Factory());
     }
 }

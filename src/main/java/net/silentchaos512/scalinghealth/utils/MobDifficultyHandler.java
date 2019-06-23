@@ -1,8 +1,9 @@
 package net.silentchaos512.scalinghealth.utils;
 
 import com.udojava.evalex.Expression;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.util.math.MathHelper;
@@ -13,13 +14,13 @@ import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.DimensionConfig;
 import net.silentchaos512.scalinghealth.config.EvalVars;
 import net.silentchaos512.scalinghealth.lib.MobHealthMode;
-import net.silentchaos512.scalinghealth.lib.MobType;
+import net.silentchaos512.scalinghealth.lib.EntityGroup;
 import net.silentchaos512.utils.MathUtils;
 
 public final class MobDifficultyHandler {
     private MobDifficultyHandler() {}
 
-    public static void process(EntityLivingBase entity, IDifficultyAffected data) {
+    public static void process(MobEntity entity, IDifficultyAffected data) {
         // Already dead?
         if (!entity.isAlive()) return;
 
@@ -30,7 +31,7 @@ public final class MobDifficultyHandler {
         setEntityProperties(entity, data, difficulty, makeBlight);
     }
 
-    public static boolean shouldBecomeBlight(EntityLivingBase entity, float difficulty) {
+    public static boolean shouldBecomeBlight(MobEntity entity, float difficulty) {
         if (Difficulty.canBecomeBlight(entity)) {
             double chance = getBlightChance(entity);
             return MathUtils.tryPercentage(ScalingHealth.random, chance);
@@ -38,7 +39,7 @@ public final class MobDifficultyHandler {
         return false;
     }
 
-    public static void setEntityProperties(EntityLivingBase entity, IDifficultyAffected data, float difficulty, boolean makeBlight) {
+    public static void setEntityProperties(MobEntity entity, IDifficultyAffected data, float difficulty, boolean makeBlight) {
         if (!entity.isAlive()) return;
 
         World world = entity.world;
@@ -82,13 +83,13 @@ public final class MobDifficultyHandler {
         Config.get(entity).mobs.randomPotions.tryApply(entity, totalDifficulty);
 
         // Apply extra health and damage.
-        MobHealthMode mode = MobType.from(entity).getHealthMode(entity);
+        MobHealthMode mode = EntityGroup.from(entity).getHealthMode(entity);
         double healthModAmount = mode.getModifierValue(healthBoost, baseMaxHealth);
         ModifierHandler.addMaxHealth(entity, healthModAmount, mode.getOperator());
-        ModifierHandler.addAttackDamage(entity, damageBoost, 0);
+        ModifierHandler.addAttackDamage(entity, damageBoost, AttributeModifier.Operation.ADDITION);
     }
 
-    private static double getBlightChance(EntityLivingBase entity) {
+    private static double getBlightChance(MobEntity entity) {
         // FIXME: May not line up with actual entity difficulty, need to pass in difficulty
         DimensionConfig config = Config.get(entity);
         Expression expr = new Expression("0.0625 * areaDifficulty / maxDifficulty");

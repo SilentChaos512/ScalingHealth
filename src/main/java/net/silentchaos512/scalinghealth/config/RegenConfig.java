@@ -1,9 +1,9 @@
 package net.silentchaos512.scalinghealth.config;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.silentchaos512.utils.config.BooleanValue;
 import net.silentchaos512.utils.config.ConfigSpecWrapper;
 import net.silentchaos512.utils.config.DoubleValue;
@@ -65,13 +65,13 @@ public class RegenConfig {
         return config;
     }
 
-    public boolean isActive(EntityLivingBase entity) {
+    public boolean isActive(LivingEntity entity) {
         if (!this.enabled.get() || !entity.isAlive() || entity.getHealth() >= entity.getMaxHealth()) {
             return false;
         }
 
-        if (entity instanceof EntityPlayer) {
-            EntityPlayer player = (EntityPlayer) entity;
+        if (entity instanceof PlayerEntity) {
+            PlayerEntity player = (PlayerEntity) entity;
             int food = player.getFoodStats().getFoodLevel();
             if (food < this.minFood.get() || food > this.maxFood.get()) {
                 return false;
@@ -82,9 +82,9 @@ public class RegenConfig {
         return health >= this.minHealth.get() && health <= this.maxHealth.get();
     }
 
-    public float getHealTickAmount(EntityLivingBase entity) {
+    public float getHealTickAmount(LivingEntity entity) {
         if (this.proportionalToMaxHealth.get()) {
-            IAttributeInstance attr = entity.getAttributeMap().getAttributeInstance(SharedMonsterAttributes.MAX_HEALTH);
+            IAttributeInstance attr = entity.getAttribute(SharedMonsterAttributes.MAX_HEALTH);
             double base = attr.getBaseValue();
             double max = attr.getValue();
             return (float) (max / base);

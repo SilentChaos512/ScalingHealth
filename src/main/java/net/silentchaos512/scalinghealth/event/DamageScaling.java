@@ -18,9 +18,9 @@
 
 package net.silentchaos512.scalinghealth.event;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -29,12 +29,14 @@ import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.DimensionConfig;
-import net.silentchaos512.scalinghealth.lib.MobType;
+import net.silentchaos512.scalinghealth.lib.EntityGroup;
 import net.silentchaos512.scalinghealth.utils.Difficulty;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 public final class DamageScaling {
     private static final Marker MARKER = MarkerManager.getMarker("DamageScaling");
@@ -50,14 +52,14 @@ public final class DamageScaling {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public void onPlayerHurt(LivingAttackEvent event) {
-        EntityLivingBase entity = event.getEntityLiving();
+        LivingEntity entity = event.getEntityLiving();
         if (entity.world.isRemote) return;
         // Entity invulnerable?
         if (entity.isInvulnerableTo(event.getSource()) || entity.hurtResistantTime > entity.maxHurtResistantTime / 2)
             return;
 
         // Check entity has already been processed from original event, or is not allowed to be affected
-        if (entityAttackedThisTick.contains(entity.getUniqueID()) || !MobType.from(entity).isAffectedByDamageScaling(entity))
+        if (entityAttackedThisTick.contains(entity.getUniqueID()) || !EntityGroup.from(entity).isAffectedByDamageScaling(entity))
             return;
 
         DamageSource source = event.getSource();
@@ -87,14 +89,14 @@ public final class DamageScaling {
         }
     }
 
-    private static double getEffectScale(EntityLivingBase entity) {
+    private static double getEffectScale(LivingEntity entity) {
         DimensionConfig config = Config.get(entity);
         Mode mode = config.damageScaling.mode.get();
         switch (mode) {
             case AREA_DIFFICULTY:
                 return Difficulty.areaDifficulty(entity.world, entity.getPosition()) * config.damageScaling.difficultyWeight.get();
             case MAX_HEALTH:
-                double baseHealth = entity instanceof EntityPlayer
+                double baseHealth = entity instanceof PlayerEntity
                         ? config.player.startingHealth.get()
                         : entity.getAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue();
                 return (entity.getMaxHealth() - baseHealth) / baseHealth;

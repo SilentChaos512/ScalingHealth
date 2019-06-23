@@ -1,6 +1,6 @@
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-package net.silentchaos512.scalinghealth.loot.properties;
+package net.silentchaos512.scalinghealth.loot.conditions;
 
 import mcp.MethodsReturnNonnullByDefault;
 

@@ -1,20 +1,17 @@
 package net.silentchaos512.scalinghealth.client.particles;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.IParticleFactory;
+import net.minecraft.client.particle.IParticleRenderType;
 import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.TexturedParticle;
+import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.utils.Color;
-import net.silentchaos512.utils.MathUtils;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -22,7 +19,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @OnlyIn(Dist.CLIENT)
-public class ModParticle extends Particle {
+public class ModParticle extends TexturedParticle {
     private static final List<ResourceLocation> TEXTURES = IntStream.range(0, 4).boxed()
             .map(k -> new ResourceLocation(ScalingHealth.MOD_ID, "textures/particle/generic" + k + ".png"))
             .collect(Collectors.toList());
@@ -40,8 +37,8 @@ public class ModParticle extends Particle {
     }
 
     @Override
-    public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
-        int frame = FRAMES.length * this.age / this.maxAge;
+    public void renderParticle(BufferBuilder buffer, ActiveRenderInfo entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
+        /*int frame = FRAMES.length * this.age / this.maxAge;
         int textureIndex = FRAMES[MathUtils.clamp(frame, 0, FRAMES.length - 1)];
         ResourceLocation texture = TEXTURES.get(textureIndex);
         Minecraft.getInstance().textureManager.bindTexture(texture);
@@ -94,12 +91,32 @@ public class ModParticle extends Particle {
                 .tex(0, 1)
                 .color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha)
                 .lightmap(j, k).endVertex();
-        buffer.finishDrawing();
+        buffer.finishDrawing();*/
     }
 
     @Override
-    public int getFXLayer() {
-        return 3;
+    public IParticleRenderType getRenderType() {
+        return IParticleRenderType.CUSTOM;
+    }
+
+    @Override
+    protected float func_217563_c() {
+        return 0;
+    }
+
+    @Override
+    protected float func_217564_d() {
+        return 0;
+    }
+
+    @Override
+    protected float func_217562_e() {
+        return 0;
+    }
+
+    @Override
+    protected float func_217560_f() {
+        return 0;
     }
 
     @OnlyIn(Dist.CLIENT)

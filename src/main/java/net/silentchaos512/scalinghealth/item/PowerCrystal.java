@@ -1,6 +1,6 @@
 package net.silentchaos512.scalinghealth.item;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.silentchaos512.scalinghealth.capability.IPlayerData;
 import net.silentchaos512.scalinghealth.client.particles.ModParticles;
@@ -9,28 +9,28 @@ import net.silentchaos512.scalinghealth.utils.Players;
 
 public class PowerCrystal extends StatBoosterItem {
     @Override
-    int getLevelCost(EntityPlayer player) {
+    int getLevelCost(PlayerEntity player) {
         return Players.levelCostToUsePowerCrystal(player);
     }
 
     @Override
-    boolean isStatIncreaseAllowed(EntityPlayer player, IPlayerData data) {
+    boolean isStatIncreaseAllowed(PlayerEntity player, IPlayerData data) {
         return Players.powerCrystalsIncreaseDamage(player);
     }
 
     @Override
-    boolean shouldConsume(EntityPlayer player) {
+    boolean shouldConsume(PlayerEntity player) {
         // No extra effect
         return false;
     }
 
     @Override
-    void extraConsumeEffect(EntityPlayer player) {
+    void extraConsumeEffect(PlayerEntity player) {
         // Nada
     }
 
     @Override
-    void increaseStat(EntityPlayer player, ItemStack stack, IPlayerData data) {
+    void increaseStat(PlayerEntity player, ItemStack stack, IPlayerData data) {
         data.addPowerCrystal(player);
     }
 

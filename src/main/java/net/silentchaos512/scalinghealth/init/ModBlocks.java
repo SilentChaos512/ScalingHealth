@@ -19,8 +19,8 @@
 package net.silentchaos512.scalinghealth.init;
 
 import net.minecraft.block.Block;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -33,8 +33,8 @@ import java.util.Locale;
 import java.util.function.Supplier;
 
 public enum ModBlocks implements IBlockProvider {
-    HEART_CRYSTAL_ORE(() -> new BlockShardOre(() -> ModItems.HEART_CRYSTAL_SHARD)),
-    POWER_CRYSTAL_ORE(() -> new BlockShardOre(() -> ModItems.POWER_CRYSTAL_SHARD));
+    HEART_CRYSTAL_ORE(BlockShardOre::new),
+    POWER_CRYSTAL_ORE(BlockShardOre::new);
 
     private final Lazy<Block> block;
 
@@ -70,7 +70,7 @@ public enum ModBlocks implements IBlockProvider {
         block.setRegistryName(registryName);
         ForgeRegistries.BLOCKS.register(block);
 
-        ItemBlock item = new ItemBlock(block, new Item.Properties());
+        BlockItem item = new BlockItem(block, new Item.Properties());
         item.setRegistryName(registryName);
         ModItems.blocksToRegister.add(item);
     }

@@ -19,16 +19,16 @@
 package net.silentchaos512.scalinghealth.item;
 
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumRarity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.stats.StatList;
+import net.minecraft.item.Rarity;
+import net.minecraft.stats.Stats;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IDifficultySource;
@@ -61,46 +61,46 @@ public class DifficultyMutatorItem extends Item {
     public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flag) {
         double amount = getEffectAmount(stack, world);
         String amountStr = (amount > 0 ? "+" : "") + String.format("%.1f", amount);
-        list.add(new TextComponentTranslation("item.scalinghealth.difficulty_changer.effectDesc", amountStr));
+        list.add(new TranslationTextComponent("item.scalinghealth.difficulty_changer.effectDesc", amountStr));
     }
 
     @Override
-    public EnumRarity getRarity(ItemStack stack) {
-        return EnumRarity.EPIC;
+    public Rarity getRarity(ItemStack stack) {
+        return Rarity.EPIC;
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getHeldItem(hand);
         IDifficultySource source = Difficulty.source(player);
 
         double particleX = player.posX;
-        double particleY = player.posY + 0.65f * player.height;
+        double particleY = player.posY + 0.65f * player.getHeight();
         double particleZ = player.posZ;
 
         if (!world.isRemote) {
             float change = getEffectAmount(stack, world);
             source.addDifficulty(change);
             stack.shrink(1);
-            player.addStat(StatList.ITEM_USED.get(this));
+            player.addStat(Stats.ITEM_USED.get(this));
         }
 
         switch (this.type) {
             // Enchanted Heart
             case ENCHANTED:
                 enchantedHeartEffects(world, player, particleX, particleY, particleZ);
-                return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+                return new ActionResult<>(ActionResultType.SUCCESS, stack);
             // Cursed Heart
             case CURSED:
                 cursedHeartEffects(world, player, particleX, particleY, particleZ);
-                return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+                return new ActionResult<>(ActionResultType.SUCCESS, stack);
             default:
                 ScalingHealth.LOGGER.error("DifficultyMutatorItem invalid type: {}", this.type);
-                return new ActionResult<>(EnumActionResult.PASS, stack);
+                return new ActionResult<>(ActionResultType.PASS, stack);
         }
     }
 
-    private void cursedHeartEffects(World world, EntityPlayer player, double particleX, double particleY, double particleZ) {
+    private void cursedHeartEffects(World world, PlayerEntity player, double particleX, double particleY, double particleZ) {
 //        for (int i = 0; i < 20 - 5 * ScalingHealth.proxy.getParticleSettings(); ++i) {
 //            double xSpeed = 0.08 * ScalingHealth.random.nextGaussian();
 //            double ySpeed = 0.05 * ScalingHealth.random.nextGaussian();
@@ -113,7 +113,7 @@ public class DifficultyMutatorItem extends Item {
 //                (float) (0.7f + 0.05f * ScalingHealth.random.nextGaussian()));
     }
 
-    private void enchantedHeartEffects(World world, EntityPlayer player, double particleX, double particleY, double particleZ) {
+    private void enchantedHeartEffects(World world, PlayerEntity player, double particleX, double particleY, double particleZ) {
 //        for (int i = 0; i < 20 - 5 * ScalingHealth.proxy.getParticleSettings(); ++i) {
 //            double xSpeed = 0.08 * ScalingHealth.random.nextGaussian();
 //            double ySpeed = 0.05 * ScalingHealth.random.nextGaussian();

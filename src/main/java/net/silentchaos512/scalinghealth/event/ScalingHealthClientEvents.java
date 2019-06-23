@@ -92,7 +92,7 @@ public final class ScalingHealthClientEvents {
 
         // Blight count
         int blightCount = world.getEntities(EntityLivingBase.class, BlightHandler::isBlight).size();
-        int blightFires = world.getEntities(EntityBlightFire.class, e -> true).size();
+        int blightFires = world.getEntities(BlightFireEntity.class, e -> true).size();
         ret.append(String.format("Blights (Fires) = %d (%d)", blightCount, blightFires));
 
         return ret.toString();

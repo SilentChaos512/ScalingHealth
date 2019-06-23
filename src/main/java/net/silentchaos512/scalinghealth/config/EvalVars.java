@@ -1,7 +1,7 @@
 package net.silentchaos512.scalinghealth.config;
 
 import com.udojava.evalex.Expression;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.silentchaos512.scalinghealth.utils.Difficulty;
@@ -30,10 +30,7 @@ public enum EvalVars {
             Difficulty.areaDifficulty(ctx.world, ctx.pos, false)
     ),
     AREA_PLAYER_COUNT("areaPlayerCount", ctx -> {
-        long radiusSquared = Difficulty.searchRadiusSquared(ctx.world);
-        return ctx.world.getPlayers(EntityPlayer.class, p ->
-                radiusSquared == 0 || p.getDistanceSq(ctx.pos) <= radiusSquared)
-                .size();
+        return Difficulty.playersInRange(ctx.world, ctx.pos, Difficulty.searchRadius(ctx.world)).count();
     });
 
     private final String name;
@@ -48,11 +45,11 @@ public enum EvalVars {
         return name;
     }
 
-    public static double apply(DimensionConfig config, EntityPlayer player, Expression expression) {
+    public static double apply(DimensionConfig config, PlayerEntity player, Expression expression) {
         return apply(config, player.world, player.getPosition(), player, expression);
     }
 
-    public static double apply(DimensionConfig config, World world, BlockPos pos, @Nullable EntityPlayer player, Expression expression) {
+    public static double apply(DimensionConfig config, World world, BlockPos pos, @Nullable PlayerEntity player, Expression expression) {
         Context context = new Context(config, world, pos, player);
         for (EvalVars variable : values()) {
             // TODO: Is toString right?
@@ -66,9 +63,9 @@ public enum EvalVars {
         private final World world;
         private final BlockPos pos;
         @Nullable
-        private final EntityPlayer player;
+        private final PlayerEntity player;
 
-        private Context(DimensionConfig config, World world, BlockPos pos, @Nullable EntityPlayer player) {
+        private Context(DimensionConfig config, World world, BlockPos pos, @Nullable PlayerEntity player) {
             this.config = config;
             this.world = world;
             this.pos = pos;

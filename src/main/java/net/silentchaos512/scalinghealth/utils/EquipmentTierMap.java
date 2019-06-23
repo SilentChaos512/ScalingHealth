@@ -18,7 +18,7 @@
 
 package net.silentchaos512.scalinghealth.utils;
 
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 
@@ -29,11 +29,11 @@ import java.util.function.Supplier;
 
 public class EquipmentTierMap {
     public final int tierCount;
-    public final EntityEquipmentSlot slot;
+    public final EquipmentSlotType slot;
 
     List<List<Supplier<ItemStack>>> sets;
 
-    public EquipmentTierMap(int tierCount, EntityEquipmentSlot slot) {
+    public EquipmentTierMap(int tierCount, EquipmentSlotType slot) {
         this.tierCount = tierCount;
         this.slot = slot;
 

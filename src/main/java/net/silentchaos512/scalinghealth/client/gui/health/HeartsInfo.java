@@ -1,8 +1,8 @@
 package net.silentchaos512.scalinghealth.client.gui.health;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.MobEffects;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.math.MathHelper;
 import net.silentchaos512.lib.event.ClientTicks;
 import net.silentchaos512.scalinghealth.config.Config;
@@ -40,7 +40,7 @@ class HeartsInfo {
         Minecraft mc = Minecraft.getInstance();
         //noinspection ConstantConditions -- can be null
         if (mc == null) return;
-        EntityPlayer player = mc.player;
+        PlayerEntity player = mc.player;
         if (player == null) return;
 
         int updateCounter = ClientTicks.ticksInGame();
@@ -61,7 +61,7 @@ class HeartsInfo {
         recentlyHurtHighlight = player.hurtResistantTime / 3 % 2 == 1;
         hardcoreMode = player.world.getWorldInfo().isHardcore();
         for (int i = 0; i < lowHealthBob.length; ++i) lowHealthBob[i] = random.nextInt(2);
-        regenTimer = player.isPotionActive(MobEffects.REGENERATION) ? updateCounter % 20 : -1;
+        regenTimer = player.isPotionActive(Effects.REGENERATION) ? updateCounter % 20 : -1;
 
         heartStyle = Config.CLIENT.heartIconStyle.get();
         absorptionStyle = Config.CLIENT.absorptionIconStyle.get();

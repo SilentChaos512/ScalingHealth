@@ -2,14 +2,14 @@ package net.silentchaos512.scalinghealth.config;
 
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.ConfigSpec;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.potion.Effect;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.lib.util.TimeUtils;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.lib.MobType;
+import net.silentchaos512.scalinghealth.lib.EntityGroup;
 import net.silentchaos512.utils.Lazy;
 import net.silentchaos512.utils.MathUtils;
 import net.silentchaos512.utils.config.ConfigSpecWrapper;
@@ -25,21 +25,21 @@ import java.util.stream.Collectors;
 
 public class MobPotionConfig {
     private static final Marker MARKER = MarkerManager.getMarker("MobPotionConfig");
-    private Lazy<List<PotionEntry>> potions;
-    private final List<PotionEntry> temp = new ArrayList<>();
+    private Lazy<List<EffectEntry>> potions;
+    private final List<EffectEntry> temp = new ArrayList<>();
 
-    public void tryApply(EntityLivingBase entity, double difficulty) {
-        double chance = MobType.from(entity).getPotionChance(entity);
+    public void tryApply(LivingEntity entity, double difficulty) {
+        double chance = EntityGroup.from(entity).getPotionChance(entity);
         if (!MathUtils.tryPercentage(chance)) return;
 
         temp.clear();
-        for (PotionEntry entry : potions.get()) {
+        for (EffectEntry entry : potions.get()) {
             if (entry.cost < difficulty) {
                 temp.add(entry);
             }
         }
         if (!temp.isEmpty()) {
-            PotionEntry entry = temp.get(MathUtils.nextInt(temp.size()));
+            EffectEntry entry = temp.get(MathUtils.nextInt(temp.size()));
             entry.applyTo(entity);
             if (ScalingHealth.LOGGER.isDebugEnabled()) {
                 ScalingHealth.LOGGER.debug(MARKER, "Applied {} from {} effects to {}", entry, temp.size(), entity.getScoreboardName());
@@ -47,7 +47,7 @@ public class MobPotionConfig {
         }
     }
 
-    public void applyAll(EntityLivingBase entity) {
+    public void applyAll(LivingEntity entity) {
         this.potions.get().forEach(entry -> entry.applyTo(entity));
         if (ScalingHealth.LOGGER.isDebugEnabled()) {
             ScalingHealth.LOGGER.debug(MARKER, "Applied all {} effects to {}", potions.get().size(), entity.getScoreboardName());
@@ -70,13 +70,13 @@ public class MobPotionConfig {
         MobPotionConfig result = new MobPotionConfig();
         result.potions = Lazy.of(() -> config.get()
                 .stream()
-                .map(c -> PotionEntry.from(c, includeCost))
+                .map(c -> EffectEntry.from(c, includeCost))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList()));
         return result;
     }
 
-    static CommentedConfig from(Potion potion, int level, double durationInMinutes, int cost) {
+    static CommentedConfig from(Effect potion, int level, double durationInMinutes, int cost) {
         CommentedConfig config = CommentedConfig.inMemory();
         config.set("potion", Objects.requireNonNull(potion.getRegistryName()).toString());
         config.set("level", level);
@@ -85,14 +85,14 @@ public class MobPotionConfig {
         return config;
     }
 
-    static class PotionEntry {
-        final Potion potion;
+    static class EffectEntry {
+        final Effect potion;
         final int level;
         final int cost;
         final int duration;
         // TODO: Include refresh boolean?
 
-        PotionEntry(Potion potion, int level, int cost, int duration) {
+        EffectEntry(Effect potion, int level, int cost, int duration) {
             this.potion = potion;
             this.level = level;
             this.cost = cost;
@@ -100,14 +100,14 @@ public class MobPotionConfig {
         }
 
         @Nullable
-        static PotionEntry from(CommentedConfig config, boolean includeCost) {
+        static EffectEntry from(CommentedConfig config, boolean includeCost) {
             String nameRaw = config.get("potion");
             ResourceLocation name = ResourceLocation.tryCreate(nameRaw);
             if (name == null) {
                 ScalingHealth.LOGGER.error(MARKER, "Invalid ID {}", nameRaw);
                 return null;
             }
-            Potion potion = ForgeRegistries.POTIONS.getValue(name);
+            Effect potion = ForgeRegistries.POTIONS.getValue(name);
             if (potion == null) {
                 ScalingHealth.LOGGER.error(MARKER, "No potion with ID {}", name);
                 return null;
@@ -118,16 +118,16 @@ public class MobPotionConfig {
             float durationInMinutes = config.getOrElse("durationInMinutes", 10.0).floatValue();
             int duration = TimeUtils.ticksFromMinutes(durationInMinutes);
 
-            return new PotionEntry(potion, level, cost, duration);
+            return new EffectEntry(potion, level, cost, duration);
         }
 
-        void applyTo(EntityLivingBase entity) {
-            entity.addPotionEffect(new PotionEffect(potion, duration, level - 1));
+        void applyTo(LivingEntity entity) {
+            entity.addPotionEffect(new EffectInstance(potion, duration, level - 1));
         }
 
         @Override
         public String toString() {
-            return "PotionEntry{" +
+            return "EffectEntry{" +
                     "potion=" + potion.getRegistryName() +
                     ", level=" + level +
                     ", cost=" + cost +

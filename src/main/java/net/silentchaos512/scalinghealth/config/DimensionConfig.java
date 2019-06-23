@@ -4,14 +4,14 @@ import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.ConfigSpec;
 import com.google.common.collect.ImmutableList;
 import com.udojava.evalex.Expression;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.monster.IMob;
-import net.minecraft.entity.passive.IAnimal;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.MobEffects;
+import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorldReaderBase;
+import net.minecraft.world.IWorldReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.dimension.DimensionType;
 import net.silentchaos512.lib.util.BiomeUtils;
@@ -176,20 +176,20 @@ public class DimensionConfig {
                     .comment("The maximum extra attack damage a mob can receive")
                     .defineInRange(10, 0, Double.MAX_VALUE);
             randomPotions = MobPotionConfig.init(wrapper, "mob.randomPotionEffects", true, ImmutableList.<CommentedConfig>builder()
-                    .add(MobPotionConfig.from(MobEffects.SPEED, 1, 10, 15))
-                    .add(MobPotionConfig.from(MobEffects.SPEED, 2, 10, 50))
-                    .add(MobPotionConfig.from(MobEffects.STRENGTH, 1, 10, 30))
-                    .add(MobPotionConfig.from(MobEffects.FIRE_RESISTANCE, 1, 10, 10))
-                    .add(MobPotionConfig.from(MobEffects.INVISIBILITY, 1, 10, 35))
-                    .add(MobPotionConfig.from(MobEffects.RESISTANCE, 1, 10, 40))
+                    .add(MobPotionConfig.from(Effects.SPEED, 1, 10, 15))
+                    .add(MobPotionConfig.from(Effects.SPEED, 2, 10, 50))
+                    .add(MobPotionConfig.from(Effects.STRENGTH, 1, 10, 30))
+                    .add(MobPotionConfig.from(Effects.FIRE_RESISTANCE, 1, 10, 10))
+                    .add(MobPotionConfig.from(Effects.INVISIBILITY, 1, 10, 35))
+                    .add(MobPotionConfig.from(Effects.RESISTANCE, 1, 10, 40))
                     .build());
 
             // Blights
             blightPotions = MobPotionConfig.init(wrapper, "mob.blight.potionEffects", false, ImmutableList.<CommentedConfig>builder()
-                    .add(MobPotionConfig.from(MobEffects.FIRE_RESISTANCE, 1, 5, 0))
-                    .add(MobPotionConfig.from(MobEffects.RESISTANCE, 1, 5, 0))
-                    .add(MobPotionConfig.from(MobEffects.SPEED, 4, 5, 0))
-                    .add(MobPotionConfig.from(MobEffects.STRENGTH, 2, 5, 0))
+                    .add(MobPotionConfig.from(Effects.FIRE_RESISTANCE, 1, 5, 0))
+                    .add(MobPotionConfig.from(Effects.RESISTANCE, 1, 5, 0))
+                    .add(MobPotionConfig.from(Effects.SPEED, 4, 5, 0))
+                    .add(MobPotionConfig.from(Effects.STRENGTH, 2, 5, 0))
                     .build());
         }
     }
@@ -447,7 +447,7 @@ public class DimensionConfig {
          *
          * @return True if exempt, false otherwise.
          */
-        public boolean isExempt(EntityPlayer player) {
+        public boolean isExempt(PlayerEntity player) {
             List<? extends String> list = difficultyExempt.get();
             for (String value : list) {
                 if (value.equalsIgnoreCase(player.getName().getFormattedText())) {
@@ -457,7 +457,7 @@ public class DimensionConfig {
             return list.contains(player.getUniqueID().toString());
         }
 
-        public Expression getKillMutator(EntityLivingBase entity) {
+        public Expression getKillMutator(LivingEntity entity) {
             // Might be nice if there was a more generic way to handle lists of tables.
             // But this works for now.
             String name = Objects.requireNonNull(entity.getType().getRegistryName()).toString();
@@ -468,7 +468,7 @@ public class DimensionConfig {
                     .orElseGet(() -> getDefaultKillMutator(entity));
         }
 
-        public double getLocationMultiplier(IWorldReaderBase world, BlockPos pos) {
+        public double getLocationMultiplier(IWorldReader world, BlockPos pos) {
             DimensionType type = world.getDimension().getType();
             Biome biome = world.getBiome(pos);
             //noinspection OverlyLongLambda
@@ -487,12 +487,12 @@ public class DimensionConfig {
         }
 
         @SuppressWarnings("ChainOfInstanceofChecks")
-        public Expression getDefaultKillMutator(EntityLivingBase entity) {
+        public Expression getDefaultKillMutator(LivingEntity entity) {
             // TODO: Check blight
             if (!entity.isNonBoss()) return onBossKilled.get();
             if (entity instanceof IMob) return onHostileKilled.get();
-            if (entity instanceof IAnimal) return onPeacefulKilled.get();
-            if (entity instanceof EntityPlayer) return onPlayerKilled.get();
+            if (entity instanceof AnimalEntity) return onPeacefulKilled.get();
+            if (entity instanceof PlayerEntity) return onPlayerKilled.get();
             return onHostileKilled.get();
         }
     }
