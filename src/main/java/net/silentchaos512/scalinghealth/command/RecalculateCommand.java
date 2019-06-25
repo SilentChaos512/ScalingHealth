@@ -6,7 +6,7 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.silentchaos512.scalinghealth.capability.CapabilityDifficultyAffected;
+import net.silentchaos512.scalinghealth.capability.DifficultyAffectedCapability;
 import net.silentchaos512.scalinghealth.utils.MobDifficultyHandler;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -30,7 +30,7 @@ public final class RecalculateCommand {
     private static int recalculateAllEntities(CommandContext<CommandSource> context) {
         AtomicInteger processed = new AtomicInteger(0);
         context.getSource().getWorld().getEntities().filter(e -> e instanceof MobEntity).forEach(entity -> {
-            entity.getCapability(CapabilityDifficultyAffected.INSTANCE).ifPresent(affected -> {
+            entity.getCapability(DifficultyAffectedCapability.INSTANCE).ifPresent(affected -> {
                 MobDifficultyHandler.process((MobEntity) entity, affected);
                 processed.incrementAndGet();
             });

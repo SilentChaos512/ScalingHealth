@@ -14,9 +14,9 @@ import net.minecraftforge.fml.event.lifecycle.*;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.silentchaos512.scalinghealth.capability.CapabilityDifficultyAffected;
-import net.silentchaos512.scalinghealth.capability.CapabilityDifficultySource;
-import net.silentchaos512.scalinghealth.capability.CapabilityPlayerData;
+import net.silentchaos512.scalinghealth.capability.DifficultyAffectedCapability;
+import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
+import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
 import net.silentchaos512.scalinghealth.client.gui.DebugOverlay;
 import net.silentchaos512.scalinghealth.client.gui.difficulty.DifficultyMeter;
 import net.silentchaos512.scalinghealth.client.gui.health.HeartDisplayHandler;
@@ -56,9 +56,9 @@ public class SideProxy {
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
-        CapabilityDifficultyAffected.register();
-        CapabilityDifficultySource.register();
-        CapabilityPlayerData.register();
+        DifficultyAffectedCapability.register();
+        DifficultySourceCapability.register();
+        PlayerDataCapability.register();
         ModGameRules.registerDefinitions();
         DeferredWorkQueue.runLater(SHWorldFeatures::addFeaturesToBiomes);
     }

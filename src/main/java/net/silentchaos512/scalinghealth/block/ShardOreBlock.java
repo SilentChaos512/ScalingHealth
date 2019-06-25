@@ -8,8 +8,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.IWorldReader;
 
-public class BlockShardOre extends OreBlock {
-    public BlockShardOre() {
+public class ShardOreBlock extends OreBlock {
+    public ShardOreBlock() {
         super(Block.Properties.create(Material.ROCK).hardnessAndResistance(3, 15));
     }
 

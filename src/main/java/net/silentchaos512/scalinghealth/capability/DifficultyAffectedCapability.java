@@ -17,7 +17,7 @@ import net.silentchaos512.scalinghealth.utils.MobDifficultyHandler;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class CapabilityDifficultyAffected implements IDifficultyAffected, ICapabilitySerializable<CompoundNBT> {
+public class DifficultyAffectedCapability implements IDifficultyAffected, ICapabilitySerializable<CompoundNBT> {
     @CapabilityInject(IDifficultyAffected.class)
     public static Capability<IDifficultyAffected> INSTANCE = null;
     public static ResourceLocation NAME = ScalingHealth.getId("difficulty_affected");
@@ -89,8 +89,8 @@ public class CapabilityDifficultyAffected implements IDifficultyAffected, ICapab
         difficulty = nbt.getFloat(NBT_DIFFICULTY);
     }
 
-    public static CapabilityDifficultyAffected read(PacketBuffer buffer) {
-        CapabilityDifficultyAffected cap = new CapabilityDifficultyAffected();
+    public static DifficultyAffectedCapability read(PacketBuffer buffer) {
+        DifficultyAffectedCapability cap = new DifficultyAffectedCapability();
         cap.blight = buffer.getBoolean(0);
         cap.difficulty = buffer.readFloat();
         cap.processed = true;
@@ -109,23 +109,23 @@ public class CapabilityDifficultyAffected implements IDifficultyAffected, ICapab
     }
 
     public static void register() {
-        CapabilityManager.INSTANCE.register(IDifficultyAffected.class, new Storage(), CapabilityDifficultyAffected::new);
+        CapabilityManager.INSTANCE.register(IDifficultyAffected.class, new Storage(), DifficultyAffectedCapability::new);
     }
 
     private static class Storage implements Capability.IStorage<IDifficultyAffected> {
         @Nullable
         @Override
         public INBT writeNBT(Capability<IDifficultyAffected> capability, IDifficultyAffected instance, Direction side) {
-            if (instance instanceof CapabilityDifficultyAffected) {
-                return ((CapabilityDifficultyAffected) instance).serializeNBT();
+            if (instance instanceof DifficultyAffectedCapability) {
+                return ((DifficultyAffectedCapability) instance).serializeNBT();
             }
             return new CompoundNBT();
         }
 
         @Override
         public void readNBT(Capability<IDifficultyAffected> capability, IDifficultyAffected instance, Direction side, INBT nbt) {
-            if (instance instanceof CapabilityDifficultyAffected) {
-                ((CapabilityDifficultyAffected) instance).deserializeNBT((CompoundNBT) nbt);
+            if (instance instanceof DifficultyAffectedCapability) {
+                ((DifficultyAffectedCapability) instance).deserializeNBT((CompoundNBT) nbt);
             }
         }
     }

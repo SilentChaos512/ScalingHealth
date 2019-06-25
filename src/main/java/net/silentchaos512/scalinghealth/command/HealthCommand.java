@@ -13,7 +13,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.silentchaos512.scalinghealth.capability.CapabilityPlayerData;
+import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
 import net.silentchaos512.scalinghealth.utils.Players;
 
 public final class HealthCommand {
@@ -71,7 +71,7 @@ public final class HealthCommand {
     }
 
     private static int getHealthSingle(CommandContext<CommandSource> context, PlayerEntity player) {
-        player.getCapability(CapabilityPlayerData.INSTANCE).ifPresent(data -> {
+        player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> {
             context.getSource().sendFeedback(ModCommands.playerNameText(player), true);
             // Actual health
             ITextComponent actualValues = ModCommands.valueText(player.getHealth(), player.getMaxHealth());
@@ -93,7 +93,7 @@ public final class HealthCommand {
     private static int runSetHealth(CommandContext<CommandSource> context) throws CommandSyntaxException {
         int amount = IntegerArgumentType.getInteger(context, "amount");
         for (ServerPlayerEntity player : EntityArgument.getPlayers(context, "targets")) {
-            player.getCapability(CapabilityPlayerData.INSTANCE).ifPresent(data -> {
+            player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> {
                 int intendedExtraHearts = (amount - Players.startingHealth(player)) / 2;
                 data.setExtraHearts(player, intendedExtraHearts);
             });
@@ -104,7 +104,7 @@ public final class HealthCommand {
     private static int runAddHealth(CommandContext<CommandSource> context) throws CommandSyntaxException {
         int amount = IntegerArgumentType.getInteger(context, "amount");
         for (ServerPlayerEntity player : EntityArgument.getPlayers(context, "targets")) {
-            player.getCapability(CapabilityPlayerData.INSTANCE).ifPresent(data -> {
+            player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> {
                 data.addHearts(player, amount);
             });
         }

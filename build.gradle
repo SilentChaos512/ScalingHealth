@@ -76,6 +76,7 @@ minecraft {
 repositories {
     jcenter()
     mavenLocal()
+    maven { url 'https://maven.mcmoddev.com' }
 }
 
 configurations {
@@ -89,6 +90,11 @@ dependencies {
     extraLibs "com.udojava:EvalEx:2.1"
     compile("net.silentchaos512:silent-lib-${project.mc_version}:${project.sl_version}") {
         exclude module: "forge"
+    }
+
+    compile "net.darkhax.bookshelf:Bookshelf-1.14.2:4.+"
+    compile("net.darkhax.gamestages:GameStages-${project.mc_version}:4.+") {
+        exclude module: "Bookshelf-1.14.2"
     }
 
     configurations.implementation.extendsFrom(configurations.extraLibs)

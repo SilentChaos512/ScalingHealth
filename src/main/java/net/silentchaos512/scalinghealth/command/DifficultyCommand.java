@@ -15,7 +15,7 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.ServerWorld;
-import net.silentchaos512.scalinghealth.capability.CapabilityDifficultySource;
+import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
 import net.silentchaos512.scalinghealth.utils.Difficulty;
 
 public final class DifficultyCommand {
@@ -92,7 +92,7 @@ public final class DifficultyCommand {
     }
 
     private static int getDifficultySingle(CommandContext<CommandSource> context, PlayerEntity player) {
-        player.getCapability(CapabilityDifficultySource.INSTANCE).ifPresent(source -> {
+        player.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
             context.getSource().sendFeedback(ModCommands.playerNameText(player), true);
             double maxDifficulty = Difficulty.maxValue(player.world);
             // Player difficulty
@@ -119,7 +119,7 @@ public final class DifficultyCommand {
 
     private static int runGetWorldDifficulty(CommandContext<CommandSource> context) {
         ServerWorld world = context.getSource().getWorld();
-        world.getCapability(CapabilityDifficultySource.INSTANCE).ifPresent(source -> {
+        world.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
             ITextComponent textWorld = new TranslationTextComponent("command.scalinghealth.worldName", world.dimension.getType().getId())
                     .applyTextStyle(TextFormatting.AQUA);
             context.getSource().sendFeedback(textWorld, true);
@@ -137,7 +137,7 @@ public final class DifficultyCommand {
     private static int runSetDifficulty(CommandContext<CommandSource> context) throws CommandSyntaxException {
         float amount = FloatArgumentType.getFloat(context, "amount");
         for (ServerPlayerEntity player : EntityArgument.getPlayers(context, "targets")) {
-            player.getCapability(CapabilityDifficultySource.INSTANCE).ifPresent(source -> {
+            player.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
                 source.setDifficulty(amount);
             });
         }
@@ -147,7 +147,7 @@ public final class DifficultyCommand {
     private static int runSetWorldDifficulty(CommandContext<CommandSource> context) {
         float amount = FloatArgumentType.getFloat(context, "amount");
         ServerWorld world = context.getSource().getWorld();
-        world.getCapability(CapabilityDifficultySource.INSTANCE).ifPresent(source -> {
+        world.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
             source.setDifficulty(amount);
         });
         return 1;
@@ -156,7 +156,7 @@ public final class DifficultyCommand {
     private static int runAddDifficulty(CommandContext<CommandSource> context) throws CommandSyntaxException {
         float amount = FloatArgumentType.getFloat(context, "amount");
         for (ServerPlayerEntity player : EntityArgument.getPlayers(context, "targets")) {
-            player.getCapability(CapabilityDifficultySource.INSTANCE).ifPresent(source -> {
+            player.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
                 source.addDifficulty(amount);
             });
         }
@@ -166,7 +166,7 @@ public final class DifficultyCommand {
     private static int runAddWorldDifficulty(CommandContext<CommandSource> context) {
         float amount = FloatArgumentType.getFloat(context, "amount");
         ServerWorld world = context.getSource().getWorld();
-        world.getCapability(CapabilityDifficultySource.INSTANCE).ifPresent(source -> {
+        world.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
             source.addDifficulty(amount);
         });
         return 1;

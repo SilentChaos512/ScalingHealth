@@ -14,8 +14,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.silentchaos512.lib.util.MCMathUtils;
-import net.silentchaos512.scalinghealth.capability.CapabilityDifficultyAffected;
-import net.silentchaos512.scalinghealth.capability.CapabilityDifficultySource;
+import net.silentchaos512.scalinghealth.capability.DifficultyAffectedCapability;
+import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
 import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
 import net.silentchaos512.scalinghealth.capability.IDifficultySource;
 import net.silentchaos512.scalinghealth.config.Config;
@@ -37,13 +37,13 @@ public final class Difficulty {
     private Difficulty() {throw new IllegalAccessError("Utility class");}
 
     public static IDifficultyAffected affected(ICapabilityProvider entity) {
-        return entity.getCapability(CapabilityDifficultyAffected.INSTANCE)
-                .orElseGet(CapabilityDifficultyAffected::new);
+        return entity.getCapability(DifficultyAffectedCapability.INSTANCE)
+                .orElseGet(DifficultyAffectedCapability::new);
     }
 
     public static IDifficultySource source(ICapabilityProvider source) {
-        return source.getCapability(CapabilityDifficultySource.INSTANCE)
-                .orElseGet(CapabilityDifficultySource::new);
+        return source.getCapability(DifficultySourceCapability.INSTANCE)
+                .orElseGet(DifficultySourceCapability::new);
     }
 
     @SuppressWarnings("TypeMayBeWeakened")
@@ -58,7 +58,7 @@ public final class Difficulty {
 
         // Get players
         playersInRange(world, center, radius).forEach(player -> {
-            player.getCapability(CapabilityDifficultySource.INSTANCE).ifPresent(source -> {
+            player.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
                 list.add(new Tuple<>(player.getPosition(), source));
             });
         });
@@ -148,8 +148,8 @@ public final class Difficulty {
     }
 
     public static boolean isBlight(MobEntity entity) {
-        return entity.getCapability(CapabilityDifficultyAffected.INSTANCE)
-                .orElseGet(CapabilityDifficultyAffected::new)
+        return entity.getCapability(DifficultyAffectedCapability.INSTANCE)
+                .orElseGet(DifficultyAffectedCapability::new)
                 .isBlight();
     }
 

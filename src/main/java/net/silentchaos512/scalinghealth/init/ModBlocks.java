@@ -26,15 +26,15 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.lib.block.IBlockProvider;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.block.BlockShardOre;
+import net.silentchaos512.scalinghealth.block.ShardOreBlock;
 import net.silentchaos512.utils.Lazy;
 
 import java.util.Locale;
 import java.util.function.Supplier;
 
 public enum ModBlocks implements IBlockProvider {
-    HEART_CRYSTAL_ORE(BlockShardOre::new),
-    POWER_CRYSTAL_ORE(BlockShardOre::new);
+    HEART_CRYSTAL_ORE(ShardOreBlock::new),
+    POWER_CRYSTAL_ORE(ShardOreBlock::new);
 
     private final Lazy<Block> block;
 

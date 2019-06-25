@@ -23,7 +23,7 @@ import net.silentchaos512.scalinghealth.utils.Players;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class CapabilityPlayerData implements IPlayerData, ICapabilitySerializable<CompoundNBT> {
+public class PlayerDataCapability implements IPlayerData, ICapabilitySerializable<CompoundNBT> {
     @CapabilityInject(IPlayerData.class)
     public static Capability<IPlayerData> INSTANCE = null;
     public static ResourceLocation NAME = ScalingHealth.getId("player_data");
@@ -123,23 +123,23 @@ public class CapabilityPlayerData implements IPlayerData, ICapabilitySerializabl
     }
 
     public static void register() {
-        CapabilityManager.INSTANCE.register(IPlayerData.class, new Storage(), CapabilityPlayerData::new);
+        CapabilityManager.INSTANCE.register(IPlayerData.class, new Storage(), PlayerDataCapability::new);
     }
 
     private static class Storage implements Capability.IStorage<IPlayerData> {
         @Nullable
         @Override
         public INBT writeNBT(Capability<IPlayerData> capability, IPlayerData instance, Direction side) {
-            if (instance instanceof CapabilityPlayerData) {
-                return ((CapabilityPlayerData) instance).serializeNBT();
+            if (instance instanceof PlayerDataCapability) {
+                return ((PlayerDataCapability) instance).serializeNBT();
             }
             return new CompoundNBT();
         }
 
         @Override
         public void readNBT(Capability<IPlayerData> capability, IPlayerData instance, Direction side, INBT nbt) {
-            if (instance instanceof CapabilityPlayerData) {
-                ((CapabilityPlayerData) instance).deserializeNBT((CompoundNBT) nbt);
+            if (instance instanceof PlayerDataCapability) {
+                ((PlayerDataCapability) instance).deserializeNBT((CompoundNBT) nbt);
             }
         }
     }

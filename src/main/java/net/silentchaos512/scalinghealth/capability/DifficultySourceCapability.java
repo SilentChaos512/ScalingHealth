@@ -13,7 +13,7 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class CapabilityDifficultySource implements IDifficultySource, ICapabilitySerializable<CompoundNBT> {
+public class DifficultySourceCapability implements IDifficultySource, ICapabilitySerializable<CompoundNBT> {
     @CapabilityInject(IDifficultySource.class)
     public static Capability<IDifficultySource> INSTANCE = null;
     public static ResourceLocation NAME = ScalingHealth.getId("difficulty_source");
@@ -66,23 +66,23 @@ public class CapabilityDifficultySource implements IDifficultySource, ICapabilit
     }
 
     public static void register() {
-        CapabilityManager.INSTANCE.register(IDifficultySource.class, new Storage(), CapabilityDifficultySource::new);
+        CapabilityManager.INSTANCE.register(IDifficultySource.class, new Storage(), DifficultySourceCapability::new);
     }
 
     private static class Storage implements Capability.IStorage<IDifficultySource> {
         @Nullable
         @Override
         public INBT writeNBT(Capability<IDifficultySource> capability, IDifficultySource instance, Direction side) {
-            if (instance instanceof CapabilityDifficultySource) {
-                return ((CapabilityDifficultySource) instance).serializeNBT();
+            if (instance instanceof DifficultySourceCapability) {
+                return ((DifficultySourceCapability) instance).serializeNBT();
             }
             return new CompoundNBT();
         }
 
         @Override
         public void readNBT(Capability<IDifficultySource> capability, IDifficultySource instance, Direction side, INBT nbt) {
-            if (instance instanceof CapabilityDifficultySource) {
-                ((CapabilityDifficultySource) instance).deserializeNBT((CompoundNBT) nbt);
+            if (instance instanceof DifficultySourceCapability) {
+                ((DifficultySourceCapability) instance).deserializeNBT((CompoundNBT) nbt);
             }
         }
     }

@@ -15,9 +15,9 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.capability.CapabilityDifficultyAffected;
-import net.silentchaos512.scalinghealth.capability.CapabilityDifficultySource;
-import net.silentchaos512.scalinghealth.capability.CapabilityPlayerData;
+import net.silentchaos512.scalinghealth.capability.DifficultyAffectedCapability;
+import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
+import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
 import net.silentchaos512.scalinghealth.utils.Difficulty;
 import net.silentchaos512.scalinghealth.utils.Players;
 import org.apache.logging.log4j.Marker;
@@ -36,28 +36,28 @@ public final class DifficultyEvents {
     @SubscribeEvent
     public static void onAttachEntityCapabilities(AttachCapabilitiesEvent<Entity> event) {
         Entity entity = event.getObject();
-        if (CapabilityDifficultyAffected.canAttachTo(entity)) {
+        if (DifficultyAffectedCapability.canAttachTo(entity)) {
 //            debug(event::getObject);
-            event.addCapability(CapabilityDifficultyAffected.NAME, new CapabilityDifficultyAffected());
+            event.addCapability(DifficultyAffectedCapability.NAME, new DifficultyAffectedCapability());
         }
-        if (CapabilityDifficultySource.canAttachTo(entity)) {
+        if (DifficultySourceCapability.canAttachTo(entity)) {
 //            debug(() -> "Attaching difficulty source capability to " + entity);
             debug(() -> "attach difficulty source");
-            event.addCapability(CapabilityDifficultySource.NAME, new CapabilityDifficultySource());
+            event.addCapability(DifficultySourceCapability.NAME, new DifficultySourceCapability());
         }
-        if (CapabilityPlayerData.canAttachTo(entity)) {
+        if (PlayerDataCapability.canAttachTo(entity)) {
 //            debug(() -> "Attaching player data capability to " + entity);
             debug(() -> "attach player data");
-            event.addCapability(CapabilityPlayerData.NAME, new CapabilityPlayerData());
+            event.addCapability(PlayerDataCapability.NAME, new PlayerDataCapability());
         }
     }
 
     @SubscribeEvent
     public static void onAttachWorldCapabilities(AttachCapabilitiesEvent<World> event) {
         World world = event.getObject();
-        if (CapabilityDifficultySource.canAttachTo(world)) {
+        if (DifficultySourceCapability.canAttachTo(world)) {
 //            debug(() -> "Attaching difficulty source capability to " + world);
-            event.addCapability(CapabilityDifficultySource.NAME, new CapabilityDifficultySource());
+            event.addCapability(DifficultySourceCapability.NAME, new DifficultySourceCapability());
         }
     }
 
@@ -68,14 +68,14 @@ public final class DifficultyEvents {
 
         // Tick mobs, which will calculate difficulty when appropriate and apply changes
         if (entity instanceof MobEntity) {
-            entity.getCapability(CapabilityDifficultyAffected.INSTANCE).ifPresent(affected -> {
+            entity.getCapability(DifficultyAffectedCapability.INSTANCE).ifPresent(affected -> {
                 affected.tick((MobEntity) entity);
             });
         }
 
         // Tick difficulty source, such as players
         if (entity.world.getGameTime() % 20 == 0) {
-            entity.getCapability(CapabilityDifficultySource.INSTANCE).ifPresent(source -> {
+            entity.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
                 float change = (float) Difficulty.changePerSecond(entity.world);
                 source.setDifficulty(source.getDifficulty() + change);
             });
@@ -89,7 +89,7 @@ public final class DifficultyEvents {
 
         // Tick world difficulty source
         if (world.getGameTime() % 20 == 0) {
-            world.getCapability(CapabilityDifficultySource.INSTANCE).ifPresent(source -> {
+            world.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
                 float change = (float) Difficulty.changePerSecond(world);
                 source.setDifficulty(source.getDifficulty() + change);
             });
@@ -100,7 +100,7 @@ public final class DifficultyEvents {
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
         PlayerEntity player = event.player;
         if (player.world.isRemote) return;
-        player.getCapability(CapabilityPlayerData.INSTANCE).ifPresent(data -> data.tick(player));
+        player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> data.tick(player));
     }
 
     @SubscribeEvent
@@ -112,16 +112,16 @@ public final class DifficultyEvents {
         PlayerEntity original = event.getOriginal();
         PlayerEntity clone = event.getEntityPlayer();
         debug(() -> "onPlayerClone");
-        copyCapability(CapabilityPlayerData.INSTANCE, original, clone);
-        copyCapability(CapabilityDifficultySource.INSTANCE, original, clone);
+        copyCapability(PlayerDataCapability.INSTANCE, original, clone);
+        copyCapability(DifficultySourceCapability.INSTANCE, original, clone);
 
         // Apply death mutators
-        clone.getCapability(CapabilityPlayerData.INSTANCE).ifPresent(data -> {
+        clone.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> {
             int newCrystals = Players.getCrystalCountFromHealth(clone, Players.getHealthAfterDeath(clone, original.dimension));
             notifyOfChanges(clone, "heart crystal(s)", data.getExtraHearts(), newCrystals);
             data.setExtraHearts(clone, newCrystals);
         });
-        clone.getCapability(CapabilityDifficultySource.INSTANCE).ifPresent(source -> {
+        clone.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
             float newDifficulty = (float) Difficulty.getDifficultyAfterDeath(clone, original.dimension);
             notifyOfChanges(clone, "difficulty", source.getDifficulty(), newDifficulty);
             source.setDifficulty(newDifficulty);

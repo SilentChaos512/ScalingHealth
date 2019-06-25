@@ -15,7 +15,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.silentchaos512.scalinghealth.capability.CapabilityPlayerData;
+import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
 import net.silentchaos512.scalinghealth.utils.Players;
 
 public final class PowerCommand {
@@ -73,7 +73,7 @@ public final class PowerCommand {
     }
 
     private static int runGetSingle(CommandContext<CommandSource> context, PlayerEntity player) {
-        player.getCapability(CapabilityPlayerData.INSTANCE).ifPresent(data -> {
+        player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> {
             context.getSource().sendFeedback(ModCommands.playerNameText(player), true);
             // Actual power
             IAttributeInstance attr = player.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
@@ -95,7 +95,7 @@ public final class PowerCommand {
     private static int runSet(CommandContext<CommandSource> context) throws CommandSyntaxException {
         int amount = IntegerArgumentType.getInteger(context, "amount");
         for (ServerPlayerEntity player : EntityArgument.getPlayers(context, "targets")) {
-            player.getCapability(CapabilityPlayerData.INSTANCE).ifPresent(data -> {
+            player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> {
                 int intendedCrystalCount = (int) ((amount - 1) / Players.powerCrystalIncreaseAmount(player));
                 data.setPowerCrystalCount(player, intendedCrystalCount);
             });
@@ -106,7 +106,7 @@ public final class PowerCommand {
     private static int runAdd(CommandContext<CommandSource> context) throws CommandSyntaxException {
         int amount = IntegerArgumentType.getInteger(context, "amount");
         for (ServerPlayerEntity player : EntityArgument.getPlayers(context, "targets")) {
-            player.getCapability(CapabilityPlayerData.INSTANCE).ifPresent(data -> {
+            player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> {
                 data.addPowerCrystals(player, amount);
             });
         }

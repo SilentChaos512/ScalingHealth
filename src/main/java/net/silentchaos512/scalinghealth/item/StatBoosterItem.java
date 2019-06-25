@@ -12,7 +12,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.capability.CapabilityPlayerData;
+import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
 import net.silentchaos512.scalinghealth.capability.IPlayerData;
 import net.silentchaos512.scalinghealth.client.particles.ModParticles;
 import net.silentchaos512.scalinghealth.init.ModSounds;
@@ -40,7 +40,7 @@ public abstract class StatBoosterItem extends Item {
         ItemStack stack = playerIn.getHeldItem(handIn);
 
         if (!worldIn.isRemote) {
-            IPlayerData data = playerIn.getCapability(CapabilityPlayerData.INSTANCE).orElseThrow(() ->
+            IPlayerData data = playerIn.getCapability(PlayerDataCapability.INSTANCE).orElseThrow(() ->
                     new IllegalStateException("Player data is null!"));
 
             final boolean statIncreaseAllowed = isStatIncreaseAllowed(playerIn, data);
