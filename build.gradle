@@ -92,9 +92,9 @@ dependencies {
         exclude module: "forge"
     }
 
-    compile "net.darkhax.bookshelf:Bookshelf-1.14.2:4.+"
-    compile("net.darkhax.gamestages:GameStages-${project.mc_version}:4.+") {
-        exclude module: "Bookshelf-1.14.2"
+    compileOnly "net.darkhax.bookshelf:Bookshelf-1.14.3:4.+"
+    compileOnly("net.darkhax.gamestages:GameStages-${project.mc_version}:4.+") {
+        exclude module: "Bookshelf-1.14.3"
     }
 
     configurations.implementation.extendsFrom(configurations.extraLibs)

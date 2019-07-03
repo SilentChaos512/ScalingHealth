@@ -24,7 +24,7 @@
                   }
                 }
               ],
-              "name": "scalinghealt:heart_crystal_ore"
+              "name": "scalinghealth:heart_crystal_ore"
             },
             {
               "type": "minecraft:item",

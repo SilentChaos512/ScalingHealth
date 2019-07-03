@@ -21,7 +21,7 @@ import net.silentchaos512.scalinghealth.capability.IDifficultySource;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.DimensionConfig;
 import net.silentchaos512.scalinghealth.config.EvalVars;
-import net.silentchaos512.scalinghealth.init.ModGameRules;
+//import net.silentchaos512.scalinghealth.init.ModGameRules;
 import net.silentchaos512.scalinghealth.lib.AreaDifficultyMode;
 
 import java.util.ArrayList;
@@ -74,8 +74,7 @@ public final class Difficulty {
     }
 
     public static boolean enabledIn(World world) {
-        return ModGameRules.DIFFICULTY.getBoolean(world)
-                && Config.get(world).difficulty.maxValue.get() > 0;
+        return Config.get(world).difficulty.maxValue.get() > 0 /*&& ModGameRules.DIFFICULTY.getBoolean(world)*/;
     }
 
     public static double areaDifficulty(World world, BlockPos pos) {

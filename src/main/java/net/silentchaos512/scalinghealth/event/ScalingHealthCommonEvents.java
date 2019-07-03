@@ -30,6 +30,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.world.GameRules;
 import net.minecraft.world.ServerWorld;
 import net.minecraft.world.World;
 import net.minecraft.world.storage.loot.LootContext;
@@ -88,7 +89,7 @@ public final class ScalingHealthCommonEvents {
         if (server == null) return;
 
         // Mob loot disabled?
-        if (!world.getGameRules().getBoolean("doMobLoot")) return;
+        if (!world.getGameRules().getBoolean(GameRules.DO_MOB_LOOT)) return;
 
         PlayerEntity player = getPlayerThatCausedDeath(event.getSource());
 

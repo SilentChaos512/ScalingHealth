@@ -59,7 +59,7 @@ public class SideProxy {
         DifficultyAffectedCapability.register();
         DifficultySourceCapability.register();
         PlayerDataCapability.register();
-        ModGameRules.registerDefinitions();
+//        ModGameRules.registerDefinitions();
         DeferredWorkQueue.runLater(SHWorldFeatures::addFeaturesToBiomes);
     }
 
@@ -72,7 +72,7 @@ public class SideProxy {
     }
 
     private void serverStarted(FMLServerStartedEvent event) {
-        ModGameRules.setRules(event.getServer());
+//        ModGameRules.setRules(event.getServer());
     }
 
     @Nullable

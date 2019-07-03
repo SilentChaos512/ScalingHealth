@@ -64,8 +64,8 @@ public class SHMobProperties implements ILootCondition {
                 JsonElement difficulty = json.get("difficulty");
                 if (difficulty.isJsonObject()) {
                     JsonObject jsonObject = difficulty.getAsJsonObject();
-                    minDifficulty = JSONUtils.getFloat(jsonObject, "min");
-                    maxDifficulty = JSONUtils.getFloat(jsonObject, "max");
+                    minDifficulty = JSONUtils.getFloat(jsonObject, "min", minDifficulty);
+                    maxDifficulty = JSONUtils.getFloat(jsonObject, "max", maxDifficulty);
                 } else {
                     minDifficulty = maxDifficulty = difficulty.getAsFloat();
                 }

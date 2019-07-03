@@ -3,7 +3,14 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.2.0] - 2019-07-03
+Updated for 1.14.3
+### Fixed
+- Ore loot tables
+- `scalinghealth:mob_properties` condition requiring both min and max difficulty (both are optional)
+
+## [2.1.0]
+Port to 1.14.2
 Update zh_cn translation (XuyuEre)
 ### Added
 - Sleep configs are back
