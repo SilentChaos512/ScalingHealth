@@ -5,8 +5,6 @@ import net.minecraft.particles.BasicParticleType;
 import net.minecraft.particles.ParticleType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.IWorld;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -47,7 +45,7 @@ public enum ModParticles {
         }
     }
 
-    @OnlyIn(Dist.CLIENT)
+//    @OnlyIn(Dist.CLIENT)
     public static void registerAll(RegistryEvent.Register<ParticleType<?>> event) {
         // FIXME: This does not work AT ALL. As far as I can tell, we need to register an
         //  IParticleFactory, but all the methods are private.
