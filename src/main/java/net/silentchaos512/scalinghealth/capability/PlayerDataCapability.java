@@ -60,6 +60,12 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
     }
 
     @Override
+    public void updateStats(PlayerEntity player) {
+        ModifierHandler.addMaxHealth(player, getHealthModifier(player), AttributeModifier.Operation.ADDITION);
+        ModifierHandler.addAttackDamage(player, getAttackDamageModifier(player), AttributeModifier.Operation.ADDITION);
+    }
+
+    @Override
     public void tick(PlayerEntity player) {
         // TODO: Position tracking for idle multiplier?
 

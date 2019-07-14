@@ -12,6 +12,8 @@ public interface IPlayerData {
 
     void setPowerCrystalCount(PlayerEntity player, int amount);
 
+    void updateStats(PlayerEntity player);
+
     void tick(PlayerEntity player);
 
     default void addHeart(PlayerEntity player) {
@@ -31,7 +33,7 @@ public interface IPlayerData {
     }
 
     default int getHealthModifier(PlayerEntity player) {
-        return 2 * getExtraHearts();
+        return 2 * getExtraHearts() + Players.startingHealth(player) - 20;
     }
 
     default double getAttackDamageModifier(PlayerEntity player) {

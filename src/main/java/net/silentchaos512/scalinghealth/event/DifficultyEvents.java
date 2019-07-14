@@ -128,6 +128,15 @@ public final class DifficultyEvents {
         });
     }
 
+    @SubscribeEvent
+    public static void onPlayerJoinServer(net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent event) {
+        PlayerEntity player = event.getPlayer();
+        player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> {
+            ScalingHealth.LOGGER.info("Updating stats for {}", player.getScoreboardName());
+            data.updateStats(player);
+        });
+    }
+
     private static void notifyOfChanges(PlayerEntity player, String valueName, float oldValue, float newValue) {
         // TODO: Could also notify player in chat?
 //        if (MathUtils.doublesEqual(oldValue, newValue)) return;
