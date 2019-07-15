@@ -52,7 +52,6 @@ public enum EvalVars {
     public static double apply(DimensionConfig config, World world, BlockPos pos, @Nullable PlayerEntity player, Expression expression) {
         Context context = new Context(config, world, pos, player);
         for (EvalVars variable : values()) {
-            // TODO: Is toString right?
             expression.setVariable(variable.varName(), variable.value.apply(context).toString());
         }
         return expression.eval().doubleValue();

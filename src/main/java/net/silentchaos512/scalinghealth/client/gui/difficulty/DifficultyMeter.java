@@ -35,7 +35,6 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.client.ClientHandler;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.lib.AreaDifficultyMode;
-import net.silentchaos512.scalinghealth.utils.Difficulty;
 import net.silentchaos512.utils.Anchor;
 
 public class DifficultyMeter extends Screen {
@@ -68,16 +67,13 @@ public class DifficultyMeter extends Screen {
         if (player == null) return;
         World world = player.world;
 
-//        DimensionConfig config = Config.get(player);
-        // FIXME: max value probably won't sync?
-        final double maxDifficulty = Difficulty.maxValue(world);
+        final double maxDifficulty = ClientHandler.maxDifficultyValue;
         if (maxDifficulty <= 0) return;
 
         int width = mc.mainWindow.getScaledWidth();
         int height = mc.mainWindow.getScaledHeight();
 
-        // FIXME: area mode probably won't sync
-        AreaDifficultyMode areaMode = Difficulty.areaMode(world);
+        AreaDifficultyMode areaMode = ClientHandler.areaMode;
         int preClampAreaDifficulty = (int) ClientHandler.areaDifficulty;
         int areaDifficulty = MathHelper.clamp(preClampAreaDifficulty, 0, (int) maxDifficulty);
         int difficulty = areaMode == AreaDifficultyMode.DIMENSION_WIDE

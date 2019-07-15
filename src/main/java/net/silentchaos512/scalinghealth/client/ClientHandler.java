@@ -1,5 +1,7 @@
 package net.silentchaos512.scalinghealth.client;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraftforge.fml.network.NetworkEvent;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.lib.AreaDifficultyMode;
@@ -23,7 +25,7 @@ public final class ClientHandler {
     public static int regenTimer;
     public static int locationMultiPercent;
     // Infrequent updates (join server/world, travel to new dimension)
-    public static AreaDifficultyMode areaMode;
+    public static AreaDifficultyMode areaMode = AreaDifficultyMode.WEIGHTED_AVERAGE;
     public static float maxDifficultyValue;
 
     private ClientHandler() {}
@@ -39,6 +41,12 @@ public final class ClientHandler {
         areaDifficulty = msg.areaDifficulty;
         regenTimer = msg.regenTimer;
         locationMultiPercent = msg.locationMultiPercent;
+
+        Minecraft mc = Minecraft.getInstance();
+        ClientPlayerEntity player = mc.player;
+        if (player != null) {
+            //player.experienceLevel = msg.experienceLevel;
+        }
     }
 
     public static void onLoginMessage(ClientLoginMessage msg, Supplier<NetworkEvent.Context> ctx) {

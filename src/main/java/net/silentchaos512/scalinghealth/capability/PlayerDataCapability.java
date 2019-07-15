@@ -8,15 +8,9 @@ import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fml.network.NetworkDirection;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.event.PlayerBonusRegenHandler;
-import net.silentchaos512.scalinghealth.network.ClientSyncMessage;
-import net.silentchaos512.scalinghealth.network.Network;
-import net.silentchaos512.scalinghealth.utils.Difficulty;
 import net.silentchaos512.scalinghealth.utils.ModifierHandler;
 import net.silentchaos512.scalinghealth.utils.Players;
 
@@ -74,22 +68,8 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
         // TODO: Health by XP
 
         if (player.world.getGameTime() % 20 == 0 && player instanceof ServerPlayerEntity) {
-            sendUpdatePacketTo(player);
+            IPlayerData.sendUpdatePacketTo(player);
         }
-    }
-
-    private static void sendUpdatePacketTo(PlayerEntity player) {
-        World world = player.world;
-        BlockPos pos = player.getPosition();
-        ClientSyncMessage msg = new ClientSyncMessage(
-                Difficulty.source(player).getDifficulty(),
-                Difficulty.source(world).getDifficulty(),
-                (float) Difficulty.areaDifficulty(world, pos),
-                PlayerBonusRegenHandler.getTimerForPlayer(player),
-                Difficulty.locationMultiplier(world, pos)
-        );
-        ServerPlayerEntity playerMP = (ServerPlayerEntity) player;
-        Network.channel.sendTo(msg, playerMP.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
     }
 
     @Nonnull

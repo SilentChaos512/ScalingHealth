@@ -20,6 +20,7 @@ package net.silentchaos512.scalinghealth.event;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -107,7 +108,11 @@ public final class ScalingHealthCommonEvents {
                 .withNullableParameter(LootParameters.LAST_DAMAGE_PLAYER, player);
         if (player != null) contextBuilder.withLuck(player.getLuck());
         List<ItemStack> list = lootTable.generate(contextBuilder.build(LootParameterSets.ENTITY));
-        list.forEach(stack -> event.getDrops().add(entity.entityDropItem(stack)));
+        list.forEach(stack -> event.getDrops().add(dropItem(entity, world, stack)));
+    }
+
+    private static ItemEntity dropItem(LivingEntity entity, World world, ItemStack stack) {
+        return new ItemEntity(world, entity.posX, entity.posY + entity.getHeight() / 2, entity.posZ, stack);
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

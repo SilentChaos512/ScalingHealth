@@ -5,6 +5,7 @@ import com.electronwill.nightconfig.core.ConfigSpec;
 import com.google.common.collect.ImmutableList;
 import com.udojava.evalex.Expression;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -17,6 +18,7 @@ import net.minecraft.world.dimension.DimensionType;
 import net.silentchaos512.lib.util.BiomeUtils;
 import net.silentchaos512.lib.util.DimensionUtils;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.event.BlightHandler;
 import net.silentchaos512.scalinghealth.lib.AreaDifficultyMode;
 import net.silentchaos512.scalinghealth.lib.MobHealthMode;
 import net.silentchaos512.utils.config.*;
@@ -488,11 +490,16 @@ public class DimensionConfig {
 
         @SuppressWarnings("ChainOfInstanceofChecks")
         public Expression getDefaultKillMutator(LivingEntity entity) {
-            // TODO: Check blight
-            if (!entity.isNonBoss()) return onBossKilled.get();
-            if (entity instanceof IMob) return onHostileKilled.get();
-            if (entity instanceof AnimalEntity) return onPeacefulKilled.get();
-            if (entity instanceof PlayerEntity) return onPlayerKilled.get();
+            if (!entity.isNonBoss())
+                return onBossKilled.get();
+            if (entity instanceof MobEntity && BlightHandler.isBlight((MobEntity) entity))
+                return onBlightKilled.get();
+            if (entity instanceof IMob)
+                return onHostileKilled.get();
+            if (entity instanceof AnimalEntity)
+                return onPeacefulKilled.get();
+            if (entity instanceof PlayerEntity)
+                return onPlayerKilled.get();
             return onHostileKilled.get();
         }
     }

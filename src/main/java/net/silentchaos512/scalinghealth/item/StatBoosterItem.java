@@ -12,8 +12,8 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
 import net.silentchaos512.scalinghealth.capability.IPlayerData;
+import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
 import net.silentchaos512.scalinghealth.client.particles.ModParticles;
 import net.silentchaos512.scalinghealth.init.ModSounds;
 
@@ -104,7 +104,7 @@ public abstract class StatBoosterItem extends Item {
         stack.shrink(1);
         consumeLevels(player, levelRequirement);
         player.addStat(Stats.ITEM_USED.get(this));
-        // TODO: Send a packet to client?
+        IPlayerData.sendUpdatePacketTo(player);
         return new ActionResult<>(ActionResultType.SUCCESS, stack);
     }
 
@@ -117,6 +117,7 @@ public abstract class StatBoosterItem extends Item {
     }
 
     private static void consumeLevels(PlayerEntity player, int amount) {
-        player.experienceLevel -= amount;
+        //player.experienceLevel -= amount;
+        player.addExperienceLevel(-amount);
     }
 }

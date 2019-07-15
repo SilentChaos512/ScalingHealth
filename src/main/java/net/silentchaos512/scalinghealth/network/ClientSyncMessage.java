@@ -8,15 +8,17 @@ public class ClientSyncMessage {
     public float areaDifficulty;
     public int regenTimer;
     public int locationMultiPercent;
+    public int experienceLevel;
 
     public ClientSyncMessage() {}
 
-    public ClientSyncMessage(float playerDifficulty, float worldDifficulty, float areaDifficulty, int regenTimer, double locationMultiplier) {
+    public ClientSyncMessage(float playerDifficulty, float worldDifficulty, float areaDifficulty, int regenTimer, double locationMultiplier, int xp) {
         this.playerDifficulty = playerDifficulty;
         this.worldDifficulty = worldDifficulty;
         this.areaDifficulty = areaDifficulty;
         this.regenTimer = regenTimer;
         this.locationMultiPercent = (int) (100 * locationMultiplier);
+        this.experienceLevel = xp;
     }
 
     public static ClientSyncMessage fromBytes(PacketBuffer buf) {

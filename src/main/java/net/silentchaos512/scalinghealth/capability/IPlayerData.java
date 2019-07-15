@@ -1,6 +1,14 @@
 package net.silentchaos512.scalinghealth.capability;
 
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.network.NetworkDirection;
+import net.silentchaos512.scalinghealth.event.PlayerBonusRegenHandler;
+import net.silentchaos512.scalinghealth.network.ClientSyncMessage;
+import net.silentchaos512.scalinghealth.network.Network;
+import net.silentchaos512.scalinghealth.utils.Difficulty;
 import net.silentchaos512.scalinghealth.utils.Players;
 
 public interface IPlayerData {
@@ -38,5 +46,20 @@ public interface IPlayerData {
 
     default double getAttackDamageModifier(PlayerEntity player) {
         return getPowerCrystals() * Players.powerCrystalIncreaseAmount(player);
+    }
+
+    static void sendUpdatePacketTo(PlayerEntity player) {
+        World world = player.world;
+        BlockPos pos = player.getPosition();
+        ClientSyncMessage msg = new ClientSyncMessage(
+                Difficulty.source(player).getDifficulty(),
+                Difficulty.source(world).getDifficulty(),
+                (float) Difficulty.areaDifficulty(world, pos),
+                PlayerBonusRegenHandler.getTimerForPlayer(player),
+                Difficulty.locationMultiplier(world, pos),
+                player.experienceLevel
+        );
+        ServerPlayerEntity playerMP = (ServerPlayerEntity) player;
+        Network.channel.sendTo(msg, playerMP.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
     }
 }

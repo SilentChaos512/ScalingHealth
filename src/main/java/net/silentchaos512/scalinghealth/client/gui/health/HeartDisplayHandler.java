@@ -229,7 +229,7 @@ public final class HeartDisplayHandler extends Screen {
         int textureY = 9 * (info.hardcoreMode ? 5 : 0);
         int margin = 16;
 
-        float healthMax = Math.min(info.health, 20);
+        float healthMax = Math.min(info.maxHealth, 20);
         float absorbRemaining = info.absorption;
         float healthTotal = info.healthInt + info.absorptionInt;
 
