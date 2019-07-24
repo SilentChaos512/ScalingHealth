@@ -22,7 +22,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.ServerWorld;
+import net.minecraft.world.server.ServerWorld;
 import net.silentchaos512.scalinghealth.capability.DifficultyAffectedCapability;
 import net.silentchaos512.scalinghealth.utils.MobDifficultyHandler;
 

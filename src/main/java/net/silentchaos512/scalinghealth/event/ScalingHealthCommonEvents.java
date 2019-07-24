@@ -32,8 +32,8 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.GameRules;
-import net.minecraft.world.ServerWorld;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.storage.loot.LootContext;
 import net.minecraft.world.storage.loot.LootParameterSets;
 import net.minecraft.world.storage.loot.LootParameters;
@@ -266,7 +266,8 @@ public final class ScalingHealthCommonEvents {
             DimensionConfig config = Config.get(player);
             double newDifficulty = EvalVars.apply(config, player, config.difficulty.onPlayerSleep.get());
 
-            if (!MathUtils.doublesEqual(Difficulty.ofEntity(player), newDifficulty)) {
+            if (!MathUtils.doublesEqual(Difficulty.ofEntity(player), newDifficulty, 0.1)) {
+                ScalingHealth.LOGGER.debug("old={}, new={}", Difficulty.ofEntity(player), newDifficulty);
                 // Difficulty would change (doesn't change until onPlayerWakeUp)
                 String configMsg = config.difficulty.sleepWarningMessage.get();
                 ITextComponent text = configMsg.isEmpty()
