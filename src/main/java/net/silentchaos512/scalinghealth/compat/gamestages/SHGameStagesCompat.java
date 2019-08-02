@@ -28,7 +28,9 @@ public class SHGameStagesCompat {
     public static int getDifficultyFromStages(EntityPlayer player) {
         int max = 0;
         for (String stage : GameStageHelper.getPlayerData(player).getStages()) {
-            max = Math.max(max, Config.Difficulty.DIFFICULTY_BY_GAME_STAGES.get(stage));
+            if (Config.Difficulty.DIFFICULTY_BY_GAME_STAGES.containsKey(stage)) {
+                max = Math.max(max, Config.Difficulty.DIFFICULTY_BY_GAME_STAGES.get(stage));
+            }
         }
         return max;
     }

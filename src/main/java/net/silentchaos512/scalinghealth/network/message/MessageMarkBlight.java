@@ -42,9 +42,9 @@ public class MessageMarkBlight extends Message {
             Minecraft mc = Minecraft.getMinecraft();
             // Sometimes MC client instance is null, seems to happen when connecting to servers
             //noinspection ConstantConditions -- mc can be null, IDEA says otherwise
-            if (mc == null) return;
+            if (mc == null || mc.world == null) return;
 
-            Entity entity = Minecraft.getMinecraft().world.getEntityByID(entityId);
+            Entity entity = mc.world.getEntityByID(entityId);
             if (entity instanceof EntityLivingBase)
                 BlightHandler.markBlight((EntityLivingBase) entity, this.isBlight);
         });

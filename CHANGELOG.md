@@ -3,6 +3,11 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.39] - 2019-08-02
+### Fixed
+- Crash when setting a game stage not in the config (Game Stages) [#184]
+- Possible client crash
+
 ## [1.3.38] - 2019-06-19
 ### Added
 - Config to disable WIT compatibility [#178]
