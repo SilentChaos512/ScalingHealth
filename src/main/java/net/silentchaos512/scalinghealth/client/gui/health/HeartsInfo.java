@@ -103,4 +103,30 @@ class HeartsInfo {
         }
         return y;
     }
+
+    // Tank style
+
+    int getHeartTanks() {
+        return healthInt / 20;
+    }
+
+    int getMaxHeartTanks() {
+        return (int) maxHealth / 20;
+    }
+
+    int getHeartTankRowCount() {
+        return MathHelper.ceil(getHeartTanks() / 20f);
+    }
+
+    int getMaxHeartTankRowCount() {
+        return MathHelper.ceil(getMaxHeartTanks() / 20f);
+    }
+
+    int getFilledHeartTanksInRow(int row) {
+        return Math.min(getHeartTanks() - 20 * row, 20);
+    }
+
+    int getAllHeartTanksInRow(int row) {
+        return Math.min(getMaxHeartTanks() - 20 * row, 20);
+    }
 }

@@ -3,6 +3,11 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.1] - 2019-08-06
+- Updated for Forge 28.0.45
+### Added
+- New WIP HUD element, "heart tanks". This is a row of icons above your hearts which will display how many rows of hearts. No configs for this at the moment, just needed to get this update out.
+
 ## [2.3.0] - 2019-07-23
 - Updated for 1.14.4
 

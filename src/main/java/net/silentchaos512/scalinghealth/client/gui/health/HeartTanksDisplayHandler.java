@@ -1,21 +1,3 @@
-/*
- * Scaling Health
- * Copyright (C) 2018 SilentChaos512
- *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation version 3
- * of the License.
- *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package net.silentchaos512.scalinghealth.client.gui.health;
 
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -26,7 +8,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.client.ForgeIngameGui;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
@@ -40,12 +21,8 @@ import net.silentchaos512.utils.MathUtils;
 
 import java.util.List;
 
-/**
- * Handles display of regular and absorption hearts.
- * <p>For future reference, much of the vanilla code can be found in {@link ForgeIngameGui}.
- */
-public final class HeartDisplayHandler extends Screen {
-    public static final HeartDisplayHandler INSTANCE = new HeartDisplayHandler(new StringTextComponent(""));
+public final class HeartTanksDisplayHandler extends Screen {
+    public static final HeartTanksDisplayHandler INSTANCE = new HeartTanksDisplayHandler();
 
     private static final float COLOR_CHANGE_PERIOD = 150;
     private static final ResourceLocation TEXTURE = new ResourceLocation(ScalingHealth.MOD_ID, "textures/gui/hud.png");
@@ -57,14 +34,12 @@ public final class HeartDisplayHandler extends Screen {
 
     private final HeartsInfo info = new HeartsInfo();
 
-    private HeartDisplayHandler(ITextComponent title) {
-        super(title);
+    private HeartTanksDisplayHandler() {
+        super(new StringTextComponent(""));
     }
 
     @SubscribeEvent(receiveCanceled = true)
     public void onHealthBar(RenderGameOverlayEvent.Pre event) {
-        if (info.heartStyle == HeartIconStyle.VANILLA) return;
-
         Minecraft mc = Minecraft.getInstance();
         PlayerEntity player = mc.player;
 
@@ -155,19 +130,6 @@ public final class HeartDisplayHandler extends Screen {
             }
         }
 
-        for (int i = 0; i < 10 && i < Math.ceil(info.healthInt / 2f); ++i) {
-            int y = info.offsetHeartPosY(i, top);
-            // Effect hearts (poison, wither)
-            if (showEffectHearts(player)) {
-                int color = effectHeartColor(player);
-                blitWithColor(left + 8 * i, y, 0, 54, 9, 9, color);
-            }
-            // Shiny glint on top of the hearts, a single white pixel in the upper left <3
-            if (!info.hardcoreMode) {
-                blitWithColor(left + 8 * i, y, 17, 0, 9, 9, 0xCCFFFFFF);
-            }
-        }
-
         // Tanks
 
         if (info.getMaxHeartTanks() > 0) {
@@ -178,8 +140,8 @@ public final class HeartDisplayHandler extends Screen {
                 int filledTanksInRow = info.getFilledHeartTanksInRow(row);
                 int allTanksInRow = info.getAllHeartTanksInRow(row);
                 int rowColor = getColorForRow(row, false);
-                top -= 4;
-                ForgeIngameGui.left_height += 4;
+                top -= 5;
+                ForgeIngameGui.left_height += 5;
 
                 // Draw tanks
                 int x;
@@ -193,10 +155,23 @@ public final class HeartDisplayHandler extends Screen {
                 boolean anythingDrawn = x > 0;
 
                 if (Config.CLIENT.lastHeartOutline.get() && anythingDrawn && row == maxTankRows - 1) {
-                    x = (int) (Math.ceil(allTanksInRow)) - 1;
+                    x = (int) (Math.ceil(filledTanksInRow)) - 1;
                     if (x < 0) x += 20;
                     TANK_OUTLINE.blit(left + 4 * x, top, Config.CLIENT.lastHeartOutlineColor.get(), this);
                 }
+            }
+        }
+
+        for (int i = 0; i < 10 && i < Math.ceil(info.healthInt / 2f); ++i) {
+            int y = info.offsetHeartPosY(i, top);
+            // Effect hearts (poison, wither)
+            if (showEffectHearts(player)) {
+                int color = effectHeartColor(player);
+                blitWithColor(left + 8 * i, y, 0, 54, 9, 9, color);
+            }
+            // Shiny glint on top of the hearts, a single white pixel in the upper left <3
+            if (!info.hardcoreMode) {
+                blitWithColor(left + 8 * i, y, 17, 0, 9, 9, 0xCCFFFFFF);
             }
         }
 
