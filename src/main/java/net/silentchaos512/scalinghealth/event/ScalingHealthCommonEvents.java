@@ -41,13 +41,12 @@ import net.minecraft.world.storage.loot.LootTable;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IDifficultySource;
@@ -70,7 +69,7 @@ public final class ScalingHealthCommonEvents {
     private ScalingHealthCommonEvents() {}
 
     @SubscribeEvent
-    public static void onPlayerLoggedIn(PlayerLoggedInEvent event) {
+    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getPlayer() instanceof ServerPlayerEntity)) return;
         ServerPlayerEntity player = (ServerPlayerEntity) event.getPlayer();
         World world = player.world;
@@ -221,7 +220,7 @@ public final class ScalingHealthCommonEvents {
     }
 
     @SubscribeEvent
-    public static void onPlayerJoinedServer(PlayerLoggedInEvent event) {
+    public static void onPlayerJoinedServer(PlayerEvent.PlayerLoggedInEvent event) {
         /*
         // Sync player data and set health.
         if (event.player instanceof ServerPlayerEntity) {
