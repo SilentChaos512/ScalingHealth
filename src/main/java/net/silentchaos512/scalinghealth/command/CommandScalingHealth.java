@@ -55,6 +55,11 @@ public class CommandScalingHealth extends CommandBaseSL {
     }
 
     @Override
+    public int getRequiredPermissionLevel() {
+        return 2;
+    }
+
+    @Override
     public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
         if (args.length == 1 && "config_reload".equals(args[0])) {
             executeConfigReload(sender);
