@@ -2,6 +2,7 @@ package net.silentchaos512.scalinghealth.lib;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -35,13 +36,13 @@ public enum EntityGroup {
             return PLAYER;
         if (!entity.isNonBoss())
             return BOSS;
-        if (entity instanceof MobEntity) {
-            if (!ignoreBlightStatus && Difficulty.isBlight((MobEntity) entity))
-                return BLIGHT;
-            return HOSTILE;
-        }
-        return PEACEFUL;
+        if (entity instanceof IMob) {
+        if (!ignoreBlightStatus && Difficulty.isBlight((MobEntity) entity))
+            return BLIGHT;
+        return HOSTILE;
     }
+        return PEACEFUL;
+}
 
     public double getPotionChance(LivingEntity entity) {
         if (this == PEACEFUL)
