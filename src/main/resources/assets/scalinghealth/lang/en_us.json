@@ -39,7 +39,7 @@
   "item.scalinghealth.bandages": "Bandages",
   "item.scalinghealth.heart_crystal_shard": "Heart Crystal Shard",
   "item.scalinghealth.cursed_heart": "Cursed Heart",
-  "item.scalinghealth.difficultychanger.effectDesc": "Difficulty %s",
+  "item.scalinghealth.difficulty_changer.effectDesc": "Difficulty %s",
   "item.scalinghealth.enchanted_heart": "Enchanted Heart",
   "item.scalinghealth.heart_crystal": "Heart Crystal",
   "item.scalinghealth.heart_crystal.desc": "Increases maximum health",

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Peaceful mobs being identified as hostile (wrong effect chances)
 
+## [Unreleased]
+### Fixed
+- Cursed heart and enchanted heart not appearing in creative menu or JEI [#191]
+
 ## [2.3.1] - 2019-08-06
 - Updated for Forge 28.0.45
 ### Added

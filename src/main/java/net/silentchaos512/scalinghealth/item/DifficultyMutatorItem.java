@@ -21,6 +21,7 @@ package net.silentchaos512.scalinghealth.item;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Rarity;
 import net.minecraft.stats.Stats;
@@ -46,11 +47,13 @@ public class DifficultyMutatorItem extends Item {
     private final Type type;
 
     public DifficultyMutatorItem(Type type) {
-        super(new Item.Properties());
+        super(new Item.Properties().group(ItemGroup.MISC));
         this.type = type;
     }
 
     public float getEffectAmount(ItemStack stack, @Nullable World world) {
+        if (world == null)
+            return 0;
         if (type == Type.CURSED)
             return Players.cursedHeartAffectAmount(world);
         else
