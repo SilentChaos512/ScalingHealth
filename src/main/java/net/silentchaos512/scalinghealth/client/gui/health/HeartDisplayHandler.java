@@ -170,7 +170,7 @@ public final class HeartDisplayHandler extends Screen {
 
         // Tanks
 
-        if (info.getMaxHeartTanks() > 0) {
+        if (info.getMaxHeartTanks() > 0 && Config.CLIENT.heartTanks.get()) {
             int tankRows = info.getHeartTankRowCount();
             int maxTankRows = info.getMaxHeartTankRowCount();
 

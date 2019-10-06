@@ -68,6 +68,8 @@ public final class Config {
         public final BooleanValue lastHeartOutline;
         public final IntValue lastHeartOutlineColor;
         public final BooleanValue heartColorLooping;
+        // Heart Tanks
+        public final BooleanValue heartTanks;
 
         // Health Text
         public final EnumValue<HealthTextStyle> healthTextStyle;
@@ -148,6 +150,12 @@ public final class Config {
                     .builder("hearts.health.icons.colorLooping")
                     .comment("If true, heart colors will 'loop around' to the first color after going through the",
                             "entire list. Set false to have every row after the last have the same color.")
+                    .define(true);
+
+            // Tanks
+            heartTanks = wrapper
+                    .builder("hearts.health.tanks.enabled")
+                    .comment("Enable heart tanks, the small icons above your hearts which indicate the number of filled health rows")
                     .define(true);
 
             wrapper.comment("hearts.health.text", "Settings for the text displayed next to the heart rows");
