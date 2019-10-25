@@ -1,0 +1,77 @@
+itemGroup.scalinghealth=Scaling Health
+
+##########
+# Bloki #
+##########
+
+tile.scalinghealth.crystalore.name=Ruda Kryształu Serca
+
+
+
+#########
+# Przedmioty #
+#########
+
+item.scalinghealth.crystalshard.name=Odłamek Kryształu Serca
+item.scalinghealth.enchanted_heart.name=Zaklęte Serce
+item.scalinghealth.cursed_heart.name=Przeklęte Serce
+item.scalinghealth.difficultychanger.effectDesc=Poziom trudności %s
+item.scalinghealth.heartcontainer.name=Pojemnik na serce
+item.scalinghealth.heartcontainer.desc=Zwiększa maksymalne zdrowie
+item.scalinghealth.heartcontainer.notEnoughXP=Potrzebujesz %d poziomów doświadczenia, aby z tego skorzystać
+item.scalinghealth.heartdust.name=Sercowy Pył
+item.scalinghealth.bandage.name=Bandaże
+item.scalinghealth.medkit.name=Zestaw medyczny
+item.scalinghealth.healingitem.healingValue=Przywraca %d%% twojego zdrowia przez %d sekund.
+item.scalinghealth.healingitem.howToUse=Używaj przez %d sekund, aby zastosować.
+
+
+###########
+# Mikstury #
+###########
+
+effect.scalinghealth.bandaged=Bandażowany
+
+
+
+###########
+# Blights #
+###########
+
+blight.scalinghealth.name=Blight %s
+blight.scalinghealth.killedByPlayer=Blight %s został zabity przez %s!
+
+
+
+############
+# Komendy #
+############
+
+command.scalinghealth.outOfBounds=Wartość musi być pomiędzy %s a %s.
+command.scalinghealth.recalculate.result=Ponownie obliczono trudność i statystyki dla %d bytów, sprawdź dziennik, aby uzyskać więcej informacji
+command.scalinghealth.showDifficulty=Trudność %s: %s / %s
+command.scalinghealth.setDifficulty=Ustaw poziom trudności gracza %s na %s.
+command.scalinghealth.showHealth=Zdrowie %s: %s / %s (%s)
+command.scalinghealth.setHealth=Ustaw zdrowie gracza %s na %d.
+command.scalinghealth.showWorldDifficulty=Poziom trudności świata: %s / %s
+command.scalinghealth.setWorldDifficulty=Ustaw poziom trudności świata na %s.
+
+
+
+########
+# Różne #
+########
+
+misc.scalinghealth.sleepWarning=[Scaling Health] UWAGA: Spanie zmieni twój poziom trudności!
+misc.scalinghealth.difficultyMeterText=POZIOM TRUDNOŚCI
+
+
+
+# Sound effect subtitles
+
+scalinghealth.subtitle.cursed_heart_use=Użyto przeklętego serca
+scalinghealth.subtitle.enchanted_heart_use=Użyto zaklętego serca
+scalinghealth.subtitle.heart_container_use=Używany pojemnik na serce
+
+# April Fool's sounds
+scalinghealth.subtitle.player_died=Ktoś umarł (LOL)
