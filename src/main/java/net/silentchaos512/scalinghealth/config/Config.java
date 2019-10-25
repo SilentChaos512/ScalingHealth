@@ -218,6 +218,11 @@ public class Config extends ConfigBaseNew {
                     " cap. You can change that value with the \"Max Health Cap\" setting under the main category.")
             public static int maxHealth;
 
+            @ConfigOption(name = "Min Health", category = CAT_PLAYER_HEALTH)
+            @ConfigOption.RangeInt(value = 2, min = 2)
+            @ConfigOption.Comment("The minimum amount of health (in half hearts) a player can have. This is different from starting health.")
+            public static int minHealth;
+
             // TODO: 1.13 - should be "change on death" for consistency
             @ConfigOption(name = "Health Lost On Death", category = CAT_PLAYER_HEALTH)
             @ConfigOption.RangeInt(0)

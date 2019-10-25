@@ -259,7 +259,7 @@ public final class SHPlayerDataHandler {
 
         public float getMaxHealth() {
             if (maxHealth < 2)
-                maxHealth = Config.Player.Health.startingHealth;
+                maxHealth = Config.Player.Health.minHealth;
             return maxHealth;
         }
 

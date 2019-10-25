@@ -179,8 +179,8 @@ public class ScalingHealthCommonEvents {
             // Lose health on death?
             if (Config.Player.Health.lostOnDeath > 0 && !event.isEndConquered()) {
                 float newHealth = data.getMaxHealth() - Config.Player.Health.lostOnDeath;
-                float startHealth = Config.Player.Health.startingHealth;
-                data.setMaxHealth(newHealth < startHealth ? startHealth : newHealth);
+                float minHealth = Config.Player.Health.minHealth;
+                data.setMaxHealth(newHealth < minHealth ? minHealth : newHealth);
             }
 
             // Lose difficulty on death?
