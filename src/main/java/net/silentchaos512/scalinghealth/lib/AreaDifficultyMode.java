@@ -31,6 +31,8 @@ import net.silentchaos512.scalinghealth.utils.Difficulty;
 import java.util.Collection;
 import java.util.Locale;
 
+// TODO: Add options more relevant to the end and or nether - Ex: end with DISTANCE_FROM_SPAWN would result in pretty hard mobs in the outer islands right off the gate, incorporate a possible offset
+//  Add preset configs with multiple dimensions ie: nether scales difficulty 8x more with distance.
 public enum AreaDifficultyMode {
     WEIGHTED_AVERAGE {
         @Override
