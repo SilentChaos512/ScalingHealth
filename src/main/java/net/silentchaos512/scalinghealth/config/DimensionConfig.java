@@ -38,6 +38,7 @@ public class DimensionConfig {
     public static class Items {
         public final DoubleValue cursedHeartAffect;
         public final DoubleValue enchantedHeartAffect;
+        public final DoubleValue chanceHeartAffect;
         public final DoubleValue heartCrystalHealthRestored;
         public final IntValue heartCrystalLevelCost;
         public final BooleanValue heartCrystalIncreaseHealth;
@@ -55,6 +56,13 @@ public class DimensionConfig {
                     .builder("item.enchanted_heart.change")
                     .comment("Change in difficulty when an enchanted heart is used")
                     .defineInRange(-10, -Double.MAX_VALUE, Double.MAX_VALUE);
+            chanceHeartAffect = wrapper
+                    .builder("item.chance_heart.change")
+                    .comment("Change in difficulty when a chance heart is used",
+                            "For a value n, a chance heart has 1 in 2n + 1 chance of being cursed",
+                            "In that case, n difficulty is added (n = 10, 1 in 21 chance to get +10)",
+                            "There's a 2 in 2n + 1 chance for 1 to n difficulty to be subtracted (n = 3, 2 in 7 chance of getting -1, -2, or -3")
+                    .defineInRange(10, -Double.MAX_VALUE, Double.MAX_VALUE);
             heartCrystalHealthRestored = wrapper
                     .builder("item.heart_crystal.healthRestored")
                     .comment("The amount of additional health restored by heart crystals (min = 0)",
