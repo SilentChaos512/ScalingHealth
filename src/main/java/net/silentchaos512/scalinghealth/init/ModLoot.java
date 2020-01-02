@@ -73,6 +73,11 @@ public final class ModLoot {
                             .quality(5)
                             .acceptFunction(SetCount.builder(new RandomValueRange(1, 3)))
                     )
+                    .addEntry(ItemLootEntry.builder(ModItems.CHANCE_HEART)
+                            .weight(1)
+                            .quality(5)
+                            .acceptFunction(SetCount.builder(new RandomValueRange(1, 3)))
+                    )
                     .addEntry(EmptyLootEntry.func_216167_a().weight(10))
                     .build());
         }
