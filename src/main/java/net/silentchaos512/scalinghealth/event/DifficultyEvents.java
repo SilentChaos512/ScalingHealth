@@ -110,14 +110,14 @@ public final class DifficultyEvents {
 
         // Player died. Copy capabilities and apply health/difficulty changes.
         PlayerEntity original = event.getOriginal();
-        PlayerEntity clone = event.getEntityPlayer();
+        PlayerEntity clone = event.getPlayer();
         debug(() -> "onPlayerClone");
         copyCapability(PlayerDataCapability.INSTANCE, original, clone);
         copyCapability(DifficultySourceCapability.INSTANCE, original, clone);
 
         // Apply death mutators
         clone.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> {
-            int newCrystals = Players.getCrystalCountFromHealth(clone, Players.getHealthAfterDeath(clone, original.dimension));
+            int newCrystals = Players.getCrystalCountFromHealth(original, Players.getHealthAfterDeath(original, original.dimension));
             notifyOfChanges(clone, "heart crystal(s)", data.getExtraHearts(), newCrystals);
             data.setExtraHearts(clone, newCrystals);
         });

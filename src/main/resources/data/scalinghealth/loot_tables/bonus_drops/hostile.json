@@ -117,6 +117,17 @@
             "entries": [
                 {
                     "type": "item",
+                    "name": "scalinghealth:chance_heart",
+                    "weight": 1,
+                    "functions": [
+                        {
+                            "function": "set_count",
+                            "count": 1
+                        }
+                    ]
+                },
+                {
+                    "type": "item",
                     "name": "scalinghealth:enchanted_heart",
                     "weight": 1,
                     "functions": [
@@ -130,7 +141,7 @@
             "conditions": [
                 {
                     "condition": "random_chance_with_looting",
-                    "chance": 0.01,
+                    "chance": 0.015,
                     "looting_multiplier": 0.0025
                 },
                 {
