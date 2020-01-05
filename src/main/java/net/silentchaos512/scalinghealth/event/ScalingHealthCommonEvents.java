@@ -260,7 +260,7 @@ public final class ScalingHealthCommonEvents {
 
     @SubscribeEvent
     public static void onPlayerSleepInBed(PlayerSleepInBedEvent event) {
-        PlayerEntity player = event.getEntityPlayer();
+        PlayerEntity player = event.getPlayer();
         if (!player.world.isRemote && Config.CLIENT.warnWhenSleeping.get()) {
             DimensionConfig config = Config.get(player);
             double newDifficulty = EvalVars.apply(config, player, config.difficulty.onPlayerSleep.get());
@@ -279,7 +279,7 @@ public final class ScalingHealthCommonEvents {
 
     @SubscribeEvent
     public static void onPlayerWakeUp(PlayerWakeUpEvent event) {
-        PlayerEntity player = event.getEntityPlayer();
+        PlayerEntity player = event.getPlayer();
         if (!player.world.isRemote && !event.updateWorld()) {
             DimensionConfig config = Config.get(player);
             IDifficultySource source = Difficulty.source(player);

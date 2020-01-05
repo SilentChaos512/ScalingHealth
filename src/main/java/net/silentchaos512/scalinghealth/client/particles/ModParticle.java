@@ -61,9 +61,9 @@ public class ModParticle extends TexturedParticle {
         if (this.particleAngle != 0.0F) {
             float f8 = this.particleAngle + (this.particleAngle - this.prevParticleAngle) * partialTicks;
             float f9 = MathHelper.cos(f8 * 0.5F);
-            float f10 = MathHelper.sin(f8 * 0.5F) * (float) cameraViewDir.x;
-            float f11 = MathHelper.sin(f8 * 0.5F) * (float) cameraViewDir.y;
-            float f12 = MathHelper.sin(f8 * 0.5F) * (float) cameraViewDir.z;
+            float f10 = MathHelper.sin(f8 * 0.5F) * (float) entityIn.getLookDirection().x;
+            float f11 = MathHelper.sin(f8 * 0.5F) * (float) entityIn.getLookDirection().x;
+            float f12 = MathHelper.sin(f8 * 0.5F) * (float) entityIn.getLookDirection().x;
             Vec3d vec3d = new Vec3d((double) f10, (double) f11, (double) f12);
 
             for (int l = 0; l < 4; ++l) {

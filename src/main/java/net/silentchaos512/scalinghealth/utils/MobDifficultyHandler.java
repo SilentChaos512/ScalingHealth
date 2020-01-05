@@ -58,8 +58,8 @@ public final class MobDifficultyHandler {
         IAttributeInstance attributeMaxHealth = entity.getAttribute(SharedMonsterAttributes.MAX_HEALTH);
         double baseMaxHealth = attributeMaxHealth.getBaseValue();
         double healthMultiplier = isHostile
-                ? 0.5 //Config.Mob.Health.hostileHealthMultiplier
-                : 0.25; //Config.Mob.Health.peacefulHealthMultiplier;
+                ? 0.5       //Config.Mob.Health.hostileHealthMultiplier
+                : 0.25;     //Config.Mob.Health.peacefulHealthMultiplier;
 
         healthBoost *= healthMultiplier;
 
