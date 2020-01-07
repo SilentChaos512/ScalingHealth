@@ -1,10 +1,13 @@
 package net.silentchaos512.scalinghealth.event;
 
+import net.minecraft.client.gui.NewChatGui;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.INBT;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -108,21 +111,21 @@ public final class DifficultyEvents {
         // If not dead, player is returning from the End
         if (!event.isWasDeath()) return;
 
-        // Player died. Copy capabilities and apply health/difficulty changes.
+        // Player died. Copy capabilities before applying health/difficulty changes.
         PlayerEntity original = event.getOriginal();
-        PlayerEntity clone = event.getEntityPlayer();
+        PlayerEntity clone = event.getPlayer();
         debug(() -> "onPlayerClone");
         copyCapability(PlayerDataCapability.INSTANCE, original, clone);
         copyCapability(DifficultySourceCapability.INSTANCE, original, clone);
 
         // Apply death mutators
         clone.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> {
-            int newCrystals = Players.getCrystalCountFromHealth(clone, Players.getHealthAfterDeath(clone, original.dimension));
+            int newCrystals = Players.getCrystalCountFromHealth(original, Players.getHealthAfterDeath(original, original.dimension));
             notifyOfChanges(clone, "heart crystal(s)", data.getExtraHearts(), newCrystals);
             data.setExtraHearts(clone, newCrystals);
         });
         clone.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
-            float newDifficulty = (float) Difficulty.getDifficultyAfterDeath(clone, original.dimension);
+            float newDifficulty = (float) Difficulty.getDifficultyAfterDeath(clone, original.dimension);    //not sure to pass the clone or the og (the dim is good)
             notifyOfChanges(clone, "difficulty", source.getDifficulty(), newDifficulty);
             source.setDifficulty(newDifficulty);
         });
@@ -138,10 +141,10 @@ public final class DifficultyEvents {
     }
 
     private static void notifyOfChanges(PlayerEntity player, String valueName, float oldValue, float newValue) {
-        // TODO: Could also notify player in chat?
-//        if (MathUtils.doublesEqual(oldValue, newValue)) return;
         float diff = newValue - oldValue;
         String line = String.format("%s %.2f %s", diff > 0 ? "gained" : "lost", diff, valueName);
+        if(diff != 0)
+            player.sendMessage(new StringTextComponent(line));
         ScalingHealth.LOGGER.info("Player {}", line);
     }
 

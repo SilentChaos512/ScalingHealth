@@ -58,8 +58,8 @@ public final class MobDifficultyHandler {
         IAttributeInstance attributeMaxHealth = entity.getAttribute(SharedMonsterAttributes.MAX_HEALTH);
         double baseMaxHealth = attributeMaxHealth.getBaseValue();
         double healthMultiplier = isHostile
-                ? 0.5 //Config.Mob.Health.hostileHealthMultiplier
-                : 0.25; //Config.Mob.Health.peacefulHealthMultiplier;
+                ? 0.5       //Config.Mob.Health.hostileHealthMultiplier
+                : 0.25;     //Config.Mob.Health.peacefulHealthMultiplier;
 
         healthBoost *= healthMultiplier;
 
@@ -90,7 +90,7 @@ public final class MobDifficultyHandler {
     }
 
     private static double getBlightChance(MobEntity entity) {
-        // FIXME: May not line up with actual entity difficulty, need to pass in difficulty
+        // FIXME: May not line up with actual entity difficulty, need to pass in difficulty : line 34, shouldBecomeBlight
         DimensionConfig config = Config.get(entity);
         Expression expr = new Expression("0.0625 * areaDifficulty / maxDifficulty");
         return EvalVars.apply(config, entity.world, entity.getPosition(), null, expr);

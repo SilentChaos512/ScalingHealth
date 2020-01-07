@@ -90,11 +90,14 @@ public final class Players {
         return Config.get(player).item.heartCrystalHealthRestored.get().floatValue();
     }
 
-    public static float cursedHeartAffectAmount(World world) {
-        return Config.get(world).item.cursedHeartAffect.get().floatValue();
+    public static int cursedHeartAffectAmount(World world) {
+        return Config.get(world).item.cursedHeartAffect.get().intValue();
     }
 
-    public static float enchantedHeartAffectAmount(World world) {
-        return Config.get(world).item.enchantedHeartAffect.get().floatValue();
+    public static int enchantedHeartAffectAmount(World world) {
+        return Config.get(world).item.enchantedHeartAffect.get().intValue();
+    }
+    public static int chanceHeartAffectAmount(World world){
+        return Config.get(world).item.chanceHeartAffect.get().intValue();
     }
 }

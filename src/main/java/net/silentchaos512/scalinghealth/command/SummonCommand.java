@@ -84,7 +84,7 @@ public final class SummonCommand {
                                                         new CompoundNBT(),
                                                         true
                                                 )
-                                        ).then(Commands.argument("nbt", NBTCompoundTagArgument.func_218043_a())
+                                        ).then(Commands.argument("nbt", NBTCompoundTagArgument.nbt())
                                                 .executes(source ->
                                                         summonEntity(
                                                                 source.getSource(),
@@ -92,7 +92,7 @@ public final class SummonCommand {
                                                                 IntegerArgumentType.getInteger(source, "difficulty"),
                                                                 BoolArgumentType.getBool(source, "forceBlight"),
                                                                 Vec3Argument.getVec3(source, "pos"),
-                                                                NBTCompoundTagArgument.func_218042_a(source, "nbt"),
+                                                                NBTCompoundTagArgument.getNbt(source, "nbt"),
                                                                 false
                                                         )
                                                 )

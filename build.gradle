@@ -76,6 +76,12 @@ minecraft {
 repositories {
     jcenter()
     mavenLocal()
+    maven {
+        url  "https://dl.bintray.com/silentchaos512/silent-lib"
+    }
+    maven {
+        url  "https://dl.bintray.com/silentchaos512/silent-utils"
+    }
     maven { url 'https://maven.mcmoddev.com' }
     maven {
         // location of the maven that hosts JEI files

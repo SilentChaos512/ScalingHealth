@@ -46,7 +46,8 @@ public enum ModItems implements IItemProvider {
     BANDAGES(() -> new HealingItem(0.3f, 1)),
     MEDKIT(() -> new HealingItem(0.7f, 4)),
     CURSED_HEART(() -> new DifficultyMutatorItem(DifficultyMutatorItem.Type.CURSED)),
-    ENCHANTED_HEART(() -> new DifficultyMutatorItem(DifficultyMutatorItem.Type.ENCHANTED));
+    ENCHANTED_HEART(() -> new DifficultyMutatorItem(DifficultyMutatorItem.Type.ENCHANTED)),
+    CHANCE_HEART(() -> new DifficultyMutatorItem(DifficultyMutatorItem.Type.CHANCE));
 
     private final Lazy<Item> item;
 

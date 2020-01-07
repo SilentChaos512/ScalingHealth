@@ -31,6 +31,8 @@ import net.silentchaos512.scalinghealth.utils.Difficulty;
 import java.util.Collection;
 import java.util.Locale;
 
+// TODO: Add options more relevant to the end and or nether - Ex: end with DISTANCE_FROM_SPAWN would result in pretty hard mobs in the outer islands right off the gate, incorporate a possible offset
+//  Add preset configs with multiple dimensions ie: nether scales difficulty 8x more with distance.
 public enum AreaDifficultyMode {
     WEIGHTED_AVERAGE {
         @Override
@@ -56,6 +58,8 @@ public enum AreaDifficultyMode {
             for (Tuple<BlockPos, IDifficultySource> tuple : sources) {
                 total += tuple.getB().getDifficulty();
             }
+            if(sources.size() == 0)
+                return 0;
             return total / sources.size();
         }
     },
@@ -82,18 +86,15 @@ public enum AreaDifficultyMode {
     DISTANCE_FROM_SPAWN {
         @Override
         public double getBaseAreaDifficulty(World world, BlockPos pos, int radius) {
-            double dx = pos.getX() - pos.getX();
-            double dz = pos.getZ() - pos.getZ();
-            double distance = Math.sqrt(dx * dx + dz * dz);
+            double distance = MCMathUtils.distance(pos, world.getSpawnPoint());
             return distance * Difficulty.distanceFactor(world);
         }
     },
     DISTANCE_FROM_ORIGIN {
         @Override
         public double getBaseAreaDifficulty(World world, BlockPos pos, int radius) {
-            double dx = pos.getX() - pos.getX();
-            double dz = pos.getZ() - pos.getZ();
-            double distance = Math.sqrt(dx * dx + dz * dz);
+            //TODO: no implementation of distance in y axis?
+            double distance = MCMathUtils.distance(pos, new BlockPos(0, pos.getY(), 0));
             return distance * Difficulty.distanceFactor(world);
         }
     },

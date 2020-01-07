@@ -38,6 +38,7 @@ public class DimensionConfig {
     public static class Items {
         public final DoubleValue cursedHeartAffect;
         public final DoubleValue enchantedHeartAffect;
+        public final DoubleValue chanceHeartAffect;
         public final DoubleValue heartCrystalHealthRestored;
         public final IntValue heartCrystalLevelCost;
         public final BooleanValue heartCrystalIncreaseHealth;
@@ -55,6 +56,13 @@ public class DimensionConfig {
                     .builder("item.enchanted_heart.change")
                     .comment("Change in difficulty when an enchanted heart is used")
                     .defineInRange(-10, -Double.MAX_VALUE, Double.MAX_VALUE);
+            chanceHeartAffect = wrapper
+                    .builder("item.chance_heart.change")
+                    .comment("Change in difficulty when a chance heart is used",
+                            "For a value n, a chance heart has 1 in 2n + 1 chance of being cursed",
+                            "In that case, n difficulty is added (n = 10, 1 in 21 chance to get +10)",
+                            "There's a 2 in 2n + 1 chance for 1 to n difficulty to be subtracted (n = 3, 2 in 7 chance of getting -1, -2, or -3")
+                    .defineInRange(10, -Double.MAX_VALUE, Double.MAX_VALUE);
             heartCrystalHealthRestored = wrapper
                     .builder("item.heart_crystal.healthRestored")
                     .comment("The amount of additional health restored by heart crystals (min = 0)",
@@ -160,7 +168,12 @@ public class DimensionConfig {
             healthMode = wrapper
                     .builder("mob.health.modifierMode")
                     .comment("Determines how difficulty affects mob health.",
-                            "TODO: Describe each mode")
+                            "2 types of modes: Multiplier and additive, with 3 different multipliers.",
+                            "MULTI: Mob hp is multiplied, mobs with higher base hp have more increase.",
+                            "MULTI_HALF: Same as MULTI but mobs with more than 20 hp have reduced scaling (bosses, endermen, witches, etc).",
+                            "MULTI_QUARTER: Same as MULTI_HALF but scaling is reduced further for 20hp+ mobs.",
+                            "ADD: Flat increase for all mobs, no matter their base hp."
+                            )
                     .defineEnum(MobHealthMode.MULTI_HALF);
             wrapper.comment("mob.potionChance", "Chance for mobs to receive a random potion effect (assuming their difficulty is high enough)");
             hostilePotionChance = wrapper
@@ -335,7 +348,22 @@ public class DimensionConfig {
             areaMode = wrapper
                     .builder("difficulty.areaMode")
                     .comment("Determines how difficulty is calculated.",
-                            "TODO: List and describe values")
+                            "WEIGHTED_AVERAGE:",
+                            "weighted average of players difficulty based on distance - players further away from an area will have less of an impact",
+                            "AVERAGE:",
+                            "Takes the average difficulty of nearby players",
+                            "MIN_LEVEL:",
+                            "Lowest difficulty of all nearby players",
+                            "MAX_LEVEL:",
+                            "Highest difficulty of all nearby players",
+                            "DISTANCE_FROM_SPAWN:",
+                            "Difficulty increases further away from world spawn, see distanceFactor config above.",
+                            "DISTANCE_FROM_ORIGIN:",
+                            "Same as DISTANCE_FROM_SPAWN but from (0, 0, 0)",
+                            "DISTANCE_AND_TIME:",
+                            "Mix of WEIGHTED_AVERAGE and DISTANCE_FROM_SPAWN. Difficulty increases with time but also with distance",
+                            "DIMENSION_WIDE:",
+                            "Difficulty tracked at the server level. Player difficulty is irrelevant.")
                     .defineEnum(AreaDifficultyMode.WEIGHTED_AVERAGE);
             searchRadius = wrapper
                     .builder("difficulty.searchRadius")
@@ -371,7 +399,9 @@ public class DimensionConfig {
                     .defineString("");
 
             // Mutators
-            wrapper.comment("difficulty.mutators", "Change difficulty when certain things happen");
+            wrapper.comment("difficulty.mutators",
+                    "Change difficulty when certain things happen",
+                    "putting in -difficulty- produces no change, putting 0 will reset difficulty after this action");
 
             onBlightKilled = defineExpression(wrapper,
                     "difficulty.mutators.onBlightKilled",
