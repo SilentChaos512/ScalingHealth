@@ -152,6 +152,7 @@ public class DimensionConfig {
     }
 
     public static class Mobs {
+        final ConfigValue<List<? extends String>> mobsExempt;
         public final EnumValue<MobHealthMode> healthMode;
         public final DoubleValue hostilePotionChance;
         public final DoubleValue peacefulPotionChance;
@@ -200,12 +201,28 @@ public class DimensionConfig {
                     .build());
 
             // Blights
+            mobsExempt = wrapper
+                    .builder("mob.blight.exemptedMobs")
+                    .comment("These mobs won't be able to become blights")
+                    .defineList(ImmutableList.of("Bat", "Cat", "Chicken"), ConfigValue.IS_NONEMPTY_STRING);
             blightPotions = MobPotionConfig.init(wrapper, "mob.blight.potionEffects", false, ImmutableList.<CommentedConfig>builder()
                     .add(MobPotionConfig.from(Effects.FIRE_RESISTANCE, 1, 5, 0))
                     .add(MobPotionConfig.from(Effects.RESISTANCE, 1, 5, 0))
                     .add(MobPotionConfig.from(Effects.SPEED, 4, 5, 0))
                     .add(MobPotionConfig.from(Effects.STRENGTH, 2, 5, 0))
                     .build());
+        }
+
+        public boolean isMobExempt(MobEntity entity) {
+            String name = entity.getName().getString();
+            List<? extends String> list = mobsExempt.get();
+            for (String value : list) {
+                if (value.equalsIgnoreCase(name)) {
+                    ScalingHealth.LOGGER.debug("Stopped {} from becoming blight", name);
+                    return true;
+                }
+            }
+            return list.contains(name);
         }
     }
 

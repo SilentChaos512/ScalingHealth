@@ -143,7 +143,7 @@ public final class Difficulty {
     }
 
     public static boolean canBecomeBlight(MobEntity entity) {
-        return true;
+        return Config.get(entity.world).mobs.isMobExempt(entity);
     }
 
     public static boolean isBlight(MobEntity entity) {
