@@ -3,6 +3,15 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.4] - 2020-01-07
+### Added
+- Lucky Heart
+- Blacklist mob config
+- Explanation for the different difficulty types and mob hp configs
+### Fixed
+- Hearts lost on death
+- Certain difficulty types now work properly
+
 ## [2.3.3] - 2019-10-06
 ### Added
 - Config to disable heart tank icons

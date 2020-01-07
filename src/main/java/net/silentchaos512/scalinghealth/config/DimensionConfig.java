@@ -204,7 +204,9 @@ public class DimensionConfig {
             mobsExempt = wrapper
                     .builder("mob.blight.exemptedMobs")
                     .comment("These mobs won't be able to become blights")
-                    .defineList(ImmutableList.of("Bat", "Cat", "Chicken"), ConfigValue.IS_NONEMPTY_STRING);
+                    .defineList(ImmutableList.of("Bat", "Cat", "Chicken", "Cod", "Cow", "Donkey", "Fox", "Horse", "Mooshroom",
+                            "Mule", "Ocelot", "Parrot", "Pig", "Rabbit", "Salmon", "Sheep", "Squid", "Tropical Fish", "Turtle", "Villager", "Wandering Trader"),
+                            ConfigValue.IS_NONEMPTY_STRING);
             blightPotions = MobPotionConfig.init(wrapper, "mob.blight.potionEffects", false, ImmutableList.<CommentedConfig>builder()
                     .add(MobPotionConfig.from(Effects.FIRE_RESISTANCE, 1, 5, 0))
                     .add(MobPotionConfig.from(Effects.RESISTANCE, 1, 5, 0))
