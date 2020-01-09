@@ -61,7 +61,12 @@ public final class Players {
 
     public static float getHealthAfterDeath(PlayerEntity player, DimensionType deathDimension) {
         DimensionConfig config = Config.get(deathDimension);
-        return (float) EvalVars.apply(config, player, config.player.setHealthOnDeath.get());
+        int deathHp = (int) EvalVars.apply(config, player, config.player.setHealthOnDeath.get());
+        int maxHp = maxHealth(player);
+        int minHp = minHealth(player);
+        int hp = deathHp < minHp ? minHp : deathHp;
+        hp = hp > maxHp ? maxHp : hp;
+        return hp;
     }
 
     public static boolean heartCrystalsIncreaseHealth(PlayerEntity player) {

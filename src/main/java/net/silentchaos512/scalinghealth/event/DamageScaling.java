@@ -101,7 +101,7 @@ public final class DamageScaling {
                         : entity.getAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue();
                 return (entity.getMaxHealth() - baseHealth) / baseHealth;
             case DIFFICULTY:
-                return Difficulty.ofEntity(entity) * config.damageScaling.difficultyWeight.get();
+                return Difficulty.getDifficultyOf(entity) * config.damageScaling.difficultyWeight.get();
             default:
                 throw new IllegalStateException("Unknown damage scaling mode: " + mode);
         }

@@ -50,7 +50,7 @@ public class MobPotionConfig {
     public void applyAll(LivingEntity entity) {
         this.potions.get().forEach(entry -> entry.applyTo(entity));
         if (ScalingHealth.LOGGER.isDebugEnabled()) {
-            ScalingHealth.LOGGER.debug(MARKER, "Applied all {} effects to {}", potions.get().size(), entity.getScoreboardName());
+            //ScalingHealth.LOGGER.debug(MARKER, "Applied all {} effects to {}", potions.get().size(), entity.getScoreboardName());
         }
     }
 

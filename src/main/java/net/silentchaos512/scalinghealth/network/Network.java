@@ -35,6 +35,11 @@ public final class Network {
                 .encoder(SpawnBlightFirePacket::toBytes)
                 .consumer(SpawnBlightFirePacket::handle)
                 .add();
+        channel.messageBuilder(MarkBlightPacket.class, 4)
+                .decoder(MarkBlightPacket::fromBytes)
+                .encoder(MarkBlightPacket::toBytes)
+                .consumer(MarkBlightPacket::handle)
+                .add();
     }
 
     private Network() {}

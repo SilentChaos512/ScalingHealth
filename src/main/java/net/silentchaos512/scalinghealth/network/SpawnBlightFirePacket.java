@@ -32,9 +32,11 @@ public class SpawnBlightFirePacket {
     }
 
     public static void handle(SpawnBlightFirePacket packet, Supplier<NetworkEvent.Context> context) {
+        //ScalingHealth.LOGGER.debug("Handling the SpawnBlightFire Packet!");
         context.get().enqueueWork(() -> {
             Entity entity = getTargetEntity(packet.parentId);
-            if (entity != null && entity instanceof MobEntity) {
+            if (entity instanceof MobEntity) {
+                ScalingHealth.LOGGER.debug("Spawning Blight Fire on the CLIENT");
                 entity.world.addEntity(new BlightFireEntity((MobEntity) entity));
             }
         });

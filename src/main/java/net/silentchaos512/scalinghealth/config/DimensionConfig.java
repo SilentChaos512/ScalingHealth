@@ -152,12 +152,17 @@ public class DimensionConfig {
     }
 
     public static class Mobs {
-        final ConfigValue<List<? extends String>> mobsExempt;
+        private final ConfigValue<List<? extends String>> mobsExempt;
+        public final DoubleValue passiveMultiplier;
+        public final DoubleValue hostileMultiplier;
         public final EnumValue<MobHealthMode> healthMode;
+        public final BooleanValue notifyOnBlightDeath;
         public final DoubleValue hostilePotionChance;
         public final DoubleValue peacefulPotionChance;
         public final DoubleValue damageBoostScale;
         public final DoubleValue maxDamageBoost;
+        public final DoubleValue xpBoost;
+        public final DoubleValue xpBlightBoost;
         public final MobPotionConfig randomPotions;
         // Blights
 //        public final Supplier<Expression> blightChance;
@@ -177,6 +182,12 @@ public class DimensionConfig {
                             )
                     .defineEnum(MobHealthMode.MULTI_HALF);
             wrapper.comment("mob.potionChance", "Chance for mobs to receive a random potion effect (assuming their difficulty is high enough)");
+            passiveMultiplier = wrapper
+                    .builder("mob.health.multiplier.passive")
+                    .defineInRange(0.375, 0, 1);
+            hostileMultiplier = wrapper
+                    .builder("mob.health.multiplier.hostile")
+                    .defineInRange(0.375, 0, 1);
             hostilePotionChance = wrapper
                     .builder("mob.potionChance.hostile")
                     .defineInRange(0.375, 0, 1);
@@ -191,6 +202,10 @@ public class DimensionConfig {
                     .builder("mob.damage.maxBoost")
                     .comment("The maximum extra attack damage a mob can receive")
                     .defineInRange(10, 0, Double.MAX_VALUE);
+            xpBoost = wrapper
+                    .builder("mob.xp.Boost")
+                    .comment("Xp scaling multiplied by difficulty - xp scale of 0.1 with difficulty 10 will give about 11x more xp")
+                    .defineInRange(0.03, 0, 1);
             randomPotions = MobPotionConfig.init(wrapper, "mob.randomPotionEffects", true, ImmutableList.<CommentedConfig>builder()
                     .add(MobPotionConfig.from(Effects.SPEED, 1, 10, 15))
                     .add(MobPotionConfig.from(Effects.SPEED, 2, 10, 50))
@@ -213,6 +228,14 @@ public class DimensionConfig {
                     .add(MobPotionConfig.from(Effects.SPEED, 4, 5, 0))
                     .add(MobPotionConfig.from(Effects.STRENGTH, 2, 5, 0))
                     .build());
+            notifyOnBlightDeath = wrapper
+                    .builder("mob.blight.notifyOnDeath")
+                    .comment("Notify everyone that a blight died in combat")
+                    .define(true);
+            xpBlightBoost = wrapper
+                    .builder("mob.blight.maxBoost")
+                    .comment("Xp scaling for blights, 3 will give 3 more times more xp then another mob on the same difficulty")
+                    .defineInRange(3, 1, Double.MAX_VALUE);
         }
 
         public boolean isMobExempt(MobEntity entity) {
@@ -220,7 +243,7 @@ public class DimensionConfig {
             List<? extends String> list = mobsExempt.get();
             for (String value : list) {
                 if (value.equalsIgnoreCase(name)) {
-                    ScalingHealth.LOGGER.debug("Stopped {} from becoming blight", name);
+                    //ScalingHealth.LOGGER.debug("Stopped {} from becoming blight", name);
                     return true;
                 }
             }

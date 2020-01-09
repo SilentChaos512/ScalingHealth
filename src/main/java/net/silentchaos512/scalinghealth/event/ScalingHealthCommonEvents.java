@@ -20,6 +20,7 @@ package net.silentchaos512.scalinghealth.event;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -28,6 +29,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -50,6 +52,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IDifficultySource;
+import net.silentchaos512.scalinghealth.capability.IPlayerData;
+import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.DimensionConfig;
 import net.silentchaos512.scalinghealth.config.EvalVars;
@@ -58,6 +62,7 @@ import net.silentchaos512.scalinghealth.lib.module.ModuleAprilTricks;
 import net.silentchaos512.scalinghealth.network.ClientLoginMessage;
 import net.silentchaos512.scalinghealth.network.Network;
 import net.silentchaos512.scalinghealth.utils.Difficulty;
+import net.silentchaos512.scalinghealth.utils.Players;
 import net.silentchaos512.utils.MathUtils;
 
 import javax.annotation.Nullable;
@@ -116,24 +121,21 @@ public final class ScalingHealthCommonEvents {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onXPDropped(LivingExperienceDropEvent event) {
-        /*
-        LivingEntity entityLiving = event.getEntityLiving();
-
+        LivingEntity entity = event.getEntityLiving();
         // Additional XP from all mobs.
-        short difficulty = entityLiving.getEntityData()
-                .getShort(DifficultyHandler.NBT_ENTITY_DIFFICULTY);
-        float multi = 1.0f + Config.Mob.xpBoost * difficulty;
+        short difficulty = (short) Difficulty.areaDifficulty(entity.world, entity.getPosition());
+        float multi = (float) (1.0f + Config.get(entity).mobs.xpBoost.get() * difficulty);
 
         float amount = event.getDroppedExperience();
         amount *= multi;
 
         // Additional XP from blights.
-        if (BlightHandler.isBlight(entityLiving)) {
-            amount *= Config.Mob.Blight.xpMultiplier;
+        if(entity instanceof MobEntity) {
+            if (BlightHandler.isBlight((MobEntity) entity)) {
+                amount *= Config.get(entity).mobs.xpBlightBoost.get();
+            }
         }
-
         event.setDroppedExperience(Math.round(amount));
-        */
     }
 
     /**
@@ -157,13 +159,12 @@ public final class ScalingHealthCommonEvents {
         // Player's pet is true source.
         boolean isTamedAnimal = entitySource instanceof TameableEntity
                 && ((TameableEntity) entitySource).isTamed();
-        if (entitySource instanceof TameableEntity) {
+        if (isTamedAnimal) {
             TameableEntity tamed = (TameableEntity) entitySource;
-            if (tamed.isTamed() && tamed.getOwner() instanceof PlayerEntity) {
+            if (tamed.getOwner() instanceof PlayerEntity) {
                 return (PlayerEntity) tamed.getOwner();
             }
         }
-
         // No player responsible.
         return null;
     }
@@ -182,91 +183,14 @@ public final class ScalingHealthCommonEvents {
     }
 
     @SubscribeEvent
-    public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
-        /*
-        // Set player health correctly after respawn.
-        if (event.player instanceof ServerPlayerEntity) {
-            ServerPlayerEntity player = (ServerPlayerEntity) event.player;
-            PlayerData data = SHPlayerDataHandler.get(player);
-            if (data == null) return;
-
-            // Lose health on death?
-            if (Config.Player.Health.lostOnDeath > 0 && !event.isEndConquered()) {
-                float newHealth = data.getMaxHealth() - Config.Player.Health.lostOnDeath;
-                float startHealth = Config.Player.Health.startingHealth;
-                data.setMaxHealth(newHealth < startHealth ? startHealth : newHealth);
-            }
-
-            // Lose difficulty on death?
-            if (!event.isEndConquered()) {
-                double currentDifficulty = data.getDifficulty();
-                double newDifficulty = MathHelper.clamp(
-                        currentDifficulty - Config.Difficulty.lostOnDeath,
-                        Config.Difficulty.minValue, Config.Difficulty.maxValue);
-                data.setDifficulty(newDifficulty);
-            }
-
-            // Apply health modifier
-            if (Config.Player.Health.allowModify) {
-                float health = player.getHealth();
-                float maxHealth = data.getMaxHealth();
-                ModifierHandler.setMaxHealth(player, maxHealth, 0);
-                if (health != maxHealth && maxHealth > 0) {
-                    player.setHealth(player.getMaxHealth());
-                }
-            }
-        }
-        */
-    }
-
-    @SubscribeEvent
-    public static void onPlayerJoinedServer(PlayerEvent.PlayerLoggedInEvent event) {
-        /*
-        // Sync player data and set health.
-        if (event.player instanceof ServerPlayerEntity) {
-            ServerPlayerEntity player = (ServerPlayerEntity) event.player;
-            PlayerData data = SHPlayerDataHandler.get(player);
-
-            // Resets, based on config?
-            Calendar today = Calendar.getInstance();
-            Calendar lastTimePlayed = data.getLastTimePlayed();
-
-            if (Config.Difficulty.DIFFFICULTY_RESET_TIME.shouldReset(today, lastTimePlayed)) {
-                ScalingHealth.logHelper.info("Reset player {}'s difficulty to {}", player.getName(), (int) Config.Difficulty.startValue);
-                ChatHelper.sendMessage(player, "[Scaling Health] Your difficulty has been reset.");
-                data.setDifficulty(Config.Difficulty.startValue);
-            }
-            if (Config.Player.Health.resetTime.shouldReset(today, lastTimePlayed)) {
-                data.setMaxHealth(Config.Player.Health.startingHealth);
-                ScalingHealth.logHelper.info("Reset player {}'s health to {}", player.getName(), Config.Player.Health.startingHealth);
-                ChatHelper.sendMessage(player, "[Scaling Health] Your health has been reset.");
-            }
-
-            data.getLastTimePlayed().setTime(today.getTime());
-
-            // Apply health modifier
-            if (Config.Player.Health.allowModify) {
-                float maxHealth = data.getMaxHealth();
-                ModifierHandler.setMaxHealth(player, maxHealth, 0);
-            }
-        }
-
-        if (ModuleAprilTricks.instance.isEnabled() && ModuleAprilTricks.instance.isRightDay()) {
-            ChatHelper.sendMessage(event.player,
-                    TextFormatting.RED + "[Scaling Health] It's April Fool's time... hehehe.");
-        }
-        */
-    }
-
-    @SubscribeEvent
     public static void onPlayerSleepInBed(PlayerSleepInBedEvent event) {
         PlayerEntity player = event.getPlayer();
         if (!player.world.isRemote && Config.CLIENT.warnWhenSleeping.get()) {
             DimensionConfig config = Config.get(player);
             double newDifficulty = EvalVars.apply(config, player, config.difficulty.onPlayerSleep.get());
 
-            if (!MathUtils.doublesEqual(Difficulty.ofEntity(player), newDifficulty, 0.1)) {
-                ScalingHealth.LOGGER.debug("old={}, new={}", Difficulty.ofEntity(player), newDifficulty);
+            if (!MathUtils.doublesEqual(Difficulty.getDifficultyOf(player), newDifficulty, 0.1)) {
+                ScalingHealth.LOGGER.debug("old={}, new={}", Difficulty.getDifficultyOf(player), newDifficulty);
                 // Difficulty would change (doesn't change until onPlayerWakeUp)
                 String configMsg = config.difficulty.sleepWarningMessage.get();
                 ITextComponent text = configMsg.isEmpty()
@@ -293,14 +217,4 @@ public final class ScalingHealthCommonEvents {
             // TODO: World difficulty increase?
         }
     }
-
-    /*
-    @SubscribeEvent
-    public void onConfigChanged(ConfigChangedEvent.OnConfigChangedEvent event) {
-        if (event.getModID().equals(ScalingHealth.MOD_ID)) {
-            Config.INSTANCE.load();
-            Config.INSTANCE.save();
-        }
-    }
-    */
 }

@@ -8,14 +8,20 @@ import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.network.PacketDistributor;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.DimensionConfig;
 import net.silentchaos512.scalinghealth.config.EvalVars;
+import net.silentchaos512.scalinghealth.event.BlightHandler;
 import net.silentchaos512.scalinghealth.lib.MobHealthMode;
 import net.silentchaos512.scalinghealth.lib.EntityGroup;
+import net.silentchaos512.scalinghealth.network.MarkBlightPacket;
+import net.silentchaos512.scalinghealth.network.Network;
 import net.silentchaos512.utils.MathUtils;
+
+import java.util.function.Supplier;
 
 public final class MobDifficultyHandler {
     private MobDifficultyHandler() {}
@@ -46,6 +52,15 @@ public final class MobDifficultyHandler {
         boolean isHostile = entity instanceof IMob;
 
         if (makeBlight) {
+            if(entity.world.isRemote)
+                ScalingHealth.LOGGER.debug("Marked Blight on the CLIENT");
+            else
+            {
+                ScalingHealth.LOGGER.debug("Marked Blight on the SERVER");
+                MarkBlightPacket packet = new MarkBlightPacket(entity);
+                Supplier<PacketDistributor.TargetPoint> target = PacketDistributor.TargetPoint.p(entity.posX, entity.posY, entity.posZ, 128, entity.dimension);
+                Network.channel.send(PacketDistributor.NEAR.with(target), packet);
+            }
             difficulty *= getBlightDifficultyMultiplier(world);
             data.setIsBlight(true);
         }
@@ -58,8 +73,8 @@ public final class MobDifficultyHandler {
         IAttributeInstance attributeMaxHealth = entity.getAttribute(SharedMonsterAttributes.MAX_HEALTH);
         double baseMaxHealth = attributeMaxHealth.getBaseValue();
         double healthMultiplier = isHostile
-                ? 0.5       //Config.Mob.Health.hostileHealthMultiplier
-                : 0.25;     //Config.Mob.Health.peacefulHealthMultiplier;
+                ? Config.get(world).mobs.hostileMultiplier.get()
+                : Config.get(world).mobs.passiveMultiplier.get();
 
         healthBoost *= healthMultiplier;
 
@@ -91,7 +106,7 @@ public final class MobDifficultyHandler {
 
     private static double getBlightChance(MobEntity entity) {
         // FIXME: May not line up with actual entity difficulty, need to pass in difficulty : line 34, shouldBecomeBlight
-        DimensionConfig config = Config.get(entity);
+        DimensionConfig config = Config.get(entity.world);
         Expression expr = new Expression("0.0625 * areaDifficulty / maxDifficulty");
         return EvalVars.apply(config, entity.world, entity.getPosition(), null, expr);
     }

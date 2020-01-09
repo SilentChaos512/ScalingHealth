@@ -45,7 +45,7 @@ public final class ClientHandler {
         Minecraft mc = Minecraft.getInstance();
         ClientPlayerEntity player = mc.player;
         if (player != null) {
-            //player.experienceLevel = msg.experienceLevel;
+            player.experienceLevel = msg.experienceLevel;
         }
     }
 

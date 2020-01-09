@@ -20,21 +20,28 @@ package net.silentchaos512.scalinghealth.entity;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.passive.CatEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.IPacket;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.datasync.DataParameter;
+import net.minecraft.network.datasync.DataSerializers;
+import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.network.play.server.SSpawnObjectPacket;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.init.ModEntities;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.MarkerManager;
 
 import javax.annotation.Nullable;
 
 public class BlightFireEntity extends Entity implements IEntityAdditionalSpawnData {
+    private static final Marker MARKER = MarkerManager.getMarker("BlightFireEntity");
     private static final String NBT_PARENT = "ParentBlight";
 
-    private MobEntity parent;
+    private static final DataParameter<Integer> PARENT = EntityDataManager.createKey(BlightFireEntity.class, DataSerializers.VARINT);
 
     public BlightFireEntity(World worldIn) {
         super(ModEntities.BLIGHT_FIRE.type(), worldIn);
@@ -42,29 +49,42 @@ public class BlightFireEntity extends Entity implements IEntityAdditionalSpawnDa
 
     public BlightFireEntity(MobEntity parent) {
         this(parent.world);
-        this.parent = parent;
+        this.dataManager.set(PARENT, parent.getEntityId());
+        if(parent.world.isRemote())
+            ScalingHealth.LOGGER.debug(MARKER,"CLIENT SIDE SPAWN");
+        else
+            ScalingHealth.LOGGER.debug(MARKER,"SERVER SIDE SPAWN");
+        this.startRiding(parent);
     }
 
     @Override
-    protected void registerData() { }
+    protected void registerData() {
+        this.dataManager.register(PARENT, 1);
+    }
 
     @Override
     public void tick() {
         // Server side only, blight fire must have a parent.
-        if (!world.isRemote && (parent == null || !parent.isAlive())) {
-            if (ScalingHealth.LOGGER.isDebugEnabled()) {
-                ScalingHealth.LOGGER.debug("Removed blight fire (parent missing or dead)");
+        if(!world.isRemote){
+            MobEntity p = (MobEntity) world.getEntityByID(this.dataManager.get(PARENT));
+            if (p == null || !p.isAlive()) {
+                if (ScalingHealth.LOGGER.isDebugEnabled()) {
+                    ScalingHealth.LOGGER.debug("Removed blight fire (parent missing or dead)");
+                }
+                remove();
+                //return;
             }
-            remove();
-            return;
-        }
 
-        // Update position manually in case fire is not riding the blight.
-        if (parent != null) {
-            this.posX = parent.posX;
-            this.posY = parent.posY + parent.getHeight() / 1.5;
-            this.posZ = parent.posZ;
+            ScalingHealth.LOGGER.debug(MARKER, "BlightFire Pos: ({}, {}, {})", this.posX, this.posY, this.posZ);
         }
+        // Update position manually in case fire is not riding the blight.
+        //if (parent != null) {
+        //    this.posX = parent.posX;
+        //    this.posY = parent.posY + parent.getHeight() / 1.5;
+        //    this.posZ = parent.posZ;
+
+        //    ScalingHealth.LOGGER.debug(MARKER, "BlightFire Pos: ({}, {}, {})", this.posX, this.posY, this.posZ);
+        //}
     }
 
     @Override
@@ -78,30 +98,31 @@ public class BlightFireEntity extends Entity implements IEntityAdditionalSpawnDa
             int id = compound.getInt(NBT_PARENT);
             Entity entity = world.getEntityByID(id);
             if (entity instanceof MobEntity)
-                parent = (MobEntity) entity;
+                this.dataManager.set(PARENT, id);
         }
     }
 
     @Override
     protected void writeAdditional(CompoundNBT compound) {
-        if (parent != null) {
-            compound.putInt(NBT_PARENT, parent.getEntityId());
+        if (world.getEntityByID(this.dataManager.get(PARENT)) != null) {
+            compound.putInt(NBT_PARENT, this.dataManager.get(PARENT));
         }
     }
 
     @Override
     public IPacket<?> createSpawnPacket() {
+        ScalingHealth.LOGGER.debug("Blight Fire spawned on the SERVER");
         return new SSpawnObjectPacket(this);
     }
 
     @Nullable
     public MobEntity getParent() {
-        return parent;
+        return (MobEntity) world.getEntityByID(this.dataManager.get(PARENT));
     }
 
     @Override
     public void writeSpawnData(PacketBuffer buffer) {
-        buffer.writeInt(parent == null ? -1 : parent.getEntityId());
+        buffer.writeInt(world.getEntityByID(this.dataManager.get(PARENT)) == null ? -1 : this.dataManager.get(PARENT));
     }
 
     @Override
@@ -110,7 +131,7 @@ public class BlightFireEntity extends Entity implements IEntityAdditionalSpawnDa
         if (id != -1) {
             Entity entity = world.getEntityByID(id);
             if (entity instanceof MobEntity)
-                parent = (MobEntity) entity;
+                this.dataManager.set(PARENT, id);
         }
     }
 }

@@ -47,7 +47,7 @@ public final class Difficulty {
     }
 
     @SuppressWarnings("TypeMayBeWeakened")
-    public static double ofEntity(Entity entity) {
+    public static double getDifficultyOf(Entity entity) {
         if (entity instanceof PlayerEntity)
             return source(entity).getDifficulty();
         return affected(entity).getDifficulty();
@@ -152,6 +152,10 @@ public final class Difficulty {
                 .isBlight();
     }
 
+    public static boolean notifyOnDeath(IWorldReader world){
+        return Config.get(world).mobs.notifyOnBlightDeath.get();
+    }
+
     public static double damageBoostScale(MobEntity entity) {
         return Config.get(entity).mobs.damageBoostScale.get();
     }
@@ -162,6 +166,6 @@ public final class Difficulty {
 
     public static double getDifficultyAfterDeath(PlayerEntity player, DimensionType deathDimension) {
         DimensionConfig config = Config.get(deathDimension);
-        return EvalVars.apply(config, player.world, player.getPosition(), player, config.difficulty.onPlayerDeath.get());
+        return EvalVars.apply(config, player, config.difficulty.onPlayerDeath.get());
     }
 }
