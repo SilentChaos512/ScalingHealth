@@ -23,11 +23,8 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.text.*;
 import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -39,7 +36,6 @@ import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.DimensionConfig;
 import net.silentchaos512.scalinghealth.entity.BlightFireEntity;
-import net.silentchaos512.scalinghealth.network.MarkBlightPacket;
 import net.silentchaos512.scalinghealth.network.Network;
 import net.silentchaos512.scalinghealth.network.SpawnBlightFirePacket;
 import net.silentchaos512.scalinghealth.utils.Difficulty;
@@ -65,13 +61,6 @@ public final class BlightHandler {
         return Difficulty.affected(entity).isBlight();
     }
 
-    public static void markBlight(MobEntity entity) {
-        if (entity != null){
-            IDifficultyAffected data = Difficulty.affected(entity);
-            MobDifficultyHandler.setEntityProperties(entity, data , data.getDifficulty(), true);
-        }
-    }
-
     private static void spawnBlightFire(MobEntity blight) {
         if (blight.world.isRemote || getBlightFire(blight) != null) return;
 
@@ -84,7 +73,7 @@ public final class BlightHandler {
         Network.channel.send(PacketDistributor.NEAR.with(target), packet);
 
         if (ScalingHealth.LOGGER.isDebugEnabled()) {
-            ScalingHealth.LOGGER.debug("Spawned blight fire for {}", blight);
+            ScalingHealth.LOGGER.debug("Spawned blight fire for {}", blight.getName().getString());
         }
     }
 
@@ -180,10 +169,6 @@ public final class BlightHandler {
         MobEntity blight = (MobEntity) livingEntity;
         if (!blight.world.isRemote && isBlight(blight)) {
             World world = blight.world;
-
-            if(!blight.getPassengers().isEmpty())
-                ScalingHealth.LOGGER.debug("{} #{} has passenger {}", blight.getName().getString(), blight.getEntityId(), blight.getPassengers().get(0).getName().getString());
-
             // Add in entity ID so not all blights update on the same tick
             if ((world.getGameTime() + blight.getEntityId()) % UPDATE_DELAY == 0) {
                 spawnBlightFire(blight);

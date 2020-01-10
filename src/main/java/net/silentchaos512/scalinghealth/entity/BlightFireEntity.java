@@ -30,6 +30,7 @@ import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.network.play.server.SSpawnObjectPacket;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
+import net.minecraftforge.fml.network.NetworkHooks;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.init.ModEntities;
 import org.apache.logging.log4j.Marker;
@@ -50,10 +51,6 @@ public class BlightFireEntity extends Entity implements IEntityAdditionalSpawnDa
     public BlightFireEntity(MobEntity parent) {
         this(parent.world);
         this.dataManager.set(PARENT, parent.getEntityId());
-        if(parent.world.isRemote())
-            ScalingHealth.LOGGER.debug(MARKER,"CLIENT SIDE SPAWN");
-        else
-            ScalingHealth.LOGGER.debug(MARKER,"SERVER SIDE SPAWN");
         this.startRiding(parent);
     }
 
@@ -74,8 +71,6 @@ public class BlightFireEntity extends Entity implements IEntityAdditionalSpawnDa
                 remove();
                 //return;
             }
-
-            ScalingHealth.LOGGER.debug(MARKER, "BlightFire Pos: ({}, {}, {})", this.posX, this.posY, this.posZ);
         }
         // Update position manually in case fire is not riding the blight.
         //if (parent != null) {
@@ -112,7 +107,7 @@ public class BlightFireEntity extends Entity implements IEntityAdditionalSpawnDa
     @Override
     public IPacket<?> createSpawnPacket() {
         ScalingHealth.LOGGER.debug("Blight Fire spawned on the SERVER");
-        return new SSpawnObjectPacket(this);
+        return NetworkHooks.getEntitySpawningPacket(this);
     }
 
     @Nullable

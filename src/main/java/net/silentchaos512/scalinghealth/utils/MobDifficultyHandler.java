@@ -14,10 +14,8 @@ import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.DimensionConfig;
 import net.silentchaos512.scalinghealth.config.EvalVars;
-import net.silentchaos512.scalinghealth.event.BlightHandler;
 import net.silentchaos512.scalinghealth.lib.MobHealthMode;
 import net.silentchaos512.scalinghealth.lib.EntityGroup;
-import net.silentchaos512.scalinghealth.network.MarkBlightPacket;
 import net.silentchaos512.scalinghealth.network.Network;
 import net.silentchaos512.utils.MathUtils;
 
@@ -55,12 +53,7 @@ public final class MobDifficultyHandler {
             if(entity.world.isRemote)
                 ScalingHealth.LOGGER.debug("Marked Blight on the CLIENT");
             else
-            {
                 ScalingHealth.LOGGER.debug("Marked Blight on the SERVER");
-                MarkBlightPacket packet = new MarkBlightPacket(entity);
-                Supplier<PacketDistributor.TargetPoint> target = PacketDistributor.TargetPoint.p(entity.posX, entity.posY, entity.posZ, 128, entity.dimension);
-                Network.channel.send(PacketDistributor.NEAR.with(target), packet);
-            }
             difficulty *= getBlightDifficultyMultiplier(world);
             data.setIsBlight(true);
         }
