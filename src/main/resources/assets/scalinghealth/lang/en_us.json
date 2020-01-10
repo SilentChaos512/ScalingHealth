@@ -1,7 +1,6 @@
 {
   "blight.scalinghealth": "Blight %s",
   "blight.scalinghealth.killedByPlayer": "Blight %s was killed by %s!",
-  "entity.scalinghealth.blight_fire": "Blight Fire",
   "block.scalinghealth.heart_crystal_ore": "Heart Crystal Ore",
   "block.scalinghealth.power_crystal_ore": "Power Crystal Ore",
   "command.scalinghealth.outOfBounds": "Value must be between %s and %s.",
@@ -53,6 +52,7 @@
   "item.scalinghealth.power_crystal": "Power Crystal",
   "item.scalinghealth.power_crystal.desc": "Increases base attack damage",
   "item.scalinghealth.power_crystal_shard": "Power Crystal Shard",
+  "entity.scalinghealth.blight_fire": "Blight Fire",
   "itemGroup.scalinghealth": "Scaling Health",
   "misc.scalinghealth.difficultyMeterText": "DIFFICULTY",
   "misc.scalinghealth.sleepWarning": "[Scaling Health] WARNING: Sleeping will change your difficulty!",

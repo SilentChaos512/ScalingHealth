@@ -21,9 +21,12 @@ package net.silentchaos512.scalinghealth.init;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.IItemProvider;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.item.DifficultyMutatorItem;
@@ -37,12 +40,13 @@ import java.util.Collection;
 import java.util.Locale;
 import java.util.function.Supplier;
 
+@Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public enum ModItems implements IItemProvider {
     HEART_CRYSTAL(HeartCrystal::new),
-    HEART_CRYSTAL_SHARD(() -> new Item(new Item.Properties().group(ItemGroup.MISC))),
-    HEART_DUST(() -> new Item(new Item.Properties().group(ItemGroup.MISC))),
+    HEART_CRYSTAL_SHARD(() -> new Item(new Item.Properties().group(ScalingHealth.SH))),
+    HEART_DUST(() -> new Item(new Item.Properties().group(ScalingHealth.SH))),
     POWER_CRYSTAL(PowerCrystal::new),
-    POWER_CRYSTAL_SHARD(() -> new Item(new Item.Properties().group(ItemGroup.MISC))),
+    POWER_CRYSTAL_SHARD(() -> new Item(new Item.Properties().group(ScalingHealth.SH))),
     BANDAGES(() -> new HealingItem(0.3f, 1)),
     MEDKIT(() -> new HealingItem(0.7f, 4)),
     CURSED_HEART(() -> new DifficultyMutatorItem(DifficultyMutatorItem.Type.CURSED)),
@@ -66,6 +70,7 @@ public enum ModItems implements IItemProvider {
 
     static final Collection<BlockItem> blocksToRegister = new ArrayList<>();
 
+    @SubscribeEvent
     public static void registerAll(RegistryEvent.Register<Item> event) {
         // Workaround for Forge event bus bug
         if (!event.getName().equals(ForgeRegistries.ITEMS.getRegistryName())) return;

@@ -1,17 +1,23 @@
 package net.silentchaos512.scalinghealth.client.particles;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.IParticleFactory;
 import net.minecraft.client.particle.IParticleRenderType;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.TexturedParticle;
 import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.particles.BasicParticleType;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.utils.Color;
+import net.silentchaos512.utils.MathUtils;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -38,7 +44,7 @@ public class ModParticle extends TexturedParticle {
 
     @Override
     public void renderParticle(BufferBuilder buffer, ActiveRenderInfo entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
-        /*int frame = FRAMES.length * this.age / this.maxAge;
+        int frame = FRAMES.length * this.age / this.maxAge;
         int textureIndex = FRAMES[MathUtils.clamp(frame, 0, FRAMES.length - 1)];
         ResourceLocation texture = TEXTURES.get(textureIndex);
         Minecraft.getInstance().textureManager.bindTexture(texture);
@@ -91,7 +97,7 @@ public class ModParticle extends TexturedParticle {
                 .tex(0, 1)
                 .color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha)
                 .lightmap(j, k).endVertex();
-        buffer.finishDrawing();*/
+        buffer.finishDrawing();
     }
 
     @Override
@@ -120,16 +126,15 @@ public class ModParticle extends TexturedParticle {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public static class Factory implements IParticleFactory<ModParticleType> {
+    public static class Factory implements IParticleFactory<BasicParticleType> {
         private final Color color;
-
         public Factory(Color color) {
             this.color = color;
         }
 
         @Nullable
         @Override
-        public Particle makeParticle(ModParticleType typeIn, World worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle makeParticle(BasicParticleType typeIn, World worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
             return new ModParticle(worldIn, this.color, x, y, z, xSpeed, ySpeed, zSpeed);
         }
     }

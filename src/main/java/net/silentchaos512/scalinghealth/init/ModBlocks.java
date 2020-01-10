@@ -21,8 +21,11 @@ package net.silentchaos512.scalinghealth.init;
 import net.minecraft.block.Block;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.lib.block.IBlockProvider;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -32,6 +35,7 @@ import net.silentchaos512.utils.Lazy;
 import java.util.Locale;
 import java.util.function.Supplier;
 
+@Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public enum ModBlocks implements IBlockProvider {
     HEART_CRYSTAL_ORE(ShardOreBlock::new),
     POWER_CRYSTAL_ORE(ShardOreBlock::new);
@@ -56,11 +60,13 @@ public enum ModBlocks implements IBlockProvider {
         return name().toLowerCase(Locale.ROOT);
     }
 
+    @SubscribeEvent
     public static void registerAll(RegistryEvent.Register<Block> event) {
-        // Workaround for Forge event bus bug
+        // Workaround for Forge event bus bug TODO
         if (!event.getName().equals(ForgeRegistries.BLOCKS.getRegistryName())) return;
 
         for (ModBlocks block : values()) {
+            ScalingHealth.LOGGER.debug("Hey registed block");
             register(block.getName(), block.asBlock());
         }
     }
@@ -70,7 +76,7 @@ public enum ModBlocks implements IBlockProvider {
         block.setRegistryName(registryName);
         ForgeRegistries.BLOCKS.register(block);
 
-        BlockItem item = new BlockItem(block, new Item.Properties());
+        BlockItem item = new BlockItem(block, new Item.Properties().group(ScalingHealth.SH));
         item.setRegistryName(registryName);
         ModItems.blocksToRegister.add(item);
     }

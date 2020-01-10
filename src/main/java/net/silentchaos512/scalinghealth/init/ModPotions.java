@@ -21,6 +21,8 @@ package net.silentchaos512.scalinghealth.init;
 import net.minecraft.potion.Effect;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.potion.BandagedEffect;
@@ -29,6 +31,7 @@ import net.silentchaos512.utils.Lazy;
 import java.util.Locale;
 import java.util.function.Supplier;
 
+@Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public enum ModPotions {
     BANDAGED(BandagedEffect::new);
 
@@ -46,6 +49,7 @@ public enum ModPotions {
         return name().toLowerCase(Locale.ROOT);
     }
 
+    @SubscribeEvent
     public static void registerAll(RegistryEvent.Register<Effect> event) {
         // Workaround for Forge event bus bug
         if (!event.getName().equals(ForgeRegistries.POTIONS.getRegistryName())) return;

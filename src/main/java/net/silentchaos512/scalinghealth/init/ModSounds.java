@@ -22,12 +22,16 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.utils.Lazy;
 
+import java.util.List;
 import java.util.Locale;
 
+@Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public enum ModSounds {
     CURSED_HEART_USE,
     ENCHANTED_HEART_USE,
@@ -60,6 +64,7 @@ public enum ModSounds {
         //entity.world.playSound(null, entity.getPosition(), this.get(), SoundCategory.PLAYERS, volume, pitch);
     }
 
+    @SubscribeEvent
     public static void registerAll(RegistryEvent.Register<SoundEvent> event) {
         // Workaround for Forge event bus bug
         if (!event.getName().equals(ForgeRegistries.SOUND_EVENTS.getRegistryName())) return;

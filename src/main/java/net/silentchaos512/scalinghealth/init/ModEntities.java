@@ -22,7 +22,9 @@ import net.minecraft.entity.EntityClassification;
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -33,6 +35,7 @@ import net.silentchaos512.utils.Lazy;
 import java.util.Locale;
 import java.util.function.Supplier;
 
+@Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public enum ModEntities {
     BLIGHT_FIRE(() -> EntityType.Builder.create((type, world) -> new BlightFireEntity(world), EntityClassification.AMBIENT));
 
@@ -53,12 +56,14 @@ public enum ModEntities {
         return name().toLowerCase(Locale.ROOT);
     }
 
+    @SubscribeEvent
     public static void registerAll(RegistryEvent.Register<EntityType<?>> event) {
         for (ModEntities entity : values()) {
             register(entity.getName(), entity.type());
         }
     }
 
+    @SubscribeEvent
     public static void registerRenderers(FMLClientSetupEvent event) {
         RenderingRegistry.registerEntityRenderingHandler(BlightFireEntity.class, new BlightFireRenderer.Factory());
     }

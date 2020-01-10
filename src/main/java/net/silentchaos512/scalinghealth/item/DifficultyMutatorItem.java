@@ -38,6 +38,7 @@ import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IDifficultySource;
+import net.silentchaos512.scalinghealth.client.particles.ModParticles;
 import net.silentchaos512.scalinghealth.utils.Difficulty;
 import net.silentchaos512.scalinghealth.utils.Players;
 
@@ -53,7 +54,7 @@ public class DifficultyMutatorItem extends Item {
     private final Type type;
 
     public DifficultyMutatorItem(Type type) {
-        super(new Item.Properties().group(ItemGroup.MISC));
+        super(new Item.Properties().group(ScalingHealth.SH));
         this.type = type;
     }
 
@@ -99,7 +100,6 @@ public class DifficultyMutatorItem extends Item {
         else{
             list.add(new TranslationTextComponent("item.scalinghealth.difficulty_changer.effectDesc", "?"));
         }
-
     }
 
     @Override
@@ -126,15 +126,15 @@ public class DifficultyMutatorItem extends Item {
         switch (this.type) {
             // Enchanted Heart
             case ENCHANTED:
-                enchantedHeartEffects(world, player, particleX, particleY, particleZ);
+                enchantedHeartEffects(world, player);
                 return new ActionResult<>(ActionResultType.SUCCESS, stack);
             // Cursed Heart
             case CURSED:
-                cursedHeartEffects(world, player, particleX, particleY, particleZ);
+                cursedHeartEffects(world, player);
                 return new ActionResult<>(ActionResultType.SUCCESS, stack);
             // Chance Heart
             case CHANCE:
-                chanceHeartEffects(world, player, particleX, particleY, particleZ);
+                chanceHeartEffects(world, player);
                 return new ActionResult<>(ActionResultType.SUCCESS, stack);
             default:
                 ScalingHealth.LOGGER.error("DifficultyMutatorItem invalid type: {}", this.type);
@@ -144,7 +144,7 @@ public class DifficultyMutatorItem extends Item {
 
 
 
-    private void cursedHeartEffects(World world, PlayerEntity player, double particleX, double particleY, double particleZ) {
+    private void cursedHeartEffects(World world, PlayerEntity player) {
 //        for (int i = 0; i < 20 - 5 * ScalingHealth.proxy.getParticleSettings(); ++i) {
 //            double xSpeed = 0.08 * ScalingHealth.random.nextGaussian();
 //            double ySpeed = 0.05 * ScalingHealth.random.nextGaussian();
@@ -155,9 +155,14 @@ public class DifficultyMutatorItem extends Item {
 //        world.playSound(null, player.getPosition(), ModSounds.CURSED_HEART_USE,
 //                SoundCategory.PLAYERS, 0.3f,
 //                (float) (0.7f + 0.05f * ScalingHealth.random.nextGaussian()));
+
+        if(world.isRemote){
+            ScalingHealth.LOGGER.debug("Spawned Particles on client");
+            ModParticles.ENCHANTED_HEART.spawn(40, player);
+        }
     }
 
-    private void enchantedHeartEffects(World world, PlayerEntity player, double particleX, double particleY, double particleZ) {
+    private void enchantedHeartEffects(World world, PlayerEntity player) {
 //        for (int i = 0; i < 20 - 5 * ScalingHealth.proxy.getParticleSettings(); ++i) {
 //            double xSpeed = 0.08 * ScalingHealth.random.nextGaussian();
 //            double ySpeed = 0.05 * ScalingHealth.random.nextGaussian();
@@ -167,9 +172,13 @@ public class DifficultyMutatorItem extends Item {
 //        }
 //        world.playSound(null, player.getPosition(), ModSounds.ENCHANTED_HEART_USE,
 //                SoundCategory.PLAYERS, 0.4f, 1.7f);
+        if(world.isRemote){
+            ScalingHealth.LOGGER.debug("Spawned Particles on client");
+            ModParticles.CURSED_HEART.spawn(40, player);
+        }
     }
 
-    private void chanceHeartEffects(World world, PlayerEntity player, double particleX, double particleY, double particleZ){
+    private void chanceHeartEffects(World world, PlayerEntity player){
         //TODO: Create Particles + Fix others
     }
 }

@@ -43,12 +43,12 @@ public class SideProxy {
         MinecraftForge.EVENT_BUS.addListener(this::serverAboutToStart);
         MinecraftForge.EVENT_BUS.addListener(this::serverStarted);
 
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Block.class, ModBlocks::registerAll);
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(EntityType.class, ModEntities::registerAll);
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Item.class, ModItems::registerAll);
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(ParticleType.class, ModParticles::registerAll);
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Effect.class, ModPotions::registerAll);
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(SoundEvent.class, ModSounds::registerAll);
+        //FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Block.class, ModBlocks::registerAll);
+        //FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(EntityType.class, ModEntities::registerAll);
+        //FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Item.class, ModItems::registerAll);
+        //FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(ParticleType.class, ModParticles::registerAll);
+        //FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Effect.class, ModPotions::registerAll);
+        //FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(SoundEvent.class, ModSounds::registerAll);
 //        FMLModLoadingContext.get().getModEventBus().addListener(ModTileEntities::registerAll);
 
         MinecraftForge.EVENT_BUS.register(PetEventHandler.INSTANCE);
@@ -66,6 +66,7 @@ public class SideProxy {
     private void imcEnqueue(InterModEnqueueEvent event) {}
 
     private void imcProcess(InterModProcessEvent event) {}
+
 
     private void serverAboutToStart(FMLServerAboutToStartEvent event) {
         ModCommands.registerAll(event.getServer().getCommandManager().getDispatcher());
@@ -92,7 +93,7 @@ public class SideProxy {
         }
 
         private static void clientSetup(FMLClientSetupEvent event) {
-            ModEntities.registerRenderers(event);
+
         }
 
         @Nullable
