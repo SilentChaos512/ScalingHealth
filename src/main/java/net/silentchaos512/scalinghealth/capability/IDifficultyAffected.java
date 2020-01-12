@@ -1,26 +1,29 @@
 package net.silentchaos512.scalinghealth.capability;
 
 import net.minecraft.entity.MobEntity;
+import net.minecraft.world.World;
+import net.silentchaos512.scalinghealth.utils.Difficulty;
 
 public interface IDifficultyAffected {
     float getDifficulty();
 
-    void setDifficulty(float value);
+    void setDifficulty(MobEntity mob);
+
+    void forceDifficulty(float diff);
 
     boolean isBlight();
 
     void setIsBlight(boolean value);
 
-    default float affectiveDifficulty() {
-        // TODO: Blight difficulty config
-        return isBlight() ? 3 * getDifficulty() : getDifficulty();
-    }
+    void setProcessed(boolean value);
+
+    void tick(MobEntity entity);
 
     default int getDisplayLevel() {
         return (int) (getDifficulty() / 3);
     }
 
-    void setProcessed(boolean value);
-
-    void tick(MobEntity entity);
+    default float affectiveDifficulty(World world) {
+        return isBlight() ? (float) Difficulty.getBlightDifficultyMultiplier(world) * getDifficulty() : getDifficulty();
+    }
 }

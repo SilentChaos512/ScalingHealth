@@ -18,8 +18,9 @@
 
 package net.silentchaos512.scalinghealth.init;
 
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -28,7 +29,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.utils.Lazy;
 
-import java.util.List;
 import java.util.Locale;
 
 @Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -55,13 +55,12 @@ public enum ModSounds {
         return name().toLowerCase(Locale.ROOT);
     }
 
-    public void play(LivingEntity entity) {
+    public void play(PlayerEntity entity) {
         play(entity, 0.5f, 1 + 0.1f * (float) ScalingHealth.random.nextGaussian());
     }
 
-    public void play(LivingEntity entity, float volume, float pitch) {
-        // FIXME: Playing sounds crashes the game? No crash report either...
-        //entity.world.playSound(null, entity.getPosition(), this.get(), SoundCategory.PLAYERS, volume, pitch);
+    public void play(PlayerEntity entity, float volume, float pitch) {
+        entity.world.playSound(entity, entity.getPosition(), this.get(), SoundCategory.PLAYERS, volume, pitch);
     }
 
     @SubscribeEvent

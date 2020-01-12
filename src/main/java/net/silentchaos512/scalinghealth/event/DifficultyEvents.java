@@ -40,16 +40,13 @@ public final class DifficultyEvents {
     public static void onAttachEntityCapabilities(AttachCapabilitiesEvent<Entity> event) {
         Entity entity = event.getObject();
         if (DifficultyAffectedCapability.canAttachTo(entity)) {
-//            debug(event::getObject);
             event.addCapability(DifficultyAffectedCapability.NAME, new DifficultyAffectedCapability());
         }
         if (DifficultySourceCapability.canAttachTo(entity)) {
-//            debug(() -> "Attaching difficulty source capability to " + entity);
             debug(() -> "attach difficulty source");
             event.addCapability(DifficultySourceCapability.NAME, new DifficultySourceCapability());
         }
         if (PlayerDataCapability.canAttachTo(entity)) {
-//            debug(() -> "Attaching player data capability to " + entity);
             debug(() -> "attach player data");
             event.addCapability(PlayerDataCapability.NAME, new PlayerDataCapability());
         }
@@ -59,7 +56,6 @@ public final class DifficultyEvents {
     public static void onAttachWorldCapabilities(AttachCapabilitiesEvent<World> event) {
         World world = event.getObject();
         if (DifficultySourceCapability.canAttachTo(world)) {
-//            debug(() -> "Attaching difficulty source capability to " + world);
             event.addCapability(DifficultySourceCapability.NAME, new DifficultySourceCapability());
         }
     }
@@ -149,20 +145,6 @@ public final class DifficultyEvents {
     }
 
     private static <T> void copyCapability(Capability<T> capability, ICapabilityProvider original, ICapabilityProvider clone) {
-        // Temporary hack to work around Forge bug
-/*        try {
-            Field field = CapabilityProvider.class.getDeclaredField("capabilities");
-            field.setAccessible(true);
-            CapabilityDispatcher caps = (CapabilityDispatcher) field.get(original);
-            caps.getCapability(capability).ifPresent(t -> {
-                T tClone = clone.getCapability(capability).orElseThrow(IllegalStateException::new);
-                INBT nbt = capability.getStorage().writeNBT(capability, t, null);
-                capability.getStorage().readNBT(capability, tClone, null, nbt);
-            });
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-        }*/
-
         original.getCapability(capability).ifPresent(dataOriginal -> {
             clone.getCapability(capability).ifPresent(dataClone -> {
                 INBT nbt = capability.getStorage().writeNBT(capability, dataOriginal, null);

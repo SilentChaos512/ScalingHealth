@@ -28,37 +28,31 @@ public final class MobDifficultyHandler {
         // Already dead?
         if (!entity.isAlive()) return;
 
-        float difficulty = data.getDifficulty();
-
         // Make blight?
-        boolean makeBlight = shouldBecomeBlight(entity, difficulty);
-        setEntityProperties(entity, data, difficulty, makeBlight);
+        boolean makeBlight = shouldBecomeBlight(entity, data.affectiveDifficulty(entity.world));
+        setEntityProperties(entity, data, makeBlight);
     }
 
     public static boolean shouldBecomeBlight(MobEntity entity, float difficulty) {
         if (Difficulty.canBecomeBlight(entity)) {
-            double chance = getBlightChance(entity);
+            double chance = getBlightChance(entity, difficulty);
             return MathUtils.tryPercentage(ScalingHealth.random, chance);
         }
         return false;
     }
 
-    public static void setEntityProperties(MobEntity entity, IDifficultyAffected data, float difficulty, boolean makeBlight) {
+    public static void setEntityProperties(MobEntity entity, IDifficultyAffected data, boolean makeBlight) {
         if (!entity.isAlive()) return;
 
         World world = entity.world;
         boolean isHostile = entity instanceof IMob;
 
         if (makeBlight) {
-            if(entity.world.isRemote)
-                ScalingHealth.LOGGER.debug("Marked Blight on the CLIENT");
-            else
-                ScalingHealth.LOGGER.debug("Marked Blight on the SERVER");
-            difficulty *= getBlightDifficultyMultiplier(world);
             data.setIsBlight(true);
         }
 
-        final float totalDifficulty = difficulty;
+        //Get difficulty after making blight or not. This will determine if a blight's diff is multiplied
+        final float difficulty = data.affectiveDifficulty(world);
 
         double healthBoost = difficulty;
         double damageBoost = 0;
@@ -88,7 +82,7 @@ public final class MobDifficultyHandler {
         }
 
         // Random potion effect
-        Config.get(entity).mobs.randomPotions.tryApply(entity, totalDifficulty);
+        Config.get(entity).mobs.randomPotions.tryApply(entity, difficulty);
 
         // Apply extra health and damage.
         MobHealthMode mode = EntityGroup.from(entity).getHealthMode(entity);
@@ -97,14 +91,10 @@ public final class MobDifficultyHandler {
         ModifierHandler.addAttackDamage(entity, damageBoost, AttributeModifier.Operation.ADDITION);
     }
 
-    private static double getBlightChance(MobEntity entity) {
-        // FIXME: May not line up with actual entity difficulty, need to pass in difficulty : line 34, shouldBecomeBlight
+    private static double getBlightChance(MobEntity entity, float difficulty) {
+        //not rly tested
         DimensionConfig config = Config.get(entity.world);
-        Expression expr = new Expression("0.0625 * areaDifficulty / maxDifficulty");
-        return EvalVars.apply(config, entity.world, entity.getPosition(), null, expr);
-    }
-
-    private static double getBlightDifficultyMultiplier(World world) {
-        return 3;
+        Expression expr = new Expression("0.0625 / maxDifficulty");
+        return (double) difficulty * EvalVars.apply(config, entity.world, entity.getPosition(), null, expr);
     }
 }

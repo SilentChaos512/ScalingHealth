@@ -23,7 +23,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.server.ServerWorld;
+import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.DifficultyAffectedCapability;
+import net.silentchaos512.scalinghealth.utils.Difficulty;
 import net.silentchaos512.scalinghealth.utils.MobDifficultyHandler;
 
 public final class SummonCommand {
@@ -131,12 +133,12 @@ public final class SummonCommand {
                     if (difficulty > 0) {
                         entity.getCapability(DifficultyAffectedCapability.INSTANCE).ifPresent(affected -> {
                             boolean blight = forceBlight || MobDifficultyHandler.shouldBecomeBlight(mob, difficulty);
-                            MobDifficultyHandler.setEntityProperties(mob, affected, difficulty, blight);
+                            affected.forceDifficulty(difficulty);
+                            MobDifficultyHandler.setEntityProperties(mob, affected, blight);
                             affected.setProcessed(true);
                         });
                     }
                 }
-
                 source.sendFeedback(new TranslationTextComponent("commands.summon.success", entity.getDisplayName()), true);
                 return 1;
             }

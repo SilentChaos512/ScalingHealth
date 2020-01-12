@@ -111,13 +111,10 @@ public abstract class StatBoosterItem extends Item {
     private void spawnParticlesAndPlaySound(World world, PlayerEntity player) {
         ScalingHealth.LOGGER.debug("StatBoosterItem effect!");
         getParticleType().spawn(40, player);
-
-        float pitch = 1 + 0.1f * (float) ScalingHealth.random.nextGaussian();
-        getSoundEffect().play(player, 0.5f, pitch);
+        getSoundEffect().play(player);
     }
 
     private static void consumeLevels(PlayerEntity player, int amount) {
-        //player.experienceLevel -= amount;
         player.addExperienceLevel(-amount);
     }
 }

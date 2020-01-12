@@ -58,7 +58,6 @@ public class DifficultySourceCapability implements IDifficultySource, ICapabilit
                 return false;
             }
         } catch (NullPointerException ex) {
-            // Forge seems to be screwing up somewhere?
             ScalingHealth.LOGGER.error("Failed to get capabilities from {}", obj);
             return false;
         }

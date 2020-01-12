@@ -8,9 +8,11 @@ import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.utils.Difficulty;
 import net.silentchaos512.scalinghealth.utils.ModifierHandler;
 import net.silentchaos512.scalinghealth.utils.Players;
 
@@ -27,9 +29,12 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
 
     private final LazyOptional<IPlayerData> holder = LazyOptional.of(() -> this);
 
+
+    private boolean afk = false;
+    private int timeAfk = 0;
+    private BlockPos lastPos;
     private int extraHearts;
     private int powerCrystals;
-    private BlockPos lastPos;
 
     @Override
     public int getExtraHearts() {
@@ -61,14 +66,41 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
 
     @Override
     public void tick(PlayerEntity player) {
-        // TODO: Position tracking for idle multiplier?
+        if(player.world.getGameTime() % 20 == 0){
+            checkPlayerIdle(player);
+        }
+
+        if (player.world.getGameTime() % 20 == 0 && player instanceof ServerPlayerEntity) {
+            IPlayerData.sendUpdatePacketTo(player);
+        }
 
         // TODO: Difficulty by Game Stages
 
         // TODO: Health by XP
+    }
 
-        if (player.world.getGameTime() % 20 == 0 && player instanceof ServerPlayerEntity) {
-            IPlayerData.sendUpdatePacketTo(player);
+    private void checkPlayerIdle(PlayerEntity player){
+        if(player.getPosition().equals(lastPos)){
+            timeAfk++;
+        }
+        else {
+            afk = false;
+            timeAfk = 0;
+        }
+
+        lastPos = player.getPosition();
+        if(timeAfk > 120){
+            if(!afk) {
+                afk = true;
+                player.sendMessage(new StringTextComponent("You are now afk, you will gain less difficulty with time"));
+            }
+        }
+
+        if(afk){
+            IDifficultySource data = Difficulty.source(player);
+            float changePerSec = (float) Difficulty.changePerSecond(player.world);
+            //since last second we added "changePerSec" difficulty, we subtract an amount based on idlemodifier
+            data.addDifficulty(- changePerSec * (float) (1 - Players.idleModifier(player)));
         }
     }
 

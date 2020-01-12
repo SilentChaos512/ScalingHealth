@@ -86,15 +86,26 @@ public enum AreaDifficultyMode {
     DISTANCE_FROM_SPAWN {
         @Override
         public double getBaseAreaDifficulty(World world, BlockPos pos, int radius) {
-            double distance = MCMathUtils.distance(pos, world.getSpawnPoint());
+            double distance;
+            //to ignore y axis, take the same y as the evaluated position
+            if(Difficulty.ignoreYAxis(world)){
+                distance = MCMathUtils.distance(pos, new BlockPos(world.getSpawnPoint().getX(), pos.getY(), world.getSpawnPoint().getZ()));
+            } else {
+                distance = MCMathUtils.distance(pos, world.getSpawnPoint());
+            }
             return distance * Difficulty.distanceFactor(world);
         }
     },
     DISTANCE_FROM_ORIGIN {
         @Override
         public double getBaseAreaDifficulty(World world, BlockPos pos, int radius) {
-            //TODO: no implementation of distance in y axis?
-            double distance = MCMathUtils.distance(pos, new BlockPos(0, pos.getY(), 0));
+            double distance;
+            //to ignore y axis, take the same y as the evaluated position
+            if(Difficulty.ignoreYAxis(world)){
+                distance = MCMathUtils.distance(pos, new BlockPos(0, pos.getY(), 0));
+            } else {
+                distance = MCMathUtils.distance(pos, new BlockPos(0, world.getSpawnPoint().getY(), 0));
+            }
             return distance * Difficulty.distanceFactor(world);
         }
     },

@@ -3,6 +3,7 @@ package net.silentchaos512.scalinghealth.utils;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
+import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.DimensionConfig;
 import net.silentchaos512.scalinghealth.config.EvalVars;
@@ -89,6 +90,10 @@ public final class Players {
     public static int levelCostToUsePowerCrystal(PlayerEntity player) {
         if (player.abilities.isCreativeMode) return 0;
         return Config.get(player).item.powerCrystalLevelCost.get();
+    }
+
+    public static double idleModifier(PlayerEntity player) {
+        return EvalVars.apply(Config.get(player), player, Config.get(player).difficulty.idleMultiplier.get());
     }
 
     public static float heartCrystalHealthRestored(PlayerEntity player) {

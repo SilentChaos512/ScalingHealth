@@ -57,6 +57,7 @@ import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.DimensionConfig;
 import net.silentchaos512.scalinghealth.config.EvalVars;
+import net.silentchaos512.scalinghealth.init.ModSounds;
 import net.silentchaos512.scalinghealth.lib.EntityGroup;
 import net.silentchaos512.scalinghealth.lib.module.ModuleAprilTricks;
 import net.silentchaos512.scalinghealth.network.ClientLoginMessage;
@@ -176,9 +177,10 @@ public final class ScalingHealthCommonEvents {
         }
 
         PlayerEntity player = (PlayerEntity) event.getEntity();
+        ModSounds.PLAYER_DIED.play(player);
 
         if (ModuleAprilTricks.instance.isEnabled() && ModuleAprilTricks.instance.isRightDay()) {
-//            ScalingHealth.proxy.playSoundOnClient(player, ModSounds.PLAYER_DIED, 0.6f, 1f);
+            ModSounds.PLAYER_DIED.play(player);
         }
     }
 
@@ -212,9 +214,8 @@ public final class ScalingHealthCommonEvents {
             if (!MathUtils.doublesEqual(source.getDifficulty(), newDifficulty)) {
                 // Update difficulty after sleeping
                 source.setDifficulty((float) newDifficulty);
+                Difficulty.source(player.world).setDifficulty((float) newDifficulty);
             }
-
-            // TODO: World difficulty increase?
         }
     }
 }

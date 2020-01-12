@@ -50,7 +50,7 @@ public final class Difficulty {
     public static double getDifficultyOf(Entity entity) {
         if (entity instanceof PlayerEntity)
             return source(entity).getDifficulty();
-        return affected(entity).getDifficulty();
+        return affected(entity).affectiveDifficulty(entity.world);
     }
 
     public static Collection<Tuple<BlockPos, IDifficultySource>> sources(IEntityReader world, Vec3i center, long radius) {
@@ -117,6 +117,10 @@ public final class Difficulty {
         return radius <= 0 ? Integer.MAX_VALUE : radius;
     }
 
+    public static boolean ignoreYAxis(World world){
+        return Config.get(world).difficulty.ignoreYAxis.get();
+    }
+
     public static long searchRadiusSquared(IWorldReader world) {
         final long radius = searchRadius(world);
         return radius * radius;
@@ -150,6 +154,10 @@ public final class Difficulty {
         return entity.getCapability(DifficultyAffectedCapability.INSTANCE)
                 .orElseGet(DifficultyAffectedCapability::new)
                 .isBlight();
+    }
+
+    public static double getBlightDifficultyMultiplier(World world) {
+        return Config.get(world).mobs.blightDiffModifier.get();
     }
 
     public static boolean notifyOnDeath(IWorldReader world){

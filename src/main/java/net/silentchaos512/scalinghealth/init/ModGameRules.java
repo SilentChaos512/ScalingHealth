@@ -8,7 +8,7 @@
 //import org.apache.commons.lang3.StringUtils;
 //
 //import java.util.function.Supplier;
-//
+//// FIXME: Game rules seem to not work at all...
 //public enum ModGameRules implements IStringSerializable {
 //    DIFFICULTY(() -> "true");
 //
@@ -19,7 +19,7 @@
 //    }
 //
 //    public boolean getBoolean(World world) {
-//        // FIXME: Game rules are not being registered?
+//
 //        return world.getGameRules().getBoolean(getName());
 ////        return true;
 //    }

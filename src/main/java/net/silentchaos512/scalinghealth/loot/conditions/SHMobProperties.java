@@ -33,7 +33,7 @@ public class SHMobProperties implements ILootCondition {
         Entity entity = lootContext.get(this.target.getParameter());
         if (entity instanceof MobEntity) {
             IDifficultyAffected affected = entity.getCapability(DifficultyAffectedCapability.INSTANCE).orElseGet(DifficultyAffectedCapability::new);
-            float difficulty = affected.getDifficulty();
+            float difficulty = affected.affectiveDifficulty(entity.world);
             return difficulty >= this.minDifficulty && difficulty <= this.maxDifficulty && (!this.isBlight || affected.isBlight());
         }
         return false;

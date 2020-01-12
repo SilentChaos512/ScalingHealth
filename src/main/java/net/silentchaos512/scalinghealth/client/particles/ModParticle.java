@@ -31,9 +31,9 @@ public class ModParticle extends TexturedParticle {
             .collect(Collectors.toList());
     private static final int[] FRAMES = {0, 1, 2, 3, 2, 1, 0};
 
-    protected ModParticle(World worldIn, Color color, double posXIn, double posYIn, double posZIn) {
-        this(worldIn, color, posXIn, posYIn, posZIn, 0, 0, 0);
-    }
+    //protected ModParticle(World worldIn, Color color, double posXIn, double posYIn, double posZIn) {
+    //    this(worldIn, color, posXIn, posYIn, posZIn, 0, 0, 0);
+    //}
 
     public ModParticle(World worldIn, Color color, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn) {
         super(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn);
@@ -125,7 +125,6 @@ public class ModParticle extends TexturedParticle {
         return IParticleRenderType.CUSTOM;
     }
 
-    @OnlyIn(Dist.CLIENT)
     public static class Factory implements IParticleFactory<BasicParticleType> {
         private final Color color;
         public Factory(Color color) {

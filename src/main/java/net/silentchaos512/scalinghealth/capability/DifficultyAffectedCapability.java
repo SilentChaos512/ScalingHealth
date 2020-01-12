@@ -37,8 +37,13 @@ public class DifficultyAffectedCapability implements IDifficultyAffected, ICapab
     }
 
     @Override
-    public void setDifficulty(float value) {
-        difficulty = value;
+    public void setDifficulty(MobEntity mob) {
+        difficulty = (float) ((Math.random()*(0.1)+0.95) * Difficulty.areaDifficulty(mob.world, mob.getPosition()));
+    }
+
+    @Override
+    public void forceDifficulty(float diff) {
+        difficulty = diff;
     }
 
     @Override
@@ -59,7 +64,8 @@ public class DifficultyAffectedCapability implements IDifficultyAffected, ICapab
     @Override
     public void tick(MobEntity entity) {
         if (!processed && entity.isAlive() && entity.ticksExisted > 2) {
-            difficulty = (float) Difficulty.areaDifficulty(entity.world, entity.getPosition());
+            //set the difficulty after the entity has existed for a bit, created weird mc crashes/not loading issues if put in the attach cap event
+            setDifficulty(entity);
             MobDifficultyHandler.process(entity, this);
             processed = true;
 

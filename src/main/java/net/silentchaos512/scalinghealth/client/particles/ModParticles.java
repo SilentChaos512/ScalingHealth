@@ -27,6 +27,7 @@ public enum ModParticles {
     CURSED_HEART("cursed_heart", Color.REBECCAPURPLE, 0.08, 0.05),
     ENCHANTED_HEART("enchanted_heart", Color.ALICEBLUE, 0.08, 0.05);
 
+    private final String name;
     private final BasicParticleType particleType;
     private final Color color;
     private final double motionScaleX;
@@ -35,6 +36,7 @@ public enum ModParticles {
 
     ModParticles(String name, Color color, double motionScaleXZ, double motionScaleY) {
         this.particleType = new BasicParticleType(true);
+        this.name = name;
         this.color = color;
         this.motionScaleX = motionScaleXZ;
         this.motionScaleZ = motionScaleXZ;
@@ -50,14 +52,14 @@ public enum ModParticles {
             double motionX = motionScaleX * ScalingHealth.random.nextGaussian();
             double motionY = motionScaleY * ScalingHealth.random.nextGaussian();
             double motionZ = motionScaleZ * ScalingHealth.random.nextGaussian();
-            world.addParticle(particleType, posX, posY, posZ, motionX, motionY, motionZ);
+            world.addParticle(this.particleType, posX, posY, posZ, motionX, motionY, motionZ);
         }
     }
 
     @SubscribeEvent
     public static void registerAll(RegistryEvent.Register<ParticleType<?>> event) {
         for (ModParticles particle : values()) {
-            ResourceLocation id = ScalingHealth.getId(particle.name().toLowerCase(Locale.ROOT));
+            ResourceLocation id = ScalingHealth.getId(particle.name.toLowerCase(Locale.ROOT));
             particle.particleType.setRegistryName(id);
             ForgeRegistries.PARTICLE_TYPES.register(particle.particleType);
         }
