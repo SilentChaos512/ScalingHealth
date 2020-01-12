@@ -93,7 +93,7 @@ public final class Players {
     }
 
     public static double idleModifier(PlayerEntity player) {
-        return EvalVars.apply(Config.get(player), player, Config.get(player).difficulty.idleMultiplier.get());
+        return Config.get(player).difficulty.idleMultiplier.get();
     }
 
     public static float heartCrystalHealthRestored(PlayerEntity player) {

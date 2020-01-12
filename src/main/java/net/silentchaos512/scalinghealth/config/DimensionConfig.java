@@ -334,7 +334,7 @@ public class DimensionConfig {
         public final BooleanValue localDimensionDifficulty;
         public final BooleanValue ignoreYAxis;
         public final Supplier<Expression> groupAreaBonus;
-        public final Supplier<Expression> idleMultiplier;
+        public final DoubleValue idleMultiplier;
         public final StringValue sleepWarningMessage;
 
         // Mutators
@@ -433,11 +433,10 @@ public class DimensionConfig {
                     "1 + 0.05 * (areaPlayerCount - 1)",
                     EvalVars.AREA_PLAYER_COUNT,
                     "A multiplier for area difficulty calculations, typically based on the number of players in the search radius.");
-            idleMultiplier = defineExpression(wrapper,
-                    "difficulty.idleMultiplier",
-                    "0.5",
-                    null,
-                    "Multiplier for changePerSecond when the player is not moving.");
+            idleMultiplier = wrapper
+                    .builder("difficulty.idleMultiplier")
+                    .comment("Multiplier for changePerSecond when the player is not moving.")
+                    .defineInRange(0.5, 0, Double.MAX_VALUE);
             sleepWarningMessage = wrapper
                     .builder("difficulty.sleepWarningMessage")
                     .comment("Message displayed to the player when sleeping, assuming it would change their difficulty.",
@@ -580,16 +579,15 @@ public class DimensionConfig {
         }
     }
 
+    /**
+     * Expression creation time: roughly 5000 ns (0.005 ms)
+     * As long as it's not referenced every render tick, it should be OK
+     */
     private static Supplier<Expression> defineExpression(ConfigSpecWrapper wrapper, String path, String defaultValue, @Nullable EvalVars intendedVar, String comment) {
         StringValue config = wrapper
                 .builder(path)
                 .comment("EvalEx expression: " + comment)
                 .defineString(() -> defaultValue, o -> validateExpression(o, path, intendedVar));
-
-        // TODO: I would guess creating an Expression is very expensive. Is this OK?
-        // Expression creation time: roughly 5000 ns (0.005 ms)
-        // As long as it's not referenced every render tick, it should be OK
-        // Could use LazyLoadBase, but would that affect config reloads?
         return () -> new Expression(config.get());
     }
 

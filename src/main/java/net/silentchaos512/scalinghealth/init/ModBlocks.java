@@ -61,9 +61,6 @@ public enum ModBlocks implements IBlockProvider {
 
     @SubscribeEvent
     public static void registerAll(RegistryEvent.Register<Block> event) {
-        // Workaround for Forge event bus bug TODO
-        if (!event.getName().equals(ForgeRegistries.BLOCKS.getRegistryName())) return;
-
         for (ModBlocks block : values()) {
             ScalingHealth.LOGGER.debug("Hey registed block");
             register(block.getName(), block.asBlock());

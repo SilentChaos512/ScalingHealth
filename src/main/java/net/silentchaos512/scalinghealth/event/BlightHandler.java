@@ -82,8 +82,6 @@ public final class BlightHandler {
         for (BlightFireEntity fire : blight.world.getEntitiesWithinAABB(BlightFireEntity.class, blight.getBoundingBox().grow(5))) {
             if (blight.equals(fire.getParent())) {
                 return fire;
-            }   else {
-                ScalingHealth.LOGGER.debug("Is there another Blight near this one? Only reason this should be called");
             }
         }
         return null;
@@ -94,7 +92,7 @@ public final class BlightHandler {
         config.mobs.blightPotions.applyAll(entityLiving);
     }
 
-    private static void notifyPlayers(ITextComponent deathMessage, MobEntity blight){
+    private static void notifyPlayers(ITextComponent deathMessage, MobEntity blight, PlayerEntity slayer){
         if (deathMessage instanceof TranslationTextComponent) {
             // Assuming arguments are the same as in DamageSource#getDeathMessage
             // May fail with some modded damage sources, but should be fine in most cases
@@ -104,17 +102,26 @@ public final class BlightHandler {
             s.setStyle(new Style().setColor(TextFormatting.DARK_PURPLE));
 
             TranslationTextComponent newMessage = new TranslationTextComponent(original.getKey(), s);
-            StringTextComponent finalMessage = new StringTextComponent(newMessage.getFormattedText());
+            StringTextComponent almostFinalMessage = new StringTextComponent(newMessage.getFormattedText());
             String message = newMessage.getString();
 
             if(message.contains("drowned")){
                 if(message.startsWith("Blight Squid")){
-                    finalMessage = new StringTextComponent(finalMessage.getFormattedText() + "... again");
+                    almostFinalMessage = new StringTextComponent(almostFinalMessage.getFormattedText() + "... again");
                 }
                 else
-                    finalMessage = new StringTextComponent(finalMessage.getFormattedText() + "... gg");
+                    almostFinalMessage = new StringTextComponent(almostFinalMessage.getFormattedText() + "... gg");
             } else if(message.contains("suffocated in a wall")){
-                finalMessage = new StringTextComponent(finalMessage.getFormattedText() + " *slow clap*");
+                almostFinalMessage = new StringTextComponent(almostFinalMessage.getFormattedText() + " *slow clap*");
+            }
+
+            StringTextComponent finalMessage = almostFinalMessage;
+
+            if(slayer != null)  {
+                if(almostFinalMessage.getFormattedText().contains("  "))
+                    finalMessage = new StringTextComponent(almostFinalMessage.getFormattedText().replace("  ", " " + slayer.getName().getFormattedText() + " ")) ;
+                else
+                    finalMessage = new StringTextComponent(almostFinalMessage.getFormattedText() + slayer.getName().getFormattedText());
             }
 
             for (PlayerEntity p : blight.world.getPlayers())
@@ -150,14 +157,14 @@ public final class BlightHandler {
             // Tell all players that the blight was killed.
             if (Difficulty.notifyOnDeath(blight.world) && player != null) {
                 ScalingHealth.LOGGER.info("Blight {} was killed by {}", blight.getName().getString(), actualKiller.getName().getString());
-                notifyPlayers(event.getSource().getDeathMessage(blight), blight);
+                notifyPlayers(event.getSource().getDeathMessage(blight), blight, player);
             }
         } else {
             // Killed by something else.
             // Tell all players that the blight died.
             if (Difficulty.notifyOnDeath(blight.world))
                 ScalingHealth.LOGGER.info("Blight {} has died", blight.getName().getString());
-                notifyPlayers(event.getSource().getDeathMessage(blight), blight);
+                notifyPlayers(event.getSource().getDeathMessage(blight), blight, null);
         }
     }
 

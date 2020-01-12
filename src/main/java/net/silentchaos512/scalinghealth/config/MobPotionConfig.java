@@ -90,7 +90,6 @@ public class MobPotionConfig {
         final int level;
         final int cost;
         final int duration;
-        // TODO: Include refresh boolean?
 
         EffectEntry(Effect potion, int level, int cost, int duration) {
             this.potion = potion;

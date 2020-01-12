@@ -51,9 +51,6 @@ public enum ModPotions {
 
     @SubscribeEvent
     public static void registerAll(RegistryEvent.Register<Effect> event) {
-        // Workaround for Forge event bus bug
-        if (!event.getName().equals(ForgeRegistries.POTIONS.getRegistryName())) return;
-
         for (ModPotions potion : values()) {
             register(potion.getName(), potion.get());
         }

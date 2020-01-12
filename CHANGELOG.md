@@ -3,6 +3,16 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.8] - 2020-01-12
+### Added
+- Functionality for configs:
+- ignoring y-axis during diff calcs
+- blight diff modifier
+- idle player diff modifier
+- Mobs will now spawn with a difficulty of 95% to 105% of the area difficulty. (will add config options later)
+### Fixed
+- Sounds are back!
+
 ## [2.3.7] - 2020-01-10
 ### Added
 - Power Crystal now has a texture!

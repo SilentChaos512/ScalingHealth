@@ -72,9 +72,6 @@ public enum ModItems implements IItemProvider {
 
     @SubscribeEvent
     public static void registerAll(RegistryEvent.Register<Item> event) {
-        // Workaround for Forge event bus bug
-        if (!event.getName().equals(ForgeRegistries.ITEMS.getRegistryName())) return;
-
         blocksToRegister.forEach(ForgeRegistries.ITEMS::register);
 
         for (ModItems item : values()) {

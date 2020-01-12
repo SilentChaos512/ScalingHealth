@@ -65,9 +65,6 @@ public enum ModSounds {
 
     @SubscribeEvent
     public static void registerAll(RegistryEvent.Register<SoundEvent> event) {
-        // Workaround for Forge event bus bug
-        if (!event.getName().equals(ForgeRegistries.SOUND_EVENTS.getRegistryName())) return;
-
         for (ModSounds sound : values()) {
             register(sound.getName(), sound.get());
         }

@@ -321,10 +321,7 @@ public final class Config {
     public static void init() {
         WRAPPER_CLIENT.validate();
         WRAPPER_COMMON.validate();
-        // FIXME: Sometimes corrections fail, producing an empty SimpleCommentedConfig (something = {})
-        // Validating twice should resolve the issue for now
-        WRAPPER_CLIENT.validate();
-        WRAPPER_COMMON.validate();
+        // was validating twice before for configs, apparently not needed anymore - further bugs may still arise
         initDimensionConfigs();
     }
 
@@ -341,8 +338,7 @@ public final class Config {
                 DIMENSIONS.put(dimensionID, config);
                 ScalingHealth.LOGGER.info("Loaded config for dimension {}", dimensionID);
                 config.validate();
-                // FIXME: Why is double validation is needed
-                config.validate();
+                // was validating twice before for configs, apparently not needed anymore - further bugs may still arise
             }
         } else {
             ScalingHealth.LOGGER.error("Something went wrong when trying to gets files from '{}'", directory);
