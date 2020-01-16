@@ -40,12 +40,14 @@ import net.minecraft.world.storage.loot.LootContext;
 import net.minecraft.world.storage.loot.LootParameterSets;
 import net.minecraft.world.storage.loot.LootParameters;
 import net.minecraft.world.storage.loot.LootTable;
+import net.minecraftforge.event.enchanting.EnchantmentLevelSetEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
+import net.minecraftforge.event.entity.player.PlayerXpEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -137,6 +139,17 @@ public final class ScalingHealthCommonEvents {
             }
         }
         event.setDroppedExperience(Math.round(amount));
+    }
+
+    @SubscribeEvent
+    public static void onLevelChange(PlayerXpEvent.LevelChange event){
+        PlayerEntity player = event.getPlayer();
+        if(!Players.xpModeEnabled(player.world)) return;
+
+        int xp = event.getLevels();
+        int numberOfIncrease = (int) Math.floor(xp / Players.levelsPerHp(player.world));
+
+        player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> data.addHearts(player, numberOfIncrease * Players.hpPerLevel(player.world)));
     }
 
     /**

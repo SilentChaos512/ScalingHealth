@@ -110,6 +110,9 @@ public class DimensionConfig {
     public static class Player {
         // Health settings
         public final BooleanValue localHealth;
+        public final IntValue healthByXp;
+        public final IntValue levelsPerHp;
+        public final IntValue hpPerLevel;
         public final IntValue startingHealth;
         public final IntValue minHealth;
         public final IntValue maxHealth;
@@ -141,6 +144,19 @@ public class DimensionConfig {
                     EvalVars.MAX_HEALTH.varName(),
                     EvalVars.MAX_HEALTH,
                     "On death, set the player's max health to this value. By default, there is no change.");
+            wrapper.comment("player.health.xp", "settings for hp scaling by xp level");
+            healthByXp = wrapper
+                    .builder("player.health.xp.mode")
+                    .comment("mode of health by xp, 0 for inactive, 1 for pure hp by level (deactivates heart crystals), 2 for mix, xp and heart crystals increases hp")
+                    .defineInRange(0, 0, 2);
+            levelsPerHp = wrapper
+                    .builder("player.health.xp.levelAmount")
+                    .comment("How many levels it takes for an hp increase")
+                    .defineInRange(1, 1, Integer.MAX_VALUE);
+            hpPerLevel = wrapper
+                    .builder("player.health.xp.hpAmount")
+                    .comment("On hp increase, how much hp is gained")
+                    .defineInRange(1, 1, Integer.MAX_VALUE);
             maxAttackDamage = wrapper
                     .builder("player.attackDamage.maxValue")
                     .comment("The highest attack damage a player can achieve, not considering the vanilla",
@@ -289,9 +305,6 @@ public class DimensionConfig {
                     .builder("mob.blight.blightModifier")
                     .comment("Multiplier for blight difficulty, 3 will make blights have stats equal to 3 * current difficulty")
                     .defineInRange(3, 1, Double.MAX_VALUE);
-
-
-
         }
 
         public boolean isMobExempt(MobEntity entity) {

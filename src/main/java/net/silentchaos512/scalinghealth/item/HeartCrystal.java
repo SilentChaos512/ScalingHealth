@@ -38,8 +38,7 @@ public class HeartCrystal extends StatBoosterItem {
     boolean isStatIncreaseAllowed(PlayerEntity player, IPlayerData data) {
         //if this would increase the health by 0, we wont't process it
         //TODO not sure if I clamp the hp. If the increase is of 5 and max hp is of 41, it could be possible to get 45 hp. (have to check)
-        return Players.heartCrystalIncreaseAmount(player) > 0
-                && data.getExtraHearts() < Players.maxHeartCrystals(player);
+        return Players.heartCrystalIncreaseAmount(player) > 0 || data.getExtraHearts() < Players.maxHeartCrystals(player) || Players.hpDisabledByXp(player.world);
     }
 
     @Override

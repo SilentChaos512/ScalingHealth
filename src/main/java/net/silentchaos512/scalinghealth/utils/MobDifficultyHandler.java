@@ -7,6 +7,9 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.Style;
+import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -49,6 +52,11 @@ public final class MobDifficultyHandler {
 
         if (makeBlight) {
             data.setIsBlight(true);
+            if(EntityGroup.from(entity) == EntityGroup.BOSS){
+                StringTextComponent name = new StringTextComponent("Blight " + entity.getName().getString());
+                name.setStyle(new Style().setColor(TextFormatting.DARK_PURPLE));
+                entity.setCustomName(name);
+            }
         }
 
         //Get difficulty after making blight or not. This will determine if a blight's diff is multiplied
@@ -93,9 +101,6 @@ public final class MobDifficultyHandler {
     }
 
     private static double getBlightChance(MobEntity entity, float difficulty) {
-        //not rly tested
-        DimensionConfig config = Config.get(entity.world);
-        Expression expr = new Expression("0.0625 / maxDifficulty");
-        return (double) difficulty * EvalVars.apply(config, entity.world, entity.getPosition(), null, expr);
+        return 0.0625 * difficulty / Difficulty.maxValue(entity.world);
     }
 }

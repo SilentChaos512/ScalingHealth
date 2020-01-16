@@ -103,6 +103,26 @@ public final class Players {
         return Config.get(player).item.heartCrystalHealthRestored.get().floatValue();
     }
 
+    public static boolean xpModeEnabled(World world){
+        return xpMode(world) != 0;
+    }
+
+    public static boolean hpDisabledByXp(World world){
+        return xpMode(world) != 1;
+    }
+
+    public static int xpMode(World world){
+        return Config.get(world).player.healthByXp.get();
+    }
+
+    public static int levelsPerHp(World world){
+        return Config.get(world).player.levelsPerHp.get();
+    }
+
+    public static int hpPerLevel(World world){
+        return Config.get(world).player.hpPerLevel.get();
+    }
+
     public static int cursedHeartAffectAmount(World world) {
         return Config.get(world).item.cursedHeartAffect.get().intValue();
     }
