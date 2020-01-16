@@ -68,10 +68,9 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
     public void tick(PlayerEntity player) {
         if(player.world.getGameTime() % 20 == 0){
             checkPlayerIdle(player);
-        }
 
-        if (player.world.getGameTime() % 20 == 0 && player instanceof ServerPlayerEntity) {
-            IPlayerData.sendUpdatePacketTo(player);
+            if(player instanceof ServerPlayerEntity)
+                IPlayerData.sendUpdatePacketTo(player);
         }
 
         // TODO: Difficulty by Game Stages

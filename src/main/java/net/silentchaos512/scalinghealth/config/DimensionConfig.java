@@ -9,12 +9,15 @@ import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.Items;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.lib.util.BiomeUtils;
 import net.silentchaos512.lib.util.DimensionUtils;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -25,6 +28,8 @@ import net.silentchaos512.utils.config.*;
 
 import javax.annotation.Nullable;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -39,9 +44,11 @@ public class DimensionConfig {
         public final DoubleValue cursedHeartAffect;
         public final DoubleValue enchantedHeartAffect;
         public final DoubleValue chanceHeartAffect;
+
         public final DoubleValue heartCrystalHealthRestored;
         public final IntValue heartCrystalLevelCost;
-        public final BooleanValue heartCrystalIncreaseHealth;
+        public final IntValue heartCrystalHealthIncrease;
+
         public final IntValue powerCrystalLevelCost;
         public final DoubleValue powerCrystalDamageIncrease;
 
@@ -72,11 +79,10 @@ public class DimensionConfig {
                     .builder("item.heart_crystal.levelCost")
                     .comment("The number of levels required to use a heart crystal (min = 0)")
                     .defineInRange(3, 0, Integer.MAX_VALUE);
-            heartCrystalIncreaseHealth = wrapper
-                    .builder("item.heart_crystal.increaseHealth")
-                    .comment("Do heart crystals increase max health?",
-                            "If set to false, they can still be used as a healing item.")
-                    .define(true);
+            heartCrystalHealthIncrease = wrapper
+                    .builder("item.heart_crystal.healthBoost")
+                    .comment("How much health a player will gain using a heart crystal (set 0 to disable)")
+                    .defineInRange(1, 0, Integer.MAX_VALUE);
             powerCrystalLevelCost = wrapper
                     .builder("item.power_crystal.levelCost")
                     .comment("The number of levels required to use a power crystal (min = 0)")
@@ -103,7 +109,6 @@ public class DimensionConfig {
 
     public static class Player {
         // Health settings
-        public final BooleanValue allowHealthModification;
         public final BooleanValue localHealth;
         public final IntValue startingHealth;
         public final IntValue minHealth;
@@ -114,11 +119,6 @@ public class DimensionConfig {
 
         Player(ConfigSpecWrapper wrapper) {
             wrapper.comment("player", "Settings for players");
-
-            allowHealthModification = wrapper
-                    .builder("player.health.allowModification")
-                    .comment("Allow Scaling Health to apply health modifiers. Heart crystals will not work if this is disabled.")
-                    .define(true);
             localHealth = wrapper
                     .builder("player.health.localHealth")
                     .comment("Player health and max health are unique to this dimension.")
@@ -152,7 +152,6 @@ public class DimensionConfig {
     }
 
     public static class Mobs {
-        private final ConfigValue<List<? extends String>> mobsExempt;
         public final DoubleValue passiveMultiplier;
         public final DoubleValue hostileMultiplier;
         public final EnumValue<MobHealthMode> healthMode;
@@ -163,7 +162,15 @@ public class DimensionConfig {
         public final DoubleValue xpBoost;
 
         public final MobPotionConfig randomPotions;
+        //public final EquipmentConfig equipmentHelmet;
+        //public final EquipmentConfig equipmentChest;
+        //public final EquipmentConfig equipmentLegging;
+        //public final EquipmentConfig equipmentBoots;
+        //public final EquipmentConfig equipmentWeapon;
+
         // Blights
+        private final ConfigValue<List<? extends String>> mobsExempt;
+        //private final ConfigValue<List<? extends String>> blightArmor;
         public final DoubleValue blightDiffModifier;
         public final MobPotionConfig blightPotions;
         public final BooleanValue notifyOnBlightDeath;
@@ -179,8 +186,7 @@ public class DimensionConfig {
                             "MULTI: Mob hp is multiplied, mobs with higher base hp have more increase.",
                             "MULTI_HALF: Same as MULTI but mobs with more than 20 hp have reduced scaling (bosses, endermen, witches, etc).",
                             "MULTI_QUARTER: Same as MULTI_HALF but scaling is reduced further for 20hp+ mobs.",
-                            "ADD: Flat increase for all mobs, no matter their base hp."
-                            )
+                            "ADD: Flat increase for all mobs, no matter their base hp.")
                     .defineEnum(MobHealthMode.MULTI_HALF);
             wrapper.comment("mob.potionChance", "Chance for mobs to receive a random potion effect (assuming their difficulty is high enough)");
             passiveMultiplier = wrapper
@@ -207,6 +213,7 @@ public class DimensionConfig {
                     .builder("mob.xp.Boost")
                     .comment("Xp scaling multiplied by difficulty - xp scale of 0.1 with difficulty 10 will give about 11x more xp")
                     .defineInRange(0.03, 0, 1);
+
             randomPotions = MobPotionConfig.init(wrapper, "mob.randomPotionEffects", true, ImmutableList.<CommentedConfig>builder()
                     .add(MobPotionConfig.from(Effects.SPEED, 1, 10, 15))
                     .add(MobPotionConfig.from(Effects.SPEED, 2, 10, 50))
@@ -215,6 +222,47 @@ public class DimensionConfig {
                     .add(MobPotionConfig.from(Effects.INVISIBILITY, 1, 10, 35))
                     .add(MobPotionConfig.from(Effects.RESISTANCE, 1, 10, 40))
                     .build());
+
+            //TODO: the paths of the equipment are doubled (helmet.helmet) to easier distinguish them in the .toml file (better way to do it?
+            /*equipmentHelmet = EquipmentConfig.init(wrapper, "mob.equipments.helmet.helmet", true,
+                    ImmutableList.<CommentedConfig>builder()
+                            .add(EquipmentConfig.fromGeneral(EquipmentSlotType.HEAD, 3))
+                            .add(EquipmentConfig.from(net.minecraft.item.Items.GOLDEN_HELMET, 2, ImmutableList.<String>builder().add("protection").add("thorns").build(),20))
+                            .add(EquipmentConfig.from(net.minecraft.item.Items.LEATHER_HELMET, 1, ImmutableList.<String>builder().add("thorns").build(),5))
+                            .build());
+
+            equipmentChest = EquipmentConfig.init(wrapper, "mob.equipments.chestplate.chestplate", true,
+                    ImmutableList.<CommentedConfig>builder()
+                            .add(EquipmentConfig.fromGeneral(EquipmentSlotType.CHEST, 3))
+                            .add(EquipmentConfig.from(net.minecraft.item.Items.DIAMOND_CHESTPLATE, 3, ImmutableList.<String>builder().add("protection").add("thorns").add("").build(),40))
+                            .add(EquipmentConfig.from(net.minecraft.item.Items.LEATHER_CHESTPLATE, 1, ImmutableList.<String>builder().add("thorns").build(),10))
+                            .add(EquipmentConfig.from(net.minecraft.item.Items.DIAMOND_CHESTPLATE, 2, ImmutableList.<String>builder().build(),25))
+                            .build());
+
+            equipmentLegging = EquipmentConfig.init(wrapper, "mob.equipments.leggings.leggings", true,
+                    ImmutableList.<CommentedConfig>builder()
+                            .add(EquipmentConfig.fromGeneral(EquipmentSlotType.LEGS, 3))
+                            .add(EquipmentConfig.from(net.minecraft.item.Items.CHAINMAIL_LEGGINGS, 1, ImmutableList.<String>builder().add("protection").build(),10))
+                            .build());
+
+            equipmentBoots = EquipmentConfig.init(wrapper, "mob.equipments.boots.boots", true,
+                    ImmutableList.<CommentedConfig>builder()
+                            .add(EquipmentConfig.fromGeneral(EquipmentSlotType.FEET, 4))
+                            .add(EquipmentConfig.from(net.minecraft.item.Items.DIAMOND_BOOTS, 4, ImmutableList.<String>builder().add("protection").add("thorns").add("frost_walker").add("feather_falling").build(),70))
+                            .add(EquipmentConfig.from(net.minecraft.item.Items.IRON_BOOTS, 2, ImmutableList.<String>builder().add("projectile_protection").build(),25))
+                            .add(EquipmentConfig.from(net.minecraft.item.Items.LEATHER_BOOTS, 3, ImmutableList.<String>builder().add("thorns").add("feather_falling").add("frost_walker").build(),45))
+                            .build());
+
+            equipmentWeapon = EquipmentConfig.init(wrapper, "mob.equipments.weapon.weapon", true,
+                    ImmutableList.<CommentedConfig>builder()
+                            .add(EquipmentConfig.fromGeneral(EquipmentSlotType.MAINHAND, 5))
+                            .add(EquipmentConfig.from(net.minecraft.item.Items.STONE_SWORD, 1, ImmutableList.<String>builder().add("fire_aspect").build(),5))
+                            .add(EquipmentConfig.from(net.minecraft.item.Items.BOW, 2, ImmutableList.<String>builder().add("punch").build(),20))
+                            .add(EquipmentConfig.from(net.minecraft.item.Items.DIAMOND_SWORD, 3, ImmutableList.<String>builder().add("sharpness").build(),35))
+                            .add(EquipmentConfig.from(net.minecraft.item.Items.TRIDENT, 4, ImmutableList.<String>builder().add("impaling").add("channeling").build(),50))
+                            .add(EquipmentConfig.from(net.minecraft.item.Items.BOW, 5, ImmutableList.<String>builder().add("punch").add("flame").add("power").build(),45))
+                            .build());*/
+
 
             // Blights
             mobsExempt = wrapper
@@ -241,6 +289,9 @@ public class DimensionConfig {
                     .builder("mob.blight.blightModifier")
                     .comment("Multiplier for blight difficulty, 3 will make blights have stats equal to 3 * current difficulty")
                     .defineInRange(3, 1, Double.MAX_VALUE);
+
+
+
         }
 
         public boolean isMobExempt(MobEntity entity) {
@@ -261,6 +312,7 @@ public class DimensionConfig {
         public final BooleanValue affectPlayers;
         public final BooleanValue affectHostiles;
         public final BooleanValue affectPeacefuls;
+        public final ConfigValue<List<? extends String>> modBlacklist;
         public final EnumValue<net.silentchaos512.scalinghealth.event.DamageScaling.Mode> mode;
         private final ConfigSpec scalesSpec = new ConfigSpec();
         private final ConfigValue<List<? extends CommentedConfig>> scales;
@@ -293,6 +345,10 @@ public class DimensionConfig {
                     .builder("damageScaling.affectPeacefuls")
                     .comment("Does damage scaling affect peaceful mobs (animals)?")
                     .define(false);
+            modBlacklist = wrapper
+                    .builder("damageScaling.blacklistMods")
+                    .comment("give the modid of a mod to negate ALL damage scaling in the mod")
+                    .defineList(ImmutableList.of("modid", "othermodid"), ConfigValue.IS_NONEMPTY_STRING);
             mode = wrapper
                     .builder("damageScaling.mode")
                     .comment("Damage scaling mode",
@@ -322,6 +378,7 @@ public class DimensionConfig {
 
     public static class Difficulty {
         // Standard options
+        //TODO bunch of config desc in the lang files, remove hardcoded descriptions and use translation components
         final ConfigValue<List<? extends String>> difficultyExempt;
         public final DoubleValue startingValue;
         public final DoubleValue minValue;
@@ -525,6 +582,8 @@ public class DimensionConfig {
          * @return True if exempt, false otherwise.
          */
         public boolean isExempt(PlayerEntity player) {
+            //TODO player.getName() seems to always be null when called from AttachCapabilities event in DifficultySourceCap.canAttachTo
+            // Or I am doing something wrong
             List<? extends String> list = difficultyExempt.get();
             for (String value : list) {
                 if (value.equalsIgnoreCase(player.getName().getFormattedText())) {
@@ -535,8 +594,9 @@ public class DimensionConfig {
         }
 
         public Expression getKillMutator(LivingEntity entity) {
-            // Might be nice if there was a more generic way to handle lists of tables.
-            // But this works for now.
+            //TODO implement
+            //Might be nice if there was a more generic way to handle lists of tables.
+            //But this works for now.
             String name = Objects.requireNonNull(entity.getType().getRegistryName()).toString();
             return byEntityMutators.get().stream()
                     .filter(c -> c.<List<? extends String>>get("types").contains(name))
@@ -606,7 +666,7 @@ public class DimensionConfig {
                     path, intendedVar);
         }
 
-        // TODO: What else can we do here?
+        // TODO: What else can we do here to validate an expression?
         return true;
     }
 

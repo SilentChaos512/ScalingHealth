@@ -83,6 +83,7 @@ public final class MobDifficultyHandler {
 
         // Random potion effect
         Config.get(entity).mobs.randomPotions.tryApply(entity, difficulty);
+        //Difficulty.equipAll(entity);
 
         // Apply extra health and damage.
         MobHealthMode mode = EntityGroup.from(entity).getHealthMode(entity);

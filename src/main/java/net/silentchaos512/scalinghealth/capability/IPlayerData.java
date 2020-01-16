@@ -24,10 +24,6 @@ public interface IPlayerData {
 
     void tick(PlayerEntity player);
 
-    default void addHeart(PlayerEntity player) {
-        setExtraHearts(player, getExtraHearts() + 1);
-    }
-
     default void addHearts(PlayerEntity player, int amount) {
         setExtraHearts(player, getExtraHearts() + amount);
     }

@@ -3,7 +3,6 @@ package net.silentchaos512.scalinghealth.utils;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
-import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.DimensionConfig;
 import net.silentchaos512.scalinghealth.config.EvalVars;
@@ -70,8 +69,8 @@ public final class Players {
         return hp;
     }
 
-    public static boolean heartCrystalsIncreaseHealth(PlayerEntity player) {
-        return Config.get(player).item.heartCrystalIncreaseHealth.get();
+    public static int heartCrystalIncreaseAmount(PlayerEntity player) {
+        return Config.get(player).item.heartCrystalHealthIncrease.get();
     }
 
     public static double powerCrystalIncreaseAmount(PlayerEntity player) {
@@ -94,6 +93,10 @@ public final class Players {
 
     public static double idleModifier(PlayerEntity player) {
         return Config.get(player).difficulty.idleMultiplier.get();
+    }
+
+    public static boolean isPlayerExempt(PlayerEntity player){
+        return Config.get(player).difficulty.isExempt(player);
     }
 
     public static float heartCrystalHealthRestored(PlayerEntity player) {

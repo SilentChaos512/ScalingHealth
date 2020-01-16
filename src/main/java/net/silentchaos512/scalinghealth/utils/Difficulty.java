@@ -8,18 +8,20 @@ import net.minecraft.util.Tuple;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.IEntityReader;
+import net.minecraft.world.IWorld;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.silentchaos512.lib.util.MCMathUtils;
+import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.DifficultyAffectedCapability;
 import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
 import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
 import net.silentchaos512.scalinghealth.capability.IDifficultySource;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.DimensionConfig;
+import net.silentchaos512.scalinghealth.config.EquipmentConfig;
 import net.silentchaos512.scalinghealth.config.EvalVars;
 //import net.silentchaos512.scalinghealth.init.ModGameRules;
 import net.silentchaos512.scalinghealth.lib.AreaDifficultyMode;
@@ -53,7 +55,7 @@ public final class Difficulty {
         return affected(entity).affectiveDifficulty(entity.world);
     }
 
-    public static Collection<Tuple<BlockPos, IDifficultySource>> sources(IEntityReader world, Vec3i center, long radius) {
+    public static Collection<Tuple<BlockPos, IDifficultySource>> sources(IWorld world, Vec3i center, long radius) {
         Collection<Tuple<BlockPos, IDifficultySource>> list = new ArrayList<>();
 
         // Get players
@@ -68,9 +70,18 @@ public final class Difficulty {
         return list;
     }
 
-    public static Stream<? extends PlayerEntity> playersInRange(IEntityReader world, Vec3i center, long radius) {
-        long radiusSquared = radius * radius;
-        return world.getPlayers().stream().filter(p -> radius <= 0 || MCMathUtils.distanceSq(p, center) < radiusSquared);
+    public static Stream<? extends PlayerEntity> playersInRange(IWorld world, Vec3i center, long radius) {
+        return world.getPlayers().stream().filter(p -> radius <= 0 || MCMathUtils.distanceSq(p, center) < searchRadiusSquared(world));
+    }
+
+    public static int searchRadius(IWorldReader world) {
+        final int radius = Config.get(world).difficulty.searchRadius.get();
+        return radius <= 0 ? Integer.MAX_VALUE : radius;
+    }
+
+    public static long searchRadiusSquared(IWorldReader world) {
+        final long radius = searchRadius(world);
+        return radius * radius;
     }
 
     public static boolean enabledIn(World world) {
@@ -112,18 +123,8 @@ public final class Difficulty {
         return MathHelper.clamp(difficulty, minValue(world), maxValue(world));
     }
 
-    public static int searchRadius(IWorldReader world) {
-        final int radius = Config.get(world).difficulty.searchRadius.get();
-        return radius <= 0 ? Integer.MAX_VALUE : radius;
-    }
-
     public static boolean ignoreYAxis(World world){
         return Config.get(world).difficulty.ignoreYAxis.get();
-    }
-
-    public static long searchRadiusSquared(IWorldReader world) {
-        final long radius = searchRadius(world);
-        return radius * radius;
     }
 
     public static double distanceFactor(IWorldReader world) {
@@ -142,6 +143,76 @@ public final class Difficulty {
         return Config.get(world).difficulty.changePerSecond.get();
     }
 
+    /*public static void equipAll(MobEntity entity){
+        equipHelmet(entity);
+        equipChestplate(entity);
+        equipLeggings(entity);
+        equipBoots(entity);
+        equipWeapon(entity);
+    }
+
+    public static void equipHelmet(MobEntity entity){
+        EquipmentConfig config = Config.get(entity).mobs.equipmentHelmet;
+        //adding 1 to max tier or else the max tier will only happen on max diff
+        int tier = (int) (config.getMaxTier() * Difficulty.affected(entity).affectiveDifficulty(entity.world) / maxValue(entity.world));
+        ScalingHealth.LOGGER.debug("HELMET: Maxtier = {}, mob diff = {}, max = {}, tier = {}", config.getMaxTier(), Difficulty.affected(entity).affectiveDifficulty(entity.world), maxValue(entity.world), tier);
+
+        if(tier > config.getMaxTier()) tier = config.getMaxTier();
+        //if were at at least 2% of max difficulty, set tier to 1
+        if(tier == 0 && Difficulty.areaDifficulty(entity.world, entity.getPosition()) > maxValue(entity.world) * 0.02) tier = 1;
+
+        config.processMob(entity, tier);
+    }
+
+    public static void equipChestplate(MobEntity entity){
+        EquipmentConfig config = Config.get(entity).mobs.equipmentChest;
+        //adding 1 to max tier or else the max tier will only happen on max diff
+        int tier = (int) (config.getMaxTier() * Difficulty.affected(entity).affectiveDifficulty(entity.world) / maxValue(entity.world));
+        ScalingHealth.LOGGER.debug("CHESTPLATE: Maxtier = {}, mob diff = {}, max = {}, tier = {}", config.getMaxTier(), Difficulty.affected(entity).affectiveDifficulty(entity.world), maxValue(entity.world), tier);
+        if(tier > config.getMaxTier()) tier = config.getMaxTier();
+        //if were at at least 2% of max difficulty, set tier to 1
+        if(tier == 0 && Difficulty.areaDifficulty(entity.world, entity.getPosition()) > maxValue(entity.world) * 0.02) tier = 1;
+
+        config.processMob(entity, tier);
+    }
+
+    public static void equipLeggings(MobEntity entity){
+        EquipmentConfig config = Config.get(entity).mobs.equipmentLegging;
+        //adding 1 to max tier or else the max tier will only happen on max diff
+        int tier = (int) (config.getMaxTier() * Difficulty.affected(entity).affectiveDifficulty(entity.world) / maxValue(entity.world));
+        ScalingHealth.LOGGER.debug("LEGGINGS: Maxtier = {}, mob diff = {}, max = {}, tier = {}", config.getMaxTier(), Difficulty.affected(entity).affectiveDifficulty(entity.world), maxValue(entity.world), tier);
+        if(tier > config.getMaxTier()) tier = config.getMaxTier();
+        //if were at at least 2% of max difficulty, set tier to 1
+        if(tier == 0 && Difficulty.areaDifficulty(entity.world, entity.getPosition()) > maxValue(entity.world) * 0.02) tier = 1;
+
+        config.processMob(entity, tier);
+    }
+
+    public static void equipBoots(MobEntity entity){
+        EquipmentConfig config =  Config.get(entity).mobs.equipmentBoots;
+        //adding 1 to max tier or else the max tier will only happen on max diff
+        int tier = (int) (config.getMaxTier() * Difficulty.affected(entity).affectiveDifficulty(entity.world) / maxValue(entity.world));
+        ScalingHealth.LOGGER.debug("BOOTS: Maxtier = {}, mob diff = {}, max = {}, tier = {}", config.getMaxTier(), Difficulty.affected(entity).affectiveDifficulty(entity.world), maxValue(entity.world), tier);
+        if(tier > config.getMaxTier()) tier = config.getMaxTier();
+        //if were at at least 2% of max difficulty, set tier to 1
+        if(tier == 0 && Difficulty.areaDifficulty(entity.world, entity.getPosition()) > maxValue(entity.world) * 0.02) tier = 1;
+
+        config.processMob(entity, tier);
+    }
+
+    public static void equipWeapon(MobEntity entity){
+        EquipmentConfig config = Config.get(entity).mobs.equipmentWeapon;
+        //adding 1 to max tier or else the max tier will only happen on max diff
+        int tier = (int) (config.getMaxTier() * Difficulty.affected(entity).affectiveDifficulty(entity.world) / maxValue(entity.world));
+        ScalingHealth.LOGGER.debug("WEAPON: Maxtier = {}, mob diff = {}, max = {}, tier = {}", config.getMaxTier(), Difficulty.affected(entity).affectiveDifficulty(entity.world), maxValue(entity.world), tier);
+        if(tier > config.getMaxTier()) tier = config.getMaxTier();
+        //if were at at least 2% of max difficulty, set tier to 1
+        if(tier == 0 && Difficulty.areaDifficulty(entity.world, entity.getPosition()) > maxValue(entity.world) * 0.02) tier = 1;
+
+        config.processMob(entity, tier);
+    }*/
+
+    //TODO: implement
     public static boolean allowsDifficultyChanges(MobEntity entity) {
         return true;
     }
@@ -170,6 +241,10 @@ public final class Difficulty {
 
     public static double maxDamageBoost(MobEntity entity) {
         return Config.get(entity).mobs.maxDamageBoost.get();
+    }
+
+    public static List<? extends String> getBlacklistedMods(World world){
+        return Config.get(world).damageScaling.modBlacklist.get();
     }
 
     public static double getDifficultyAfterDeath(PlayerEntity player, DimensionType deathDimension) {

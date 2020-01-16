@@ -28,6 +28,7 @@ public class ClientSyncMessage {
         msg.areaDifficulty = buf.readFloat();
         msg.regenTimer = buf.readVarInt();
         msg.locationMultiPercent = buf.readVarInt();
+        msg.experienceLevel = buf.readVarInt();
         return msg;
     }
 
@@ -37,5 +38,6 @@ public class ClientSyncMessage {
         buf.writeFloat(areaDifficulty);
         buf.writeVarInt(regenTimer);
         buf.writeVarInt(locationMultiPercent);
+        buf.writeVarInt(experienceLevel);
     }
 }

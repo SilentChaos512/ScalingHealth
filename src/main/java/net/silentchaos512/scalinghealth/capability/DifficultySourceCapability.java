@@ -9,6 +9,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.utils.Players;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -61,7 +62,8 @@ public class DifficultySourceCapability implements IDifficultySource, ICapabilit
             ScalingHealth.LOGGER.error("Failed to get capabilities from {}", obj);
             return false;
         }
-        return obj instanceof PlayerEntity || obj instanceof World;
+        //return (obj instanceof PlayerEntity && Players.isPlayerExempt((PlayerEntity) obj))|| obj instanceof World;
+        return  obj instanceof PlayerEntity || obj instanceof World;
     }
 
     public static void register() {

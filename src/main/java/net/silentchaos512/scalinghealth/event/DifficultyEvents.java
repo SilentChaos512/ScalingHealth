@@ -72,7 +72,7 @@ public final class DifficultyEvents {
             });
         }
 
-        // Tick difficulty source, such as players
+        // Tick difficulty source, such as players, except if exempted
         if (entity.world.getGameTime() % 20 == 0) {
             entity.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
                 float change = (float) Difficulty.changePerSecond(entity.world);

@@ -19,12 +19,18 @@
 package net.silentchaos512.scalinghealth.utils;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.lib.util.EntityHelper;
+import net.silentchaos512.scalinghealth.ScalingHealth;
 
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 public final class ModifierHandler {
@@ -58,6 +64,14 @@ public final class ModifierHandler {
     }
 
     public static void addAttackDamage(LivingEntity entity, double amount, AttributeModifier.Operation op) {
+        boolean stop = false;
+        if(entity instanceof MobEntity){
+            List<? extends String> mods = Difficulty.getBlacklistedMods(entity.world);
+            for (String mod : mods) {
+                if (mod.equals(ForgeRegistries.ENTITIES.getKey(entity.getType()).getNamespace())) stop = true;
+            }
+        }
+        if(stop) return;
         setModifier(entity, SharedMonsterAttributes.ATTACK_DAMAGE, MODIFIER_ID_DAMAGE, MODIFIER_NAME_DAMAGE, amount, op);
     }
 }
