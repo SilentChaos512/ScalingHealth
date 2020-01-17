@@ -8,8 +8,9 @@ import net.minecraftforge.fml.network.NetworkDirection;
 import net.silentchaos512.scalinghealth.event.PlayerBonusRegenHandler;
 import net.silentchaos512.scalinghealth.network.ClientSyncMessage;
 import net.silentchaos512.scalinghealth.network.Network;
-import net.silentchaos512.scalinghealth.utils.Difficulty;
-import net.silentchaos512.scalinghealth.utils.Players;
+import net.silentchaos512.scalinghealth.utils.SHDifficulty;
+import net.silentchaos512.scalinghealth.utils.SHItems;
+import net.silentchaos512.scalinghealth.utils.SHPlayers;
 
 public interface IPlayerData {
     int getExtraHearts();
@@ -37,22 +38,22 @@ public interface IPlayerData {
     }
 
     default int getHealthModifier(PlayerEntity player) {
-        return 2 * getExtraHearts() + Players.startingHealth(player) - 20;
+        return 2 * getExtraHearts() + SHPlayers.startingHealth(player) - 20;
     }
 
     default double getAttackDamageModifier(PlayerEntity player) {
-        return getPowerCrystals() * Players.powerCrystalIncreaseAmount(player);
+        return getPowerCrystals() * SHItems.powerCrystalIncreaseAmount(player);
     }
 
     static void sendUpdatePacketTo(PlayerEntity player) {
         World world = player.world;
         BlockPos pos = player.getPosition();
         ClientSyncMessage msg = new ClientSyncMessage(
-                Difficulty.source(player).getDifficulty(),
-                Difficulty.source(world).getDifficulty(),
-                (float) Difficulty.areaDifficulty(world, pos),
+                SHDifficulty.source(player).getDifficulty(),
+                SHDifficulty.source(world).getDifficulty(),
+                (float) SHDifficulty.areaDifficulty(world, pos),
                 PlayerBonusRegenHandler.getTimerForPlayer(player),
-                Difficulty.locationMultiplier(world, pos),
+                SHDifficulty.locationMultiplier(world, pos),
                 player.experienceLevel
         );
         ServerPlayerEntity playerMP = (ServerPlayerEntity) player;

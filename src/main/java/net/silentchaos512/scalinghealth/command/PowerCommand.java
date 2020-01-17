@@ -16,7 +16,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
-import net.silentchaos512.scalinghealth.utils.Players;
+import net.silentchaos512.scalinghealth.utils.SHItems;
 
 public final class PowerCommand {
     private PowerCommand() {}
@@ -96,7 +96,7 @@ public final class PowerCommand {
         int amount = IntegerArgumentType.getInteger(context, "amount");
         for (ServerPlayerEntity player : EntityArgument.getPlayers(context, "targets")) {
             player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> {
-                int intendedCrystalCount = (int) ((amount - 1) / Players.powerCrystalIncreaseAmount(player));
+                int intendedCrystalCount = (int) ((amount - 1) / SHItems.powerCrystalIncreaseAmount(player));
                 data.setPowerCrystalCount(player, intendedCrystalCount);
             });
         }

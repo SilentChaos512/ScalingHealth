@@ -69,17 +69,8 @@ public class BlightFireEntity extends Entity implements IEntityAdditionalSpawnDa
                     ScalingHealth.LOGGER.debug("Removed blight fire (parent missing or dead)");
                 }
                 remove();
-                //return;
             }
         }
-        // Update position manually in case fire is not riding the blight.
-        //if (parent != null) {
-        //    this.posX = parent.posX;
-        //    this.posY = parent.posY + parent.getHeight() / 1.5;
-        //    this.posZ = parent.posZ;
-
-        //    ScalingHealth.LOGGER.debug(MARKER, "BlightFire Pos: ({}, {}, {})", this.posX, this.posY, this.posZ);
-        //}
     }
 
     @Override

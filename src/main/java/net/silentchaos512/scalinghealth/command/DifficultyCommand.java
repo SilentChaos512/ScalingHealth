@@ -16,7 +16,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.server.ServerWorld;
 import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
-import net.silentchaos512.scalinghealth.utils.Difficulty;
+import net.silentchaos512.scalinghealth.utils.SHDifficulty;
 
 public final class DifficultyCommand {
     private DifficultyCommand() {}
@@ -94,7 +94,7 @@ public final class DifficultyCommand {
     private static int getDifficultySingle(CommandContext<CommandSource> context, PlayerEntity player) {
         player.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
             context.getSource().sendFeedback(ModCommands.playerNameText(player), true);
-            double maxDifficulty = Difficulty.maxValue(player.world);
+            double maxDifficulty = SHDifficulty.maxValue(player.world);
             // Player difficulty
             float difficulty = source.getDifficulty();
             ITextComponent playerValues = ModCommands.valueText(difficulty, maxDifficulty);
@@ -102,14 +102,14 @@ public final class DifficultyCommand {
                     .applyTextStyle(TextFormatting.YELLOW);
             context.getSource().sendFeedback(playerText, true);
             // Area difficulty
-            double areaDifficulty = Difficulty.areaDifficulty(player.world, player.getPosition());
+            double areaDifficulty = SHDifficulty.areaDifficulty(player.world, player.getPosition());
             ITextComponent areaValues = ModCommands.valueText(areaDifficulty, maxDifficulty);
             ITextComponent areaText = text("area", areaValues)
                     .applyTextStyle(TextFormatting.YELLOW);
             // Area mode
             ITextComponent modeText = new StringTextComponent(" (")
                     .applyTextStyle(TextFormatting.GRAY)
-                    .appendSibling(Difficulty.areaMode(player.world).getDisplayName())
+                    .appendSibling(SHDifficulty.areaMode(player.world).getDisplayName())
                     .appendText(")");
             areaText.appendSibling(modeText);
             context.getSource().sendFeedback(areaText, true);
@@ -125,7 +125,7 @@ public final class DifficultyCommand {
             context.getSource().sendFeedback(textWorld, true);
             // Difficulty
             double difficulty = source.getDifficulty();
-            double maxDifficulty = Difficulty.maxValue(world);
+            double maxDifficulty = SHDifficulty.maxValue(world);
             ITextComponent textValues = ModCommands.valueText(difficulty, maxDifficulty);
             ITextComponent textDifficulty = text("world", textValues)
                     .applyTextStyle(TextFormatting.YELLOW);

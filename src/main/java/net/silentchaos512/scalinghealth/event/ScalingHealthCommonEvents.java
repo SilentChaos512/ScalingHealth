@@ -29,7 +29,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -40,7 +39,6 @@ import net.minecraft.world.storage.loot.LootContext;
 import net.minecraft.world.storage.loot.LootParameterSets;
 import net.minecraft.world.storage.loot.LootParameters;
 import net.minecraft.world.storage.loot.LootTable;
-import net.minecraftforge.event.enchanting.EnchantmentLevelSetEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
@@ -54,7 +52,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IDifficultySource;
-import net.silentchaos512.scalinghealth.capability.IPlayerData;
 import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.DimensionConfig;
@@ -64,8 +61,9 @@ import net.silentchaos512.scalinghealth.lib.EntityGroup;
 import net.silentchaos512.scalinghealth.lib.module.ModuleAprilTricks;
 import net.silentchaos512.scalinghealth.network.ClientLoginMessage;
 import net.silentchaos512.scalinghealth.network.Network;
-import net.silentchaos512.scalinghealth.utils.Difficulty;
-import net.silentchaos512.scalinghealth.utils.Players;
+import net.silentchaos512.scalinghealth.utils.SHDifficulty;
+import net.silentchaos512.scalinghealth.utils.SHMobs;
+import net.silentchaos512.scalinghealth.utils.SHPlayers;
 import net.silentchaos512.utils.MathUtils;
 
 import javax.annotation.Nullable;
@@ -82,7 +80,7 @@ public final class ScalingHealthCommonEvents {
         ServerPlayerEntity player = (ServerPlayerEntity) event.getPlayer();
         World world = player.world;
         ScalingHealth.LOGGER.info("Sending login packet to player {}", player);
-        ClientLoginMessage msg = new ClientLoginMessage(Difficulty.areaMode(world), (float) Difficulty.maxValue(world));
+        ClientLoginMessage msg = new ClientLoginMessage(SHDifficulty.areaMode(world), (float) SHDifficulty.maxValue(world));
         Network.channel.sendTo(msg, player.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
     }
 
@@ -126,16 +124,16 @@ public final class ScalingHealthCommonEvents {
     public static void onXPDropped(LivingExperienceDropEvent event) {
         LivingEntity entity = event.getEntityLiving();
         // Additional XP from all mobs.
-        short difficulty = (short) Difficulty.areaDifficulty(entity.world, entity.getPosition());
-        float multi = (float) (1.0f + Config.get(entity).mobs.xpBoost.get() * difficulty);
+        short difficulty = (short) SHDifficulty.areaDifficulty(entity.world, entity.getPosition());
+        float multi = (float) (1.0f + SHMobs.xpBoost(entity.world) * difficulty);
 
         float amount = event.getDroppedExperience();
         amount *= multi;
 
         // Additional XP from blights.
         if(entity instanceof MobEntity) {
-            if (BlightHandler.isBlight((MobEntity) entity)) {
-                amount *= Config.get(entity).mobs.xpBlightBoost.get();
+            if (SHMobs.isBlight((MobEntity) entity)) {
+                amount *= SHMobs.xpBlightBoost(entity.world);
             }
         }
         event.setDroppedExperience(Math.round(amount));
@@ -144,12 +142,12 @@ public final class ScalingHealthCommonEvents {
     @SubscribeEvent
     public static void onLevelChange(PlayerXpEvent.LevelChange event){
         PlayerEntity player = event.getPlayer();
-        if(!Players.xpModeEnabled(player.world)) return;
+        if(!SHPlayers.xpModeEnabled(player.world)) return;
 
         int xp = event.getLevels();
-        int numberOfIncrease = (int) Math.floor(xp / Players.levelsPerHp(player.world));
+        int numberOfIncrease = (int) Math.floor(xp / SHPlayers.levelsPerHp(player.world));
 
-        player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> data.addHearts(player, numberOfIncrease * Players.hpPerLevel(player.world)));
+        player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> data.addHearts(player, numberOfIncrease * SHPlayers.hpPerLevel(player.world)));
     }
 
     /**
@@ -204,10 +202,10 @@ public final class ScalingHealthCommonEvents {
             DimensionConfig config = Config.get(player);
             double newDifficulty = EvalVars.apply(config, player, config.difficulty.onPlayerSleep.get());
 
-            if (!MathUtils.doublesEqual(Difficulty.getDifficultyOf(player), newDifficulty, 0.1)) {
-                ScalingHealth.LOGGER.debug("old={}, new={}", Difficulty.getDifficultyOf(player), newDifficulty);
+            if (!MathUtils.doublesEqual(SHDifficulty.getDifficultyOf(player), newDifficulty, 0.1)) {
+                ScalingHealth.LOGGER.debug("old={}, new={}", SHDifficulty.getDifficultyOf(player), newDifficulty);
                 // Difficulty would change (doesn't change until onPlayerWakeUp)
-                String configMsg = config.difficulty.sleepWarningMessage.get();
+                String configMsg = SHDifficulty.sleepWarningMessage(player.world);
                 ITextComponent text = configMsg.isEmpty()
                         ? new TranslationTextComponent("misc.scalinghealth.sleepWarning")
                         : new StringTextComponent(configMsg);
@@ -221,13 +219,13 @@ public final class ScalingHealthCommonEvents {
         PlayerEntity player = event.getPlayer();
         if (!player.world.isRemote && !event.updateWorld()) {
             DimensionConfig config = Config.get(player);
-            IDifficultySource source = Difficulty.source(player);
-            double newDifficulty = EvalVars.apply(config, player, config.difficulty.onPlayerSleep.get());
+            IDifficultySource source = SHDifficulty.source(player);
+            double newDifficulty = SHDifficulty.diffOnPlayerSleep(player);
 
             if (!MathUtils.doublesEqual(source.getDifficulty(), newDifficulty)) {
                 // Update difficulty after sleeping
                 source.setDifficulty((float) newDifficulty);
-                Difficulty.source(player.world).setDifficulty((float) newDifficulty);
+                SHDifficulty.source(player.world).setDifficulty((float) newDifficulty);
             }
         }
     }

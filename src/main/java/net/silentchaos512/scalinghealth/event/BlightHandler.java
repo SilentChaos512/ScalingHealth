@@ -32,14 +32,13 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.DimensionConfig;
 import net.silentchaos512.scalinghealth.entity.BlightFireEntity;
 import net.silentchaos512.scalinghealth.network.Network;
 import net.silentchaos512.scalinghealth.network.SpawnBlightFirePacket;
-import net.silentchaos512.scalinghealth.utils.Difficulty;
-import net.silentchaos512.scalinghealth.utils.MobDifficultyHandler;
+import net.silentchaos512.scalinghealth.utils.SHDifficulty;
+import net.silentchaos512.scalinghealth.utils.SHMobs;
 
 import javax.annotation.Nullable;
 import java.util.function.Supplier;
@@ -55,11 +54,6 @@ public final class BlightHandler {
     // ******************
     // * Blight marking *
     // ******************
-
-    @SuppressWarnings("TypeMayBeWeakened")
-    public static boolean isBlight(MobEntity entity) {
-        return Difficulty.affected(entity).isBlight();
-    }
 
     private static void spawnBlightFire(MobEntity blight) {
         if (blight.world.isRemote || getBlightFire(blight) != null) return;
@@ -138,7 +132,7 @@ public final class BlightHandler {
         if(!(event.getEntityLiving() instanceof MobEntity)) return;
 
         MobEntity blight = (MobEntity) event.getEntityLiving();
-        if (event.getSource() == null || !isBlight(blight) || event.getEntity().world.isRemote)
+        if (event.getSource() == null || !SHMobs.isBlight(blight) || event.getEntity().world.isRemote)
             return;
 
         Entity entitySource = event.getSource().getTrueSource();
@@ -155,14 +149,14 @@ public final class BlightHandler {
             }
 
             // Tell all players that the blight was killed.
-            if (Difficulty.notifyOnDeath(blight.world) && player != null) {
+            if (SHMobs.notifyOnDeath(blight.world) && player != null) {
                 ScalingHealth.LOGGER.info("Blight {} was killed by {}", blight.getName().getString(), actualKiller.getName().getString());
                 notifyPlayers(event.getSource().getDeathMessage(blight), blight, player);
             }
         } else {
             // Killed by something else.
             // Tell all players that the blight died.
-            if (Difficulty.notifyOnDeath(blight.world))
+            if (SHMobs.notifyOnDeath(blight.world))
                 ScalingHealth.LOGGER.info("Blight {} has died", blight.getName().getString());
                 notifyPlayers(event.getSource().getDeathMessage(blight), blight, null);
         }
@@ -174,7 +168,7 @@ public final class BlightHandler {
         if (!(livingEntity instanceof MobEntity)) return;
 
         MobEntity blight = (MobEntity) livingEntity;
-        if (!blight.world.isRemote && isBlight(blight)) {
+        if (!blight.world.isRemote && SHMobs.isBlight(blight)) {
             World world = blight.world;
             // Add in entity ID so not all blights update on the same tick
             if ((world.getGameTime() + blight.getEntityId()) % UPDATE_DELAY == 0) {

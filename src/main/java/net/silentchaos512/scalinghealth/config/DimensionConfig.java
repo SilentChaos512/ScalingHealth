@@ -24,6 +24,7 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.event.BlightHandler;
 import net.silentchaos512.scalinghealth.lib.AreaDifficultyMode;
 import net.silentchaos512.scalinghealth.lib.MobHealthMode;
+import net.silentchaos512.scalinghealth.utils.SHMobs;
 import net.silentchaos512.utils.config.*;
 
 import javax.annotation.Nullable;
@@ -327,6 +328,7 @@ public class DimensionConfig {
         public final BooleanValue affectPeacefuls;
         public final ConfigValue<List<? extends String>> modBlacklist;
         public final EnumValue<net.silentchaos512.scalinghealth.event.DamageScaling.Mode> mode;
+
         private final ConfigSpec scalesSpec = new ConfigSpec();
         private final ConfigValue<List<? extends CommentedConfig>> scales;
 
@@ -640,7 +642,7 @@ public class DimensionConfig {
         public Expression getDefaultKillMutator(LivingEntity entity) {
             if (!entity.isNonBoss())
                 return onBossKilled.get();
-            if (entity instanceof MobEntity && BlightHandler.isBlight((MobEntity) entity))
+            if (entity instanceof MobEntity && SHMobs.isBlight((MobEntity) entity))
                 return onBlightKilled.get();
             if (entity instanceof IMob)
                 return onHostileKilled.get();

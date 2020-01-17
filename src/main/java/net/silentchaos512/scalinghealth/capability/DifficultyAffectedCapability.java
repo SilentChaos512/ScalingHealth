@@ -11,8 +11,9 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.event.DifficultyEvents;
-import net.silentchaos512.scalinghealth.utils.Difficulty;
+import net.silentchaos512.scalinghealth.utils.SHDifficulty;
 import net.silentchaos512.scalinghealth.utils.MobDifficultyHandler;
+import net.silentchaos512.scalinghealth.utils.SHMobs;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -38,7 +39,7 @@ public class DifficultyAffectedCapability implements IDifficultyAffected, ICapab
 
     @Override
     public void setDifficulty(MobEntity mob) {
-        difficulty = (float) ((Math.random()*(0.1)+0.95) * Difficulty.areaDifficulty(mob.world, mob.getPosition()));
+        difficulty = (float) ((Math.random()*(0.1)+0.95) * SHDifficulty.areaDifficulty(mob.world, mob.getPosition()));
     }
 
     @Override
@@ -111,7 +112,7 @@ public class DifficultyAffectedCapability implements IDifficultyAffected, ICapab
     public static boolean canAttachTo(ICapabilityProvider entity) {
         return entity instanceof MobEntity
                 && !entity.getCapability(INSTANCE).isPresent()
-                && Difficulty.allowsDifficultyChanges((MobEntity) entity);
+                && SHMobs.allowsDifficultyChanges((MobEntity) entity);
     }
 
     public static void register() {

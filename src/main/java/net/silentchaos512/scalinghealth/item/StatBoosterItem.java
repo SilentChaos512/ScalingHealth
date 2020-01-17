@@ -16,6 +16,8 @@ import net.silentchaos512.scalinghealth.capability.IPlayerData;
 import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
 import net.silentchaos512.scalinghealth.client.particles.ModParticles;
 import net.silentchaos512.scalinghealth.init.ModSounds;
+import net.silentchaos512.scalinghealth.utils.SHDifficulty;
+import net.silentchaos512.scalinghealth.utils.SHPlayers;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -36,38 +38,37 @@ public abstract class StatBoosterItem extends Item {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity playerIn, Hand handIn) {
-        ItemStack stack = playerIn.getHeldItem(handIn);
+    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand handIn) {
+        ItemStack stack = player.getHeldItem(handIn);
 
-        if (!worldIn.isRemote) {
-            IPlayerData data = playerIn.getCapability(PlayerDataCapability.INSTANCE).orElseThrow(() ->
+        if (!world.isRemote) {
+            IPlayerData data = player.getCapability(PlayerDataCapability.INSTANCE).orElseThrow(() ->
                     new IllegalStateException("Player data is null!"));
 
-            final boolean statIncreaseAllowed = isStatIncreaseAllowed(playerIn, data);
-            final int levelRequirement = getLevelCost(playerIn);
+            final boolean statIncreaseAllowed = isStatIncreaseAllowed(player, data);
+            final int levelRequirement = getLevelCost(player);
 
             // Does player have enough XP?
-            if (playerIn.experienceLevel < levelRequirement) {
+            if (player.experienceLevel < levelRequirement) {
                 String translationKey = "item.scalinghealth.stat_booster.notEnoughXP";
-                playerIn.sendMessage(new TranslationTextComponent(translationKey, levelRequirement));
+                player.sendMessage(new TranslationTextComponent(translationKey, levelRequirement));
                 return new ActionResult<>(ActionResultType.PASS, stack);
             }
-
             // May be used as a healing item even if there is no stat increase
-            final boolean consumed = shouldConsume(playerIn);
+            final boolean consumed = shouldConsume(player);
             if (consumed) {
-                extraConsumeEffect(playerIn);
+                extraConsumeEffect(player);
             }
 
             // End here is stat increases are not allowed
             if (!statIncreaseAllowed) {
-                return useAsConsumable(worldIn, playerIn, stack, levelRequirement, consumed);
+                return useAsConsumable(world, player, stack, levelRequirement, consumed);
             }
 
             // Increase stat, consume item
-            return useAsStatIncreaseItem(worldIn, playerIn, stack, data, levelRequirement);
+            return useAsStatIncreaseItem(world, player, stack, data, levelRequirement);
         } else {
-            spawnParticlesAndPlaySound(worldIn, playerIn);
+            spawnParticlesAndPlaySound(world, player);
         }
 
         return new ActionResult<>(ActionResultType.SUCCESS, stack);

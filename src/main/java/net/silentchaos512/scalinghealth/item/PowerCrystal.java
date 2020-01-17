@@ -5,17 +5,17 @@ import net.minecraft.item.ItemStack;
 import net.silentchaos512.scalinghealth.capability.IPlayerData;
 import net.silentchaos512.scalinghealth.client.particles.ModParticles;
 import net.silentchaos512.scalinghealth.init.ModSounds;
-import net.silentchaos512.scalinghealth.utils.Players;
+import net.silentchaos512.scalinghealth.utils.SHItems;
 
 public class PowerCrystal extends StatBoosterItem {
     @Override
     int getLevelCost(PlayerEntity player) {
-        return Players.levelCostToUsePowerCrystal(player);
+        return SHItems.levelCostToUsePowerCrystal(player);
     }
 
     @Override
     boolean isStatIncreaseAllowed(PlayerEntity player, IPlayerData data) {
-        return Players.powerCrystalsIncreaseDamage(player);
+        return SHItems.powerCrystalsIncreaseDamage(player);
     }
 
     @Override

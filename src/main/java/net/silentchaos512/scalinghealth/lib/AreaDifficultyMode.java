@@ -26,7 +26,7 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.silentchaos512.lib.util.MCMathUtils;
 import net.silentchaos512.scalinghealth.capability.IDifficultySource;
-import net.silentchaos512.scalinghealth.utils.Difficulty;
+import net.silentchaos512.scalinghealth.utils.SHDifficulty;
 
 import java.util.Collection;
 import java.util.Locale;
@@ -39,7 +39,7 @@ public enum AreaDifficultyMode {
         public double getBaseAreaDifficulty(World world, BlockPos pos, int radius) {
             double total = 0;
             int totalWeight = 0;
-            for (Tuple<BlockPos, IDifficultySource> tuple : Difficulty.sources(world, pos, radius)) {
+            for (Tuple<BlockPos, IDifficultySource> tuple : SHDifficulty.sources(world, pos, radius)) {
                 BlockPos sourcePos = tuple.getA();
                 IDifficultySource source = tuple.getB();
                 int distance = (int) MCMathUtils.distance(pos, sourcePos);
@@ -54,7 +54,7 @@ public enum AreaDifficultyMode {
         @Override
         public double getBaseAreaDifficulty(World world, BlockPos pos, int radius) {
             double total = 0;
-            Collection<Tuple<BlockPos, IDifficultySource>> sources = Difficulty.sources(world, pos, radius);
+            Collection<Tuple<BlockPos, IDifficultySource>> sources = SHDifficulty.sources(world, pos, radius);
             for (Tuple<BlockPos, IDifficultySource> tuple : sources) {
                 total += tuple.getB().getDifficulty();
             }
@@ -66,8 +66,8 @@ public enum AreaDifficultyMode {
     MIN_LEVEL {
         @Override
         public double getBaseAreaDifficulty(World world, BlockPos pos, int radius) {
-            double min = Difficulty.maxValue(world);
-            for (Tuple<BlockPos, IDifficultySource> tuple : Difficulty.sources(world, pos, radius)) {
+            double min = SHDifficulty.maxValue(world);
+            for (Tuple<BlockPos, IDifficultySource> tuple : SHDifficulty.sources(world, pos, radius)) {
                 min = Math.min(tuple.getB().getDifficulty(), min);
             }
             return min;
@@ -77,7 +77,7 @@ public enum AreaDifficultyMode {
         @Override
         public double getBaseAreaDifficulty(World world, BlockPos pos, int radius) {
             double max = 0;
-            for (Tuple<BlockPos, IDifficultySource> tuple : Difficulty.sources(world, pos, radius)) {
+            for (Tuple<BlockPos, IDifficultySource> tuple : SHDifficulty.sources(world, pos, radius)) {
                 max = Math.max(tuple.getB().getDifficulty(), max);
             }
             return max;
@@ -88,12 +88,12 @@ public enum AreaDifficultyMode {
         public double getBaseAreaDifficulty(World world, BlockPos pos, int radius) {
             double distance;
             //to ignore y axis, take the same y as the evaluated position
-            if(Difficulty.ignoreYAxis(world)){
+            if(SHDifficulty.ignoreYAxis(world)){
                 distance = MCMathUtils.distance(pos, new BlockPos(world.getSpawnPoint().getX(), pos.getY(), world.getSpawnPoint().getZ()));
             } else {
                 distance = MCMathUtils.distance(pos, world.getSpawnPoint());
             }
-            return distance * Difficulty.distanceFactor(world);
+            return distance * SHDifficulty.distanceFactor(world);
         }
     },
     DISTANCE_FROM_ORIGIN {
@@ -101,12 +101,12 @@ public enum AreaDifficultyMode {
         public double getBaseAreaDifficulty(World world, BlockPos pos, int radius) {
             double distance;
             //to ignore y axis, take the same y as the evaluated position
-            if(Difficulty.ignoreYAxis(world)){
+            if(SHDifficulty.ignoreYAxis(world)){
                 distance = MCMathUtils.distance(pos, new BlockPos(0, pos.getY(), 0));
             } else {
                 distance = MCMathUtils.distance(pos, new BlockPos(0, world.getSpawnPoint().getY(), 0));
             }
-            return distance * Difficulty.distanceFactor(world);
+            return distance * SHDifficulty.distanceFactor(world);
         }
     },
     DISTANCE_AND_TIME {
@@ -120,7 +120,7 @@ public enum AreaDifficultyMode {
     DIMENSION_WIDE {
         @Override
         public double getBaseAreaDifficulty(World world, BlockPos pos, int radius) {
-            return Difficulty.source(world).getDifficulty();
+            return SHDifficulty.source(world).getDifficulty();
         }
     };
 
@@ -128,15 +128,15 @@ public enum AreaDifficultyMode {
 
     public double getAreaDifficulty(World world, BlockPos pos, boolean groupBonus) {
         // Is difficulty disabled via game rule or other means?
-        if (!world.isRemote && !Difficulty.enabledIn(world)) return 0.0;
+        if (!world.isRemote && !SHDifficulty.enabledIn(world)) return 0.0;
 
-        final int radius = Difficulty.searchRadius(world);
+        final int radius = SHDifficulty.searchRadius(world);
         final double baseAreaDifficulty = getBaseAreaDifficulty(world, pos, radius);
-        final double locationMultiplier = Difficulty.locationMultiplier(world, pos);
-        final double lunarMultiplier = Difficulty.lunarMultiplier(world);
-        final double clampedDifficulty = Difficulty.clamp(world, baseAreaDifficulty * locationMultiplier * lunarMultiplier);
+        final double locationMultiplier = SHDifficulty.locationMultiplier(world, pos);
+        final double lunarMultiplier = SHDifficulty.lunarMultiplier(world);
+        final double clampedDifficulty = SHDifficulty.clamp(world, baseAreaDifficulty * locationMultiplier * lunarMultiplier);
 
-        return groupBonus ? Difficulty.withGroupBonus(world, pos, clampedDifficulty) : clampedDifficulty;
+        return groupBonus ? SHDifficulty.withGroupBonus(world, pos, clampedDifficulty) : clampedDifficulty;
     }
 
     public ITextComponent getDisplayName() {

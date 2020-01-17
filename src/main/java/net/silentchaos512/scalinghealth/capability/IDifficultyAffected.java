@@ -2,7 +2,7 @@ package net.silentchaos512.scalinghealth.capability;
 
 import net.minecraft.entity.MobEntity;
 import net.minecraft.world.World;
-import net.silentchaos512.scalinghealth.utils.Difficulty;
+import net.silentchaos512.scalinghealth.utils.SHMobs;
 
 public interface IDifficultyAffected {
     float getDifficulty();
@@ -24,6 +24,6 @@ public interface IDifficultyAffected {
     }
 
     default float affectiveDifficulty(World world) {
-        return isBlight() ? (float) Difficulty.getBlightDifficultyMultiplier(world) * getDifficulty() : getDifficulty();
+        return isBlight() ? (float) SHMobs.getBlightDifficultyMultiplier(world) * getDifficulty() : getDifficulty();
     }
 }

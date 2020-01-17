@@ -6,14 +6,15 @@ import net.minecraft.world.dimension.DimensionType;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.DimensionConfig;
 import net.silentchaos512.scalinghealth.config.EvalVars;
+import net.silentchaos512.scalinghealth.config.RegenConfig;
 import net.silentchaos512.utils.MathUtils;
 
 /**
- * Utility class for player-related settings. Same as with {@link Difficulty}, this should put a
+ * Utility class for player-related settings. Same as with {@link SHDifficulty}, this should put a
  * stop to the tangled mess of config references.
  */
-public final class Players {
-    private Players() {throw new IllegalAccessError("Utility class");}
+public final class SHPlayers {
+    private SHPlayers() {throw new IllegalAccessError("Utility class");}
 
     public static int startingHealth(PlayerEntity player) {
         return Config.get(player).player.startingHealth.get();
@@ -38,7 +39,7 @@ public final class Players {
     }
 
     public static int maxPowerCrystals(PlayerEntity player) {
-        return (int) ((maxAttackDamage(player) - 1) / powerCrystalIncreaseAmount(player));
+        return (int) ((maxAttackDamage(player) - 1) / SHItems.powerCrystalIncreaseAmount(player));
     }
 
     public static int clampExtraHearts(PlayerEntity player, int value) {
@@ -69,38 +70,8 @@ public final class Players {
         return hp;
     }
 
-    public static int heartCrystalIncreaseAmount(PlayerEntity player) {
-        return Config.get(player).item.heartCrystalHealthIncrease.get();
-    }
-
-    public static double powerCrystalIncreaseAmount(PlayerEntity player) {
-        return Config.get(player).item.powerCrystalDamageIncrease.get();
-    }
-
-    public static boolean powerCrystalsIncreaseDamage(PlayerEntity player) {
-        return powerCrystalIncreaseAmount(player) > 0;
-    }
-
-    public static int levelCostToUseHeartCrystal(PlayerEntity player) {
-        if (player.abilities.isCreativeMode) return 0;
-        return Config.get(player).item.heartCrystalLevelCost.get();
-    }
-
-    public static int levelCostToUsePowerCrystal(PlayerEntity player) {
-        if (player.abilities.isCreativeMode) return 0;
-        return Config.get(player).item.powerCrystalLevelCost.get();
-    }
-
-    public static double idleModifier(PlayerEntity player) {
-        return Config.get(player).difficulty.idleMultiplier.get();
-    }
-
-    public static boolean isPlayerExempt(PlayerEntity player){
-        return Config.get(player).difficulty.isExempt(player);
-    }
-
-    public static float heartCrystalHealthRestored(PlayerEntity player) {
-        return Config.get(player).item.heartCrystalHealthRestored.get().floatValue();
+    public static RegenConfig getRegenConfig(World world){
+        return Config.get(world).player.regen;
     }
 
     public static boolean xpModeEnabled(World world){
@@ -121,16 +92,5 @@ public final class Players {
 
     public static int hpPerLevel(World world){
         return Config.get(world).player.hpPerLevel.get();
-    }
-
-    public static int cursedHeartAffectAmount(World world) {
-        return Config.get(world).item.cursedHeartAffect.get().intValue();
-    }
-
-    public static int enchantedHeartAffectAmount(World world) {
-        return Config.get(world).item.enchantedHeartAffect.get().intValue();
-    }
-    public static int chanceHeartAffectAmount(World world){
-        return Config.get(world).item.chanceHeartAffect.get().intValue();
     }
 }

@@ -34,8 +34,8 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IDifficultySource;
 import net.silentchaos512.scalinghealth.client.particles.ModParticles;
 import net.silentchaos512.scalinghealth.init.ModSounds;
-import net.silentchaos512.scalinghealth.utils.Difficulty;
-import net.silentchaos512.scalinghealth.utils.Players;
+import net.silentchaos512.scalinghealth.utils.SHDifficulty;
+import net.silentchaos512.scalinghealth.utils.SHItems;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -58,13 +58,13 @@ public class DifficultyMutatorItem extends Item {
         switch (this.type) {
             // Enchanted Heart
             case CURSED:
-                return Players.cursedHeartAffectAmount(world);
+                return SHItems.cursedHeartAffectAmount(world);
             // Cursed Heart
             case ENCHANTED:
-                return  Players.enchantedHeartAffectAmount(world);
+                return  SHItems.enchantedHeartAffectAmount(world);
             // Chance Heart
             case CHANCE:
-                int max = Players.chanceHeartAffectAmount(world);
+                int max = SHItems.chanceHeartAffectAmount(world);
                 // random equation:
                 // (Math.random()*((max-min)+1))+min
                 // max is max, min is -max
@@ -103,7 +103,7 @@ public class DifficultyMutatorItem extends Item {
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getHeldItem(hand);
-        IDifficultySource source = Difficulty.source(player);
+        IDifficultySource source = SHDifficulty.source(player);
 
         float change = getEffectAmount(world);
         if (!world.isRemote) {
@@ -150,7 +150,7 @@ public class DifficultyMutatorItem extends Item {
     }
 
     private void chanceHeartEffects(World world, PlayerEntity player, float diffChange){
-        int max = Players.chanceHeartAffectAmount(world);
+        int max = SHItems.chanceHeartAffectAmount(world);
         if(diffChange == max){
             cursedHeartEffects(world, player);
         }

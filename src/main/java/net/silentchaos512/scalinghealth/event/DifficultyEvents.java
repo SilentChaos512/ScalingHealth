@@ -1,13 +1,11 @@
 package net.silentchaos512.scalinghealth.event;
 
-import net.minecraft.client.gui.NewChatGui;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -21,8 +19,8 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.DifficultyAffectedCapability;
 import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
 import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
-import net.silentchaos512.scalinghealth.utils.Difficulty;
-import net.silentchaos512.scalinghealth.utils.Players;
+import net.silentchaos512.scalinghealth.utils.SHDifficulty;
+import net.silentchaos512.scalinghealth.utils.SHPlayers;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
@@ -75,7 +73,7 @@ public final class DifficultyEvents {
         // Tick difficulty source, such as players, except if exempted
         if (entity.world.getGameTime() % 20 == 0) {
             entity.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
-                float change = (float) Difficulty.changePerSecond(entity.world);
+                float change = (float) SHDifficulty.changePerSecond(entity.world);
                 source.setDifficulty(source.getDifficulty() + change);
             });
         }
@@ -89,7 +87,7 @@ public final class DifficultyEvents {
         // Tick world difficulty source
         if (world.getGameTime() % 20 == 0) {
             world.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
-                float change = (float) Difficulty.changePerSecond(world);
+                float change = (float) SHDifficulty.changePerSecond(world);
                 source.setDifficulty(source.getDifficulty() + change);
             });
         }
@@ -116,12 +114,12 @@ public final class DifficultyEvents {
 
         // Apply death mutators
         clone.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> {
-            int newCrystals = Players.getCrystalCountFromHealth(original, Players.getHealthAfterDeath(original, original.dimension));
+            int newCrystals = SHPlayers.getCrystalCountFromHealth(original, SHPlayers.getHealthAfterDeath(original, original.dimension));
             notifyOfChanges(clone, "heart crystal(s)", data.getExtraHearts(), newCrystals);
             data.setExtraHearts(clone, newCrystals);
         });
         clone.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
-            float newDifficulty = (float) Difficulty.getDifficultyAfterDeath(clone, original.dimension);    //not sure to pass the clone or the og (the dim is good)
+            float newDifficulty = (float) SHDifficulty.getDifficultyAfterDeath(clone, original.dimension);    //not sure to pass the clone or the og (the dim is good)
             notifyOfChanges(clone, "difficulty", source.getDifficulty(), newDifficulty);
             source.setDifficulty(newDifficulty);
         });

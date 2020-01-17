@@ -4,7 +4,7 @@ import com.udojava.evalex.Expression;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.silentchaos512.scalinghealth.utils.Difficulty;
+import net.silentchaos512.scalinghealth.utils.SHDifficulty;
 
 import javax.annotation.Nullable;
 import java.util.function.Function;
@@ -21,16 +21,16 @@ public enum EvalVars {
     ),
     PLAYER_DIFFICULTY("difficulty", ctx -> {
         if (ctx.player == null) return 0;
-        return Difficulty.source(ctx.player).getDifficulty();
+        return SHDifficulty.source(ctx.player).getDifficulty();
     }),
     MAX_DIFFICULTY("maxDifficulty", ctx ->
-            Difficulty.maxValue(ctx.world)
+            SHDifficulty.maxValue(ctx.world)
     ),
     AREA_DIFFICULTY("areaDifficulty", ctx ->
-            Difficulty.areaDifficulty(ctx.world, ctx.pos, false)
+            SHDifficulty.areaDifficulty(ctx.world, ctx.pos, false)
     ),
     AREA_PLAYER_COUNT("areaPlayerCount", ctx -> {
-        return Difficulty.playersInRange(ctx.world, ctx.pos, Difficulty.searchRadius(ctx.world)).count();
+        return SHDifficulty.playersInRange(ctx.world, ctx.pos, SHDifficulty.searchRadius(ctx.world)).count();
     });
 
     private final String name;

@@ -7,7 +7,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.Config;
-import net.silentchaos512.scalinghealth.utils.Difficulty;
+import net.silentchaos512.scalinghealth.utils.SHMobs;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -37,7 +37,7 @@ public enum EntityGroup {
         if (!entity.isNonBoss())
             return BOSS;
         if (entity instanceof IMob) {
-        if (!ignoreBlightStatus && Difficulty.isBlight((MobEntity) entity))
+        if (!ignoreBlightStatus && SHMobs.isBlight((MobEntity) entity))
             return BLIGHT;
         return HOSTILE;
     }
@@ -46,12 +46,12 @@ public enum EntityGroup {
 
     public double getPotionChance(LivingEntity entity) {
         if (this == PEACEFUL)
-            return Config.get(entity).mobs.peacefulPotionChance.get();
-        return Config.get(entity).mobs.hostilePotionChance.get();
+            return SHMobs.passivePotionChance(entity.world);
+        return SHMobs.hostilePotionChance(entity.world);
     }
 
     public MobHealthMode getHealthMode(LivingEntity entity) {
-        return Config.get(entity).mobs.healthMode.get();
+        return SHMobs.healthMode(entity.world);
     }
 
     public Optional<ResourceLocation> getBonusDropsLootTable() {

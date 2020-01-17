@@ -12,9 +12,9 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.utils.Difficulty;
+import net.silentchaos512.scalinghealth.utils.SHDifficulty;
 import net.silentchaos512.scalinghealth.utils.ModifierHandler;
-import net.silentchaos512.scalinghealth.utils.Players;
+import net.silentchaos512.scalinghealth.utils.SHPlayers;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -48,13 +48,13 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
 
     @Override
     public void setExtraHearts(PlayerEntity player, int amount) {
-        extraHearts = Players.clampExtraHearts(player, amount);
+        extraHearts = SHPlayers.clampExtraHearts(player, amount);
         ModifierHandler.addMaxHealth(player, getHealthModifier(player), AttributeModifier.Operation.ADDITION);
     }
 
     @Override
     public void setPowerCrystalCount(PlayerEntity player, int amount) {
-        powerCrystals = Players.clampPowerCrystals(player, amount);
+        powerCrystals = SHPlayers.clampPowerCrystals(player, amount);
         ModifierHandler.addAttackDamage(player, getAttackDamageModifier(player), AttributeModifier.Operation.ADDITION);
     }
 
@@ -91,15 +91,16 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
         if(timeAfk > 120){
             if(!afk) {
                 afk = true;
+                //TODO use a translation text component instead
                 player.sendMessage(new StringTextComponent("You are now afk, you will gain less difficulty with time"));
             }
         }
 
         if(afk){
-            IDifficultySource data = Difficulty.source(player);
-            float changePerSec = (float) Difficulty.changePerSecond(player.world);
+            IDifficultySource data = SHDifficulty.source(player);
+            float changePerSec = (float) SHDifficulty.changePerSecond(player.world);
             //since last second we added "changePerSec" difficulty, we subtract an amount based on idlemodifier
-            data.addDifficulty(- changePerSec * (float) (1 - Players.idleModifier(player)));
+            data.addDifficulty(- changePerSec * (float) (1 - SHDifficulty.idleModifier(player)));
         }
     }
 

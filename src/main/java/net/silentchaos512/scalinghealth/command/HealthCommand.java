@@ -14,7 +14,7 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
-import net.silentchaos512.scalinghealth.utils.Players;
+import net.silentchaos512.scalinghealth.utils.SHPlayers;
 
 public final class HealthCommand {
     private HealthCommand() {}
@@ -94,7 +94,7 @@ public final class HealthCommand {
         int amount = IntegerArgumentType.getInteger(context, "amount");
         for (ServerPlayerEntity player : EntityArgument.getPlayers(context, "targets")) {
             player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> {
-                int intendedExtraHearts = (amount - Players.startingHealth(player)) / 2;
+                int intendedExtraHearts = (amount - SHPlayers.startingHealth(player)) / 2;
                 data.setExtraHearts(player, intendedExtraHearts);
             });
         }

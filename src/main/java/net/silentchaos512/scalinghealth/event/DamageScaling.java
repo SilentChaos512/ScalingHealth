@@ -30,7 +30,7 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.DimensionConfig;
 import net.silentchaos512.scalinghealth.lib.EntityGroup;
-import net.silentchaos512.scalinghealth.utils.Difficulty;
+import net.silentchaos512.scalinghealth.utils.SHDifficulty;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
@@ -94,14 +94,14 @@ public final class DamageScaling {
         Mode mode = config.damageScaling.mode.get();
         switch (mode) {
             case AREA_DIFFICULTY:
-                return Difficulty.areaDifficulty(entity.world, entity.getPosition()) * config.damageScaling.difficultyWeight.get();
+                return SHDifficulty.areaDifficulty(entity.world, entity.getPosition()) * config.damageScaling.difficultyWeight.get();
             case MAX_HEALTH:
                 double baseHealth = entity instanceof PlayerEntity
                         ? config.player.startingHealth.get()
                         : entity.getAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue();
                 return (entity.getMaxHealth() - baseHealth) / baseHealth;
             case DIFFICULTY:
-                return Difficulty.getDifficultyOf(entity) * config.damageScaling.difficultyWeight.get();
+                return SHDifficulty.getDifficultyOf(entity) * config.damageScaling.difficultyWeight.get();
             default:
                 throw new IllegalStateException("Unknown damage scaling mode: " + mode);
         }

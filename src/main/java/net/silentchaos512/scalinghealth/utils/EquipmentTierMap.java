@@ -108,7 +108,7 @@ public class EquipmentTierMap {
     }
 
     public void equip(MobEntity mob, int tier){
-        IDifficultyAffected data = Difficulty.affected(mob);
+        IDifficultyAffected data = SHDifficulty.affected(mob);
         EquipmentEntry entry = getRandom(tier);
         if(entry == null) return;
         ItemStack equipment = entry.equipment.get();
@@ -135,7 +135,7 @@ public class EquipmentTierMap {
             Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation("", enchant));
             int enchantLevel = 0;
             //Might need to tweak this, because it might not be balanced... at first try changing the 3 for a higher number
-            if(((int) (Math.random()*3*Difficulty.maxValue(mob.world)/data.affectiveDifficulty(mob.world))) % (this.tierCount + 2) - tier == 0){
+            if(((int) (Math.random()*3* SHDifficulty.maxValue(mob.world)/data.affectiveDifficulty(mob.world))) % (this.tierCount + 2) - tier == 0){
                 int r = (int) (Math.random()* (this.tierCount * 2 + 3));
                 if(r <= tierCount * 2){
                     enchantLevel = MathHelper.clamp(r - this.tierCount + tier, 0, 2 * enchantment.getMaxLevel());

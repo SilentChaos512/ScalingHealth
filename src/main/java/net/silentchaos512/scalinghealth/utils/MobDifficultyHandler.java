@@ -1,6 +1,5 @@
 package net.silentchaos512.scalinghealth.utils;
 
-import com.udojava.evalex.Expression;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -11,18 +10,12 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.network.PacketDistributor;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
 import net.silentchaos512.scalinghealth.config.Config;
-import net.silentchaos512.scalinghealth.config.DimensionConfig;
-import net.silentchaos512.scalinghealth.config.EvalVars;
 import net.silentchaos512.scalinghealth.lib.MobHealthMode;
 import net.silentchaos512.scalinghealth.lib.EntityGroup;
-import net.silentchaos512.scalinghealth.network.Network;
 import net.silentchaos512.utils.MathUtils;
-
-import java.util.function.Supplier;
 
 public final class MobDifficultyHandler {
     private MobDifficultyHandler() {}
@@ -37,7 +30,7 @@ public final class MobDifficultyHandler {
     }
 
     public static boolean shouldBecomeBlight(MobEntity entity, float difficulty) {
-        if (Difficulty.canBecomeBlight(entity)) {
+        if (SHMobs.canBecomeBlight(entity)) {
             double chance = getBlightChance(entity, difficulty);
             return MathUtils.tryPercentage(ScalingHealth.random, chance);
         }
@@ -68,8 +61,8 @@ public final class MobDifficultyHandler {
         IAttributeInstance attributeMaxHealth = entity.getAttribute(SharedMonsterAttributes.MAX_HEALTH);
         double baseMaxHealth = attributeMaxHealth.getBaseValue();
         double healthMultiplier = isHostile
-                ? Config.get(world).mobs.hostileMultiplier.get()
-                : Config.get(world).mobs.passiveMultiplier.get();
+                ? SHMobs.healthHostileMultiplier(world)
+                : SHMobs.healthPassiveMutliplier(world);
 
         healthBoost *= healthMultiplier;
 
@@ -81,17 +74,17 @@ public final class MobDifficultyHandler {
         // Increase attack damage.
         if (difficulty > 0) {
             float diffIncrease = difficulty * ScalingHealth.random.nextFloat();
-            damageBoost = diffIncrease * Difficulty.damageBoostScale(entity);
+            damageBoost = diffIncrease * SHMobs.damageBoostScale(entity);
             // Clamp the value so it doesn't go over the maximum config.
-            double max = Difficulty.maxDamageBoost(entity);
+            double max = SHMobs.maxDamageBoost(entity);
             if (max > 0f) {
                 damageBoost = MathHelper.clamp(damageBoost, 0, max);
             }
         }
 
         // Random potion effect
-        Config.get(entity).mobs.randomPotions.tryApply(entity, difficulty);
-        //Difficulty.equipAll(entity);
+        SHMobs.getMobPotionConfig(world).tryApply(entity, difficulty);
+        //SHMobs.equipAll(entity);
 
         // Apply extra health and damage.
         MobHealthMode mode = EntityGroup.from(entity).getHealthMode(entity);
@@ -101,6 +94,6 @@ public final class MobDifficultyHandler {
     }
 
     private static double getBlightChance(MobEntity entity, float difficulty) {
-        return 0.0625 * difficulty / Difficulty.maxValue(entity.world);
+        return 0.0625 * difficulty / SHDifficulty.maxValue(entity.world);
     }
 }

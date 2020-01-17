@@ -9,7 +9,6 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.utils.Players;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
