@@ -81,6 +81,7 @@ public final class DifficultyEvents {
 
     @SubscribeEvent
     public static void onWorldTick(TickEvent.WorldTickEvent event) {
+        if(event.phase == TickEvent.Phase.START) return;
         World world = event.world;
         if (world.isRemote) return;
 

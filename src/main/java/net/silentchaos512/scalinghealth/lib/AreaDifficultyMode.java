@@ -39,7 +39,7 @@ public enum AreaDifficultyMode {
         public double getBaseAreaDifficulty(World world, BlockPos pos, int radius) {
             double total = 0;
             int totalWeight = 0;
-            for (Tuple<BlockPos, IDifficultySource> tuple : SHDifficulty.sources(world, pos, radius)) {
+            for (Tuple<BlockPos, IDifficultySource> tuple : SHDifficulty.allPlayerSources(world, pos, radius)) {
                 BlockPos sourcePos = tuple.getA();
                 IDifficultySource source = tuple.getB();
                 int distance = (int) MCMathUtils.distance(pos, sourcePos);
@@ -54,7 +54,7 @@ public enum AreaDifficultyMode {
         @Override
         public double getBaseAreaDifficulty(World world, BlockPos pos, int radius) {
             double total = 0;
-            Collection<Tuple<BlockPos, IDifficultySource>> sources = SHDifficulty.sources(world, pos, radius);
+            Collection<Tuple<BlockPos, IDifficultySource>> sources = SHDifficulty.allPlayerSources(world, pos, radius);
             for (Tuple<BlockPos, IDifficultySource> tuple : sources) {
                 total += tuple.getB().getDifficulty();
             }
@@ -67,7 +67,7 @@ public enum AreaDifficultyMode {
         @Override
         public double getBaseAreaDifficulty(World world, BlockPos pos, int radius) {
             double min = SHDifficulty.maxValue(world);
-            for (Tuple<BlockPos, IDifficultySource> tuple : SHDifficulty.sources(world, pos, radius)) {
+            for (Tuple<BlockPos, IDifficultySource> tuple : SHDifficulty.allPlayerSources(world, pos, radius)) {
                 min = Math.min(tuple.getB().getDifficulty(), min);
             }
             return min;
@@ -77,7 +77,7 @@ public enum AreaDifficultyMode {
         @Override
         public double getBaseAreaDifficulty(World world, BlockPos pos, int radius) {
             double max = 0;
-            for (Tuple<BlockPos, IDifficultySource> tuple : SHDifficulty.sources(world, pos, radius)) {
+            for (Tuple<BlockPos, IDifficultySource> tuple : SHDifficulty.allPlayerSources(world, pos, radius)) {
                 max = Math.max(tuple.getB().getDifficulty(), max);
             }
             return max;
@@ -145,5 +145,9 @@ public enum AreaDifficultyMode {
 
     public static AreaDifficultyMode fromOrdinal(int ordinal) {
         return values()[MathHelper.clamp(ordinal, 0, values().length - 1)];
+    }
+
+    public boolean isPlayerDifficultyActive(){
+        return this != DIMENSION_WIDE && this != DISTANCE_FROM_SPAWN && this != DISTANCE_FROM_ORIGIN;
     }
 }

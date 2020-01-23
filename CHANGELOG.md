@@ -3,6 +3,15 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.10] - 2020-01-22
+### Added
+- Config for scaling bonus hp of mob spawned by spawners
+- Blight Bosses have cool dark purple names
+- New configs for bonus hp based on xp, can replace or add to current heart crystal sys
+### Fixed
+- Crashes occurring during getBlightChance
+
+
 ## [2.3.9] - 2020-01-15
 ### Added
 - Config for changing heart crystal heart gain

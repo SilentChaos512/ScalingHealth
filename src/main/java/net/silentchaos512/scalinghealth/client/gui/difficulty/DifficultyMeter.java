@@ -65,7 +65,6 @@ public class DifficultyMeter extends Screen {
         Minecraft mc = Minecraft.getInstance();
         PlayerEntity player = mc.player;
         if (player == null) return;
-        World world = player.world;
 
         final double maxDifficulty = ClientHandler.maxDifficultyValue;
         if (maxDifficulty <= 0) return;

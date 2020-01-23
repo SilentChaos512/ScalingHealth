@@ -38,6 +38,7 @@ import java.util.function.Supplier;
 public class DimensionConfig {
     public static class General {
         General(ConfigSpecWrapper wrapper) {
+            wrapper.comment("general", "settings for a particular dimension");
         }
     }
 
@@ -176,6 +177,7 @@ public class DimensionConfig {
         public final DoubleValue peacefulPotionChance;
         public final DoubleValue damageBoostScale;
         public final DoubleValue maxDamageBoost;
+        public final DoubleValue spawnerModifier;
         public final DoubleValue xpBoost;
 
         public final MobPotionConfig randomPotions;
@@ -226,10 +228,16 @@ public class DimensionConfig {
                     .builder("mob.damage.maxBoost")
                     .comment("The maximum extra attack damage a mob can receive")
                     .defineInRange(10, 0, Double.MAX_VALUE);
+            spawnerModifier = wrapper
+                    .builder("mob.health.spawner")
+                    .comment("This modifier affects the hp scale of mobs spawned by spawners, a normal 100 hp boost, will be of 30 using default value")
+                    .defineInRange(0.3, 0, Double.MAX_VALUE);
             xpBoost = wrapper
                     .builder("mob.xp.Boost")
                     .comment("Xp scaling multiplied by difficulty - xp scale of 0.1 with difficulty 10 will give about 11x more xp")
                     .defineInRange(0.03, 0, 1);
+
+
 
             randomPotions = MobPotionConfig.init(wrapper, "mob.randomPotionEffects", true, ImmutableList.<CommentedConfig>builder()
                     .add(MobPotionConfig.from(Effects.SPEED, 1, 10, 15))
@@ -729,6 +737,7 @@ public class DimensionConfig {
     }
 
     private static int dimensionIdFromString(String str) {
+        ScalingHealth.LOGGER.debug("Config found for dimension: " + str);
         if ("default".equalsIgnoreCase(str) || "overworld".equalsIgnoreCase(str)) return 0;
         if ("nether".equalsIgnoreCase(str)) return -1;
         if ("end".equalsIgnoreCase(str)) return 1;

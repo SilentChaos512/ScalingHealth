@@ -63,7 +63,7 @@ public final class ModifierHandler {
     public static void addAttackDamage(LivingEntity entity, double amount, AttributeModifier.Operation op) {
         boolean stop = false;
         if(entity instanceof MobEntity){
-            List<? extends String> mods = SHDifficulty.getBlacklistedMods(entity.world);
+            List<? extends String> mods = SHDifficulty.getDamageBlacklistedMods(entity.world);
             for (String mod : mods) {
                 if (mod.equals(ForgeRegistries.ENTITIES.getKey(entity.getType()).getNamespace())) stop = true;
             }

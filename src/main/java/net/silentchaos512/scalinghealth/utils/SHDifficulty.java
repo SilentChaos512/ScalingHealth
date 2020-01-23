@@ -51,7 +51,7 @@ public final class SHDifficulty {
         return affected(entity).affectiveDifficulty(entity.world);
     }
 
-    public static Collection<Tuple<BlockPos, IDifficultySource>> sources(IWorld world, Vec3i center, long radius) {
+    public static Collection<Tuple<BlockPos, IDifficultySource>> allPlayerSources(IWorld world, Vec3i center, long radius) {
         Collection<Tuple<BlockPos, IDifficultySource>> list = new ArrayList<>();
 
         // Get players
@@ -161,7 +161,11 @@ public final class SHDifficulty {
         return Config.get(world).difficulty.sleepWarningMessage.get();
     }
 
-    public static List<? extends String> getBlacklistedMods(World world){
+    public static boolean localPlayerDifficulty(DimensionType world){
+        return Config.get(world).difficulty.localPlayerDifficulty.get();
+    }
+
+    public static List<? extends String> getDamageBlacklistedMods(World world){
         return Config.get(world).damageScaling.modBlacklist.get();
     }
 }

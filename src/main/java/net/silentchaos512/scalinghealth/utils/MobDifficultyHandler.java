@@ -1,5 +1,6 @@
 package net.silentchaos512.scalinghealth.utils;
 
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
@@ -12,7 +13,7 @@ import net.minecraft.util.text.TextFormatting;
 import net.minecraft.world.World;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
-import net.silentchaos512.scalinghealth.config.Config;
+import net.silentchaos512.scalinghealth.event.ScalingHealthCommonEvents;
 import net.silentchaos512.scalinghealth.lib.MobHealthMode;
 import net.silentchaos512.scalinghealth.lib.EntityGroup;
 import net.silentchaos512.utils.MathUtils;
@@ -62,13 +63,20 @@ public final class MobDifficultyHandler {
         double baseMaxHealth = attributeMaxHealth.getBaseValue();
         double healthMultiplier = isHostile
                 ? SHMobs.healthHostileMultiplier(world)
-                : SHMobs.healthPassiveMutliplier(world);
+                : SHMobs.healthPassiveMultiplier(world);
 
         healthBoost *= healthMultiplier;
 
         if (difficulty > 0) {
             double diffIncrease = 2 * healthMultiplier * difficulty * ScalingHealth.random.nextFloat();
             healthBoost += diffIncrease;
+        }
+
+        if(ScalingHealthCommonEvents.spawnerSpawns.contains(entity.getUniqueID())){
+            ScalingHealth.LOGGER.debug("Previous boost: {}", healthBoost);
+            healthBoost *= SHMobs.spawnerHealth(world);
+            ScalingHealthCommonEvents.spawnerSpawns.remove(entity.getUniqueID());
+            ScalingHealth.LOGGER.debug("Mob spawned in a spawner with {} hp, boost {}", entity.getMaxHealth()+healthBoost, healthBoost);
         }
 
         // Increase attack damage.

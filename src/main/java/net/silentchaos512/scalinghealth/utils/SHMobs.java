@@ -30,7 +30,7 @@ public final class SHMobs {
         return Config.get(world).mobs.notifyOnBlightDeath.get();
     }
 
-    public static double healthPassiveMutliplier(World world){
+    public static double healthPassiveMultiplier(World world){
         return Config.get(world).mobs.passiveMultiplier.get();
     }
 
@@ -52,6 +52,10 @@ public final class SHMobs {
 
     public static MobHealthMode healthMode(World world){
         return Config.get(world).mobs.healthMode.get();
+    }
+
+    public static double spawnerHealth(World world){
+        return Config.get(world).mobs.spawnerModifier.get();
     }
 
     public static double xpBoost(World world){

@@ -18,7 +18,6 @@ public class DebugOverlay extends DebugRenderOverlay {
     public static DebugOverlay INSTANCE = new DebugOverlay();
 
     public static void init() {
-        // Just need to classload this...
     }
 
     @Nonnull
