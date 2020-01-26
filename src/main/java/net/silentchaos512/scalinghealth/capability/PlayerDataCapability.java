@@ -92,7 +92,7 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
             if(!afk) {
                 afk = true;
                 //TODO use a translation text component instead
-                player.sendMessage(new StringTextComponent("You are now afk, you will gain less difficulty with time"));
+                if(SHDifficulty.afkMessage(player.world)) player.sendMessage(new StringTextComponent("You are now afk, you will gain less difficulty with time"));
             }
         }
 

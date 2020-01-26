@@ -3,6 +3,13 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.11] - 2020-01
+### Added
+- Config option to deactivate the afk message
+### Fixed
+- Player exemption lists now works, beware however since it sets the difficulty to 0, it doesn't just stop it.
+- Particles now work! Hooray! Not quite as fancy as I would like though, might work on them more in the future
+
 ## [2.3.10] - 2020-01-22
 ### Added
 - Config for scaling bonus hp of mob spawned by spawners

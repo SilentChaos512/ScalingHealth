@@ -31,9 +31,9 @@ public class ModParticle extends TexturedParticle {
             .collect(Collectors.toList());
     private static final int[] FRAMES = {0, 1, 2, 3, 2, 1, 0};
 
-    //protected ModParticle(World worldIn, Color color, double posXIn, double posYIn, double posZIn) {
-    //    this(worldIn, color, posXIn, posYIn, posZIn, 0, 0, 0);
-    //}
+    protected ModParticle(World worldIn, Color color, double posXIn, double posYIn, double posZIn) {
+        this(worldIn, color, posXIn, posYIn, posZIn, 0, 0, 0);
+    }
 
     public ModParticle(World worldIn, Color color, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn) {
         super(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn);
@@ -48,8 +48,8 @@ public class ModParticle extends TexturedParticle {
         int textureIndex = FRAMES[MathUtils.clamp(frame, 0, FRAMES.length - 1)];
         ResourceLocation texture = TEXTURES.get(textureIndex);
         Minecraft.getInstance().textureManager.bindTexture(texture);
-
-        // Mostly just copied from vanilla and cleaned up a bit
+        super.renderParticle(buffer, entityIn, partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
+        /*// Mostly just copied from vanilla and cleaned up a bit
         float f4 = 0.1F * this.particleScale;
 
         float f5 = (float) (this.prevPosX + (this.posX - this.prevPosX) * partialTicks - interpPosX);
@@ -97,7 +97,7 @@ public class ModParticle extends TexturedParticle {
                 .tex(0, 1)
                 .color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha)
                 .lightmap(j, k).endVertex();
-        buffer.finishDrawing();
+        buffer.finishDrawing();*/
     }
 
     @Override
@@ -122,7 +122,7 @@ public class ModParticle extends TexturedParticle {
 
     @Override
     public IParticleRenderType getRenderType() {
-        return IParticleRenderType.CUSTOM;
+        return IParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
     }
 
     public static class Factory implements IParticleFactory<BasicParticleType> {

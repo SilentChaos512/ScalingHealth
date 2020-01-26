@@ -131,8 +131,6 @@ public class DifficultyMutatorItem extends Item {
         }
     }
 
-
-
     private void cursedHeartEffects(World world, PlayerEntity player) {
         if(world.isRemote){
             ScalingHealth.LOGGER.debug("Spawned Particles on client");
@@ -153,14 +151,15 @@ public class DifficultyMutatorItem extends Item {
         int max = SHItems.chanceHeartAffectAmount(world);
         if(diffChange == max){
             cursedHeartEffects(world, player);
+            ModSounds.CURSED_HEART_USE.play(player);
         }
         else if(diffChange == -max){
             enchantedHeartEffects(world, player);
+            ModSounds.ENCHANTED_HEART_USE.play(player);
         }
         else{
             ModSounds.ENCHANTED_HEART_USE.play(player);
-            if(world.isRemote)
-               ModParticles.ENCHANTED_HEART.spawn(40 * (int) (diffChange)/max, player);
+            ModParticles.ENCHANTED_HEART.spawn(40 * ((int) -diffChange)/max, player);
         }
     }
 }

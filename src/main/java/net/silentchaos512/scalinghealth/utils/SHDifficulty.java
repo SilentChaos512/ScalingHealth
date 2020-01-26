@@ -143,6 +143,10 @@ public final class SHDifficulty {
         return Config.get(player).difficulty.idleMultiplier.get();
     }
 
+    public static boolean afkMessage(World world){
+        return Config.get(world).difficulty.afkMessage.get();
+    }
+
     public static boolean isPlayerExempt(PlayerEntity player){
         return Config.get(player).difficulty.isExempt(player);
     }

@@ -23,6 +23,7 @@ public class DifficultySourceCapability implements IDifficultySource, ICapabilit
     private final LazyOptional<IDifficultySource> holder = LazyOptional.of(() -> this);
 
     private float difficulty;
+    private boolean exempt = false;
 
     @Override
     public float getDifficulty() {
@@ -31,7 +32,15 @@ public class DifficultySourceCapability implements IDifficultySource, ICapabilit
 
     @Override
     public void setDifficulty(float value) {
-        difficulty = value;
+        if(exempt)
+            difficulty = 0;
+        else
+            difficulty = value;
+    }
+
+    @Override
+    public void setExempt(boolean exempt){
+        this.exempt = exempt;
     }
 
     @Nonnull

@@ -8,6 +8,8 @@ public interface IDifficultySource {
      */
     float getDifficulty();
 
+    void setExempt(boolean exempt);
+
     /**
      * Set the difficulty of this source. Consider using {@link #addDifficulty(float)} instead.
      *

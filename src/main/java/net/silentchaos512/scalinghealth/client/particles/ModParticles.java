@@ -25,7 +25,7 @@ public enum ModParticles {
     HEART_CRYSTAL("heart_crystal", Color.FIREBRICK, 0.08, 0.05),
     POWER_CRYSTAL("power_crystal", Color.ROYALBLUE, 0.08, 0.05),
     CURSED_HEART("cursed_heart", Color.REBECCAPURPLE, 0.08, 0.05),
-    ENCHANTED_HEART("enchanted_heart", Color.ALICEBLUE, 0.08, 0.05);
+    ENCHANTED_HEART("enchanted_heart", Color.ANTIQUEWHITE, 0.08, 0.05);
 
     private final String name;
     private final BasicParticleType particleType;
@@ -64,14 +64,10 @@ public enum ModParticles {
             ForgeRegistries.PARTICLE_TYPES.register(particle.particleType);
         }
     }
-
-    @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = ScalingHealth.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
-    public static class FactoryHandler{
-        @SubscribeEvent
-        public static void registerFactories(ParticleFactoryRegisterEvent event){
-            for(ModParticles particle : values()){
-                Minecraft.getInstance().particles.registerFactory(particle.particleType, new ModParticle.Factory(particle.color));
-            }
+    @SubscribeEvent
+    public static void registerFactories(ParticleFactoryRegisterEvent event){
+        for(ModParticles particle : values()){
+            Minecraft.getInstance().particles.registerFactory(particle.particleType.getType(), new ModParticle.Factory(particle.color));
         }
     }
 }

@@ -415,6 +415,7 @@ public class DimensionConfig {
         public final BooleanValue ignoreYAxis;
         public final Supplier<Expression> groupAreaBonus;
         public final DoubleValue idleMultiplier;
+        public final BooleanValue afkMessage;
         public final StringValue sleepWarningMessage;
 
         // Mutators
@@ -517,6 +518,10 @@ public class DimensionConfig {
                     .builder("difficulty.idleMultiplier")
                     .comment("Multiplier for changePerSecond when the player is not moving.")
                     .defineInRange(0.5, 0, Double.MAX_VALUE);
+            afkMessage = wrapper
+                    .builder("difficulty.afkMessage")
+                    .comment("If true, a comment will appear to notify when you are considered afk")
+                    .define(true);
             sleepWarningMessage = wrapper
                     .builder("difficulty.sleepWarningMessage")
                     .comment("Message displayed to the player when sleeping, assuming it would change their difficulty.",
@@ -605,8 +610,6 @@ public class DimensionConfig {
          * @return True if exempt, false otherwise.
          */
         public boolean isExempt(PlayerEntity player) {
-            //TODO player.getName() seems to always be null when called from AttachCapabilities event in DifficultySourceCap.canAttachTo
-            // Or I am doing something wrong
             List<? extends String> list = difficultyExempt.get();
             for (String value : list) {
                 if (value.equalsIgnoreCase(player.getName().getFormattedText())) {

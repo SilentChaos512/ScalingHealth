@@ -73,6 +73,10 @@ public final class DifficultyEvents {
         // Tick difficulty source, such as players, except if exempted
         if (entity.world.getGameTime() % 20 == 0) {
             entity.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
+                //assuming all entity sources are players
+                boolean exempt = SHDifficulty.isPlayerExempt((PlayerEntity) event.getEntityLiving());
+                source.setExempt(exempt);
+                if(exempt) return;
                 float change = (float) SHDifficulty.changePerSecond(entity.world);
                 source.setDifficulty(source.getDifficulty() + change);
             });
