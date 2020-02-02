@@ -74,7 +74,7 @@ public final class BlightHandler {
     @Nullable
     private static BlightFireEntity getBlightFire(MobEntity blight) {
         for (BlightFireEntity fire : blight.world.getEntitiesWithinAABB(BlightFireEntity.class, blight.getBoundingBox().grow(5))) {
-            if (blight.equals(fire.getParent())) {
+            if (blight.equals(fire.getRidingEntity())) {
                 return fire;
             }
         }

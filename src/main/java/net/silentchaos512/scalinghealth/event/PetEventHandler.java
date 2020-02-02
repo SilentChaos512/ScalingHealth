@@ -18,28 +18,33 @@
 
 package net.silentchaos512.scalinghealth.event;
 
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.passive.TameableEntity;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.config.Config;
 
+@Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class PetEventHandler {
     public static PetEventHandler INSTANCE = new PetEventHandler();
-
     @SubscribeEvent
     public void onLivingUpdate(LivingUpdateEvent event) {
-        /*
-        final int regenDelay = Config.PET_REGEN_DELAY;
+        final double regenDelay = Config.get(event.getEntity()).pets.regenDelay.get();
         if (regenDelay <= 0) {
             return;
         }
 
-        EntityLivingBase entity = event.getEntityLiving();
+        LivingEntity entity = event.getEntityLiving();
         if (entity != null && !entity.world.isRemote) {
-            boolean isTamed = entity instanceof EntityTameable && ((EntityTameable) entity).isTamed();
+            boolean fullHp = entity.getHealth() == entity.getMaxHealth();
+            boolean isTamed = entity instanceof TameableEntity && ((TameableEntity) entity).isTamed();
             boolean isRegenTime = entity.hurtResistantTime <= 0 && entity.ticksExisted % regenDelay == 0;
-            if (isTamed && isRegenTime) {
+            if (isTamed && isRegenTime && !fullHp) {
                 entity.heal(2f);
+                ScalingHealth.LOGGER.debug("Healing Tamed Animal");
             }
         }
-        */
     }
 }

@@ -43,23 +43,17 @@ import java.util.function.Supplier;
 public class EquipmentTierMap {
     private static final Marker MARKER = MarkerManager.getMarker("EquipmentTierMap");
 
-    public final Integer tierCount;
+    public int maxTier = 0;
     public final EquipmentSlotType slot;
 
     List<List<EquipmentEntry>> sets;
 
-    public EquipmentTierMap(CommentedConfig config) {
-        this.tierCount = config.get("maxTier");
-        this.slot = EquipmentSlotType.fromString(config.get("equipmentType"));
+    public EquipmentTierMap(EquipmentSlotType type) {
+        this.slot = type;
 
-        if(tierCount == null){
-            throw new IllegalArgumentException("The wrong config was given");
-        }
-
+        //Init the list, plus add an empty list since we don't have a tier 0.
         sets = new ArrayList<>();
-        for (int i = 0; i <= tierCount; ++i) {
-            sets.add(new ArrayList<>());
-        }
+        sets.add(new ArrayList<>());
     }
 
     @ParametersAreNullableByDefault
@@ -67,8 +61,15 @@ public class EquipmentTierMap {
         //if our entry is null, we simply do not add it to our set
         if(entry == null) return;
 
-        if (entry.getTier() <= 0 || entry.getTier()  > tierCount) {
-            throw new IllegalArgumentException(entry.getTier() + " is invalid, tier must be between 1 and " + tierCount);
+        if(entry.tier > maxTier) {
+            for (int i = maxTier; i < entry.tier; ++i) {
+                sets.add(new ArrayList<>());
+            }
+            maxTier = entry.tier;
+        }
+
+        if (entry.getTier() <= 0) {
+            throw new IllegalArgumentException(entry.getTier() + " is invalid, tier must be higher than 0");
         }
         if(MobEntity.getSlotForItemStack(entry.getEquipment().get()) != slot){
             throw new IllegalArgumentException("This item, " + entry.getEquipment().get().getItem().getName().getString() + ", is not valid for this slot: " + slot.getName());
@@ -78,8 +79,8 @@ public class EquipmentTierMap {
 
     @Nullable
     private EquipmentEntry getRandom(int tier) {
-        if (tier <= 0 || tier > tierCount) {
-            throw new IllegalArgumentException(tier + " is invalid, tier must be between 1 and " + tierCount);
+        if (tier <= 0 || tier > maxTier) {
+            throw new IllegalArgumentException(tier + " is invalid, tier must be between 1 and " + maxTier);
         }
 
         List<EquipmentEntry> list = sets.get(tier);
@@ -93,8 +94,8 @@ public class EquipmentTierMap {
 
     @Nullable
     public EquipmentEntry get(int tier, int index) {
-        if (tier < 0 || tier >= tierCount) {
-            throw new IllegalArgumentException(tier + " is invalid, tier must be between 1 and " + tierCount);
+        if (tier <= 0 || tier >= maxTier) {
+            throw new IllegalArgumentException(tier + " is invalid, tier must be between 1 and " + maxTier);
         }
 
         List<EquipmentEntry> list = sets.get(tier);
@@ -108,22 +109,26 @@ public class EquipmentTierMap {
     }
 
     public void equip(MobEntity mob, int tier){
+        ScalingHealth.LOGGER.debug(MARKER, "Equipping with tier {}", tier);
         IDifficultyAffected data = SHDifficulty.affected(mob);
         EquipmentEntry entry = getRandom(tier);
         if(entry == null) return;
         ItemStack equipment = entry.equipment.get();
-
+        ScalingHealth.LOGGER.debug(MARKER, "Entry is {}", entry);
         //decide whether to equip or not
-        if(!equipment.canEquip(equipment.getEquipmentSlot(), mob) || data.affectiveDifficulty(mob.world) <= entry.getCost()) return;
-
-        //TODO cost can be 0, would have to check or else I will get an exception and crash
-        int chances = tier + (int) data.affectiveDifficulty(mob.world) / entry.getCost();
-        if(chances < 1) chances = 1;
+        if(data.affectiveDifficulty(mob.world) <= entry.getCost()) return;
+        //TODO check if mob can equip? doesnt seem to matter though..
+        int chances;
+        if(entry.getCost() == 0)
+            chances = tier*5;
+        else
+            chances = tier + (int) (data.affectiveDifficulty(mob.world) / entry.getCost() / tier);  //if tier = 3 and cost is 40. Has 3 rolls by default + 1 each 120 difficulty (cost*tier)
+                                                                                                    //in contrast tier = 2 and cost is 40, 2 rolls by default + 1 per 80 difficulty
         boolean equip = false;
-        int success = this.tierCount*2;
+        int success = this.maxTier * 3;
         for(int i = chances; i > 0; i--){
             ScalingHealth.LOGGER.debug(MARKER, "rolling");
-            //each time have 1 in 2*maxTier chances of success
+            //each time have 1 in success chances of success
             if((int) (Math.random()*success + 1) == success) equip = true;
         }
         if(!equip) return;
@@ -132,19 +137,19 @@ public class EquipmentTierMap {
         //we decided to equip so now we apply enchantment
         entry.getEnchantments().forEach(enchant -> {
             //TODO add possiblity for non-minecraft enchants
-            Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation("", enchant));
+            Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(enchant));
             int enchantLevel = 0;
             //Might need to tweak this, because it might not be balanced... at first try changing the 3 for a higher number
-            if(((int) (Math.random()*3* SHDifficulty.maxValue(mob.world)/data.affectiveDifficulty(mob.world))) % (this.tierCount + 2) - tier == 0){
-                int r = (int) (Math.random()* (this.tierCount * 2 + 3));
-                if(r <= tierCount * 2){
-                    enchantLevel = MathHelper.clamp(r - this.tierCount + tier, 0, 2 * enchantment.getMaxLevel());
+            if(((int) (Math.random()*3* SHDifficulty.maxValue(mob.world)/data.affectiveDifficulty(mob.world))) % (this.maxTier + 2) - tier == 0){
+                int r = (int) (Math.random()* (this.maxTier * 2 + 3));
+                if(r <= maxTier * 2){
+                    enchantLevel = MathHelper.clamp(r - this.maxTier + tier, 0, 2 * enchantment.getMaxLevel());
                 }
             }
             equipment.addEnchantment(enchantment, enchantLevel);
         });
         ScalingHealth.LOGGER.debug(MARKER,"Equipped: " + equipment.getItem().getName().getString());
-        mob.setItemStackToSlot(this.slot, equipment);
+        mob.setItemStackToSlot(this.slot, equipment.copy());
     }
 
     public static class EquipmentEntry {
@@ -203,7 +208,7 @@ public class EquipmentTierMap {
 
         @Override
         public String toString() {
-            return "EffectEntry{" +
+            return "EquipmentEntry{" +
                     "equipment=" + equipment.get().getItem().getRegistryName() +
                     ", enchantments=" + enchantments +
                     ", cost=" + cost +

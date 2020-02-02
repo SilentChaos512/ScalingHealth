@@ -56,7 +56,7 @@ public final class BlightFireRenderer extends EntityRenderer<BlightFireEntity> {
 
     @Override
     public boolean shouldRender(BlightFireEntity fire, ICamera camera, double camX, double camY, double camZ) {
-        MobEntity parent = fire.getParent();
+        MobEntity parent = (MobEntity) fire.getRidingEntity();
         if (parent == null)
             return false;
 
@@ -74,7 +74,7 @@ public final class BlightFireRenderer extends EntityRenderer<BlightFireEntity> {
 
     @Override
     public void doRender(BlightFireEntity fire, double x, double y, double z, float entityYaw, float partialTicks) {
-        MobEntity parent = fire.getParent();
+        MobEntity parent = (MobEntity) fire.getRidingEntity();
         if (parent == null) return;
 
         GlStateManager.disableLighting();

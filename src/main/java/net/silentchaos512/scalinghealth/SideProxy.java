@@ -1,13 +1,7 @@
 package net.silentchaos512.scalinghealth;
 
-import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.EntityType;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.particles.ParticleType;
-import net.minecraft.potion.Effect;
-import net.minecraft.util.SoundEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.event.lifecycle.*;
@@ -20,7 +14,6 @@ import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
 import net.silentchaos512.scalinghealth.client.gui.DebugOverlay;
 import net.silentchaos512.scalinghealth.client.gui.difficulty.DifficultyMeter;
 import net.silentchaos512.scalinghealth.client.gui.health.HeartDisplayHandler;
-import net.silentchaos512.scalinghealth.client.particles.ModParticles;
 import net.silentchaos512.scalinghealth.command.ModCommands;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.event.DamageScaling;
@@ -42,14 +35,6 @@ public class SideProxy {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::imcProcess);
         MinecraftForge.EVENT_BUS.addListener(this::serverAboutToStart);
         MinecraftForge.EVENT_BUS.addListener(this::serverStarted);
-
-        //FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Block.class, ModBlocks::registerAll);
-        //FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(EntityType.class, ModEntities::registerAll);
-        //FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Item.class, ModItems::registerAll);
-        //FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(ParticleType.class, ModParticles::registerAll);
-        //FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Effect.class, ModPotions::registerAll);
-        //FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(SoundEvent.class, ModSounds::registerAll);
-//        FMLModLoadingContext.get().getModEventBus().addListener(ModTileEntities::registerAll);
 
         MinecraftForge.EVENT_BUS.register(PetEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(DamageScaling.INSTANCE);

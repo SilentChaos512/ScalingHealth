@@ -31,11 +31,10 @@ public final class MobDifficultyHandler {
     }
 
     public static boolean shouldBecomeBlight(MobEntity entity, float difficulty) {
-        if (SHMobs.canBecomeBlight(entity)) {
-            double chance = getBlightChance(entity, difficulty);
-            return MathUtils.tryPercentage(ScalingHealth.random, chance);
-        }
-        return false;
+        if (!SHMobs.canBecomeBlight(entity))
+            return false;
+        double chance = getBlightChance(entity, difficulty);
+        return MathUtils.tryPercentage(ScalingHealth.random, chance);
     }
 
     public static void setEntityProperties(MobEntity entity, IDifficultyAffected data, boolean makeBlight) {
@@ -47,8 +46,7 @@ public final class MobDifficultyHandler {
         if (makeBlight) {
             data.setIsBlight(true);
             if(EntityGroup.from(entity) == EntityGroup.BOSS){
-                StringTextComponent name = new StringTextComponent("Blight " + entity.getName().getString());
-                name.setStyle(new Style().setColor(TextFormatting.DARK_PURPLE));
+                StringTextComponent name = (StringTextComponent) new StringTextComponent("Blight " + entity.getName().getString()).setStyle(new Style().setColor(TextFormatting.DARK_PURPLE));
                 entity.setCustomName(name);
             }
         }
@@ -92,7 +90,7 @@ public final class MobDifficultyHandler {
 
         // Random potion effect
         SHMobs.getMobPotionConfig(world).tryApply(entity, difficulty);
-        //SHMobs.equipAll(entity);
+        SHMobEquipment.equipAll(entity);
 
         // Apply extra health and damage.
         MobHealthMode mode = EntityGroup.from(entity).getHealthMode(entity);

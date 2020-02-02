@@ -18,6 +18,7 @@
 
 package net.silentchaos512.scalinghealth.entity;
 
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.passive.CatEntity;
@@ -29,6 +30,7 @@ import net.minecraft.network.datasync.DataSerializers;
 import net.minecraft.network.datasync.EntityDataManager;
 import net.minecraft.network.play.server.SSpawnObjectPacket;
 import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.common.registry.IEntityAdditionalSpawnData;
 import net.minecraftforge.fml.network.NetworkHooks;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -37,39 +39,33 @@ import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
 import javax.annotation.Nullable;
+import java.util.UUID;
 
-public class BlightFireEntity extends Entity implements IEntityAdditionalSpawnData {
-    private static final Marker MARKER = MarkerManager.getMarker("BlightFireEntity");
-    private static final String NBT_PARENT = "ParentBlight";
-
-    private static final DataParameter<Integer> PARENT = EntityDataManager.createKey(BlightFireEntity.class, DataSerializers.VARINT);
-
+public class BlightFireEntity extends Entity {
     public BlightFireEntity(World worldIn) {
         super(ModEntities.BLIGHT_FIRE.type(), worldIn);
     }
 
-    public BlightFireEntity(MobEntity parent) {
-        this(parent.world);
-        this.dataManager.set(PARENT, parent.getEntityId());
-        this.startRiding(parent);
+    public BlightFireEntity(MobEntity p) {
+        this(p.world);
+        this.startRiding(p);
     }
 
     @Override
     protected void registerData() {
-        this.dataManager.register(PARENT, 1);
+
     }
 
     @Override
     public void tick() {
         // Server side only, blight fire must have a parent.
-        if(!world.isRemote){
-            MobEntity p = (MobEntity) world.getEntityByID(this.dataManager.get(PARENT));
-            if (p == null || !p.isAlive()) {
-                if (ScalingHealth.LOGGER.isDebugEnabled()) {
-                    ScalingHealth.LOGGER.debug("Removed blight fire (parent missing or dead)");
-                }
-                remove();
+        if(world.isRemote) return;
+        Entity parent = this.getRidingEntity();
+        if (parent == null || !parent.isAlive()) {
+            if (ScalingHealth.LOGGER.isDebugEnabled()) {
+                ScalingHealth.LOGGER.debug("Removed blight fire (parent missing or dead)");
             }
+            remove();
         }
     }
 
@@ -80,44 +76,17 @@ public class BlightFireEntity extends Entity implements IEntityAdditionalSpawnDa
 
     @Override
     protected void readAdditional(CompoundNBT compound) {
-        if (compound.contains(NBT_PARENT)) {
-            int id = compound.getInt(NBT_PARENT);
-            Entity entity = world.getEntityByID(id);
-            if (entity instanceof MobEntity)
-                this.dataManager.set(PARENT, id);
-        }
+
     }
 
     @Override
     protected void writeAdditional(CompoundNBT compound) {
-        if (world.getEntityByID(this.dataManager.get(PARENT)) != null) {
-            compound.putInt(NBT_PARENT, this.dataManager.get(PARENT));
-        }
+
     }
 
     @Override
     public IPacket<?> createSpawnPacket() {
         ScalingHealth.LOGGER.debug("Blight Fire spawned on the SERVER");
         return NetworkHooks.getEntitySpawningPacket(this);
-    }
-
-    @Nullable
-    public MobEntity getParent() {
-        return (MobEntity) world.getEntityByID(this.dataManager.get(PARENT));
-    }
-
-    @Override
-    public void writeSpawnData(PacketBuffer buffer) {
-        buffer.writeInt(world.getEntityByID(this.dataManager.get(PARENT)) == null ? -1 : this.dataManager.get(PARENT));
-    }
-
-    @Override
-    public void readSpawnData(PacketBuffer additionalData) {
-        int id = additionalData.readInt();
-        if (id != -1) {
-            Entity entity = world.getEntityByID(id);
-            if (entity instanceof MobEntity)
-                this.dataManager.set(PARENT, id);
-        }
     }
 }
