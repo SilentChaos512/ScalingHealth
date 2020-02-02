@@ -15,15 +15,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class HelmetConfig {
+public class ChestConfig {
     Lazy<EquipmentTierMap> equipments;
 
     /**
-     * @param path              the path of the config (mob.equipment.ARMORTYPE)
+     * @param path              the path of the config (equipments.ARMORTYPE)
      * @param defaultSettings   list of the commented configs - the first entry HAS to be the return:  fromGeneral
      * @return                  an instance
      */
-    public static HelmetConfig init(ConfigSpecWrapper wrapper, String path, boolean includeCost, List<CommentedConfig> defaultSettings){
+    public static ChestConfig init(ConfigSpecWrapper wrapper, String path, boolean includeCost, List<CommentedConfig> defaultSettings){
         ConfigSpec spec = new ConfigSpec();
 
         List<String> enchantments = new ArrayList<>();
@@ -35,18 +35,17 @@ public class HelmetConfig {
 
         ConfigValue<List<? extends CommentedConfig>> helmetConfig = wrapper
                 .builder(path)
-                .comment("The first section initializes the equipment type",
-                        "Each other section is a piece of equipment with it's own enchantment possibilities, cost and tier")
+                .comment("CHEST ARMOR")
                 .defineList(defaultSettings, o -> {
                     if (!(o instanceof CommentedConfig)) return false;
                     return spec.isCorrect((CommentedConfig) o);
                 });
-        HelmetConfig result = new HelmetConfig();
+        ChestConfig result = new ChestConfig();
 
         result.equipments = Lazy.of(() -> {
-            EquipmentTierMap map = new EquipmentTierMap(EquipmentSlotType.HEAD);
+            EquipmentTierMap map = new EquipmentTierMap(EquipmentSlotType.CHEST);
             for(int i = 0; i < helmetConfig.get().size(); i++){
-                map.put(EquipmentTierMap.EquipmentEntry.from(helmetConfig.get().get(i), true));
+                map.put(EquipmentTierMap.EquipmentEntry.from(helmetConfig.get().get(i), includeCost));
             }
             return map;
         });

@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class HelmetConfig {
+public class WeaponConfig {
     Lazy<EquipmentTierMap> equipments;
 
     /**
@@ -23,7 +23,7 @@ public class HelmetConfig {
      * @param defaultSettings   list of the commented configs - the first entry HAS to be the return:  fromGeneral
      * @return                  an instance
      */
-    public static HelmetConfig init(ConfigSpecWrapper wrapper, String path, boolean includeCost, List<CommentedConfig> defaultSettings){
+    public static WeaponConfig init(ConfigSpecWrapper wrapper, String path, boolean includeCost, List<CommentedConfig> defaultSettings){
         ConfigSpec spec = new ConfigSpec();
 
         List<String> enchantments = new ArrayList<>();
@@ -41,12 +41,12 @@ public class HelmetConfig {
                     if (!(o instanceof CommentedConfig)) return false;
                     return spec.isCorrect((CommentedConfig) o);
                 });
-        HelmetConfig result = new HelmetConfig();
+        WeaponConfig result = new WeaponConfig();
 
         result.equipments = Lazy.of(() -> {
-            EquipmentTierMap map = new EquipmentTierMap(EquipmentSlotType.HEAD);
+            EquipmentTierMap map = new EquipmentTierMap(EquipmentSlotType.MAINHAND);
             for(int i = 0; i < helmetConfig.get().size(); i++){
-                map.put(EquipmentTierMap.EquipmentEntry.from(helmetConfig.get().get(i), true));
+                map.put(EquipmentTierMap.EquipmentEntry.from(helmetConfig.get().get(i), includeCost));
             }
             return map;
         });

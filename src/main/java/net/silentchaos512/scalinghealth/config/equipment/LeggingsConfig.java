@@ -15,15 +15,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class LeggingConfig {
+public class LeggingsConfig {
     Lazy<EquipmentTierMap> equipments;
 
     /**
-     * @param path              the path of the config (equipment.ARMORTYPE)
+     * @param path              the path of the config (equipments.ARMORTYPE)
      * @param defaultSettings   list of the commented configs - the first entry HAS to be the return:  fromGeneral
      * @return                  an instance
      */
-    public static LeggingConfig init(ConfigSpecWrapper wrapper, String path, boolean includeCost, List<CommentedConfig> defaultSettings){
+    public static LeggingsConfig init(ConfigSpecWrapper wrapper, String path, boolean includeCost, List<CommentedConfig> defaultSettings){
         ConfigSpec spec = new ConfigSpec();
 
         List<String> enchantments = new ArrayList<>();
@@ -35,13 +35,12 @@ public class LeggingConfig {
 
         ConfigValue<List<? extends CommentedConfig>> helmetConfig = wrapper
                 .builder(path)
-                .comment("The first section initializes the equipment type",
-                        "Each other section is a piece of equipment with it's own enchantment possibilities, cost and tier")
+                .comment("LEGGINGS ARMOR")
                 .defineList(defaultSettings, o -> {
                     if (!(o instanceof CommentedConfig)) return false;
                     return spec.isCorrect((CommentedConfig) o);
                 });
-        LeggingConfig result = new LeggingConfig();
+        LeggingsConfig result = new LeggingsConfig();
 
         result.equipments = Lazy.of(() -> {
             EquipmentTierMap map = new EquipmentTierMap(EquipmentSlotType.LEGS);
