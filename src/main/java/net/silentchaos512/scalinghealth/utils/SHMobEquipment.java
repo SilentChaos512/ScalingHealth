@@ -20,7 +20,7 @@ public final class SHMobEquipment {
         HelmetConfig config = Config.get(entity).equipment.equipmentHelmet;
         //adding 1 to max tier or else the max tier will only happen on max diff
         int tier = (int) ((config.getMaxTier()+ 1) * SHDifficulty.affected(entity).affectiveDifficulty(entity.world) / SHDifficulty.maxValue(entity.world));
-        ScalingHealth.LOGGER.debug("HELMET: Maxtier = {}, mob diff = {}, max = {}, tier = {}", config.getMaxTier(), SHDifficulty.affected(entity).affectiveDifficulty(entity.world), SHDifficulty.maxValue(entity.world), tier);
+        //ScalingHealth.LOGGER.debug("HELMET: Maxtier = {}, mob diff = {}, max = {}, tier = {}", config.getMaxTier(), SHDifficulty.affected(entity).affectiveDifficulty(entity.world), SHDifficulty.maxValue(entity.world), tier);
 
         if(tier > config.getMaxTier())
             tier = config.getMaxTier();
@@ -38,7 +38,7 @@ public final class SHMobEquipment {
         ChestConfig config = Config.get(entity).equipment.equipmentChest;
         //adding 1 to max tier or else the max tier will only happen on max diff
         int tier = (int) ((config.getMaxTier()+ 1) * SHDifficulty.affected(entity).affectiveDifficulty(entity.world) / SHDifficulty.maxValue(entity.world));
-        ScalingHealth.LOGGER.debug("Chestplate: Maxtier = {}, mob diff = {}, max = {}, tier = {}", config.getMaxTier(), SHDifficulty.affected(entity).affectiveDifficulty(entity.world), SHDifficulty.maxValue(entity.world), tier);
+        //ScalingHealth.LOGGER.debug("Chestplate: Maxtier = {}, mob diff = {}, max = {}, tier = {}", config.getMaxTier(), SHDifficulty.affected(entity).affectiveDifficulty(entity.world), SHDifficulty.maxValue(entity.world), tier);
 
         if(tier > config.getMaxTier())
             tier = config.getMaxTier();
@@ -57,7 +57,7 @@ public final class SHMobEquipment {
         LeggingsConfig config = Config.get(entity).equipment.equipmentLegging;
         //adding 1 to max tier or else the max tier will only happen on max diff
         int tier = (int) ((config.getMaxTier()+ 1) * SHDifficulty.affected(entity).affectiveDifficulty(entity.world) / SHDifficulty.maxValue(entity.world));
-        ScalingHealth.LOGGER.debug("Leggings: Maxtier = {}, mob diff = {}, max = {}, tier = {}", config.getMaxTier(), SHDifficulty.affected(entity).affectiveDifficulty(entity.world), SHDifficulty.maxValue(entity.world), tier);
+        //ScalingHealth.LOGGER.debug("Leggings: Maxtier = {}, mob diff = {}, max = {}, tier = {}", config.getMaxTier(), SHDifficulty.affected(entity).affectiveDifficulty(entity.world), SHDifficulty.maxValue(entity.world), tier);
 
         if(tier > config.getMaxTier())
             tier = config.getMaxTier();
@@ -76,7 +76,7 @@ public final class SHMobEquipment {
         BootsConfig config =  Config.get(entity).equipment.equipmentBoots;
         //adding 1 to max tier or else the max tier will only happen on max diff
         int tier = (int) ((config.getMaxTier()+ 1) * SHDifficulty.affected(entity).affectiveDifficulty(entity.world) / SHDifficulty.maxValue(entity.world));
-        ScalingHealth.LOGGER.debug("Boots: Maxtier = {}, mob diff = {}, max = {}, tier = {}", config.getMaxTier(), SHDifficulty.affected(entity).affectiveDifficulty(entity.world), SHDifficulty.maxValue(entity.world), tier);
+        //ScalingHealth.LOGGER.debug("Boots: Maxtier = {}, mob diff = {}, max = {}, tier = {}", config.getMaxTier(), SHDifficulty.affected(entity).affectiveDifficulty(entity.world), SHDifficulty.maxValue(entity.world), tier);
 
         if(tier > config.getMaxTier())
             tier = config.getMaxTier();

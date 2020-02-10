@@ -1,21 +1,24 @@
 package net.silentchaos512.scalinghealth.utils;
 
 import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.world.World;
 import net.silentchaos512.scalinghealth.config.Config;
+import net.silentchaos512.scalinghealth.config.DimensionConfig;
+import net.silentchaos512.scalinghealth.config.EvalVars;
 import net.silentchaos512.scalinghealth.config.MobPotionConfig;
 import net.silentchaos512.scalinghealth.lib.MobHealthMode;
 
 public final class SHMobs {
     private SHMobs() {throw new IllegalAccessError("Utility class");}
 
-    //TODO: implement
+    //TODO: implement a list of mobs that won't be affected by difficulty
     public static boolean allowsDifficultyChanges(MobEntity entity) {
         return true;
     }
 
     public static boolean canBecomeBlight(MobEntity entity) {
-        return !Config.get(entity.world).mobs.isMobExempt(entity);
+        return !Config.get(entity.world).mobs.isMobBlightExempt(entity);
     }
 
     public static boolean isBlight(MobEntity entity) {

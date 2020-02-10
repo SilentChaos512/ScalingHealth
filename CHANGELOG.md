@@ -3,6 +3,13 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.3.14] - 2020-02-09
+### Added
+- Kill mutators now work, a config option
+### Fixed
+- Ore texture's background is now the 1.14 stone texture instead of the old one
+- Coming back from the End will no longer reset your stats.
+
 ## [2.3.13] - 2020-02-02
 Friendly reminder to backup your worlds, had some weird crashes, shouldn't happen, but you never know
 ### Added

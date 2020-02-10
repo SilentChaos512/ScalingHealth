@@ -117,7 +117,7 @@ public class EquipmentTierMap {
         ScalingHealth.LOGGER.debug(MARKER, "Entry is {}", entry);
         //decide whether to equip or not
         if(data.affectiveDifficulty(mob.world) <= entry.getCost()) return;
-        //TODO check if mob can equip? doesnt seem to matter though..
+        //TODO check if mob can equip? doesn't seem to matter though..
         int chances;
         if(entry.getCost() == 0)
             chances = tier*5;
@@ -127,16 +127,15 @@ public class EquipmentTierMap {
         boolean equip = false;
         int success = this.maxTier * 3;
         for(int i = chances; i > 0; i--){
-            ScalingHealth.LOGGER.debug(MARKER, "rolling");
             //each time have 1 in success chances of success
             if((int) (Math.random()*success + 1) == success) equip = true;
+            if(equip) break;
         }
         if(!equip) return;
         ScalingHealth.LOGGER.debug(MARKER, "Success");
 
         //we decided to equip so now we apply enchantment
         entry.getEnchantments().forEach(enchant -> {
-            //TODO add possiblity for non-minecraft enchants
             Enchantment enchantment = ForgeRegistries.ENCHANTMENTS.getValue(new ResourceLocation(enchant));
             int enchantLevel = 0;
             //Might need to tweak this, because it might not be balanced... at first try changing the 3 for a higher number

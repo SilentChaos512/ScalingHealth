@@ -9,6 +9,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -74,8 +75,6 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
         }
 
         // TODO: Difficulty by Game Stages
-
-        // TODO: Health by XP
     }
 
     private void checkPlayerIdle(PlayerEntity player){
@@ -91,8 +90,7 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
         if(timeAfk > 120){
             if(!afk) {
                 afk = true;
-                //TODO use a translation text component instead
-                if(SHDifficulty.afkMessage(player.world)) player.sendMessage(new StringTextComponent("You are now afk, you will gain less difficulty with time"));
+                if(SHDifficulty.afkMessage(player.world)) player.sendMessage(new TranslationTextComponent("misc.scalinghealth.afkmessage"));
             }
         }
 

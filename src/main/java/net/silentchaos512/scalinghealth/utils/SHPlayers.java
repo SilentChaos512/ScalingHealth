@@ -65,8 +65,8 @@ public final class SHPlayers {
         int deathHp = (int) EvalVars.apply(config, player, config.player.setHealthOnDeath.get());
         int maxHp = maxHealth(player);
         int minHp = minHealth(player);
-        int hp = deathHp < minHp ? minHp : deathHp;
-        hp = hp > maxHp ? maxHp : hp;
+        int hp = Math.max(deathHp, minHp);
+        hp = Math.min(hp, maxHp);
         return hp;
     }
 

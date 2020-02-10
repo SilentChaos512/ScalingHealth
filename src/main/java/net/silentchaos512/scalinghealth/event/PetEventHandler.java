@@ -28,6 +28,7 @@ import net.silentchaos512.scalinghealth.config.Config;
 
 @Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class PetEventHandler {
+    //TODO add option to add heart crystals to pets.
     public static PetEventHandler INSTANCE = new PetEventHandler();
     @SubscribeEvent
     public void onLivingUpdate(LivingUpdateEvent event) {

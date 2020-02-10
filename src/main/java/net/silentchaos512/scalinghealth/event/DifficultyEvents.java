@@ -3,6 +3,7 @@ package net.silentchaos512.scalinghealth.event;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.text.StringTextComponent;
@@ -11,6 +12,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -84,6 +86,26 @@ public final class DifficultyEvents {
     }
 
     @SubscribeEvent
+    public static void onMobDeath(LivingDeathEvent event){
+        if(!(event.getEntityLiving() instanceof MobEntity)) return;
+        MobEntity entity = (MobEntity) event.getEntityLiving();
+        if (event.getSource() == null || event.getEntity().world.isRemote)
+            return;
+
+        Entity entitySource = event.getSource().getTrueSource();
+        boolean isTamedAnimal = entitySource instanceof TameableEntity && ((TameableEntity) entitySource).isTamed();
+        if (entitySource instanceof PlayerEntity ) {
+            SHDifficulty.setSourceDifficulty((PlayerEntity) entitySource, SHDifficulty.applyKillMutator(entity, (PlayerEntity) entitySource));
+            return;
+        }
+        if(isTamedAnimal){
+            TameableEntity pet = (TameableEntity) entitySource;
+            if(pet.getOwner() instanceof PlayerEntity)
+                SHDifficulty.setSourceDifficulty(((PlayerEntity) pet.getOwner()), SHDifficulty.applyKillMutator(entity, (PlayerEntity) pet.getOwner()));
+        }
+    }
+
+    @SubscribeEvent
     public static void onWorldTick(TickEvent.WorldTickEvent event) {
         if(event.phase == TickEvent.Phase.START) return;
         World world = event.world;
@@ -107,15 +129,15 @@ public final class DifficultyEvents {
 
     @SubscribeEvent
     public static void onPlayerClone(PlayerEvent.Clone event) {
-        // If not dead, player is returning from the End
-        if (!event.isWasDeath()) return;
-
-        // Player died. Copy capabilities before applying health/difficulty changes.
+        // Player is cloned. Copy capabilities before applying health/difficulty changes if needed.
         PlayerEntity original = event.getOriginal();
         PlayerEntity clone = event.getPlayer();
         debug(() -> "onPlayerClone");
         copyCapability(PlayerDataCapability.INSTANCE, original, clone);
         copyCapability(DifficultySourceCapability.INSTANCE, original, clone);
+
+        // If not dead, player is returning from the End
+        if (!event.isWasDeath()) return;
 
         // Apply death mutators
         clone.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> {

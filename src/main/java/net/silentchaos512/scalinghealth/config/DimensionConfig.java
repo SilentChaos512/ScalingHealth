@@ -40,6 +40,25 @@ public class DimensionConfig {
         }
     }
 
+    /*
+        new TranslationTextComponent("config.scalinghealth.area_mode.weighted_average").getFormattedText(),
+        new TranslationTextComponent("config.scalinghealth.area_mode.weighted_average.desc").getFormattedText(),
+        new TranslationTextComponent("config.scalinghealth.area_mode.average").getFormattedText(),
+        new TranslationTextComponent("config.scalinghealth.area_mode.average.desc").getFormattedText(),
+        new TranslationTextComponent("config.scalinghealth.area_mode.min_level").getFormattedText(),
+        new TranslationTextComponent("config.scalinghealth.area_mode.min_level.desc").getFormattedText(),
+        new TranslationTextComponent("config.scalinghealth.area_mode.max_level").getFormattedText(),
+        new TranslationTextComponent("config.scalinghealth.area_mode.max_level.desc").getFormattedText(),
+        new TranslationTextComponent("config.scalinghealth.area_mode.distance_from_spawn").getFormattedText(),
+        new TranslationTextComponent("config.scalinghealth.area_mode.distance_from_spawn.desc").getFormattedText(),
+        new TranslationTextComponent("config.scalinghealth.area_mode.distance_from_origin").getFormattedText(),
+        new TranslationTextComponent("config.scalinghealth.area_mode.distance_from_origin.desc").getFormattedText(),
+        new TranslationTextComponent("config.scalinghealth.area_mode.distance_and_time").getFormattedText(),
+        new TranslationTextComponent("config.scalinghealth.area_mode.distance_and_time.desc").getFormattedText(),
+        new TranslationTextComponent("config.scalinghealth.area_mode.dimension_wide").getFormattedText(),
+        new TranslationTextComponent("config.scalinghealth.area_mode.dimension_wide.desc").getFormattedText())
+     */
+
     public static class Difficulty {
         // Standard options
         //TODO bunch of config desc in the lang files, remove hardcoded descriptions and use translation components
@@ -261,7 +280,6 @@ public class DimensionConfig {
         }
 
         public Expression getKillMutator(LivingEntity entity) {
-            //TODO implement
             //Might be nice if there was a more generic way to handle lists of tables.
             //But this works for now.
             String name = Objects.requireNonNull(entity.getType().getRegistryName()).toString();
@@ -450,7 +468,7 @@ public class DimensionConfig {
         public final MobPotionConfig randomPotions;
 
         // Blights
-        private final ConfigValue<List<? extends String>> mobsExempt;
+        private final ConfigValue<List<? extends String>> mobsBlightExempt;
         //private final ConfigValue<List<? extends String>> blightArmor;
         public final DoubleValue blightDiffModifier;
         public final MobPotionConfig blightPotions;
@@ -509,7 +527,7 @@ public class DimensionConfig {
                     .build());
 
             // Blights
-            mobsExempt = wrapper
+            mobsBlightExempt = wrapper
                     .builder("mob.blight.exemptedMobs")
                     .comment("These mobs won't be able to become blight, to add use - MODID:entity_name - except for mc mobs, minecraft: can be omitted as shown")
                     .defineList(ImmutableList.of("bat", "cat", "chicken", "cod", "cow", "donkey", "fox", "horse", "mooshroom",
@@ -535,9 +553,9 @@ public class DimensionConfig {
                     .defineInRange(2, 1, Double.MAX_VALUE);
         }
 
-        public boolean isMobExempt(MobEntity entity) {
+        public boolean isMobBlightExempt(MobEntity entity) {
             ResourceLocation rl = entity.getType().getRegistryName();
-            List<? extends String> list = mobsExempt.get();
+            List<? extends String> list = mobsBlightExempt.get();
             for (String value : list) {
                 ResourceLocation rl2 = ResourceLocation.tryCreate(value);
                 if(rl2 == null)

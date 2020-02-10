@@ -2,6 +2,7 @@ package net.silentchaos512.scalinghealth.utils;
 
 import com.udojava.evalex.Expression;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.BlockPos;
@@ -13,6 +14,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.silentchaos512.lib.util.MCMathUtils;
+import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.DifficultyAffectedCapability;
 import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
 import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
@@ -21,6 +23,7 @@ import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.DimensionConfig;
 import net.silentchaos512.scalinghealth.config.EvalVars;
 import net.silentchaos512.scalinghealth.lib.AreaDifficultyMode;
+import net.silentchaos512.utils.MathUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,6 +45,15 @@ public final class SHDifficulty {
     public static IDifficultySource source(ICapabilityProvider source) {
         return source.getCapability(DifficultySourceCapability.INSTANCE)
                 .orElseGet(DifficultySourceCapability::new);
+    }
+
+    public static void setSourceDifficulty(PlayerEntity player, double difficulty){
+        IDifficultySource source = SHDifficulty.source(player);
+        if (!MathUtils.doublesEqual(source.getDifficulty(), difficulty)) {
+            // Update difficulty after sleeping
+            source.setDifficulty((float) difficulty);                               //player diff
+            SHDifficulty.source(player.world).setDifficulty((float) difficulty);    //world diff
+        }
     }
 
     @SuppressWarnings("TypeMayBeWeakened")
@@ -154,6 +166,12 @@ public final class SHDifficulty {
     public static double getDifficultyAfterDeath(PlayerEntity player, DimensionType deathDimension) {
         DimensionConfig config = Config.get(deathDimension);
         return EvalVars.apply(config, player, config.difficulty.onPlayerDeath.get());
+    }
+
+    public static double applyKillMutator(MobEntity entity, PlayerEntity player){
+        DimensionConfig config = Config.get(entity);
+        ScalingHealth.LOGGER.debug("Applying kill mutator: {}", config.difficulty.getKillMutator(entity));
+        return EvalVars.apply(config, player, config.difficulty.getKillMutator(entity));
     }
 
     public static double diffOnPlayerSleep(PlayerEntity entity){

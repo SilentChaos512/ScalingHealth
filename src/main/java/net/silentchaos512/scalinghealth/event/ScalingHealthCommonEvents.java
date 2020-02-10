@@ -54,7 +54,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.capability.IDifficultySource;
 import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.DimensionConfig;
@@ -144,7 +143,7 @@ public final class ScalingHealthCommonEvents {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public static void onXPDropped(LivingExperienceDropEvent event) {
+    public static void onMobXPDropped(LivingExperienceDropEvent event) {
         LivingEntity entity = event.getEntityLiving();
         // Additional XP from all mobs.
         short difficulty = (short) SHDifficulty.areaDifficulty(entity.world, entity.getPosition());
@@ -241,15 +240,7 @@ public final class ScalingHealthCommonEvents {
     public static void onPlayerWakeUp(PlayerWakeUpEvent event) {
         PlayerEntity player = event.getPlayer();
         if (!player.world.isRemote && !event.updateWorld()) {
-            DimensionConfig config = Config.get(player);
-            IDifficultySource source = SHDifficulty.source(player);
-            double newDifficulty = SHDifficulty.diffOnPlayerSleep(player);
-
-            if (!MathUtils.doublesEqual(source.getDifficulty(), newDifficulty)) {
-                // Update difficulty after sleeping
-                source.setDifficulty((float) newDifficulty);
-                SHDifficulty.source(player.world).setDifficulty((float) newDifficulty);
-            }
+            SHDifficulty.setSourceDifficulty(player, SHDifficulty.diffOnPlayerSleep(player));
         }
     }
 }
