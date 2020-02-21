@@ -30,6 +30,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
+import net.silentchaos512.scalinghealth.config.Config;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
@@ -108,13 +109,15 @@ public class EquipmentTierMap {
         return list.get(index);
     }
 
-    public void equip(MobEntity mob, int tier){
-        ScalingHealth.LOGGER.debug(MARKER, "Equipping with tier {}", tier);
+    public void equip(MobEntity mob, int tier) {
+        if(Config.COMMON.debugLogEquipmentEntries.get().equals(true))
+            ScalingHealth.LOGGER.debug(MARKER, "Equipping with tier {}", tier);
         IDifficultyAffected data = SHDifficulty.affected(mob);
         EquipmentEntry entry = getRandom(tier);
         if(entry == null) return;
         ItemStack equipment = entry.equipment.get();
-        ScalingHealth.LOGGER.debug(MARKER, "Entry is {}", entry);
+        if(Config.COMMON.debugLogEquipmentEntries.get().equals(true))
+            ScalingHealth.LOGGER.debug(MARKER, "Entry is {}", entry);
         //decide whether to equip or not
         if(data.affectiveDifficulty(mob.world) <= entry.getCost()) return;
         //TODO check if mob can equip? doesn't seem to matter though..
@@ -132,7 +135,6 @@ public class EquipmentTierMap {
             if(equip) break;
         }
         if(!equip) return;
-        ScalingHealth.LOGGER.debug(MARKER, "Success");
 
         //we decided to equip so now we apply enchantment
         entry.getEnchantments().forEach(enchant -> {
@@ -146,8 +148,12 @@ public class EquipmentTierMap {
                 }
             }
             equipment.addEnchantment(enchantment, enchantLevel);
+            if(Config.COMMON.debugLogEquipmentEntries.get().equals(true))
+                ScalingHealth.LOGGER.debug(MARKER,"Enchantment applied: " + enchant);
         });
-        ScalingHealth.LOGGER.debug(MARKER,"Equipped: " + equipment.getItem().getName().getString());
+
+        if(Config.COMMON.debugLogEquipmentEntries.get())
+            ScalingHealth.LOGGER.debug(MARKER,"Equipped: " + equipment.getItem().getRegistryName());
         mob.setItemStackToSlot(this.slot, equipment.copy());
     }
 

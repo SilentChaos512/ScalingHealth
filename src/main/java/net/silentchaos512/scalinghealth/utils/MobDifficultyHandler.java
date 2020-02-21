@@ -37,6 +37,11 @@ public final class MobDifficultyHandler {
         return MathUtils.tryPercentage(ScalingHealth.random, chance);
     }
 
+    //TODO change the hardcoded value for a config one
+    private static double getBlightChance(MobEntity entity, float difficulty) {
+        return 0.0625 * difficulty / SHDifficulty.maxValue(entity.world);
+    }
+
     public static void setEntityProperties(MobEntity entity, IDifficultyAffected data, boolean makeBlight) {
         if (!entity.isAlive()) return;
 
@@ -97,9 +102,5 @@ public final class MobDifficultyHandler {
         double healthModAmount = mode.getModifierValue(healthBoost, baseMaxHealth);
         ModifierHandler.addMaxHealth(entity, healthModAmount, mode.getOperator());
         ModifierHandler.addAttackDamage(entity, damageBoost, AttributeModifier.Operation.ADDITION);
-    }
-
-    private static double getBlightChance(MobEntity entity, float difficulty) {
-        return 0.0625 * difficulty / SHDifficulty.maxValue(entity.world);
     }
 }

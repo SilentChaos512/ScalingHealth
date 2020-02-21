@@ -118,7 +118,7 @@ public final class DifficultyCommand {
     }
 
     private static int runGetWorldDifficulty(CommandContext<CommandSource> context) {
-        ServerWorld world = context.getSource().getWorld();
+        ServerWorld world = context.getSource().func_197023_e();
         world.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
             ITextComponent textWorld = new TranslationTextComponent("command.scalinghealth.worldName", world.dimension.getType().getId())
                     .applyTextStyle(TextFormatting.AQUA);
@@ -146,7 +146,7 @@ public final class DifficultyCommand {
 
     private static int runSetWorldDifficulty(CommandContext<CommandSource> context) {
         float amount = FloatArgumentType.getFloat(context, "amount");
-        ServerWorld world = context.getSource().getWorld();
+        ServerWorld world = context.getSource().func_197023_e();
         world.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
             source.setDifficulty(amount);
         });
@@ -165,7 +165,7 @@ public final class DifficultyCommand {
 
     private static int runAddWorldDifficulty(CommandContext<CommandSource> context) {
         float amount = FloatArgumentType.getFloat(context, "amount");
-        ServerWorld world = context.getSource().getWorld();
+        ServerWorld world = context.getSource().func_197023_e();
         world.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
             source.addDifficulty(amount);
         });

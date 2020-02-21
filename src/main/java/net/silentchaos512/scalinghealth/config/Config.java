@@ -285,6 +285,7 @@ public final class Config {
         public final Supplier<Boolean> debugShowOverlay;
         public final Supplier<Boolean> debugLogEntitySpawns;
         public final Supplier<Boolean> debugLogScaledDamage;
+        public final Supplier<Boolean> debugLogEquipmentEntries;
 
         Common(ConfigSpecWrapper wrapper) {
             wrapper.comment("debug",
@@ -308,6 +309,11 @@ public final class Config {
                     .builder("debug.logDamageScaling")
                     .comment("Log details of scaled damage, useful for fine-tuning damage scaling.",
                             "May create a fair amount of log spam, but shouldn't slow down the game too much.")
+                    .define(true));
+            debugLogEquipmentEntries = withMasterCheck(wrapper
+                    .builder("debug.logEquipmentEntries")
+                    .comment("Log details of equipment entries.",
+                            "Likely going to lag slightly, mostly depending on the difficulty")
                     .define(true));
         }
 

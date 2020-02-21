@@ -30,7 +30,7 @@ public final class RecalculateCommand {
 
     private static int recalculateAllEntities(CommandContext<CommandSource> context) {
         AtomicInteger processed = new AtomicInteger(0);
-        context.getSource().getWorld().getEntities().filter(e -> e instanceof MobEntity).forEach(entity -> {
+        context.getSource().func_197023_e().getEntities().filter(e -> e instanceof MobEntity).forEach(entity -> {
             MobDifficultyHandler.process((MobEntity) entity, SHDifficulty.affected(entity));
             processed.incrementAndGet();
         });

@@ -3,6 +3,13 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.4.0] - 2020
+- Updated to new stable forge version, 28.2.0
+### Added
+- New debug log option in the COMMON config, covers equipment entries
+### Fixed
+- Mob equipment should no longer crash
+
 ## [2.3.14] - 2020-02-09
 ### Added
 - Kill mutators now work, a config option
