@@ -160,7 +160,7 @@ public final class SHDifficulty {
     }
 
     public static boolean isPlayerExempt(PlayerEntity player){
-        return Config.get(player).difficulty.isExempt(player);
+        return Config.get(player).difficulty.isPlayerExempt(player);
     }
 
     public static double getDifficultyAfterDeath(PlayerEntity player, DimensionType deathDimension) {

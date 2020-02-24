@@ -252,6 +252,7 @@ public final class Config {
                     .builder("difficulty.meter.show")
                     .comment("When to show the difficulty meter.",
                             " SOMETIMES will show the meter for a few seconds every so often.",
+                            "KEYPRESS will make the meter keybinded",
                             "ALWAYS and NEVER should be obvious enough.")
                     .defineEnum(DifficultyMeterShow.SOMETIMES);
             difficultyMeterShowTime = wrapper

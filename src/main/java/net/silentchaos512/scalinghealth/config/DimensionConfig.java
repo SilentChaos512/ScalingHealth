@@ -26,9 +26,11 @@ import net.silentchaos512.utils.config.*;
 
 import javax.annotation.Nullable;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static net.minecraft.item.Items.*;
 import static net.minecraft.item.Items.DIAMOND_LEGGINGS;
@@ -269,7 +271,7 @@ public class DimensionConfig {
          *
          * @return True if exempt, false otherwise.
          */
-        public boolean isExempt(PlayerEntity player) {
+        public boolean isPlayerExempt(PlayerEntity player) {
             List<? extends String> list = difficultyExempt.get();
             for (String value : list) {
                 if (value.equalsIgnoreCase(player.getName().getFormattedText())) {
@@ -469,7 +471,6 @@ public class DimensionConfig {
 
         // Blights
         private final ConfigValue<List<? extends String>> mobsBlightExempt;
-        //private final ConfigValue<List<? extends String>> blightArmor;
         public final DoubleValue blightDiffModifier;
         public final MobPotionConfig blightPotions;
         public final BooleanValue notifyOnBlightDeath;
@@ -533,6 +534,14 @@ public class DimensionConfig {
                     .defineList(ImmutableList.of("bat", "cat", "chicken", "cod", "cow", "donkey", "fox", "horse", "mooshroom",
                             "mule", "ocelot", "parrot", "pig", "rabbit", "salmon", "sheep", "tropical_fish", "turtle", "villager", "wandering_trader"),
                             ConfigValue.IS_NONEMPTY_STRING);
+
+            //caching the value, so as to not generate it every mob spawn
+            BLIGHTEXEMPTEDMOBS = mobsBlightExempt.get().
+                    stream().
+                    map(ResourceLocation::tryCreate).
+                    filter(Objects::nonNull).
+                    collect(Collectors.toList());
+
             blightPotions = MobPotionConfig.init(wrapper, "mob.blight.potionEffects", false, ImmutableList.<CommentedConfig>builder()
                     .add(MobPotionConfig.from(Effects.FIRE_RESISTANCE, 1, 5, 0))
                     .add(MobPotionConfig.from(Effects.RESISTANCE, 1, 5, 0))
@@ -553,18 +562,17 @@ public class DimensionConfig {
                     .defineInRange(2, 1, Double.MAX_VALUE);
         }
 
+        //maybe a better way to cache
+        private final List<ResourceLocation> BLIGHTEXEMPTEDMOBS;
+
         public boolean isMobBlightExempt(MobEntity entity) {
             ResourceLocation rl = entity.getType().getRegistryName();
-            List<? extends String> list = mobsBlightExempt.get();
-            for (String value : list) {
-                ResourceLocation rl2 = ResourceLocation.tryCreate(value);
-                if(rl2 == null)
-                    ScalingHealth.LOGGER.warn("failed to create resource location for {}", value);
-                else if(rl2.equals(rl)) {
+            for (ResourceLocation rl2 : BLIGHTEXEMPTEDMOBS) {
+                if (rl2.equals(rl)) {
                     return true;
                 }
             }
-            return list.contains(entity.getName().getString());
+            return false;
         }
     }
 

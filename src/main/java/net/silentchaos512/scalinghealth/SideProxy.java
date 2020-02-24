@@ -11,6 +11,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.silentchaos512.scalinghealth.capability.DifficultyAffectedCapability;
 import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
 import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
+import net.silentchaos512.scalinghealth.client.KeyBinds.KeyManager;
 import net.silentchaos512.scalinghealth.client.gui.DebugOverlay;
 import net.silentchaos512.scalinghealth.client.gui.difficulty.DifficultyMeter;
 import net.silentchaos512.scalinghealth.client.gui.health.HeartDisplayHandler;
@@ -72,13 +73,12 @@ public class SideProxy {
 
             MinecraftForge.EVENT_BUS.register(HeartDisplayHandler.INSTANCE);
             MinecraftForge.EVENT_BUS.register(DifficultyMeter.INSTANCE);
-//            MinecraftForge.EVENT_BUS.register(KeyTrackerSH.INSTANCE);
 
             DebugOverlay.init();
         }
 
         private static void clientSetup(FMLClientSetupEvent event) {
-
+            KeyManager.registerBindings();
         }
 
         @Nullable

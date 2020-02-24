@@ -28,14 +28,17 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.silentchaos512.lib.event.ClientTicks;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.client.ClientHandler;
+import net.silentchaos512.scalinghealth.client.KeyBinds.KeyManager;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.lib.AreaDifficultyMode;
 import net.silentchaos512.utils.Anchor;
+import org.lwjgl.glfw.GLFW;
 
 public class DifficultyMeter extends Screen {
     public static final DifficultyMeter INSTANCE = new DifficultyMeter(new StringTextComponent(""));
@@ -45,6 +48,8 @@ public class DifficultyMeter extends Screen {
     private int lastDifficultyDisplayed = -100;
     private int lastAreaDifficultyDisplayed = -100;
     private int lastUpdateTime = Integer.MIN_VALUE;
+
+    private boolean keyDown = false;
 
     protected DifficultyMeter(ITextComponent title) {
         super(title);
@@ -56,9 +61,22 @@ public class DifficultyMeter extends Screen {
     }
 
     @SubscribeEvent
+    public void onTick(InputEvent.KeyInputEvent event){
+        DifficultyMeterShow showMode = Config.CLIENT.difficultyMeterShow.get();
+        if(event.getKey() != KeyManager.toggleDiff.getKey().getKeyCode()  || showMode != DifficultyMeterShow.KEYPRESS)
+            return;
+        if(event.getAction() == GLFW.GLFW_PRESS){
+            keyDown = true;
+        }
+        if(event.getAction() == GLFW.GLFW_RELEASE){
+            keyDown = false;
+        }
+    }
+
+    @SubscribeEvent
     public void onRenderOverlay(RenderGameOverlayEvent.Post event) {
         DifficultyMeterShow showMode = Config.CLIENT.difficultyMeterShow.get();
-        if (event.getType() != RenderGameOverlayEvent.ElementType.TEXT|| showMode == DifficultyMeterShow.NEVER) {
+        if (event.getType() != RenderGameOverlayEvent.ElementType.TEXT || showMode == DifficultyMeterShow.NEVER) {
             return;
         }
 
@@ -90,7 +108,7 @@ public class DifficultyMeter extends Screen {
         }
 
         int currentTime = ClientTicks.ticksInGame();
-        if (showMode == DifficultyMeterShow.ALWAYS || currentTime - lastUpdateTime < 20 * Config.CLIENT.difficultyMeterShowTime.get()) {
+        if (showMode == DifficultyMeterShow.ALWAYS || currentTime - lastUpdateTime < 20 * Config.CLIENT.difficultyMeterShowTime.get() || keyDown) {
             GlStateManager.enableBlend();
 
             mc.textureManager.bindTexture(TEXTURE);
