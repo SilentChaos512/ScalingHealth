@@ -18,12 +18,11 @@ import java.util.Random;
 public class ScalingHealth {
     public static final String MOD_ID = "scalinghealth";
     public static final String MOD_NAME = "Scaling Health";
-    public static final String VERSION = "2.4.0";
+    public static final String VERSION = "2.4.1";
     public static final String RESOURCE_PREFIX = MOD_ID + ":";
 
     public static final Random random = new Random();
 
-    private static ScalingHealth INSTANCE;
     public static final ItemGroup SH = new ItemGroup("scalinghealth") {
         @Override
         public ItemStack createIcon() {
@@ -35,8 +34,8 @@ public class ScalingHealth {
 
     public static final Logger LOGGER = LogManager.getLogger(MOD_NAME);
 
+    //TODO, strip proxy system
     public ScalingHealth() {
-        INSTANCE = this;
         PROXY = DistExecutor.runForDist(() -> () -> new SideProxy.Client(), () -> () -> new SideProxy.Server());
     }
 
@@ -53,12 +52,6 @@ public class ScalingHealth {
             return str;
         }
         return "0.0.0";
-    }
-
-    public static boolean isDevBuild() {
-        // TODO: Is there a better way? Guess it works though...
-        String version = getVersion(false);
-        return "NONE".equals(version);
     }
 
     public static ResourceLocation getId(String path) {

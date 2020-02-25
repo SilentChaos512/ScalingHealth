@@ -159,6 +159,10 @@ public final class SHDifficulty {
         return Config.get(world).difficulty.afkMessage.get();
     }
 
+    public static double timeBeforeAfk(PlayerEntity player) {
+        return Config.get(player).difficulty.timeBeforeAfk.get();
+    }
+
     public static boolean isPlayerExempt(PlayerEntity player){
         return Config.get(player).difficulty.isPlayerExempt(player);
     }

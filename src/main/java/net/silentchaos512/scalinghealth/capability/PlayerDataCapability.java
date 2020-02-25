@@ -67,13 +67,12 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
 
     @Override
     public void tick(PlayerEntity player) {
-        if(player.world.getGameTime() % 20 == 0){
+        if(player.world.getGameTime() % 20 == 0 && !player.world.isRemote){
             checkPlayerIdle(player);
 
             if(player instanceof ServerPlayerEntity)
                 IPlayerData.sendUpdatePacketTo(player);
         }
-
         // TODO: Difficulty by Game Stages
     }
 
@@ -87,7 +86,7 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
         }
 
         lastPos = player.getPosition();
-        if(timeAfk > 120){
+        if(timeAfk > SHDifficulty.timeBeforeAfk(player)){
             if(!afk) {
                 afk = true;
                 if(SHDifficulty.afkMessage(player.world)) player.sendMessage(new TranslationTextComponent("misc.scalinghealth.afkmessage"));

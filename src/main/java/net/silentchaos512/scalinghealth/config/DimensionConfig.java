@@ -26,7 +26,6 @@ import net.silentchaos512.utils.config.*;
 
 import javax.annotation.Nullable;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
@@ -78,6 +77,7 @@ public class DimensionConfig {
         public final Supplier<Expression> groupAreaBonus;
         public final DoubleValue idleMultiplier;
         public final BooleanValue afkMessage;
+        public final DoubleValue timeBeforeAfk;
         public final StringValue sleepWarningMessage;
 
         // Mutators
@@ -177,13 +177,17 @@ public class DimensionConfig {
                     EvalVars.AREA_PLAYER_COUNT,
                     "A multiplier for area difficulty calculations, typically based on the number of players in the search radius.");
             idleMultiplier = wrapper
-                    .builder("difficulty.idleMultiplier")
-                    .comment("Multiplier for changePerSecond when the player is not moving.")
-                    .defineInRange(0.5, 0, Double.MAX_VALUE);
+                    .builder("difficulty.afk.multiplier")
+                    .comment("Multiplier for changePerSecond when the player is not moving. A negative value will then decrease difficulty.")
+                    .defineInRange(0.5, Double.MIN_VALUE, Double.MAX_VALUE);
             afkMessage = wrapper
-                    .builder("difficulty.afkMessage")
+                    .builder("difficulty.afk.message")
                     .comment("If true, a comment will appear to notify when you are considered afk")
                     .define(true);
+            timeBeforeAfk = wrapper
+                    .builder("difficulty.afk.time")
+                    .comment("Time in seconds before afk change kicks in")
+                    .defineInRange(120, 0, Double.MAX_VALUE);
             sleepWarningMessage = wrapper
                     .builder("difficulty.sleepWarningMessage")
                     .comment("Message displayed to the player when sleeping, assuming it would change their difficulty.",
@@ -471,6 +475,7 @@ public class DimensionConfig {
 
         // Blights
         private final ConfigValue<List<? extends String>> mobsBlightExempt;
+        public final DoubleValue blightChance;
         public final DoubleValue blightDiffModifier;
         public final MobPotionConfig blightPotions;
         public final BooleanValue notifyOnBlightDeath;
@@ -535,12 +540,12 @@ public class DimensionConfig {
                             "mule", "ocelot", "parrot", "pig", "rabbit", "salmon", "sheep", "tropical_fish", "turtle", "villager", "wandering_trader"),
                             ConfigValue.IS_NONEMPTY_STRING);
 
-            //caching the value, so as to not generate it every mob spawn
-            BLIGHTEXEMPTEDMOBS = mobsBlightExempt.get().
-                    stream().
-                    map(ResourceLocation::tryCreate).
-                    filter(Objects::nonNull).
-                    collect(Collectors.toList());
+            blightChance = wrapper
+                    .builder("mob.blight.chance")
+                    .comment("Chance that the mob has of becoming a blight - 0 will effectively deactivate blight",
+                            "The equation is : chance * difficulty/maxDifficulty",
+                            "meaning at 20% of maxDiff there is chance/5 chances of the mob being blight 1% using default value")
+                    .defineInRange(0.05, 0, Double.MAX_VALUE);
 
             blightPotions = MobPotionConfig.init(wrapper, "mob.blight.potionEffects", false, ImmutableList.<CommentedConfig>builder()
                     .add(MobPotionConfig.from(Effects.FIRE_RESISTANCE, 1, 5, 0))
@@ -563,11 +568,19 @@ public class DimensionConfig {
         }
 
         //maybe a better way to cache
-        private final List<ResourceLocation> BLIGHTEXEMPTEDMOBS;
+        private List<ResourceLocation> blightExemptedMobs = null;
 
         public boolean isMobBlightExempt(MobEntity entity) {
+            if(blightExemptedMobs == null)
+                //caching the value, so as to not generate it every mob spawn
+                blightExemptedMobs = mobsBlightExempt.get().
+                        stream().
+                        map(ResourceLocation::tryCreate).
+                        filter(Objects::nonNull).
+                        collect(Collectors.toList());
+
             ResourceLocation rl = entity.getType().getRegistryName();
-            for (ResourceLocation rl2 : BLIGHTEXEMPTEDMOBS) {
+            for (ResourceLocation rl2 : blightExemptedMobs) {
                 if (rl2.equals(rl)) {
                     return true;
                 }

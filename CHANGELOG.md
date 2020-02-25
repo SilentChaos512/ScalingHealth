@@ -3,7 +3,15 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [2.4.0] - 2020
+## [2.4.1] - 2020-02-25
+### Added
+- Key bind option to display the difficulty bar
+- Blight chance config, also allowing blights to be deactivated
+- Added config option for afk time, default is 2 minutes
+### Fixed
+- Change in difficulty from being afk now works properly
+
+## [2.4.0] - 2020-02-21
 - Updated to new stable forge version, 28.2.0
 ### Added
 - New debug log option in the COMMON config, covers equipment entries

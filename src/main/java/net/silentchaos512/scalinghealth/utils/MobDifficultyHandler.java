@@ -26,20 +26,22 @@ public final class MobDifficultyHandler {
         if (!entity.isAlive()) return;
 
         // Make blight?
-        boolean makeBlight = shouldBecomeBlight(entity, data.affectiveDifficulty(entity.world));
+        //techincally here getDiff is used not affectiveDiff since the blight modifier has no play (deciding to make it blight or not)
+        boolean makeBlight = shouldBecomeBlight(entity, data.getDifficulty());
         setEntityProperties(entity, data, makeBlight);
     }
 
     public static boolean shouldBecomeBlight(MobEntity entity, float difficulty) {
-        if (!SHMobs.canBecomeBlight(entity))
-            return false;
+        if (!SHMobs.canBecomeBlight(entity))    return false;
+
         double chance = getBlightChance(entity, difficulty);
+        if(chance == 1)    return true;
+
         return MathUtils.tryPercentage(ScalingHealth.random, chance);
     }
 
-    //TODO change the hardcoded value for a config one
     private static double getBlightChance(MobEntity entity, float difficulty) {
-        return 0.0625 * difficulty / SHDifficulty.maxValue(entity.world);
+        return SHMobs.blightChance(entity) * difficulty / SHDifficulty.maxValue(entity.world);
     }
 
     public static void setEntityProperties(MobEntity entity, IDifficultyAffected data, boolean makeBlight) {

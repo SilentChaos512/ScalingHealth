@@ -122,6 +122,7 @@ public final class DifficultyEvents {
 
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
+        if(event.phase == TickEvent.Phase.START) return;
         PlayerEntity player = event.player;
         if (player.world.isRemote) return;
         player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> data.tick(player));

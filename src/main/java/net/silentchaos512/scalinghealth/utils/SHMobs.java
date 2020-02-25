@@ -17,8 +17,13 @@ public final class SHMobs {
         return true;
     }
 
+    public static double blightChance(MobEntity entity) {
+        return Config.get(entity).mobs.blightChance.get();
+    }
+
     public static boolean canBecomeBlight(MobEntity entity) {
-        return !Config.get(entity.world).mobs.isMobBlightExempt(entity);
+        //if blight chance is 0, blights are deactivated
+        return blightChance(entity) == 0 || !Config.get(entity.world).mobs.isMobBlightExempt(entity);
     }
 
     public static boolean isBlight(MobEntity entity) {
