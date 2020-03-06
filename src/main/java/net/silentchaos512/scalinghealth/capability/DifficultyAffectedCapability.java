@@ -65,7 +65,6 @@ public class DifficultyAffectedCapability implements IDifficultyAffected, ICapab
     @Override
     public void tick(MobEntity entity) {
         if (!processed && entity.isAlive() && entity.ticksExisted > 2) {
-            //set the difficulty after the entity has existed for a bit, created weird mc crashes/not loading issues if put in the attach cap event
             setDifficulty(entity);
             MobDifficultyHandler.process(entity, this);
             processed = true;

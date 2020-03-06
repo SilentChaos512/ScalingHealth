@@ -166,7 +166,7 @@ public final class ScalingHealthCommonEvents {
         PlayerEntity player = event.getPlayer();
         if(!SHPlayers.xpModeEnabled(player.world)) return;
 
-        int xp = event.getLevels();
+        double xp = event.getLevels();
         int numberOfIncrease = (int) Math.floor(xp / SHPlayers.levelsPerHp(player.world));
 
         player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> data.addHearts(player, numberOfIncrease * SHPlayers.hpPerLevel(player.world)));

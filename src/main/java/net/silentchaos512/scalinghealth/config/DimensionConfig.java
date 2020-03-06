@@ -754,6 +754,7 @@ public class DimensionConfig {
 
     public static class Pets {
         public final DoubleValue regenDelay;
+        public final DoubleValue hpGainByCrystal;
 
         Pets(ConfigSpecWrapper wrapper) {
             wrapper.comment("pets", "Settings for tamed creatures");
@@ -762,6 +763,10 @@ public class DimensionConfig {
                     .builder("pets.regenDelay")
                     .comment("Delay (in seconds) between regen ticks for pets. Set 0 to disable.")
                     .defineInRange(30, 0, Double.MAX_VALUE);
+            hpGainByCrystal = wrapper
+                    .builder("pets.hpGain")
+                    .comment("Define the amount of hp a tamed ped will gain when right clicking with a heart crystal")
+                    .defineInRange(5, 0, Double.MAX_VALUE);
         }
     }
 

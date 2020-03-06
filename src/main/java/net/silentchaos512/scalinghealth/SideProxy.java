@@ -10,6 +10,7 @@ import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.silentchaos512.scalinghealth.capability.DifficultyAffectedCapability;
 import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
+import net.silentchaos512.scalinghealth.capability.PetHealthCapability;
 import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
 import net.silentchaos512.scalinghealth.client.KeyBinds.KeyManager;
 import net.silentchaos512.scalinghealth.client.gui.DebugOverlay;
@@ -32,10 +33,7 @@ public class SideProxy {
         ModLoot.init();
         
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::imcEnqueue);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::imcProcess);
         MinecraftForge.EVENT_BUS.addListener(this::serverAboutToStart);
-        MinecraftForge.EVENT_BUS.addListener(this::serverStarted);
 
         MinecraftForge.EVENT_BUS.register(PetEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(DamageScaling.INSTANCE);
@@ -45,21 +43,12 @@ public class SideProxy {
         DifficultyAffectedCapability.register();
         DifficultySourceCapability.register();
         PlayerDataCapability.register();
-//        ModGameRules.registerDefinitions();
+        PetHealthCapability.register();
         DeferredWorkQueue.runLater(SHWorldFeatures::addFeaturesToBiomes);
     }
 
-    private void imcEnqueue(InterModEnqueueEvent event) {}
-
-    private void imcProcess(InterModProcessEvent event) {}
-
-
     private void serverAboutToStart(FMLServerAboutToStartEvent event) {
         ModCommands.registerAll(event.getServer().getCommandManager().getDispatcher());
-    }
-
-    private void serverStarted(FMLServerStartedEvent event) {
-//        ModGameRules.setRules(event.getServer());
     }
 
     @Nullable

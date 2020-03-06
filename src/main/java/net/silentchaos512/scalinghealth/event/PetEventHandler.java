@@ -19,16 +19,23 @@
 package net.silentchaos512.scalinghealth.event;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.passive.TameableEntity;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.capability.PetHealthCapability;
 import net.silentchaos512.scalinghealth.config.Config;
+import net.silentchaos512.scalinghealth.item.HeartCrystal;
+import net.silentchaos512.scalinghealth.utils.ModifierHandler;
 
 @Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class PetEventHandler {
-    //TODO add option to add heart crystals to pets.
     public static PetEventHandler INSTANCE = new PetEventHandler();
     @SubscribeEvent
     public void onLivingUpdate(LivingUpdateEvent event) {
@@ -44,8 +51,25 @@ public class PetEventHandler {
             boolean isRegenTime = entity.hurtResistantTime <= 0 && entity.ticksExisted % regenDelay == 0;
             if (isTamed && isRegenTime && !fullHp) {
                 entity.heal(2f);
-                ScalingHealth.LOGGER.debug("Healing Tamed Animal");
             }
         }
+    }
+
+    @SubscribeEvent
+    public void onPetInteraction(PlayerInteractEvent.EntityInteractSpecific event){
+        if(!(event.getItemStack().getItem() instanceof HeartCrystal) || !(event.getTarget() instanceof TameableEntity)) return;
+        HeartCrystal heart = (HeartCrystal) event.getItemStack().getItem();
+        TameableEntity pet = (TameableEntity) event.getTarget();
+        if(!pet.isTamed()) {
+            return;
+        }
+
+        if(pet.world.isRemote){
+            event.setCancellationResult(ActionResultType.SUCCESS);
+            event.setCanceled(true);
+            return;
+        }
+
+        heart.increasePetHp(event.getPlayer(), pet, event.getItemStack());
     }
 }

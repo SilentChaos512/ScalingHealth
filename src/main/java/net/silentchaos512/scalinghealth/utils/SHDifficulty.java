@@ -174,7 +174,6 @@ public final class SHDifficulty {
 
     public static double applyKillMutator(MobEntity entity, PlayerEntity player){
         DimensionConfig config = Config.get(entity);
-        ScalingHealth.LOGGER.debug("Applying kill mutator: {}", config.difficulty.getKillMutator(entity));
         return EvalVars.apply(config, player, config.difficulty.getKillMutator(entity));
     }
 

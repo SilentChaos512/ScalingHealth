@@ -24,8 +24,10 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.passive.TameableEntity;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.lib.util.EntityHelper;
+import net.silentchaos512.scalinghealth.ScalingHealth;
 
 import java.util.List;
 import java.util.UUID;
@@ -47,10 +49,11 @@ public final class ModifierHandler {
         instance.applyModifier(new AttributeModifier(uuid, name, amount, op));
     }
 
-    public static void addMaxHealth(LivingEntity entity, double amount, AttributeModifier.Operation op) {
+    public static void setMaxHealth(LivingEntity entity, double amount, AttributeModifier.Operation op) {
         double oldMax = entity.getMaxHealth();
         setModifier(entity, SharedMonsterAttributes.MAX_HEALTH, MODIFIER_ID_HEALTH, MODIFIER_NAME_HEALTH, amount, op);
         double newMax = entity.getMaxHealth();
+
         // Heal entity when increasing max health
         if (newMax > oldMax) {
             float healAmount = (float) (newMax - oldMax);

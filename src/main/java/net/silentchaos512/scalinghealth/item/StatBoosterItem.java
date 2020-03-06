@@ -1,9 +1,10 @@
 package net.silentchaos512.scalinghealth.item;
 
 import net.minecraft.client.util.ITooltipFlag;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Rarity;
 import net.minecraft.stats.Stats;
@@ -13,11 +14,12 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IPlayerData;
+import net.silentchaos512.scalinghealth.capability.PetHealthCapability;
 import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
 import net.silentchaos512.scalinghealth.client.particles.ModParticles;
+import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.init.ModSounds;
-import net.silentchaos512.scalinghealth.utils.SHDifficulty;
-import net.silentchaos512.scalinghealth.utils.SHPlayers;
+import net.silentchaos512.scalinghealth.utils.ModifierHandler;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -40,6 +42,10 @@ public abstract class StatBoosterItem extends Item {
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand handIn) {
         ItemStack stack = player.getHeldItem(handIn);
+        if(usedForPet){
+            if(world.isRemote)  usedForPet = false;
+            return new ActionResult<>(ActionResultType.FAIL, stack);
+        }
 
         if (!world.isRemote) {
             IPlayerData data = player.getCapability(PlayerDataCapability.INSTANCE).orElseThrow(() ->
@@ -72,6 +78,24 @@ public abstract class StatBoosterItem extends Item {
         }
 
         return new ActionResult<>(ActionResultType.SUCCESS, stack);
+    }
+
+    private boolean usedForPet = false;
+
+    public void increasePetHp(PlayerEntity player, TameableEntity pet, ItemStack stack){
+        //check config
+
+        int levelRequirement = getLevelCost(player);
+        if (player.experienceLevel < levelRequirement) {
+            String translationKey = "item.scalinghealth.stat_booster.notEnoughXP";
+            player.sendMessage(new TranslationTextComponent(translationKey, levelRequirement));
+        }
+
+        usedForPet = true;
+        pet.getCapability(PetHealthCapability.INSTANCE).ifPresent(data -> data.addHealth(Config.get(pet).pets.hpGainByCrystal.get(), pet));
+        stack.shrink(1);
+        consumeLevels(player, levelRequirement);
+        player.addStat(Stats.ITEM_USED.get(this));
     }
 
     abstract int getLevelCost(PlayerEntity player);

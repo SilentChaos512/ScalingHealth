@@ -3,6 +3,7 @@ package net.silentchaos512.scalinghealth.event;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.INBT;
@@ -20,7 +21,9 @@ import net.minecraftforge.fml.common.Mod;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.DifficultyAffectedCapability;
 import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
+import net.silentchaos512.scalinghealth.capability.PetHealthCapability;
 import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
+import net.silentchaos512.scalinghealth.utils.ModifierHandler;
 import net.silentchaos512.scalinghealth.utils.SHDifficulty;
 import net.silentchaos512.scalinghealth.utils.SHPlayers;
 import org.apache.logging.log4j.Marker;
@@ -50,6 +53,10 @@ public final class DifficultyEvents {
             debug(() -> "attach player data");
             event.addCapability(PlayerDataCapability.NAME, new PlayerDataCapability());
         }
+        if(PetHealthCapability.canAttachTo(entity)){
+            debug(()-> "attach pet data");
+            event.addCapability(PetHealthCapability.NAME, new PetHealthCapability());
+        }
     }
 
     @SubscribeEvent
@@ -67,9 +74,14 @@ public final class DifficultyEvents {
 
         // Tick mobs, which will calculate difficulty when appropriate and apply changes
         if (entity instanceof MobEntity) {
-            entity.getCapability(DifficultyAffectedCapability.INSTANCE).ifPresent(affected -> {
-                affected.tick((MobEntity) entity);
-            });
+            entity.getCapability(DifficultyAffectedCapability.INSTANCE).ifPresent(affected ->
+                affected.tick((MobEntity) entity));
+        }
+
+        if(entity instanceof TameableEntity) {
+            if(!((TameableEntity) entity).isTamed()) return;
+                entity.getCapability(PetHealthCapability.INSTANCE).ifPresent(data ->
+                        data.tick((TameableEntity) entity));
         }
 
         // Tick difficulty source, such as players, except if exempted
@@ -86,7 +98,7 @@ public final class DifficultyEvents {
     }
 
     @SubscribeEvent
-    public static void onMobDeath(LivingDeathEvent event){
+    public static void onMobDeath(LivingDeathEvent event) {
         if(!(event.getEntityLiving() instanceof MobEntity)) return;
         MobEntity entity = (MobEntity) event.getEntityLiving();
         if (event.getSource() == null || event.getEntity().world.isRemote)

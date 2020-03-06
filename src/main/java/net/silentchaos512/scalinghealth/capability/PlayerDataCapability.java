@@ -8,11 +8,11 @@ import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.utils.SHDifficulty;
 import net.silentchaos512.scalinghealth.utils.ModifierHandler;
 import net.silentchaos512.scalinghealth.utils.SHPlayers;
@@ -29,7 +29,6 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
     private static final String NBT_POWER_CRYSTALS = "PowerCrystals";
 
     private final LazyOptional<IPlayerData> holder = LazyOptional.of(() -> this);
-
 
     private boolean afk = false;
     private int timeAfk = 0;
@@ -50,7 +49,7 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
     @Override
     public void setExtraHearts(PlayerEntity player, int amount) {
         extraHearts = SHPlayers.clampExtraHearts(player, amount);
-        ModifierHandler.addMaxHealth(player, getHealthModifier(player), AttributeModifier.Operation.ADDITION);
+        ModifierHandler.setMaxHealth(player, getHealthModifier(player), AttributeModifier.Operation.ADDITION);
     }
 
     @Override
@@ -61,7 +60,7 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
 
     @Override
     public void updateStats(PlayerEntity player) {
-        ModifierHandler.addMaxHealth(player, getHealthModifier(player), AttributeModifier.Operation.ADDITION);
+        ModifierHandler.setMaxHealth(player, getHealthModifier(player), AttributeModifier.Operation.ADDITION);
         ModifierHandler.addAttackDamage(player, getAttackDamageModifier(player), AttributeModifier.Operation.ADDITION);
     }
 
@@ -77,6 +76,8 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
     }
 
     private void checkPlayerIdle(PlayerEntity player){
+        if(SHDifficulty.areaDifficulty(player.world, player.getPosition()) >= SHDifficulty.maxValue(player.world)) return;
+
         if(player.getPosition().equals(lastPos)){
             timeAfk++;
         }
@@ -93,7 +94,7 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
             }
         }
 
-        if(afk){
+        if(afk) {
             IDifficultySource data = SHDifficulty.source(player);
             float changePerSec = (float) SHDifficulty.changePerSecond(player.world);
             //since last second we added "changePerSec" difficulty, we subtract an amount based on idlemodifier
