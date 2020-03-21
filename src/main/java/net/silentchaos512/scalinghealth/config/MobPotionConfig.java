@@ -29,7 +29,7 @@ public class MobPotionConfig {
     private final List<EffectEntry> temp = new ArrayList<>();
 
     public void tryApply(LivingEntity entity, double difficulty) {
-        double chance = EntityGroup.from(entity).getPotionChance(entity);
+        double chance = EntityGroup.from(entity).getPotionChance();
         if (!MathUtils.tryPercentage(chance)) return;
 
         temp.clear();
@@ -50,7 +50,7 @@ public class MobPotionConfig {
     public void applyAll(LivingEntity entity) {
         this.potions.get().forEach(entry -> entry.applyTo(entity));
         if (ScalingHealth.LOGGER.isDebugEnabled()) {
-            //ScalingHealth.LOGGER.debug(MARKER, "Applied all {} effects to {}", potions.get().size(), entity.getScoreboardName());
+            ScalingHealth.LOGGER.debug(MARKER, "Applied all {} effects to {}", potions.get().size(), entity.getScoreboardName());
         }
     }
 

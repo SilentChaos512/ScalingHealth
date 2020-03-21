@@ -26,7 +26,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.RegenConfig;
 import net.silentchaos512.scalinghealth.utils.SHPlayers;
 
@@ -52,7 +51,7 @@ public final class PlayerBonusRegenHandler {
         if (event.side == LogicalSide.CLIENT) return;
 
         PlayerEntity player = event.player;
-        RegenConfig config = SHPlayers.getRegenConfig(player.world);
+        RegenConfig config = SHPlayers.getRegenConfig();
 
         UUID uuid = player.getUniqueID();
 
@@ -77,7 +76,7 @@ public final class PlayerBonusRegenHandler {
     public static void onPlayerHurt(LivingHurtEvent event) {
         LivingEntity entity = event.getEntityLiving();
         if (!entity.world.isRemote && entity instanceof PlayerEntity) {
-            TIMERS.put(entity.getUniqueID(), SHPlayers.getRegenConfig(entity.world).getInitialDelay());
+            TIMERS.put(entity.getUniqueID(), SHPlayers.getRegenConfig().getInitialDelay());
         }
     }
 }

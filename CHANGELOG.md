@@ -3,6 +3,30 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.5.0] - 2020-03-20
+Major changes to config files. Save your current config in a text editor before updating!
+Else you have to change it all again.
+Tested a lot but not for long, backup your worlds! Especially if playing on a server.
+
+These big changes are made to wrap up the 1.14.4 version of SH. Will not be adding any other features,
+so should have a non-beta release soon (fixing bugs yay). 
+Then onto 1.15.2, where I will reimplement (or at least try to) by dim configs.
+
+#### Added
+- The dimension configs are replaced by a unique game_settings.toml file. 
+- The common config now has simple enable configs for the mods features.
+- The game_settings config is basically an extension of the common config.
+- The ore gen of both crystals can be disabled.
+- Bandaged effect now has a texture.
+
+#### Removed
+- The config by dimension feature has been removed.
+- The equipment configs have been removed.
+- Unused or now unusable configs have been removed.
+
+#### Tweaks
+- The DIMENSION_WIDE option is now SERVER_WIDE. Lang and commands have been updated accordingly.
+
 ## [2.4.2] - 2020-03-05
 ### Added
 - Pets will now accept heart crystals and it increases their hp. The amount is configurable.

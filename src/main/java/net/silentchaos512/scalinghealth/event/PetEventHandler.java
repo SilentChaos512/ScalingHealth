@@ -19,27 +19,24 @@
 package net.silentchaos512.scalinghealth.event;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.util.ActionResultType;
-import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.capability.PetHealthCapability;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.item.HeartCrystal;
-import net.silentchaos512.scalinghealth.utils.ModifierHandler;
+import net.silentchaos512.scalinghealth.utils.EnabledFeatures;
 
 @Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class PetEventHandler {
     public static PetEventHandler INSTANCE = new PetEventHandler();
+
     @SubscribeEvent
     public void onLivingUpdate(LivingUpdateEvent event) {
-        final double regenDelay = Config.get(event.getEntity()).pets.regenDelay.get();
+        double regenDelay = Config.GENERAL.pets.regenDelay.get();
         if (regenDelay <= 0) {
             return;
         }
@@ -57,19 +54,21 @@ public class PetEventHandler {
 
     @SubscribeEvent
     public void onPetInteraction(PlayerInteractEvent.EntityInteractSpecific event){
-        if(!(event.getItemStack().getItem() instanceof HeartCrystal) || !(event.getTarget() instanceof TameableEntity)) return;
-        HeartCrystal heart = (HeartCrystal) event.getItemStack().getItem();
+        if(!(event.getItemStack().getItem() instanceof HeartCrystal) ||
+                !(event.getTarget() instanceof TameableEntity)       ||
+                !EnabledFeatures.petBonusHpEnabled())
+            return;
+
         TameableEntity pet = (TameableEntity) event.getTarget();
         if(!pet.isTamed()) {
             return;
         }
-
         if(pet.world.isRemote){
             event.setCancellationResult(ActionResultType.SUCCESS);
             event.setCanceled(true);
             return;
         }
-
+        HeartCrystal heart = (HeartCrystal) event.getItemStack().getItem();
         heart.increasePetHp(event.getPlayer(), pet, event.getItemStack());
     }
 }

@@ -1,11 +1,11 @@
 package net.silentchaos512.scalinghealth.item;
 
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.silentchaos512.scalinghealth.capability.IPlayerData;
 import net.silentchaos512.scalinghealth.client.particles.ModParticles;
 import net.silentchaos512.scalinghealth.init.ModSounds;
+import net.silentchaos512.scalinghealth.utils.EnabledFeatures;
 import net.silentchaos512.scalinghealth.utils.SHItems;
+import net.silentchaos512.scalinghealth.utils.SHPlayers;
 
 public class PowerCrystal extends StatBoosterItem {
     @Override
@@ -14,8 +14,9 @@ public class PowerCrystal extends StatBoosterItem {
     }
 
     @Override
-    boolean isStatIncreaseAllowed(PlayerEntity player, IPlayerData data) {
-        return SHItems.powerCrystalsIncreaseDamage(player);
+    boolean isStatIncreaseAllowed(PlayerEntity player) {
+        return EnabledFeatures.powerCrystalEnabled() &&
+                SHPlayers.getPlayerData(player).getPowerCrystals() * SHItems.powerCrystalIncreaseAmount() > SHPlayers.maxAttackDamage();
     }
 
     @Override
@@ -30,8 +31,8 @@ public class PowerCrystal extends StatBoosterItem {
     }
 
     @Override
-    void increaseStat(PlayerEntity player, ItemStack stack, IPlayerData data) {
-        data.addPowerCrystal(player);
+    void increaseStat(PlayerEntity player) {
+        SHPlayers.getPlayerData(player).addPowerCrystal(player);
     }
 
     @Override

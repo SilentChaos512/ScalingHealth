@@ -18,10 +18,6 @@
 
 package net.silentchaos512.scalinghealth.config;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.dimension.DimensionType;
-import net.minecraftforge.common.extensions.IForgeDimension;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.client.gui.difficulty.DifficultyMeterShow;
@@ -33,29 +29,22 @@ import net.silentchaos512.utils.Anchor;
 import net.silentchaos512.utils.Color;
 import net.silentchaos512.utils.config.*;
 
-import javax.annotation.Nullable;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Supplier;
 
 public final class Config {
-    // Per-dimension configs. The "default" dimension is stored in its own field below.
-    private static final Map<Integer, DimensionConfig> DIMENSIONS = new HashMap<>();
     // config/scaling-health
     private static final Path SH_CONFIG_DIR = FMLPaths.CONFIGDIR.get().resolve("scaling-health");
-    // config/scaling-health/dimensions
-    private static final Path DIMENSION_CONFIG_DIR = SH_CONFIG_DIR.resolve("dimensions");
-    // The "default" dimension config, used when map does not contain a config for the dimension.
-    private static final DimensionConfig DEFAULT = new DimensionConfig(resolve(DIMENSION_CONFIG_DIR, "default.toml"));
 
+    private static final ConfigSpecWrapper WRAPPER_GAME = ConfigSpecWrapper.create(SH_CONFIG_DIR.resolve("game_settings.toml"));
     private static final ConfigSpecWrapper WRAPPER_CLIENT = ConfigSpecWrapper.create(SH_CONFIG_DIR.resolve("client.toml"));
     private static final ConfigSpecWrapper WRAPPER_COMMON = ConfigSpecWrapper.create(SH_CONFIG_DIR.resolve("common.toml"));
 
     public static final Client CLIENT = new Client(WRAPPER_CLIENT);
     public static final Common COMMON = new Common(WRAPPER_COMMON);
+    public static final GameConfig GENERAL = new GameConfig(WRAPPER_GAME);
 
     public static class Client {
         // Debug
@@ -288,7 +277,96 @@ public final class Config {
         public final Supplier<Boolean> debugLogScaledDamage;
         public final Supplier<Boolean> debugLogEquipmentEntries;
 
+        public final BooleanValue crystalsAddHealth;
+        public final BooleanValue xpAddHealth;
+        public final BooleanValue crystalsRegenHealth;
+        public final BooleanValue crystalsAddPetHealth;
+
+        public final BooleanValue crystalsAddDamage;
+
+        public final BooleanValue hpCrystalsOreGen;
+        public final BooleanValue powerCrystalsOreGen;
+
+        public final BooleanValue mobDamageIncrease;
+        public final BooleanValue mobHpIncrease;
+
+        public final BooleanValue playerDamageScaling;
+        public final BooleanValue mobDamageScaling;
+
+        public final BooleanValue enableDifficulty;
+        public final BooleanValue enableBlights;
+
         Common(ConfigSpecWrapper wrapper) {
+            wrapper.comment("features",
+                    "All SH features can be disabled here. False to disable.");
+
+            crystalsAddHealth = wrapper
+                    .builder("features.crystalsAddHealth")
+                    .comment("Enable player bonus hp by crystals.")
+                    .define(true);
+
+            xpAddHealth = wrapper
+                    .builder("features.xpAddHealth")
+                    .comment("Enable player bonus hp by xp.")
+                    .define(true);
+
+            crystalsRegenHealth = wrapper
+                    .builder("features.crystalsRegenHealth")
+                    .comment("Enable player regen hp by crystals.")
+                    .define(true);
+
+            crystalsAddPetHealth = wrapper
+                    .builder("features.crystalsAddPetHealth")
+                    .comment("Enable pet add hp by crystals.")
+                    .define(true);
+
+            crystalsAddDamage = wrapper
+                    .builder("features.crystalsAddDamage")
+                    .comment("Enable player add damage by crystals.")
+                    .define(true);
+
+            hpCrystalsOreGen = wrapper
+                    .builder("features.hpCrystalsOreGen")
+                    .comment("Enable ore gen of health crystals. Still drops as loot.")
+                    .define(true);
+
+            powerCrystalsOreGen = wrapper
+                    .builder("features.powerCrystalsOreGen")
+                    .comment("Enable ore gen of power crystals. Still drops as loot.")
+                    .define(true);
+
+            mobHpIncrease = wrapper
+                    .builder("features.mobHpIncrease")
+                    .comment("Mobs will gain bonus health with difficulty.")
+                    .define(true);
+
+            mobDamageIncrease = wrapper
+                    .builder("features.mobDamageIncrease")
+                    .comment("Mobs will gain bonus damage with difficulty.")
+                    .define(true);
+
+            playerDamageScaling = wrapper
+                    .builder("features.playerDamageScaling")
+                    .comment("Enable player damage scaling.")
+                    .define(true);
+
+            mobDamageScaling = wrapper
+                    .builder("features.mobDamageScaling")
+                    .comment("Enable mob damage scaling.")
+                    .define(true);
+
+            enableDifficulty = wrapper
+                    .builder("features.enableDifficulty")
+                    .comment("Enable difficulty system. If disabled, everything will have 0 difficulty.")
+                    .define(true);
+
+            enableBlights = wrapper
+                    .builder("features.enableBlights")
+                    .comment("Enable blights. If disabled, no blights will spawn.")
+                    .define(true);
+
+
+
             wrapper.comment("debug",
                     "Debug settings are intended for tuning configs or diagnosing issues.",
                     "They may decrease performance and should be disabled for normal play.");
@@ -328,28 +406,7 @@ public final class Config {
     public static void init() {
         WRAPPER_CLIENT.validate();
         WRAPPER_COMMON.validate();
-        // was validating twice before for configs, apparently not needed anymore - further bugs may still arise
-        initDimensionConfigs();
-    }
-
-    private static void initDimensionConfigs() {
-        Path path = resolve(DIMENSION_CONFIG_DIR, "");
-        File directory = path.toFile();
-        File[] files = directory.listFiles();
-
-        if (files != null) {
-            for (File file : files) {
-                ScalingHealth.LOGGER.info("Found possible dimension config: {}", file);
-                DimensionConfig config = new DimensionConfig(file.toPath());
-                int dimensionID = config.dimensionID();
-                DIMENSIONS.put(dimensionID, config);
-                ScalingHealth.LOGGER.info("Loaded config for dimension {}", dimensionID);
-                config.validate();
-                // was validating twice before for configs, apparently not needed anymore - further bugs may still arise
-            }
-        } else {
-            ScalingHealth.LOGGER.error("Something went wrong when trying to gets files from '{}'", directory);
-        }
+        GENERAL.validate();
     }
 
     private static Path resolve(Path parent, String path) {
@@ -361,29 +418,5 @@ public final class Config {
                     directory.getAbsolutePath());
         }
         return parent.resolve(path);
-    }
-
-    public static DimensionConfig getOrDefault(@Nullable IWorldReader world) {
-        return world != null ? get(world) : DEFAULT;
-    }
-
-    public static DimensionConfig get(IWorldReader world) {
-        return get(world.getDimension().getType().getId());
-    }
-
-    public static DimensionConfig get(IForgeDimension dimension) {
-        return get(dimension.getDimension().getType().getId());
-    }
-
-    public static DimensionConfig get(DimensionType dimension) {
-        return get(dimension.getId());
-    }
-
-    public static DimensionConfig get(Entity entity) {
-        return get(entity.dimension.getId());
-    }
-
-    public static DimensionConfig get(int dimension) {
-        return DIMENSIONS.getOrDefault(dimension, DEFAULT);
     }
 }

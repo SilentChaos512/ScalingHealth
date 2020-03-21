@@ -20,7 +20,6 @@ public final class ClientHandler {
     private static final Marker MARKER = MarkerManager.getMarker("ClientHandler");
     // Frequent updates (up to once per second)
     public static float playerDifficulty;
-    public static float worldDifficulty;
     public static float areaDifficulty;
     public static int regenTimer;
     public static int locationMultiPercent;
@@ -37,7 +36,6 @@ public final class ClientHandler {
 
     private static void handleSyncMessage(ClientSyncMessage msg) {
         playerDifficulty = msg.playerDifficulty;
-        worldDifficulty = msg.worldDifficulty;
         areaDifficulty = msg.areaDifficulty;
         regenTimer = msg.regenTimer;
         locationMultiPercent = msg.locationMultiPercent;

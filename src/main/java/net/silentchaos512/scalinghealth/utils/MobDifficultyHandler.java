@@ -9,12 +9,11 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.Style;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.World;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
 import net.silentchaos512.scalinghealth.event.ScalingHealthCommonEvents;
-import net.silentchaos512.scalinghealth.lib.MobHealthMode;
 import net.silentchaos512.scalinghealth.lib.EntityGroup;
+import net.silentchaos512.scalinghealth.lib.MobHealthMode;
 import net.silentchaos512.utils.MathUtils;
 
 public final class MobDifficultyHandler {
@@ -25,7 +24,7 @@ public final class MobDifficultyHandler {
         if (!entity.isAlive()) return;
 
         // Make blight?
-        //techincally here getDiff is used not affectiveDiff since the blight modifier has no play (deciding to make it blight or not)
+        // getDiff is used not affectiveDiff since the blight modifier has no play (deciding to make it blight or not)
         boolean makeBlight = shouldBecomeBlight(entity, data.getDifficulty());
         setEntityProperties(entity, data, makeBlight);
     }
@@ -33,20 +32,19 @@ public final class MobDifficultyHandler {
     public static boolean shouldBecomeBlight(MobEntity entity, float difficulty) {
         if (!SHMobs.canBecomeBlight(entity))    return false;
 
-        double chance = getBlightChance(entity, difficulty);
+        double chance = getBlightChance(difficulty);
         if(chance == 1)    return true;
 
         return MathUtils.tryPercentage(ScalingHealth.random, chance);
     }
 
-    private static double getBlightChance(MobEntity entity, float difficulty) {
-        return SHMobs.blightChance(entity) * difficulty / SHDifficulty.maxValue(entity.world);
+    private static double getBlightChance(float difficulty) {
+        return SHMobs.blightChance() * difficulty / SHDifficulty.maxValue();
     }
 
     public static void setEntityProperties(MobEntity entity, IDifficultyAffected data, boolean makeBlight) {
         if (!entity.isAlive()) return;
 
-        World world = entity.world;
         boolean isHostile = entity instanceof IMob;
 
         if (makeBlight) {
@@ -58,48 +56,49 @@ public final class MobDifficultyHandler {
         }
 
         //Get difficulty after making blight or not. This will determine if a blight's diff is multiplied
-        final float difficulty = data.affectiveDifficulty(world);
+        final float difficulty = data.affectiveDifficulty(); if(difficulty <= 0) return;
 
-        double healthBoost = difficulty;
-        double damageBoost = 0;
+        // Random potion effect
+        SHMobs.getMobPotionConfig().tryApply(entity, difficulty);
 
-        IAttributeInstance attributeMaxHealth = entity.getAttribute(SharedMonsterAttributes.MAX_HEALTH);
-        double baseMaxHealth = attributeMaxHealth.getBaseValue();
-        double healthMultiplier = isHostile
-                ? SHMobs.healthHostileMultiplier(world)
-                : SHMobs.healthPassiveMultiplier(world);
+        if(EnabledFeatures.mobHpIncreaseEnabled()){
 
-        healthBoost *= healthMultiplier;
+            double healthBoost = difficulty;
+            IAttributeInstance attributeMaxHealth = entity.getAttribute(SharedMonsterAttributes.MAX_HEALTH);
+            double baseMaxHealth = attributeMaxHealth.getBaseValue();
+            double healthMultiplier = isHostile
+                    ? SHMobs.healthHostileMultiplier()
+                    : SHMobs.healthPassiveMultiplier();
 
-        if (difficulty > 0) {
+            healthBoost *= healthMultiplier;
+
             double diffIncrease = 2 * healthMultiplier * difficulty * ScalingHealth.random.nextFloat();
             healthBoost += diffIncrease;
-        }
 
-        if(ScalingHealthCommonEvents.spawnerSpawns.contains(entity.getUniqueID())){
-            healthBoost *= SHMobs.spawnerHealth(world);
-            ScalingHealthCommonEvents.spawnerSpawns.remove(entity.getUniqueID());
+            if(ScalingHealthCommonEvents.spawnerSpawns.contains(entity.getUniqueID())){
+                healthBoost *= SHMobs.spawnerHealth();
+                ScalingHealthCommonEvents.spawnerSpawns.remove(entity.getUniqueID());
+            }
+
+            // Apply extra health and damage.
+            MobHealthMode mode = EntityGroup.from(entity).getHealthMode();
+            double healthModAmount = mode.getModifierValue(healthBoost, baseMaxHealth);
+            ModifierHandler.setMaxHealth(entity, healthModAmount, mode.getOperator());
         }
 
         // Increase attack damage.
-        if (difficulty > 0) {
+        if(EnabledFeatures.mobDamageIncreaseEnabled()){
+            double damageBoost;
+
             float diffIncrease = difficulty * ScalingHealth.random.nextFloat();
-            damageBoost = diffIncrease * SHMobs.damageBoostScale(entity);
+            damageBoost = diffIncrease * SHMobs.damageBoostScale();
             // Clamp the value so it doesn't go over the maximum config.
-            double max = SHMobs.maxDamageBoost(entity);
+            double max = SHMobs.maxDamageBoost();
             if (max > 0f) {
                 damageBoost = MathHelper.clamp(damageBoost, 0, max);
             }
+
+            ModifierHandler.addAttackDamage(entity, damageBoost, AttributeModifier.Operation.ADDITION);
         }
-
-        // Random potion effect
-        SHMobs.getMobPotionConfig(world).tryApply(entity, difficulty);
-        SHMobEquipment.equipAll(entity);
-
-        // Apply extra health and damage.
-        MobHealthMode mode = EntityGroup.from(entity).getHealthMode(entity);
-        double healthModAmount = mode.getModifierValue(healthBoost, baseMaxHealth);
-        ModifierHandler.setMaxHealth(entity, healthModAmount, mode.getOperator());
-        ModifierHandler.addAttackDamage(entity, damageBoost, AttributeModifier.Operation.ADDITION);
     }
 }

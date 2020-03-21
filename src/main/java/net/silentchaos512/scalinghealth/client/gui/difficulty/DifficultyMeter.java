@@ -27,7 +27,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -37,6 +36,7 @@ import net.silentchaos512.scalinghealth.client.ClientHandler;
 import net.silentchaos512.scalinghealth.client.KeyBinds.KeyManager;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.lib.AreaDifficultyMode;
+import net.silentchaos512.scalinghealth.utils.EnabledFeatures;
 import net.silentchaos512.utils.Anchor;
 import org.lwjgl.glfw.GLFW;
 
@@ -55,13 +55,10 @@ public class DifficultyMeter extends Screen {
         super(title);
     }
 
-    public void showBar() {
-        this.lastUpdateTime = Integer.MIN_VALUE;
-        this.lastDifficultyDisplayed = -100;
-    }
-
     @SubscribeEvent
     public void onTick(InputEvent.KeyInputEvent event){
+        if(!EnabledFeatures.difficultyEnabled()) return;
+
         DifficultyMeterShow showMode = Config.CLIENT.difficultyMeterShow.get();
         if(event.getKey() != KeyManager.toggleDiff.getKey().getKeyCode()  || showMode != DifficultyMeterShow.KEYPRESS)
             return;
@@ -75,6 +72,8 @@ public class DifficultyMeter extends Screen {
 
     @SubscribeEvent
     public void onRenderOverlay(RenderGameOverlayEvent.Post event) {
+        if(!EnabledFeatures.difficultyEnabled()) return;
+
         DifficultyMeterShow showMode = Config.CLIENT.difficultyMeterShow.get();
         if (event.getType() != RenderGameOverlayEvent.ElementType.TEXT || showMode == DifficultyMeterShow.NEVER) {
             return;
@@ -93,7 +92,7 @@ public class DifficultyMeter extends Screen {
         AreaDifficultyMode areaMode = ClientHandler.areaMode;
         int preClampAreaDifficulty = (int) ClientHandler.areaDifficulty;
         int areaDifficulty = MathHelper.clamp(preClampAreaDifficulty, 0, (int) maxDifficulty);
-        int difficulty = areaMode == AreaDifficultyMode.DIMENSION_WIDE
+        int difficulty = areaMode == AreaDifficultyMode.SERVER_WIDE
                 ? areaDifficulty
                 : (int) ClientHandler.playerDifficulty;
         int timeSinceLastUpdate = ClientTicks.ticksInGame() - lastUpdateTime;

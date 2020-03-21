@@ -1,11 +1,11 @@
 package net.silentchaos512.scalinghealth.network;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
-import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.entity.BlightFireEntity;
 
 import javax.annotation.Nullable;
@@ -32,12 +32,12 @@ public class SpawnBlightFirePacket {
     }
 
     public static void handle(SpawnBlightFirePacket packet, Supplier<NetworkEvent.Context> context) {
-        //ScalingHealth.LOGGER.debug("Handling the SpawnBlightFire Packet!");
         context.get().enqueueWork(() -> {
-            Entity entity = getTargetEntity(packet.parentId);
-            if (entity instanceof MobEntity) {
-                ScalingHealth.LOGGER.debug("Spawning Blight Fire on the CLIENT");
-                entity.world.addEntity(new BlightFireEntity((MobEntity) entity));
+            if(context.get().getDirection() == NetworkDirection.PLAY_TO_SERVER){
+                Entity entity = getTargetEntity(packet.parentId);
+                if (entity instanceof MobEntity) {
+                    entity.world.addEntity(new BlightFireEntity((MobEntity) entity));
+                }
             }
         });
         context.get().setPacketHandled(true);
@@ -45,8 +45,7 @@ public class SpawnBlightFirePacket {
 
     @Nullable
     private static Entity getTargetEntity(int entityId) {
-        PlayerEntity clientPlayer = ScalingHealth.PROXY.getClientPlayer();
-        if (clientPlayer == null) return null;
-        return clientPlayer.world.getEntityByID(entityId);
+        //This WILL crash on server, check first
+        return Minecraft.getInstance().world.getEntityByID(entityId);
     }
 }

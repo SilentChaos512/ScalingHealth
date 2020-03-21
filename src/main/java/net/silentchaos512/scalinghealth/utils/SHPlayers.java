@@ -1,11 +1,11 @@
 package net.silentchaos512.scalinghealth.utils;
 
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
+import net.silentchaos512.scalinghealth.capability.IPlayerData;
+import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
 import net.silentchaos512.scalinghealth.config.Config;
-import net.silentchaos512.scalinghealth.config.DimensionConfig;
 import net.silentchaos512.scalinghealth.config.EvalVars;
+import net.silentchaos512.scalinghealth.config.GameConfig;
 import net.silentchaos512.scalinghealth.config.RegenConfig;
 import net.silentchaos512.utils.MathUtils;
 
@@ -16,81 +16,81 @@ import net.silentchaos512.utils.MathUtils;
 public final class SHPlayers {
     private SHPlayers() {throw new IllegalAccessError("Utility class");}
 
-    public static int startingHealth(PlayerEntity player) {
-        return Config.get(player).player.startingHealth.get();
+    public static IPlayerData getPlayerData(PlayerEntity entity){
+        return entity.getCapability(PlayerDataCapability.INSTANCE).orElseThrow(() -> new IllegalStateException("Could not access capability"));
     }
 
-    public static int minHealth(PlayerEntity player) {
-        return Config.get(player).player.minHealth.get();
+    public static int startingHealth() {
+        return Config.GENERAL.player.startingHealth.get();
     }
 
-    public static int maxHealth(PlayerEntity player) {
-        int value = Config.get(player).player.maxHealth.get();
+    public static int minHealth() {
+        return Config.GENERAL.player.minHealth.get();
+    }
+
+    public static int maxHealth() {
+        int value = Config.GENERAL.player.maxHealth.get();
         return value <= 0 ? Integer.MAX_VALUE : value;
     }
 
-    public static int maxHeartCrystals(PlayerEntity player) {
-        return (maxHealth(player) - startingHealth(player)) / 2;
+    public static int maxHeartCrystals() {
+        return (maxHealth() - startingHealth()) / (2 * SHItems.heartCrystalIncreaseAmount());
     }
 
-    public static int maxAttackDamage(PlayerEntity player) {
-        int value = Config.get(player).player.maxAttackDamage.get();
+    public static int maxAttackDamage() {
+        int value = Config.GENERAL.player.maxAttackDamage.get();
         return value <= 0 ? Integer.MAX_VALUE : value;
     }
 
-    public static int maxPowerCrystals(PlayerEntity player) {
-        return (int) ((maxAttackDamage(player) - 1) / SHItems.powerCrystalIncreaseAmount(player));
+    public static int maxPowerCrystals() {
+        return (int) ((maxAttackDamage() - 1) / SHItems.powerCrystalIncreaseAmount());
     }
 
-    public static int clampExtraHearts(PlayerEntity player, int value) {
+    public static int clampExtraHearts(int value) {
         return MathUtils.clamp(value,
-                (minHealth(player) - startingHealth(player)) / 2,
-                (maxHealth(player) - startingHealth(player)) / 2
+                (minHealth() - startingHealth()) / 2,
+                (maxHealth() - startingHealth()) / 2
         );
     }
 
-    public static int clampPowerCrystals(PlayerEntity player, int value) {
+    public static int clampPowerCrystals(int value) {
         return MathUtils.clamp(value,
                 0,
-                maxPowerCrystals(player)
+                maxPowerCrystals()
         );
     }
 
-    public static int getCrystalCountFromHealth(PlayerEntity player, float health) {
-        return (int) ((health - startingHealth(player)) / 2);
+    /**
+     *  Given an hp, returns how many crystals are needed to get that hp. The amount of crystals can be negative.
+     *  (Started at 20, want to be at 10 -> -5 crystals are needed.
+     */
+    public static int getCrystalCountFromHealth(float health) {
+        return (int) ((health - startingHealth()) / (2 * SHItems.heartCrystalIncreaseAmount()));
     }
 
-    public static float getHealthAfterDeath(PlayerEntity player, DimensionType deathDimension) {
-        DimensionConfig config = Config.get(deathDimension);
-        int deathHp = (int) EvalVars.apply(config, player, config.player.setHealthOnDeath.get());
-        int maxHp = maxHealth(player);
-        int minHp = minHealth(player);
+    public static float getHealthAfterDeath(PlayerEntity player) {
+        GameConfig config = Config.GENERAL;
+        int deathHp = (int) EvalVars.apply(player, config.player.setHealthOnDeath.get());
+        int maxHp = maxHealth();
+        int minHp = minHealth();
         int hp = Math.max(deathHp, minHp);
         hp = Math.min(hp, maxHp);
         return hp;
     }
 
-    public static RegenConfig getRegenConfig(World world){
-        return Config.get(world).player.regen;
+    public static RegenConfig getRegenConfig(){
+        return Config.GENERAL.player.regen;
     }
 
-    public static boolean xpModeEnabled(World world){
-        return xpMode(world) != 0;
+    public static int levelsPerHp(){
+        return Config.GENERAL.player.levelsPerHp.get();
     }
 
-    public static boolean hpDisabledByXp(World world){
-        return xpMode(world) != 1;
+    public static int hpPerLevel() {
+        return Config.GENERAL.player.hpPerLevel.get();
     }
 
-    public static int xpMode(World world){
-        return Config.get(world).player.healthByXp.get();
-    }
-
-    public static int levelsPerHp(World world){
-        return Config.get(world).player.levelsPerHp.get();
-    }
-
-    public static int hpPerLevel(World world){
-        return Config.get(world).player.hpPerLevel.get();
+    public static int hpFromCurrentXp(int levels) {
+        return levels / levelsPerHp() * hpPerLevel();
     }
 }

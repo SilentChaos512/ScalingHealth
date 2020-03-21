@@ -16,7 +16,7 @@ public class ClientLoginMessage {
 
     public static ClientLoginMessage fromBytes(ByteBuf buf) {
         ClientLoginMessage msg = new ClientLoginMessage();
-        msg.areaMode = AreaDifficultyMode.fromOrdinal((int) buf.readByte());
+        msg.areaMode = AreaDifficultyMode.fromOrdinal(buf.readByte());
         msg.maxDifficultyValue = buf.readFloat();
         return msg;
     }

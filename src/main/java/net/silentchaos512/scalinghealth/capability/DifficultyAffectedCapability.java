@@ -3,7 +3,6 @@ package net.silentchaos512.scalinghealth.capability;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
-import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.*;
@@ -11,8 +10,8 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.event.DifficultyEvents;
-import net.silentchaos512.scalinghealth.utils.SHDifficulty;
 import net.silentchaos512.scalinghealth.utils.MobDifficultyHandler;
+import net.silentchaos512.scalinghealth.utils.SHDifficulty;
 import net.silentchaos512.scalinghealth.utils.SHMobs;
 
 import javax.annotation.Nonnull;
@@ -93,19 +92,6 @@ public class DifficultyAffectedCapability implements IDifficultyAffected, ICapab
     public void deserializeNBT(CompoundNBT nbt) {
         blight = nbt.getBoolean(NBT_BLIGHT);
         difficulty = nbt.getFloat(NBT_DIFFICULTY);
-    }
-
-    public static DifficultyAffectedCapability read(PacketBuffer buffer) {
-        DifficultyAffectedCapability cap = new DifficultyAffectedCapability();
-        cap.blight = buffer.getBoolean(0);
-        cap.difficulty = buffer.readFloat();
-        cap.processed = true;
-        return cap;
-    }
-
-    public void write(PacketBuffer buffer) {
-        buffer.writeBoolean(blight);
-        buffer.writeFloat(difficulty);
     }
 
     public static boolean canAttachTo(ICapabilityProvider entity) {

@@ -15,50 +15,25 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.dimension.DimensionType;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.lib.util.BiomeUtils;
 import net.silentchaos512.lib.util.DimensionUtils;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.config.equipment.*;
 import net.silentchaos512.scalinghealth.lib.AreaDifficultyMode;
 import net.silentchaos512.scalinghealth.lib.MobHealthMode;
 import net.silentchaos512.scalinghealth.utils.SHMobs;
 import net.silentchaos512.utils.config.*;
 
 import javax.annotation.Nullable;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static net.minecraft.item.Items.*;
-import static net.minecraft.item.Items.DIAMOND_LEGGINGS;
-
-public class DimensionConfig {
+public class GameConfig {
     public static class General {
-        General(ConfigSpecWrapper wrapper) {
-            wrapper.comment("general", "settings for a particular dimension");
-        }
+        General(ConfigSpecWrapper wrapper) { }
     }
-
-    /*
-        new TranslationTextComponent("config.scalinghealth.area_mode.weighted_average").getFormattedText(),
-        new TranslationTextComponent("config.scalinghealth.area_mode.weighted_average.desc").getFormattedText(),
-        new TranslationTextComponent("config.scalinghealth.area_mode.average").getFormattedText(),
-        new TranslationTextComponent("config.scalinghealth.area_mode.average.desc").getFormattedText(),
-        new TranslationTextComponent("config.scalinghealth.area_mode.min_level").getFormattedText(),
-        new TranslationTextComponent("config.scalinghealth.area_mode.min_level.desc").getFormattedText(),
-        new TranslationTextComponent("config.scalinghealth.area_mode.max_level").getFormattedText(),
-        new TranslationTextComponent("config.scalinghealth.area_mode.max_level.desc").getFormattedText(),
-        new TranslationTextComponent("config.scalinghealth.area_mode.distance_from_spawn").getFormattedText(),
-        new TranslationTextComponent("config.scalinghealth.area_mode.distance_from_spawn.desc").getFormattedText(),
-        new TranslationTextComponent("config.scalinghealth.area_mode.distance_from_origin").getFormattedText(),
-        new TranslationTextComponent("config.scalinghealth.area_mode.distance_from_origin.desc").getFormattedText(),
-        new TranslationTextComponent("config.scalinghealth.area_mode.distance_and_time").getFormattedText(),
-        new TranslationTextComponent("config.scalinghealth.area_mode.distance_and_time.desc").getFormattedText(),
-        new TranslationTextComponent("config.scalinghealth.area_mode.dimension_wide").getFormattedText(),
-        new TranslationTextComponent("config.scalinghealth.area_mode.dimension_wide.desc").getFormattedText())
-     */
 
     public static class Difficulty {
         // Standard options
@@ -71,8 +46,6 @@ public class DimensionConfig {
         public final DoubleValue distanceFactor;
         public final EnumValue<AreaDifficultyMode> areaMode;
         public final IntValue searchRadius;
-        public final BooleanValue localPlayerDifficulty;
-        public final BooleanValue localDimensionDifficulty;
         public final BooleanValue ignoreYAxis;
         public final Supplier<Expression> groupAreaBonus;
         public final DoubleValue idleMultiplier;
@@ -99,7 +72,7 @@ public class DimensionConfig {
         private final ConfigSpec locationMultipliersSpec = new ConfigSpec();
 
         Difficulty(ConfigSpecWrapper wrapper) {
-            byEntitySpec.defineList("types", ImmutableList.of("minecraft:villager"), DimensionConfig::validateId);
+            byEntitySpec.defineList("types", ImmutableList.of("minecraft:villager"), GameConfig::validateId);
             byEntitySpec.define("onKilled", "difficulty + 0.01", o -> validateExpression(o, "onKilled", EvalVars.PLAYER_DIFFICULTY));
 
             locationMultipliersSpec.defineList("biomes", ImmutableList.of("modid:example"), ConfigValue.IS_NONEMPTY_STRING);
@@ -151,22 +124,13 @@ public class DimensionConfig {
                             "Same as DISTANCE_FROM_SPAWN but from (0, 0, 0)",
                             "DISTANCE_AND_TIME:",
                             "Mix of WEIGHTED_AVERAGE and DISTANCE_FROM_SPAWN. Difficulty increases with time but also with distance",
-                            "DIMENSION_WIDE:",
+                            "SERVER_WIDE:",
                             "Difficulty tracked at the server level. Player difficulty is irrelevant.")
                     .defineEnum(AreaDifficultyMode.WEIGHTED_AVERAGE);
             searchRadius = wrapper
                     .builder("difficulty.searchRadius")
                     .comment("Distance to look for difficulty sources (players) when calculating area difficulty.")
                     .defineInRange(256, 64, Integer.MAX_VALUE);
-            localPlayerDifficulty = wrapper
-                    .builder("difficulty.localPlayerDifficulty")
-                    .comment("If true, player difficulty is tracked for this dimension.",
-                            "Otherwise, the value tracked for the \"default\" dimension is used.")
-                    .define(false);
-            localDimensionDifficulty = wrapper
-                    .builder("difficulty.localDimensionDifficulty")
-                    .comment("Track a difficulty value for this dimension. Otherwise, uses the \"default\" dimension.")
-                    .define(false);
             ignoreYAxis = wrapper
                     .builder("difficulty.ignoreYAxis")
                     .comment("Ignore the Y-axis in difficulty calculations")
@@ -335,14 +299,12 @@ public class DimensionConfig {
         public final DoubleValue enchantedHeartAffect;
         public final DoubleValue chanceHeartAffect;
 
-        public final DoubleValue heartCrystalHealthRestored;
+        public final DoubleValue heartCrystalHpBonusRegen;
         public final IntValue heartCrystalLevelCost;
         public final IntValue heartCrystalHealthIncrease;
-        public final BooleanValue forceDisableHeartCrystalOreGen;
 
         public final IntValue powerCrystalLevelCost;
         public final DoubleValue powerCrystalDamageIncrease;
-        public final BooleanValue forceDisablePowerCrystalOreGen;
 
         Items(ConfigSpecWrapper wrapper) {
             wrapper.comment("items", "Settings for items when used in this dimension");
@@ -362,38 +324,28 @@ public class DimensionConfig {
                             "In that case, n difficulty is added (n = 10, 1 in 21 chance to get +10)",
                             "There's a 2 in 2n + 1 chance for 1 to n difficulty to be subtracted (n = 3, 2 in 7 chance of getting -1, -2, or -3")
                     .defineInRange(10, -Double.MAX_VALUE, Double.MAX_VALUE);
-            forceDisableHeartCrystalOreGen = wrapper
-                    .builder("item.heart_crystal.oregen")
-                    .comment("Ore gen will automatically disable if heart crystals do nothing (no hp increase and hp regen), set to true to force it",
-                            "Heart crystals will still drop from mobs and appear in chests")
-                    .define(false);
 
-            heartCrystalHealthRestored = wrapper
+            heartCrystalHpBonusRegen = wrapper
                     .builder("item.heart_crystal.healthRestored")
-                    .comment("The amount of additional health restored by heart crystals (min = 0)",
+                    .comment("The amount of additional health restored by heart crystals.",
                             "Heart crystals always restore the amount of health they add, this is a bonus")
                     .defineInRange(4, 0, Double.MAX_VALUE);
             heartCrystalLevelCost = wrapper
                     .builder("item.heart_crystal.levelCost")
-                    .comment("The number of levels required to use a heart crystal (min = 0)")
+                    .comment("The number of levels required to use a heart crystal.")
                     .defineInRange(3, 0, Integer.MAX_VALUE);
             heartCrystalHealthIncrease = wrapper
                     .builder("item.heart_crystal.healthBoost")
-                    .comment("How much health a player will gain using a heart crystal (set 0 to disable)")
+                    .comment("How much hearts a player will gain using a heart crystal.")
                     .defineInRange(1, 0, Integer.MAX_VALUE);
 
-            forceDisablePowerCrystalOreGen = wrapper
-                    .builder("item.heart_crystal.oregen")
-                    .comment("Ore gen will automatically disable if power crystals do nothing, set to true to force it",
-                            "Power crystals will still drop from mobs and appear in chests")
-                    .define(false);
             powerCrystalLevelCost = wrapper
                     .builder("item.power_crystal.levelCost")
-                    .comment("The number of levels required to use a power crystal (min = 0)")
+                    .comment("The number of levels required to use a power crystal.")
                     .defineInRange(3, 0, Integer.MAX_VALUE);
             powerCrystalDamageIncrease = wrapper
                     .builder("item.power_crystal.damageBoost")
-                    .comment("How much more damage a player deals after using a power crystal (set 0 to disable)")
+                    .comment("How much more damage a player deals after using a power crystal.")
                     .defineInRange(0.5, 0, Double.MAX_VALUE);
         }
     }
@@ -402,8 +354,6 @@ public class DimensionConfig {
 
     public static class Player {
         // Health settings
-        public final BooleanValue localHealth;
-        public final IntValue healthByXp;
         public final IntValue levelsPerHp;
         public final IntValue hpPerLevel;
         public final IntValue startingHealth;
@@ -415,10 +365,6 @@ public class DimensionConfig {
 
         Player(ConfigSpecWrapper wrapper) {
             wrapper.comment("player", "Settings for players");
-            localHealth = wrapper
-                    .builder("player.health.localHealth")
-                    .comment("Player health and max health are unique to this dimension.")
-                    .define(false);
             startingHealth = wrapper
                     .builder("player.health.startingHealth")
                     .comment("Starting player health, in half-hearts (20 = 10 hearts)")
@@ -438,14 +384,10 @@ public class DimensionConfig {
                     EvalVars.MAX_HEALTH,
                     "On death, set the player's max health to this value. By default, there is no change.");
             wrapper.comment("player.health.xp", "settings for hp scaling by xp level");
-            healthByXp = wrapper
-                    .builder("player.health.xp.mode")
-                    .comment("mode of health by xp, 0 for inactive, 1 for pure hp by level (deactivates heart crystals), 2 for mix, xp and heart crystals increases hp")
-                    .defineInRange(0, 0, 2);
             levelsPerHp = wrapper
                     .builder("player.health.xp.levelAmount")
                     .comment("How many levels it takes for an hp increase")
-                    .defineInRange(1, 1, Integer.MAX_VALUE);
+                    .defineInRange(3, 1, Integer.MAX_VALUE);
             hpPerLevel = wrapper
                     .builder("player.health.xp.hpAmount")
                     .comment("On hp increase, how much hp is gained")
@@ -475,6 +417,7 @@ public class DimensionConfig {
 
         // Blights
         private final ConfigValue<List<? extends String>> mobsBlightExempt;
+        private final ConfigValue<List<? extends String>> mobsDifficultyExempt;
         public final DoubleValue blightChance;
         public final DoubleValue blightDiffModifier;
         public final MobPotionConfig blightPotions;
@@ -482,6 +425,11 @@ public class DimensionConfig {
         public final DoubleValue xpBlightBoost;
 
         Mobs(ConfigSpecWrapper wrapper) {
+            mobsDifficultyExempt = wrapper
+                    .builder("mob.difficultyExempt")
+                    .comment("These mobs will not be able to gain difficulty. They can still become blight however.")
+                    .defineList(ImmutableList.of("villager", "wandering_trader"), mob -> ForgeRegistries.ENTITIES.containsKey(new ResourceLocation((String) mob)));
+
             wrapper.comment("mob.health", "Mob health settings");
 
             healthMode = wrapper
@@ -538,7 +486,7 @@ public class DimensionConfig {
                     .comment("These mobs won't be able to become blight, to add use - MODID:entity_name - except for mc mobs, minecraft: can be omitted as shown")
                     .defineList(ImmutableList.of("bat", "cat", "chicken", "cod", "cow", "donkey", "fox", "horse", "mooshroom",
                             "mule", "ocelot", "parrot", "pig", "rabbit", "salmon", "sheep", "tropical_fish", "turtle", "villager", "wandering_trader"),
-                            ConfigValue.IS_NONEMPTY_STRING);
+                            mob -> ForgeRegistries.ENTITIES.containsKey(new ResourceLocation((String) mob)));
 
             blightChance = wrapper
                     .builder("mob.blight.chance")
@@ -569,6 +517,7 @@ public class DimensionConfig {
 
         //maybe a better way to cache
         private List<ResourceLocation> blightExemptedMobs = null;
+        private List<ResourceLocation> diffExemptedMobs = null;
 
         public boolean isMobBlightExempt(MobEntity entity) {
             if(blightExemptedMobs == null)
@@ -587,12 +536,29 @@ public class DimensionConfig {
             }
             return false;
         }
+
+        public boolean isMobDiffExempt(MobEntity entity) {
+            if(diffExemptedMobs == null)
+                //caching the value, so as to not generate it every mob spawn
+                diffExemptedMobs = mobsDifficultyExempt.get().
+                        stream().
+                        map(ResourceLocation::tryCreate).
+                        filter(Objects::nonNull).
+                        collect(Collectors.toList());
+
+            ResourceLocation rl = entity.getType().getRegistryName();
+            for (ResourceLocation rl2 : diffExemptedMobs) {
+                if (rl2.equals(rl)) {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
     public static class DamageScaling {
         public final DoubleValue difficultyWeight;
         public final DoubleValue genericScale;
-        public final BooleanValue affectPlayers;
         public final BooleanValue affectHostiles;
         public final BooleanValue affectPeacefuls;
         public final ConfigValue<List<? extends String>> modBlacklist;
@@ -610,17 +576,13 @@ public class DimensionConfig {
 
             difficultyWeight = wrapper
                     .builder("damageScaling.difficultyWeight")
-                    .comment("How sharply damage scales with difficulty")
+                    .comment("How sharply damage scales with difficulty.")
                     .defineInRange(0.04, 0, Double.MAX_VALUE);
             genericScale = wrapper
                     .builder("damageScaling.genericScale")
                     .comment("Scale for all damage types which does not have a specific scale defined.",
                             "This can have unintended side effects, so it's recommended to leave this at 0.")
                     .defineInRange(0.0, 0, Double.MAX_VALUE);
-            affectPlayers = wrapper
-                    .builder("damageScaling.affectPlayers")
-                    .comment("Does damage scaling affect players?")
-                    .define(true);
             affectHostiles = wrapper
                     .builder("damageScaling.affectHostiles")
                     .comment("Does damage scaling affect hostile mobs?")
@@ -660,98 +622,6 @@ public class DimensionConfig {
         }
     }
 
-    public static class Equipments {
-        public final HelmetConfig equipmentHelmet;
-        public final ChestConfig equipmentChest;
-        public final LeggingsConfig equipmentLegging;
-        public final BootsConfig equipmentBoots;
-        //public final WeaponConfig equipmentWeapon;
-
-        Equipments(ConfigSpecWrapper wrapper){
-            wrapper.comment("equipments",
-                    "");
-
-            equipmentHelmet = HelmetConfig.init(wrapper,
-                    "equipments.helmet",
-                    true,
-                    ImmutableList.<CommentedConfig>builder()
-                            .add(HelmetConfig.from(LEATHER_HELMET, 1, ImmutableList.<String>builder().build(),20))
-                            .add(HelmetConfig.from(LEATHER_HELMET, 1, ImmutableList.<String>builder().add("protection").build(), 35))
-                            .add(HelmetConfig.from(CHAINMAIL_HELMET, 1, ImmutableList.<String>builder().add("protection").build(), 49))
-                            .add(HelmetConfig.from(GOLDEN_HELMET, 2, ImmutableList.<String>builder().add("thorns").build(),70))
-                            .add(HelmetConfig.from(CHAINMAIL_HELMET, 2, ImmutableList.<String>builder().add("protection").build(), 90))
-                            .add(HelmetConfig.from(IRON_HELMET, 3, ImmutableList.<String>builder().add("projectile_protection").build(), 110))
-                            .add(HelmetConfig.from(IRON_HELMET, 3, ImmutableList.<String>builder().add("protection").add("thorns").build(), 125))
-                            .add(HelmetConfig.from(DIAMOND_HELMET, 3, ImmutableList.<String>builder().build(), 140))
-                            .add(HelmetConfig.from(IRON_HELMET, 4, ImmutableList.<String>builder().add("projectile_protection").add("thorns").build(), 155))
-                            .add(HelmetConfig.from(DIAMOND_HELMET, 4, ImmutableList.<String>builder().add("protection").build(), 170))
-                            .add(HelmetConfig.from(DIAMOND_HELMET, 4, ImmutableList.<String>builder().add("protection").add("thorns").build(), 210))
-                            .build());
-
-            equipmentChest = ChestConfig.init(wrapper,
-                    "equipments.chestplate",
-                    true,
-                    ImmutableList.<CommentedConfig>builder()
-                            .add(HelmetConfig.from(LEATHER_CHESTPLATE, 1, ImmutableList.<String>builder().build(),20))
-                            .add(HelmetConfig.from(LEATHER_CHESTPLATE, 1, ImmutableList.<String>builder().add("protection").build(), 35))
-                            .add(HelmetConfig.from(CHAINMAIL_CHESTPLATE, 1, ImmutableList.<String>builder().add("protection").build(), 49))
-                            .add(HelmetConfig.from(GOLDEN_CHESTPLATE, 2, ImmutableList.<String>builder().add("thorns").build(),70))
-                            .add(HelmetConfig.from(CHAINMAIL_CHESTPLATE, 2, ImmutableList.<String>builder().add("protection").build(), 90))
-                            .add(HelmetConfig.from(IRON_CHESTPLATE, 3, ImmutableList.<String>builder().add("projectile_protection").build(), 110))
-                            .add(HelmetConfig.from(IRON_CHESTPLATE, 3, ImmutableList.<String>builder().add("protection").add("thorns").build(), 125))
-                            .add(HelmetConfig.from(DIAMOND_CHESTPLATE, 3, ImmutableList.<String>builder().build(), 140))
-                            .add(HelmetConfig.from(IRON_CHESTPLATE, 4, ImmutableList.<String>builder().add("projectile_protection").add("thorns").build(), 155))
-                            .add(HelmetConfig.from(DIAMOND_CHESTPLATE, 4, ImmutableList.<String>builder().add("protection").build(), 170))
-                            .add(HelmetConfig.from(DIAMOND_CHESTPLATE, 4, ImmutableList.<String>builder().add("protection").add("thorns").build(), 210))
-                            .build());
-
-            equipmentLegging = LeggingsConfig.init(wrapper, "equipments.leggings", true,
-                    ImmutableList.<CommentedConfig>builder()
-                            .add(HelmetConfig.from(LEATHER_LEGGINGS, 1, ImmutableList.<String>builder().build(),20))
-                            .add(HelmetConfig.from(LEATHER_LEGGINGS, 1, ImmutableList.<String>builder().add("protection").build(), 35))
-                            .add(HelmetConfig.from(CHAINMAIL_LEGGINGS, 1, ImmutableList.<String>builder().add("protection").build(), 49))
-                            .add(HelmetConfig.from(GOLDEN_LEGGINGS, 2, ImmutableList.<String>builder().add("thorns").build(),70))
-                            .add(HelmetConfig.from(CHAINMAIL_LEGGINGS, 2, ImmutableList.<String>builder().add("protection").build(), 90))
-                            .add(HelmetConfig.from(IRON_LEGGINGS, 3, ImmutableList.<String>builder().add("projectile_protection").build(), 110))
-                            .add(HelmetConfig.from(IRON_LEGGINGS, 3, ImmutableList.<String>builder().add("protection").add("thorns").build(), 125))
-                            .add(HelmetConfig.from(DIAMOND_LEGGINGS, 3, ImmutableList.<String>builder().build(), 140))
-                            .add(HelmetConfig.from(IRON_LEGGINGS, 4, ImmutableList.<String>builder().add("projectile_protection").add("thorns").build(), 155))
-                            .add(HelmetConfig.from(DIAMOND_LEGGINGS, 4, ImmutableList.<String>builder().add("protection").build(), 170))
-                            .add(HelmetConfig.from(DIAMOND_LEGGINGS, 4, ImmutableList.<String>builder().add("protection").add("thorns").build(), 210))
-                            .build());
-
-            equipmentBoots = BootsConfig.init(wrapper, "equipments.boots", true,
-                    ImmutableList.<CommentedConfig>builder()
-                            .add(HelmetConfig.from(LEATHER_BOOTS, 1, ImmutableList.<String>builder().build(),5))
-                            .add(HelmetConfig.from(LEATHER_BOOTS, 1, ImmutableList.<String>builder().add("thorns").build(),15))
-                            .add(HelmetConfig.from(CHAINMAIL_BOOTS, 1, ImmutableList.<String>builder().build(),25))
-                            .add(HelmetConfig.from(LEATHER_BOOTS, 1, ImmutableList.<String>builder().add("protection").build(),25))
-                            .add(HelmetConfig.from(CHAINMAIL_BOOTS, 1, ImmutableList.<String>builder().add("protection").build(),30))
-                            .add(HelmetConfig.from(GOLDEN_BOOTS, 2, ImmutableList.<String>builder().add("thorns").build(),40))
-                            .add(HelmetConfig.from(IRON_BOOTS, 2, ImmutableList.<String>builder().build(),40))
-                            .add(HelmetConfig.from(GOLDEN_BOOTS, 2, ImmutableList.<String>builder().add("protection").add("thorns").build(),50))
-                            .add(HelmetConfig.from(CHAINMAIL_BOOTS, 2, ImmutableList.<String>builder().add("frost_walker").build(),60))
-                            .add(HelmetConfig.from(IRON_BOOTS, 3, ImmutableList.<String>builder().add("protection").build(),80))
-                            .add(HelmetConfig.from(IRON_BOOTS, 3, ImmutableList.<String>builder().add("protection").add("thorns").build(),100))
-                            .add(HelmetConfig.from(DIAMOND_BOOTS, 4, ImmutableList.<String>builder().build(),110))
-                            .add(HelmetConfig.from(LEATHER_BOOTS, 4, ImmutableList.<String>builder().add("protection").add("thorns").add("frost_walker").build(),125))
-                            .add(HelmetConfig.from(IRON_BOOTS, 4, ImmutableList.<String>builder().add("thorns").add("frost_walker").build(),135))
-                            .add(HelmetConfig.from(GOLDEN_BOOTS, 5, ImmutableList.<String>builder().add("protection").add("thorns").add("frost_walker").build(),155))
-                            .add(HelmetConfig.from(DIAMOND_BOOTS, 5, ImmutableList.<String>builder().add("protection").build(),165))
-                            .add(HelmetConfig.from(DIAMOND_BOOTS, 6, ImmutableList.<String>builder().add("protection").add("thorns").add("frost_walker").build(),195))
-                            .build());
-
-            /*equipmentWeapon = WeaponConfig.init(wrapper, "equipments.weapon", true,
-                    ImmutableList.<CommentedConfig>builder()
-                            .add(WeaponConfig.from(STONE_SWORD, 1, ImmutableList.<String>builder().add("fire_aspect").build(),5))
-                            .add(WeaponConfig.from(BOW, 2, ImmutableList.<String>builder().add("punch").build(),20))
-                            .add(WeaponConfig.from(DIAMOND_SWORD, 3, ImmutableList.<String>builder().add("sharpness").build(),35))
-                            .add(WeaponConfig.from(TRIDENT, 4, ImmutableList.<String>builder().add("impaling").add("channeling").build(),50))
-                            .add(WeaponConfig.from(BOW, 5, ImmutableList.<String>builder().add("punch").add("flame").add("power").build(),45))
-                            .build());*/
-        }
-    }
-
     public static class Pets {
         public final DoubleValue regenDelay;
         public final DoubleValue hpGainByCrystal;
@@ -765,8 +635,8 @@ public class DimensionConfig {
                     .defineInRange(30, 0, Double.MAX_VALUE);
             hpGainByCrystal = wrapper
                     .builder("pets.hpGain")
-                    .comment("Define the amount of hp a tamed ped will gain when right clicking with a heart crystal")
-                    .defineInRange(5, 0, Double.MAX_VALUE);
+                    .comment("Define the amount of hp a tamed ped will gain when right clicking with a heart crystal.")
+                    .defineInRange(5, 1, Double.MAX_VALUE);
         }
     }
 
@@ -796,8 +666,6 @@ public class DimensionConfig {
                     "Expression for '{}' does not contain the '{}' variable. This could be intended, but seems odd.",
                     path, intendedVar);
         }
-
-        // TODO: What else can we do here to validate an expression?
         return true;
     }
 
@@ -808,7 +676,6 @@ public class DimensionConfig {
     private final ConfigSpecWrapper wrapper;
 
     public final General general;
-    public final Equipments equipment;
     public final Items item;
     public final Mobs mobs;
     public final Player player;
@@ -816,55 +683,18 @@ public class DimensionConfig {
     public final Difficulty difficulty;
     public final DamageScaling damageScaling;
 
-    private final String configFileName;
-    private final int dimensionId;
-
-    @SuppressWarnings("DynamicRegexReplaceableByCompiledPattern")
-    DimensionConfig(final Path path) {
-        wrapper = ConfigSpecWrapper.create(path);
+    GameConfig(ConfigSpecWrapper wrapper) {
+        this.wrapper = wrapper;
         general = new General(wrapper);
-        equipment = new Equipments(wrapper);
         item = new Items(wrapper);
         mobs = new Mobs(wrapper);
         player = new Player(wrapper);
         pets = new Pets(wrapper);
         difficulty = new Difficulty(wrapper);
         damageScaling = new DamageScaling(wrapper);
-
-        configFileName = path.getFileName().toString();
-        String trimmed = configFileName
-                .replaceFirst("\\.toml$", "")
-                .replaceFirst("^dim(ension)?_?", "");
-        this.dimensionId = dimensionIdFromString(trimmed);
     }
 
     void validate() {
         wrapper.validate();
-    }
-
-    int dimensionID() {
-        return dimensionId;
-    }
-
-    private static int dimensionIdFromString(String str) {
-        ScalingHealth.LOGGER.debug("Config found for dimension: " + str);
-        if ("default".equalsIgnoreCase(str) || "overworld".equalsIgnoreCase(str)) return 0;
-        if ("nether".equalsIgnoreCase(str)) return -1;
-        if ("end".equalsIgnoreCase(str)) return 1;
-
-        try {
-            return Integer.parseInt(str);
-        } catch (NumberFormatException ex) {
-            ScalingHealth.LOGGER.error("Unknown dimension ID: '{}'", str);
-            return 0;
-        }
-    }
-
-    @Override
-    public String toString() {
-        return "DimensionConfig{" +
-                "id=" + dimensionId +
-                ", fileName=" + configFileName +
-                "}";
     }
 }

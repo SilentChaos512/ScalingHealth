@@ -7,6 +7,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.Config;
+import net.silentchaos512.scalinghealth.utils.EnabledFeatures;
 import net.silentchaos512.scalinghealth.utils.SHMobs;
 
 import javax.annotation.Nullable;
@@ -19,7 +20,7 @@ public enum EntityGroup {
     BLIGHT(null),
     PLAYER(null);
 
-    @Nullable private final ResourceLocation bonusDropsLootTable;
+    private final ResourceLocation bonusDropsLootTable;
 
     EntityGroup(@Nullable String bonusDropsTable) {
         bonusDropsLootTable = bonusDropsTable != null
@@ -44,28 +45,28 @@ public enum EntityGroup {
         return PEACEFUL;
 }
 
-    public double getPotionChance(LivingEntity entity) {
+    public double getPotionChance() {
         if (this == PEACEFUL)
-            return SHMobs.passivePotionChance(entity.world);
-        return SHMobs.hostilePotionChance(entity.world);
+            return SHMobs.passivePotionChance();
+        return SHMobs.hostilePotionChance();
     }
 
-    public MobHealthMode getHealthMode(LivingEntity entity) {
-        return SHMobs.healthMode(entity.world);
+    public MobHealthMode getHealthMode() {
+        return SHMobs.healthMode();
     }
 
     public Optional<ResourceLocation> getBonusDropsLootTable() {
         return Optional.ofNullable(bonusDropsLootTable);
     }
 
-    public boolean isAffectedByDamageScaling(LivingEntity entity) {
+    public boolean isAffectedByDamageScaling() {
         switch (this) {
             case PLAYER:
-                return Config.get(entity).damageScaling.affectPlayers.get();
+                return EnabledFeatures.playerDamageScalingEnabled();
             case PEACEFUL:
-                return Config.get(entity).damageScaling.affectPeacefuls.get();
+                return Config.GENERAL.damageScaling.affectPeacefuls.get();
             default:
-                return Config.get(entity).damageScaling.affectHostiles.get();
+                return Config.GENERAL.damageScaling.affectHostiles.get();
         }
     }
 }

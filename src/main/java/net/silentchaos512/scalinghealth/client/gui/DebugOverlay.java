@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.silentchaos512.lib.client.gui.DebugRenderOverlay;
+import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
 import net.silentchaos512.scalinghealth.client.ClientHandler;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.utils.SHDifficulty;
@@ -17,8 +18,7 @@ public class DebugOverlay extends DebugRenderOverlay {
 
     public static DebugOverlay INSTANCE = new DebugOverlay();
 
-    public static void init() {
-    }
+    public static void init() { }
 
     @Nonnull
     @Override
@@ -30,7 +30,7 @@ public class DebugOverlay extends DebugRenderOverlay {
                 "Difficulty (/" + ClientHandler.maxDifficultyValue + ")",
                 "- Mode=" + ClientHandler.areaMode.getDisplayName().getFormattedText(),
                 "- Player=" + String.format(FLOAT_FORMAT, ClientHandler.playerDifficulty),
-                "- World=" + String.format(FLOAT_FORMAT, ClientHandler.worldDifficulty),
+                "- Server=" + String.format(FLOAT_FORMAT, DifficultySourceCapability.getOverworldCap().orElseGet(DifficultySourceCapability::new).getDifficulty()),
                 "- Area=" + String.format(FLOAT_FORMAT + " (x%.1f, ☽x%.1f)",
                         ClientHandler.areaDifficulty,
                         ClientHandler.locationMultiPercent / 100f,

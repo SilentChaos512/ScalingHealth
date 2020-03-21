@@ -9,12 +9,15 @@ import net.minecraft.world.gen.placement.Placement;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.lib.block.IBlockProvider;
 import net.silentchaos512.scalinghealth.init.ModBlocks;
+import net.silentchaos512.scalinghealth.utils.EnabledFeatures;
 
 public class SHWorldFeatures {
     public static void addFeaturesToBiomes() {
         for (Biome biome : ForgeRegistries.BIOMES) {
-            addOre(biome, ModBlocks.HEART_CRYSTAL_ORE, 6, 1, 0, 28);
-            addOre(biome, ModBlocks.POWER_CRYSTAL_ORE, 6, 1, 0, 28);
+            if(EnabledFeatures.hpCrystalsOreGenEnabled())
+                addOre(biome, ModBlocks.HEART_CRYSTAL_ORE, 6, 1, 0, 28);
+            if(EnabledFeatures.powerCrystalsOreGenEnabled())
+                addOre(biome, ModBlocks.POWER_CRYSTAL_ORE, 6, 1, 0, 28);
         }
     }
 

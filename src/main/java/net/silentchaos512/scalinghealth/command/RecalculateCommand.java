@@ -6,7 +6,6 @@ import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.silentchaos512.scalinghealth.capability.DifficultyAffectedCapability;
 import net.silentchaos512.scalinghealth.utils.MobDifficultyHandler;
 import net.silentchaos512.scalinghealth.utils.SHDifficulty;
 

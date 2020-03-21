@@ -19,13 +19,8 @@ public final class ModCommands {
     }
 
     static ITextComponent playerNameText(PlayerEntity player) {
-        ITextComponent textDim = new TranslationTextComponent("command.scalinghealth.playerName.inDimension",
-                player.dimension
-        ).applyTextStyle(TextFormatting.GRAY);
         return new TranslationTextComponent("command.scalinghealth.playerName",
-                player.getName().applyTextStyle(TextFormatting.ITALIC),
-                textDim
-        ).applyTextStyle(TextFormatting.AQUA);
+                player.getName().applyTextStyle(TextFormatting.ITALIC)).applyTextStyle(TextFormatting.AQUA);
     }
 
     static ITextComponent valueText(double value, double maxValue) {

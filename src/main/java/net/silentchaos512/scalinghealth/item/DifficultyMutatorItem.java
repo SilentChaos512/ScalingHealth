@@ -34,6 +34,7 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IDifficultySource;
 import net.silentchaos512.scalinghealth.client.particles.ModParticles;
 import net.silentchaos512.scalinghealth.init.ModSounds;
+import net.silentchaos512.scalinghealth.utils.EnabledFeatures;
 import net.silentchaos512.scalinghealth.utils.SHDifficulty;
 import net.silentchaos512.scalinghealth.utils.SHItems;
 
@@ -42,7 +43,9 @@ import java.util.List;
 
 public class DifficultyMutatorItem extends Item {
     public enum Type {
-        ENCHANTED, CURSED, CHANCE
+        ENCHANTED,
+        CURSED,
+        CHANCE
     }
 
     private final Type type;
@@ -58,13 +61,13 @@ public class DifficultyMutatorItem extends Item {
         switch (this.type) {
             // Enchanted Heart
             case CURSED:
-                return SHItems.cursedHeartAffectAmount(world);
+                return SHItems.cursedHeartAffectAmount();
             // Cursed Heart
             case ENCHANTED:
-                return  SHItems.enchantedHeartAffectAmount(world);
+                return  SHItems.enchantedHeartAffectAmount();
             // Chance Heart
             case CHANCE:
-                int max = SHItems.chanceHeartAffectAmount(world);
+                int max = SHItems.chanceHeartAffectAmount();
                 // random equation:
                 // (Math.random()*((max-min)+1))+min
                 // max is max, min is -max
@@ -103,6 +106,9 @@ public class DifficultyMutatorItem extends Item {
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getHeldItem(hand);
+        if(!EnabledFeatures.difficultyEnabled())
+            return new ActionResult<>(ActionResultType.FAIL, stack);
+
         IDifficultySource source = SHDifficulty.source(player);
 
         float change = getEffectAmount(world);
@@ -148,7 +154,7 @@ public class DifficultyMutatorItem extends Item {
     }
 
     private void chanceHeartEffects(World world, PlayerEntity player, float diffChange){
-        int max = SHItems.chanceHeartAffectAmount(world);
+        int max = SHItems.chanceHeartAffectAmount();
         if(diffChange == max){
             cursedHeartEffects(world, player);
             ModSounds.CURSED_HEART_USE.play(player);

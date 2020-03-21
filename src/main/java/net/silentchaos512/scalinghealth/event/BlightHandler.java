@@ -33,11 +33,9 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.Config;
-import net.silentchaos512.scalinghealth.config.DimensionConfig;
 import net.silentchaos512.scalinghealth.entity.BlightFireEntity;
 import net.silentchaos512.scalinghealth.network.Network;
 import net.silentchaos512.scalinghealth.network.SpawnBlightFirePacket;
-import net.silentchaos512.scalinghealth.utils.SHDifficulty;
 import net.silentchaos512.scalinghealth.utils.SHMobs;
 
 import javax.annotation.Nullable;
@@ -46,7 +44,6 @@ import java.util.function.Supplier;
 @Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID)
 public final class BlightHandler {
 
-    public static final String NBT_BLIGHT = ScalingHealth.MOD_ID + ".IsBlight";
     private static final int UPDATE_DELAY = 200;
 
     private BlightHandler() {}
@@ -82,8 +79,7 @@ public final class BlightHandler {
     }
 
     private static void applyBlightPotionEffects(MobEntity entityLiving) {
-        DimensionConfig config = Config.get(entityLiving);
-        config.mobs.blightPotions.applyAll(entityLiving);
+        Config.GENERAL.mobs.blightPotions.applyAll(entityLiving);
     }
 
     private static void notifyPlayers(ITextComponent deathMessage, MobEntity blight, PlayerEntity slayer){
@@ -149,14 +145,14 @@ public final class BlightHandler {
             }
 
             // Tell all players that the blight was killed.
-            if (SHMobs.notifyOnDeath(blight.world) && player != null) {
+            if (SHMobs.notifyOnDeath() && player != null) {
                 ScalingHealth.LOGGER.info("Blight {} was killed by {}", blight.getName().getString(), actualKiller.getName().getString());
                 notifyPlayers(event.getSource().getDeathMessage(blight), blight, player);
             }
         } else {
             // Killed by something else.
             // Tell all players that the blight died.
-            if (SHMobs.notifyOnDeath(blight.world))
+            if (SHMobs.notifyOnDeath())
                 ScalingHealth.LOGGER.info("Blight {} has died", blight.getName().getString());
                 notifyPlayers(event.getSource().getDeathMessage(blight), blight, null);
         }

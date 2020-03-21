@@ -5,18 +5,22 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 public class DifficultySourceCapability implements IDifficultySource, ICapabilitySerializable<CompoundNBT> {
     @CapabilityInject(IDifficultySource.class)
     public static Capability<IDifficultySource> INSTANCE = null;
+
     public static ResourceLocation NAME = ScalingHealth.getId("difficulty_source");
+    private static IDifficultySource overworldCap = null;
 
     private static final String NBT_DIFFICULTY = "Difficulty";
 
@@ -24,6 +28,15 @@ public class DifficultySourceCapability implements IDifficultySource, ICapabilit
 
     private float difficulty;
     private boolean exempt = false;
+
+    public static Optional<IDifficultySource> getOverworldCap(){
+        if(overworldCap == null) return Optional.empty();
+        return Optional.of(overworldCap);
+    }
+
+    public static void setOverworldCap(IDifficultySource source){
+        overworldCap = source;
+    }
 
     @Override
     public float getDifficulty() {
@@ -70,8 +83,7 @@ public class DifficultySourceCapability implements IDifficultySource, ICapabilit
             ScalingHealth.LOGGER.error("Failed to get capabilities from {}", obj);
             return false;
         }
-        //return (obj instanceof PlayerEntity && Players.isPlayerExempt((PlayerEntity) obj))|| obj instanceof World;
-        return  obj instanceof PlayerEntity || obj instanceof World;
+        return obj instanceof PlayerEntity || (obj instanceof ServerWorld && ((ServerWorld) obj).dimension.getType() == DimensionType.OVERWORLD);
     }
 
     public static void register() {

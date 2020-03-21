@@ -13,7 +13,8 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
+import net.silentchaos512.scalinghealth.capability.IPlayerData;
+import net.silentchaos512.scalinghealth.utils.SHItems;
 import net.silentchaos512.scalinghealth.utils.SHPlayers;
 
 public final class HealthCommand {
@@ -71,32 +72,31 @@ public final class HealthCommand {
     }
 
     private static int getHealthSingle(CommandContext<CommandSource> context, PlayerEntity player) {
-        player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> {
-            context.getSource().sendFeedback(ModCommands.playerNameText(player), true);
-            // Actual health
-            ITextComponent actualValues = ModCommands.valueText(player.getHealth(), player.getMaxHealth());
-            ITextComponent actualText = text("actual", actualValues)
-                    .applyTextStyle(TextFormatting.YELLOW);
-            context.getSource().sendFeedback(actualText, true);
-            // Heart crystals and health modifier
-            int extraHearts = data.getExtraHearts();
-            String extraHealth = (extraHearts >= 0 ? "+" : "") + (2 * extraHearts);
-            ITextComponent heartsValues = text("heartCrystals.values", extraHearts, extraHealth)
-                    .applyTextStyle(TextFormatting.WHITE);
-            ITextComponent heartsText = text("heartCrystals", heartsValues)
-                    .applyTextStyle(TextFormatting.YELLOW);
-            context.getSource().sendFeedback(heartsText, true);
-        });
+        IPlayerData data = SHPlayers.getPlayerData(player);
+
+        context.getSource().sendFeedback(ModCommands.playerNameText(player), true);
+        // Actual health
+        ITextComponent actualValues = ModCommands.valueText(player.getHealth(), player.getMaxHealth());
+        ITextComponent actualText = text("actual", actualValues)
+                .applyTextStyle(TextFormatting.YELLOW);
+        context.getSource().sendFeedback(actualText, true);
+        // Heart crystals and health modifier
+        int extraHearts = data.getHeartByCrystals();
+        String extraHealth = (extraHearts >= 0 ? "+" : "") + (2 * extraHearts);
+        ITextComponent heartsValues = text("heartCrystals.values",extraHearts / SHItems.heartCrystalIncreaseAmount(), extraHealth)
+                .applyTextStyle(TextFormatting.WHITE);
+        ITextComponent heartsText = text("heartCrystals", heartsValues)
+                .applyTextStyle(TextFormatting.YELLOW);
+        context.getSource().sendFeedback(heartsText, true);
         return 1;
     }
 
     private static int runSetHealth(CommandContext<CommandSource> context) throws CommandSyntaxException {
         int amount = IntegerArgumentType.getInteger(context, "amount");
         for (ServerPlayerEntity player : EntityArgument.getPlayers(context, "targets")) {
-            player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> {
-                int intendedExtraHearts = (amount - SHPlayers.startingHealth(player)) / 2;
-                data.setExtraHearts(player, intendedExtraHearts);
-            });
+            IPlayerData data = SHPlayers.getPlayerData(player);
+            int intendedExtraHearts = (amount - SHPlayers.startingHealth()) / 2;
+            data.setHeartByCrystals(player, intendedExtraHearts);
         }
         return 1;
     }
@@ -104,9 +104,7 @@ public final class HealthCommand {
     private static int runAddHealth(CommandContext<CommandSource> context) throws CommandSyntaxException {
         int amount = IntegerArgumentType.getInteger(context, "amount");
         for (ServerPlayerEntity player : EntityArgument.getPlayers(context, "targets")) {
-            player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> {
-                data.addHearts(player, amount);
-            });
+            SHPlayers.getPlayerData(player).addHeartsByCrystals(player, amount);
         }
         return 1;
     }

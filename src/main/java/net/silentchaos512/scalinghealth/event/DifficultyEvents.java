@@ -3,7 +3,6 @@ package net.silentchaos512.scalinghealth.event;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.INBT;
@@ -23,7 +22,8 @@ import net.silentchaos512.scalinghealth.capability.DifficultyAffectedCapability;
 import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
 import net.silentchaos512.scalinghealth.capability.PetHealthCapability;
 import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
-import net.silentchaos512.scalinghealth.utils.ModifierHandler;
+import net.silentchaos512.scalinghealth.config.Config;
+import net.silentchaos512.scalinghealth.utils.EnabledFeatures;
 import net.silentchaos512.scalinghealth.utils.SHDifficulty;
 import net.silentchaos512.scalinghealth.utils.SHPlayers;
 import org.apache.logging.log4j.Marker;
@@ -45,7 +45,7 @@ public final class DifficultyEvents {
         if (DifficultyAffectedCapability.canAttachTo(entity)) {
             event.addCapability(DifficultyAffectedCapability.NAME, new DifficultyAffectedCapability());
         }
-        if (DifficultySourceCapability.canAttachTo(entity)) {
+        if (EnabledFeatures.difficultyEnabled() && DifficultySourceCapability.canAttachTo(entity)) {
             debug(() -> "attach difficulty source");
             event.addCapability(DifficultySourceCapability.NAME, new DifficultySourceCapability());
         }
@@ -53,7 +53,7 @@ public final class DifficultyEvents {
             debug(() -> "attach player data");
             event.addCapability(PlayerDataCapability.NAME, new PlayerDataCapability());
         }
-        if(PetHealthCapability.canAttachTo(entity)){
+        if(EnabledFeatures.petBonusHpEnabled() && PetHealthCapability.canAttachTo(entity)){
             debug(()-> "attach pet data");
             event.addCapability(PetHealthCapability.NAME, new PetHealthCapability());
         }
@@ -62,8 +62,10 @@ public final class DifficultyEvents {
     @SubscribeEvent
     public static void onAttachWorldCapabilities(AttachCapabilitiesEvent<World> event) {
         World world = event.getObject();
-        if (DifficultySourceCapability.canAttachTo(world)) {
-            event.addCapability(DifficultySourceCapability.NAME, new DifficultySourceCapability());
+        if (Config.COMMON.enableDifficulty.get() && DifficultySourceCapability.canAttachTo(world)) {
+            DifficultySourceCapability cap = new DifficultySourceCapability();
+            event.addCapability(DifficultySourceCapability.NAME, cap);
+            DifficultySourceCapability.setOverworldCap(cap);
         }
     }
 
@@ -91,7 +93,7 @@ public final class DifficultyEvents {
                 boolean exempt = SHDifficulty.isPlayerExempt((PlayerEntity) event.getEntityLiving());
                 source.setExempt(exempt);
                 if(exempt) return;
-                float change = (float) SHDifficulty.changePerSecond(entity.world);
+                float change = (float) SHDifficulty.changePerSecond();
                 source.setDifficulty(source.getDifficulty() + change);
             });
         }
@@ -126,7 +128,7 @@ public final class DifficultyEvents {
         // Tick world difficulty source
         if (world.getGameTime() % 20 == 0) {
             world.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
-                float change = (float) SHDifficulty.changePerSecond(world);
+                float change = (float) SHDifficulty.changePerSecond();
                 source.setDifficulty(source.getDifficulty() + change);
             });
         }
@@ -154,12 +156,12 @@ public final class DifficultyEvents {
 
         // Apply death mutators
         clone.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> {
-            int newCrystals = SHPlayers.getCrystalCountFromHealth(original, SHPlayers.getHealthAfterDeath(original, original.dimension));
-            notifyOfChanges(clone, "heart crystal(s)", data.getExtraHearts(), newCrystals);
-            data.setExtraHearts(clone, newCrystals);
+            int newCrystals = SHPlayers.getCrystalCountFromHealth(SHPlayers.getHealthAfterDeath(original));
+            notifyOfChanges(clone, "heart crystal(s)", data.getHeartByCrystals(), newCrystals);
+            data.setHeartByCrystals(clone, newCrystals);
         });
         clone.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
-            float newDifficulty = (float) SHDifficulty.getDifficultyAfterDeath(clone, original.dimension);    //not sure to pass the clone or the og (the dim is good)
+            float newDifficulty = (float) SHDifficulty.getDifficultyAfterDeath(clone);
             notifyOfChanges(clone, "difficulty", source.getDifficulty(), newDifficulty);
             source.setDifficulty(newDifficulty);
         });
@@ -183,17 +185,15 @@ public final class DifficultyEvents {
     }
 
     private static <T> void copyCapability(Capability<T> capability, ICapabilityProvider original, ICapabilityProvider clone) {
-        original.getCapability(capability).ifPresent(dataOriginal -> {
+        original.getCapability(capability).ifPresent(dataOriginal ->
             clone.getCapability(capability).ifPresent(dataClone -> {
                 INBT nbt = capability.getStorage().writeNBT(capability, dataOriginal, null);
                 capability.getStorage().readNBT(capability, dataClone, null, nbt);
-            });
-        });
+            }));
     }
 
     private static void debug(Supplier<?> msg) {
-        if (PRINT_DEBUG_INFO && ScalingHealth.LOGGER.isDebugEnabled()) {
+        if (PRINT_DEBUG_INFO && ScalingHealth.LOGGER.isDebugEnabled())
             ScalingHealth.LOGGER.debug(MARKER, msg.get());
-        }
     }
 }

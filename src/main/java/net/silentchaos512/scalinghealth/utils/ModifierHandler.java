@@ -24,10 +24,8 @@ import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttribute;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
-import net.minecraft.entity.passive.TameableEntity;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.lib.util.EntityHelper;
-import net.silentchaos512.scalinghealth.ScalingHealth;
 
 import java.util.List;
 import java.util.UUID;
@@ -66,7 +64,7 @@ public final class ModifierHandler {
     public static void addAttackDamage(LivingEntity entity, double amount, AttributeModifier.Operation op) {
         boolean stop = false;
         if(entity instanceof MobEntity){
-            List<? extends String> mods = SHDifficulty.getDamageBlacklistedMods(entity.world);
+            List<? extends String> mods = SHDifficulty.getDamageBlacklistedMods();
             for (String mod : mods) {
                 if (mod.equals(ForgeRegistries.ENTITIES.getKey(entity.getType()).getNamespace())) stop = true;
             }

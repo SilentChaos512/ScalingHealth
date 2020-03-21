@@ -28,8 +28,9 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.Config;
-import net.silentchaos512.scalinghealth.config.DimensionConfig;
+import net.silentchaos512.scalinghealth.config.GameConfig;
 import net.silentchaos512.scalinghealth.lib.EntityGroup;
+import net.silentchaos512.scalinghealth.utils.EnabledFeatures;
 import net.silentchaos512.scalinghealth.utils.SHDifficulty;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
@@ -40,9 +41,6 @@ import java.util.UUID;
 
 public final class DamageScaling {
     private static final Marker MARKER = MarkerManager.getMarker("DamageScaling");
-    private static final String[] SOURCES_DEFAULT = {"inFire", "lightningBolt", "onFire", "lava", "hotFloor", "inWall",
-            "cramming", "drown", "starve", "cactus", "fall", "flyIntoWall", "outOfWorld", "generic", "magic", "wither",
-            "anvil", "fallingBlock", "dragonBreath", "fireworks"};
 
     public static final DamageScaling INSTANCE = new DamageScaling();
 
@@ -51,7 +49,8 @@ public final class DamageScaling {
     private DamageScaling() {}
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onPlayerHurt(LivingAttackEvent event) {
+    public void onEntityHurt(LivingAttackEvent event) {
+        if(!EnabledFeatures.mobDamageScalingEnabled() && !EnabledFeatures.playerDamageScalingEnabled()) return;
         LivingEntity entity = event.getEntityLiving();
         if (entity.world.isRemote) return;
         // Entity invulnerable?
@@ -59,14 +58,14 @@ public final class DamageScaling {
             return;
 
         // Check entity has already been processed from original event, or is not allowed to be affected
-        if (entityAttackedThisTick.contains(entity.getUniqueID()) || !EntityGroup.from(entity).isAffectedByDamageScaling(entity))
+        if (entityAttackedThisTick.contains(entity.getUniqueID()) || !EntityGroup.from(entity).isAffectedByDamageScaling())
             return;
 
         DamageSource source = event.getSource();
         if (source == null) return;
 
         // Get scaling factor from map, if it exists. Otherwise, use the generic scale.
-        float scale = (float) Config.get(entity).damageScaling.getScale(source.getDamageType());
+        float scale = (float) Config.GENERAL.damageScaling.getScale(source.getDamageType());
 
         // Get the amount of the damage to affect. Can be many times the base value.
         final float affectedAmount = (float) getEffectScale(entity);
@@ -90,7 +89,7 @@ public final class DamageScaling {
     }
 
     private static double getEffectScale(LivingEntity entity) {
-        DimensionConfig config = Config.get(entity);
+        GameConfig config = Config.GENERAL;
         Mode mode = config.damageScaling.mode.get();
         switch (mode) {
             case AREA_DIFFICULTY:
@@ -122,6 +121,8 @@ public final class DamageScaling {
     }
 
     public enum Mode {
-        MAX_HEALTH, DIFFICULTY, AREA_DIFFICULTY;
+        MAX_HEALTH,
+        DIFFICULTY,
+        AREA_DIFFICULTY
     }
 }

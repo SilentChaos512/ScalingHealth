@@ -24,13 +24,13 @@ public enum EvalVars {
         return SHDifficulty.source(ctx.player).getDifficulty();
     }),
     MAX_DIFFICULTY("maxDifficulty", ctx ->
-            SHDifficulty.maxValue(ctx.world)
+            SHDifficulty.maxValue()
     ),
     AREA_DIFFICULTY("areaDifficulty", ctx ->
             SHDifficulty.areaDifficulty(ctx.world, ctx.pos, false)
     ),
     AREA_PLAYER_COUNT("areaPlayerCount", ctx -> {
-        return SHDifficulty.playersInRange(ctx.world, ctx.pos, SHDifficulty.searchRadius(ctx.world)).count();
+        return SHDifficulty.playersInRange(ctx.world, ctx.pos, SHDifficulty.searchRadius()).count();
     });
 
     private final String name;
@@ -45,12 +45,12 @@ public enum EvalVars {
         return name;
     }
 
-    public static double apply(DimensionConfig config, PlayerEntity player, Expression expression) {
-        return apply(config, player.world, player.getPosition(), player, expression);
+    public static double apply(PlayerEntity player, Expression expression) {
+        return apply(player.world, player.getPosition(), player, expression);
     }
 
-    public static double apply(DimensionConfig config, World world, BlockPos pos, @Nullable PlayerEntity player, Expression expression) {
-        Context context = new Context(config, world, pos, player);
+    public static double apply(World world, BlockPos pos, @Nullable PlayerEntity player, Expression expression) {
+        Context context = new Context(world, pos, player);
         for (EvalVars variable : values()) {
             expression.setVariable(variable.varName(), variable.value.apply(context).toString());
         }
@@ -58,14 +58,11 @@ public enum EvalVars {
     }
 
     private static final class Context {
-        private final DimensionConfig config;
         private final World world;
         private final BlockPos pos;
-        @Nullable
         private final PlayerEntity player;
 
-        private Context(DimensionConfig config, World world, BlockPos pos, @Nullable PlayerEntity player) {
-            this.config = config;
+        private Context(World world, BlockPos pos, @Nullable PlayerEntity player) {
             this.world = world;
             this.pos = pos;
             this.player = player;

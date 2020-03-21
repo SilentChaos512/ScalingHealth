@@ -32,8 +32,6 @@ import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.silentchaos512.lib.event.ClientTicks;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.entity.BlightFireEntity;
-import net.silentchaos512.scalinghealth.lib.module.ModuleAprilTricks;
-import net.silentchaos512.utils.Color;
 
 import javax.annotation.Nonnull;
 
@@ -41,7 +39,6 @@ public final class BlightFireRenderer extends EntityRenderer<BlightFireEntity> {
     private static final float FIRE_SCALE = 1.8F;
 
     private static final ResourceLocation TEXTURE = ScalingHealth.getId("textures/entity/blightfire.png");
-    private static final ResourceLocation TEXTURE_GRAY = ScalingHealth.getId("textures/entity/blightfire_gray.png");
 
     private BlightFireRenderer(EntityRendererManager renderManager) {
         super(renderManager);
@@ -50,8 +47,7 @@ public final class BlightFireRenderer extends EntityRenderer<BlightFireEntity> {
     @Nonnull
     @Override
     protected ResourceLocation getEntityTexture(BlightFireEntity entity) {
-        return ModuleAprilTricks.instance.isRightDay() && ModuleAprilTricks.instance.isEnabled()
-                ? TEXTURE_GRAY : TEXTURE;
+        return TEXTURE;
     }
 
     @Override
@@ -92,15 +88,7 @@ public final class BlightFireRenderer extends EntityRenderer<BlightFireEntity> {
 
         GlStateManager.rotatef(-this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
         GlStateManager.translatef(0, 0, f3 * 0.02f);
-
-        if (ModuleAprilTricks.instance.isRightDay() && ModuleAprilTricks.instance.isEnabled()) {
-            float changeRate = 40f + parent.getEntityId() % 80f;
-            float hue = ((ClientTicks.ticksInGame() + parent.getEntityId()) % changeRate / changeRate);
-            Color color = new Color(java.awt.Color.HSBtoRGB(hue, 1, 1));
-            GlStateManager.color4f(color.getRed(), color.getGreen(), color.getBlue(), 1.0F);
-        } else {
-            GlStateManager.color4f(1, 1, 1, 1);
-        }
+        GlStateManager.color4f(1, 1, 1, 1);
 
         float f5 = 0.0F;
         int i = 0;

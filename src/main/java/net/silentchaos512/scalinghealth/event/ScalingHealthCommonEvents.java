@@ -35,7 +35,6 @@ import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.storage.loot.LootContext;
 import net.minecraft.world.storage.loot.LootParameterSets;
@@ -56,13 +55,13 @@ import net.minecraftforge.fml.network.NetworkDirection;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
 import net.silentchaos512.scalinghealth.config.Config;
-import net.silentchaos512.scalinghealth.config.DimensionConfig;
-import net.silentchaos512.scalinghealth.config.EvalVars;
 import net.silentchaos512.scalinghealth.init.ModSounds;
+import net.silentchaos512.scalinghealth.item.DifficultyMutatorItem;
+import net.silentchaos512.scalinghealth.item.PowerCrystal;
 import net.silentchaos512.scalinghealth.lib.EntityGroup;
-import net.silentchaos512.scalinghealth.lib.module.ModuleAprilTricks;
 import net.silentchaos512.scalinghealth.network.ClientLoginMessage;
 import net.silentchaos512.scalinghealth.network.Network;
+import net.silentchaos512.scalinghealth.utils.EnabledFeatures;
 import net.silentchaos512.scalinghealth.utils.SHDifficulty;
 import net.silentchaos512.scalinghealth.utils.SHMobs;
 import net.silentchaos512.scalinghealth.utils.SHPlayers;
@@ -84,19 +83,8 @@ public final class ScalingHealthCommonEvents {
     public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         if (!(event.getPlayer() instanceof ServerPlayerEntity)) return;
         ServerPlayerEntity player = (ServerPlayerEntity) event.getPlayer();
-        World world = player.world;
         ScalingHealth.LOGGER.info("Sending login packet to player {}", player);
-        ClientLoginMessage msg = new ClientLoginMessage(SHDifficulty.areaMode(world), (float) SHDifficulty.maxValue(world));
-        Network.channel.sendTo(msg, player.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
-    }
-
-    @SubscribeEvent
-    public static void onPlayerChangeDimension(PlayerEvent.PlayerChangedDimensionEvent event){
-        if(!(event.getPlayer() instanceof ServerPlayerEntity)) return;
-        DimensionType type = event.getTo();
-        ServerPlayerEntity player = (ServerPlayerEntity) event.getPlayer();
-        ScalingHealth.LOGGER.info("Sending login packet to player {}, resulting of a dim change", player);
-        ClientLoginMessage msg = new ClientLoginMessage(Config.get(type).difficulty.areaMode.get(), Config.get(type).difficulty.maxValue.get().floatValue());
+        ClientLoginMessage msg = new ClientLoginMessage(SHDifficulty.areaMode(), (float) SHDifficulty.maxValue());
         Network.channel.sendTo(msg, player.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
     }
 
@@ -139,7 +127,15 @@ public final class ScalingHealthCommonEvents {
     }
 
     private static ItemEntity dropItem(LivingEntity entity, World world, ItemStack stack) {
-        return new ItemEntity(world, entity.posX, entity.posY + entity.getHeight() / 2, entity.posZ, stack);
+        return new ItemEntity(world, entity.posX, entity.posY + entity.getHeight() / 2, entity.posZ, getCorrectStack(stack));
+    }
+
+    //If some items are useless, do not drop them.
+    private static ItemStack getCorrectStack(ItemStack stack){
+        if((stack.getItem() instanceof DifficultyMutatorItem && !EnabledFeatures.difficultyEnabled()) ||
+                (stack.getItem() instanceof PowerCrystal && !EnabledFeatures.powerCrystalEnabled()))
+           return ItemStack.EMPTY;
+        return stack;
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -147,7 +143,7 @@ public final class ScalingHealthCommonEvents {
         LivingEntity entity = event.getEntityLiving();
         // Additional XP from all mobs.
         short difficulty = (short) SHDifficulty.areaDifficulty(entity.world, entity.getPosition());
-        float multi = (float) (1.0f + SHMobs.xpBoost(entity.world) * difficulty);
+        float multi = (float) (1.0f + SHMobs.xpBoost() * difficulty);
 
         float amount = event.getDroppedExperience();
         amount *= multi;
@@ -155,21 +151,18 @@ public final class ScalingHealthCommonEvents {
         // Additional XP from blights.
         if(entity instanceof MobEntity) {
             if (SHMobs.isBlight((MobEntity) entity)) {
-                amount *= SHMobs.xpBlightBoost(entity.world);
+                amount *= SHMobs.xpBlightBoost();
             }
         }
         event.setDroppedExperience(Math.round(amount));
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onLevelChange(PlayerXpEvent.LevelChange event){
+        if(!EnabledFeatures.healthXpEnabled() || event.isCanceled()) return;
         PlayerEntity player = event.getPlayer();
-        if(!SHPlayers.xpModeEnabled(player.world)) return;
-
-        double xp = event.getLevels();
-        int numberOfIncrease = (int) Math.floor(xp / SHPlayers.levelsPerHp(player.world));
-
-        player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> data.addHearts(player, numberOfIncrease * SHPlayers.hpPerLevel(player.world)));
+        int health = SHPlayers.hpFromCurrentXp(player.experienceLevel + event.getLevels());
+        player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> data.setXpHearts(player, health));
     }
 
     /**
@@ -184,7 +177,7 @@ public final class ScalingHealthCommonEvents {
             return null;
         }
 
-        // Player is true source.
+        // Player is true source.S
         Entity entitySource = source.getTrueSource();
         if (entitySource instanceof PlayerEntity) {
             return (PlayerEntity) entitySource;
@@ -211,23 +204,18 @@ public final class ScalingHealthCommonEvents {
 
         PlayerEntity player = (PlayerEntity) event.getEntity();
         ModSounds.PLAYER_DIED.play(player);
-
-        if (ModuleAprilTricks.instance.isEnabled() && ModuleAprilTricks.instance.isRightDay()) {
-            ModSounds.PLAYER_DIED.play(player);
-        }
     }
 
     @SubscribeEvent
     public static void onPlayerSleepInBed(PlayerSleepInBedEvent event) {
         PlayerEntity player = event.getPlayer();
         if (!player.world.isRemote && Config.CLIENT.warnWhenSleeping.get()) {
-            DimensionConfig config = Config.get(player);
-            double newDifficulty = EvalVars.apply(config, player, config.difficulty.onPlayerSleep.get());
+            double newDifficulty = SHDifficulty.diffOnPlayerSleep(player);
 
             if (!MathUtils.doublesEqual(SHDifficulty.getDifficultyOf(player), newDifficulty, 0.1)) {
                 ScalingHealth.LOGGER.debug("old={}, new={}", SHDifficulty.getDifficultyOf(player), newDifficulty);
                 // Difficulty would change (doesn't change until onPlayerWakeUp)
-                String configMsg = SHDifficulty.sleepWarningMessage(player.world);
+                String configMsg = SHDifficulty.sleepWarningMessage();
                 ITextComponent text = configMsg.isEmpty()
                         ? new TranslationTextComponent("misc.scalinghealth.sleepWarning")
                         : new StringTextComponent(configMsg);

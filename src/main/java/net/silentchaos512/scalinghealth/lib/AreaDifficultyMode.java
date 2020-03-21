@@ -25,7 +25,9 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
 import net.silentchaos512.lib.util.MCMathUtils;
+import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
 import net.silentchaos512.scalinghealth.capability.IDifficultySource;
+import net.silentchaos512.scalinghealth.utils.EnabledFeatures;
 import net.silentchaos512.scalinghealth.utils.SHDifficulty;
 
 import java.util.Collection;
@@ -64,7 +66,7 @@ public enum AreaDifficultyMode {
     MIN_LEVEL {
         @Override
         public double getBaseAreaDifficulty(World world, BlockPos pos, int radius) {
-            double min = SHDifficulty.maxValue(world);
+            double min = SHDifficulty.maxValue();
             for (Tuple<BlockPos, IDifficultySource> tuple : SHDifficulty.allPlayerSources(world, pos, radius)) {
                 min = Math.min(tuple.getB().getDifficulty(), min);
             }
@@ -86,12 +88,12 @@ public enum AreaDifficultyMode {
         public double getBaseAreaDifficulty(World world, BlockPos pos, int radius) {
             double distance;
             //to ignore y axis, take the same y as the evaluated position
-            if(SHDifficulty.ignoreYAxis(world)){
+            if(SHDifficulty.ignoreYAxis()){
                 distance = MCMathUtils.distance(pos, new BlockPos(world.getSpawnPoint().getX(), pos.getY(), world.getSpawnPoint().getZ()));
             } else {
                 distance = MCMathUtils.distance(pos, world.getSpawnPoint());
             }
-            return distance * SHDifficulty.distanceFactor(world);
+            return distance * SHDifficulty.distanceFactor();
         }
     },
     DISTANCE_FROM_ORIGIN {
@@ -99,12 +101,12 @@ public enum AreaDifficultyMode {
         public double getBaseAreaDifficulty(World world, BlockPos pos, int radius) {
             double distance;
             //to ignore y axis, take the same y as the evaluated position
-            if(SHDifficulty.ignoreYAxis(world)){
+            if(SHDifficulty.ignoreYAxis()){
                 distance = MCMathUtils.distance(pos, new BlockPos(0, pos.getY(), 0));
             } else {
                 distance = MCMathUtils.distance(pos, new BlockPos(0, world.getSpawnPoint().getY(), 0));
             }
-            return distance * SHDifficulty.distanceFactor(world);
+            return distance * SHDifficulty.distanceFactor();
         }
     },
     DISTANCE_AND_TIME {
@@ -115,10 +117,13 @@ public enum AreaDifficultyMode {
             return fromSources + fromDistance;
         }
     },
-    DIMENSION_WIDE {
+    SERVER_WIDE {
         @Override
         public double getBaseAreaDifficulty(World world, BlockPos pos, int radius) {
-            return SHDifficulty.source(world).getDifficulty();
+            if(DifficultySourceCapability.getOverworldCap().isPresent())
+                return DifficultySourceCapability.getOverworldCap().get().getDifficulty();
+            else
+                return 0.0;
         }
     };
 
@@ -126,13 +131,13 @@ public enum AreaDifficultyMode {
 
     public double getAreaDifficulty(World world, BlockPos pos, boolean groupBonus) {
         // Is difficulty disabled via game rule or other means?
-        if (!world.isRemote && !SHDifficulty.enabledIn(world)) return 0.0;
+        if (!world.isRemote && !EnabledFeatures.difficultyEnabled()) return 0.0;
 
-        final int radius = SHDifficulty.searchRadius(world);
+        final int radius = SHDifficulty.searchRadius();
         final double baseAreaDifficulty = getBaseAreaDifficulty(world, pos, radius);
         final double locationMultiplier = SHDifficulty.locationMultiplier(world, pos);
         final double lunarMultiplier = SHDifficulty.lunarMultiplier(world);
-        final double clampedDifficulty = SHDifficulty.clamp(world, baseAreaDifficulty * locationMultiplier * lunarMultiplier);
+        final double clampedDifficulty = SHDifficulty.clamp(baseAreaDifficulty * locationMultiplier * lunarMultiplier);
 
         return groupBonus ? SHDifficulty.withGroupBonus(world, pos, clampedDifficulty) : clampedDifficulty;
     }
@@ -143,9 +148,5 @@ public enum AreaDifficultyMode {
 
     public static AreaDifficultyMode fromOrdinal(int ordinal) {
         return values()[MathHelper.clamp(ordinal, 0, values().length - 1)];
-    }
-
-    public boolean isPlayerDifficultyActive(){
-        return this != DIMENSION_WIDE && this != DISTANCE_FROM_SPAWN && this != DISTANCE_FROM_ORIGIN;
     }
 }

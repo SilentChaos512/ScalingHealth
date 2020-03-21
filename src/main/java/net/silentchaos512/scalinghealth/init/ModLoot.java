@@ -26,6 +26,7 @@ import net.minecraft.world.storage.loot.functions.SetCount;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.silentchaos512.scalinghealth.loot.conditions.SHMobProperties;
+import net.silentchaos512.scalinghealth.utils.EnabledFeatures;
 
 import java.util.List;
 
@@ -50,23 +51,25 @@ public final class ModLoot {
 
     private static void onLootTableLoad(LootTableLoadEvent event) {
         if (ADD_ITEMS_TO.contains(event.getName())) {
-            event.getTable().addPool((new LootPool.Builder())
+            event.getTable().addPool(correctEntries((new LootPool.Builder())
                     .name("scalinghealth_added")
                     .rolls(new RandomValueRange(1))
                     .addEntry(ItemLootEntry.builder(ModItems.HEART_CRYSTAL)
                             .weight(3)
                             .quality(2)
                             .acceptFunction(SetCount.builder(new RandomValueRange(1, 2)))
-                    )
-                    .addEntry(ItemLootEntry.builder(ModItems.POWER_CRYSTAL)
-                            .weight(2)
-                            .quality(7)
-                            .acceptFunction(SetCount.builder(new RandomValueRange(1, 2)))
-                    )
-                    .addEntry(ItemLootEntry.builder(ModItems.CURSED_HEART)
-                            .weight(1)
-                            .quality(5)
-                            .acceptFunction(SetCount.builder(new RandomValueRange(1, 3)))
+                    ))
+                    .addEntry(EmptyLootEntry.func_216167_a().weight(10))
+                    .build());
+        }
+    }
+
+    private static LootPool.Builder correctEntries(LootPool.Builder builder){
+        if(EnabledFeatures.difficultyEnabled())
+            builder.addEntry(ItemLootEntry.builder(ModItems.CURSED_HEART)
+                    .weight(1)
+                    .quality(5)
+                    .acceptFunction(SetCount.builder(new RandomValueRange(1, 3)))
                     )
                     .addEntry(ItemLootEntry.builder(ModItems.ENCHANTED_HEART)
                             .weight(1)
@@ -77,9 +80,14 @@ public final class ModLoot {
                             .weight(1)
                             .quality(5)
                             .acceptFunction(SetCount.builder(new RandomValueRange(1, 3)))
-                    )
-                    .addEntry(EmptyLootEntry.func_216167_a().weight(10))
-                    .build());
-        }
+                    );
+        if(EnabledFeatures.powerCrystalEnabled())
+            builder.addEntry(ItemLootEntry.builder(ModItems.POWER_CRYSTAL)
+                    .weight(2)
+                    .quality(7)
+                    .acceptFunction(SetCount.builder(new RandomValueRange(1, 2)))
+            );
+
+        return builder;
     }
 }

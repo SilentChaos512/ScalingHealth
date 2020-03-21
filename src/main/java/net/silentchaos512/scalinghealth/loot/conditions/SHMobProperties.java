@@ -10,7 +10,6 @@ import net.minecraft.util.JSONUtils;
 import net.minecraft.world.storage.loot.LootContext;
 import net.minecraft.world.storage.loot.conditions.ILootCondition;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
 import net.silentchaos512.scalinghealth.utils.SHDifficulty;
 
 public class SHMobProperties implements ILootCondition {
@@ -32,10 +31,7 @@ public class SHMobProperties implements ILootCondition {
     public boolean test(LootContext lootContext) {
         Entity entity = lootContext.get(this.target.getParameter());
         if (entity instanceof MobEntity) {
-            IDifficultyAffected affected = SHDifficulty.affected(entity);
-            //rare case where its prob better to get the non-blight difficulty
-            float difficulty = affected.getDifficulty();
-            return difficulty >= this.minDifficulty && difficulty <= this.maxDifficulty && (!this.isBlight || affected.isBlight());
+            return this.isBlight == SHDifficulty.affected(entity).isBlight();
         }
         return false;
     }

@@ -12,9 +12,8 @@ import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.config.Config;
-import net.silentchaos512.scalinghealth.utils.SHDifficulty;
 import net.silentchaos512.scalinghealth.utils.ModifierHandler;
+import net.silentchaos512.scalinghealth.utils.SHDifficulty;
 import net.silentchaos512.scalinghealth.utils.SHPlayers;
 
 import javax.annotation.Nonnull;
@@ -33,12 +32,30 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
     private boolean afk = false;
     private int timeAfk = 0;
     private BlockPos lastPos;
-    private int extraHearts;
+    private int heartByXp;
+    private int heartByCrystals;
     private int powerCrystals;
 
     @Override
-    public int getExtraHearts() {
-        return extraHearts;
+    public int getAllHearts() {
+        return heartByXp + heartByCrystals;
+    }
+
+    @Override
+    public int getHeartByCrystals() {
+        return heartByCrystals;
+    }
+
+    @Override
+    public void setXpHearts(PlayerEntity player, int amount) {
+        heartByXp = SHPlayers.clampExtraHearts(amount);
+        ModifierHandler.setMaxHealth(player, getHealthModifier(), AttributeModifier.Operation.ADDITION);
+    }
+
+    @Override
+    public void setHeartByCrystals(PlayerEntity player, int amount) {
+        heartByCrystals = SHPlayers.clampExtraHearts(amount);
+        ModifierHandler.setMaxHealth(player, getHealthModifier(), AttributeModifier.Operation.ADDITION);
     }
 
     @Override
@@ -47,21 +64,15 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
     }
 
     @Override
-    public void setExtraHearts(PlayerEntity player, int amount) {
-        extraHearts = SHPlayers.clampExtraHearts(player, amount);
-        ModifierHandler.setMaxHealth(player, getHealthModifier(player), AttributeModifier.Operation.ADDITION);
-    }
-
-    @Override
     public void setPowerCrystalCount(PlayerEntity player, int amount) {
-        powerCrystals = SHPlayers.clampPowerCrystals(player, amount);
-        ModifierHandler.addAttackDamage(player, getAttackDamageModifier(player), AttributeModifier.Operation.ADDITION);
+        powerCrystals = SHPlayers.clampPowerCrystals(amount);
+        ModifierHandler.addAttackDamage(player, getAttackDamageModifier(), AttributeModifier.Operation.ADDITION);
     }
 
     @Override
     public void updateStats(PlayerEntity player) {
-        ModifierHandler.setMaxHealth(player, getHealthModifier(player), AttributeModifier.Operation.ADDITION);
-        ModifierHandler.addAttackDamage(player, getAttackDamageModifier(player), AttributeModifier.Operation.ADDITION);
+        ModifierHandler.setMaxHealth(player, getHealthModifier(), AttributeModifier.Operation.ADDITION);
+        ModifierHandler.addAttackDamage(player, getAttackDamageModifier(), AttributeModifier.Operation.ADDITION);
     }
 
     @Override
@@ -72,11 +83,10 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
             if(player instanceof ServerPlayerEntity)
                 IPlayerData.sendUpdatePacketTo(player);
         }
-        // TODO: Difficulty by Game Stages
     }
 
     private void checkPlayerIdle(PlayerEntity player){
-        if(SHDifficulty.areaDifficulty(player.world, player.getPosition()) >= SHDifficulty.maxValue(player.world)) return;
+        if(SHDifficulty.areaDifficulty(player.world, player.getPosition()) >= SHDifficulty.maxValue()) return;
 
         if(player.getPosition().equals(lastPos)){
             timeAfk++;
@@ -87,18 +97,18 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
         }
 
         lastPos = player.getPosition();
-        if(timeAfk > SHDifficulty.timeBeforeAfk(player)){
+        if(timeAfk > SHDifficulty.timeBeforeAfk()){
             if(!afk) {
                 afk = true;
-                if(SHDifficulty.afkMessage(player.world)) player.sendMessage(new TranslationTextComponent("misc.scalinghealth.afkmessage"));
+                if(SHDifficulty.afkMessage()) player.sendMessage(new TranslationTextComponent("misc.scalinghealth.afkmessage"));
             }
         }
 
         if(afk) {
             IDifficultySource data = SHDifficulty.source(player);
-            float changePerSec = (float) SHDifficulty.changePerSecond(player.world);
+            float changePerSec = (float) SHDifficulty.changePerSecond();
             //since last second we added "changePerSec" difficulty, we subtract an amount based on idlemodifier
-            data.addDifficulty(- changePerSec * (float) (1 - SHDifficulty.idleModifier(player)));
+            data.addDifficulty(- changePerSec * (float) (1 - SHDifficulty.idleModifier()));
         }
     }
 
@@ -111,14 +121,14 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
     @Override
     public CompoundNBT serializeNBT() {
         CompoundNBT nbt = new CompoundNBT();
-        nbt.putInt(NBT_HEART_CRYSTALS, extraHearts);
+        nbt.putInt(NBT_HEART_CRYSTALS, heartByCrystals);
         nbt.putInt(NBT_POWER_CRYSTALS, powerCrystals);
         return nbt;
     }
 
     @Override
     public void deserializeNBT(CompoundNBT nbt) {
-        extraHearts = nbt.getInt(NBT_HEART_CRYSTALS);
+        heartByCrystals = nbt.getInt(NBT_HEART_CRYSTALS);
         powerCrystals = nbt.getInt(NBT_POWER_CRYSTALS);
     }
 

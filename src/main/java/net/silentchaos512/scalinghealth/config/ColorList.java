@@ -30,7 +30,6 @@ public class ColorList {
                 .defineList(defaultList, o -> o instanceof String && Color.validate((String) o));
 
         // Lazy so we only need to parse once
-        // TODO: What about config reloads? (Forge config still not installed)
         list = Lazy.of(() -> ImmutableList.copyOf(
                 config.get()
                         .stream()

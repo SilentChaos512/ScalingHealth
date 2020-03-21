@@ -23,8 +23,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.server.ServerWorld;
-import net.silentchaos512.scalinghealth.capability.DifficultyAffectedCapability;
+import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
 import net.silentchaos512.scalinghealth.utils.MobDifficultyHandler;
+import net.silentchaos512.scalinghealth.utils.SHDifficulty;
 
 public final class SummonCommand {
     private static final SimpleCommandExceptionType SUMMON_FAILED = new SimpleCommandExceptionType(new TranslationTextComponent("commands.summon.failed"));
@@ -129,12 +130,11 @@ public final class SummonCommand {
                     mob.onInitialSpawn(world, world.getDifficultyForLocation(new BlockPos(entity)), SpawnReason.COMMAND, null, null);
 
                     if (difficulty > 0) {
-                        entity.getCapability(DifficultyAffectedCapability.INSTANCE).ifPresent(affected -> {
-                            boolean blight = forceBlight || MobDifficultyHandler.shouldBecomeBlight(mob, difficulty);
-                            affected.forceDifficulty(difficulty);
-                            MobDifficultyHandler.setEntityProperties(mob, affected, blight);
-                            affected.setProcessed(true);
-                        });
+                        IDifficultyAffected affected = SHDifficulty.affected(entity);
+                        boolean blight = forceBlight || MobDifficultyHandler.shouldBecomeBlight(mob, difficulty);
+                        affected.forceDifficulty(difficulty);
+                        MobDifficultyHandler.setEntityProperties(mob, affected, blight);
+                        affected.setProcessed(true);
                     }
                 }
                 source.sendFeedback(new TranslationTextComponent("commands.summon.success", entity.getDisplayName()), true);

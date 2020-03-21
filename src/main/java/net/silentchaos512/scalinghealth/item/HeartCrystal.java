@@ -19,12 +19,11 @@
 package net.silentchaos512.scalinghealth.item;
 
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.silentchaos512.lib.util.EntityHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.capability.IPlayerData;
 import net.silentchaos512.scalinghealth.client.particles.ModParticles;
 import net.silentchaos512.scalinghealth.init.ModSounds;
+import net.silentchaos512.scalinghealth.utils.EnabledFeatures;
 import net.silentchaos512.scalinghealth.utils.SHItems;
 import net.silentchaos512.scalinghealth.utils.SHPlayers;
 import net.silentchaos512.utils.MathUtils;
@@ -36,21 +35,22 @@ public class HeartCrystal extends StatBoosterItem {
     }
 
     @Override
-    boolean isStatIncreaseAllowed(PlayerEntity player, IPlayerData data) {
+    boolean isStatIncreaseAllowed(PlayerEntity player) {
         //if this would increase the health by 0, we wont't process it
-        return SHItems.heartCrystalIncreaseAmount(player) > 0 || data.getExtraHearts() < SHPlayers.maxHeartCrystals(player) || SHPlayers.hpDisabledByXp(player.world);
+        return EnabledFeatures.healthCrystalEnabled() &&
+                SHPlayers.getPlayerData(player).getAllHearts() < SHPlayers.maxHeartCrystals();
     }
 
     @Override
     boolean shouldConsume(PlayerEntity player) {
-        return SHItems.heartCrystalHealthRestored(player) > 0
+        return EnabledFeatures.healthCrystalRegenEnabled()
                 && player.getHealth() < player.getMaxHealth();
     }
 
     @Override
     void extraConsumeEffect(PlayerEntity player) {
         int current = (int) player.getHealth();
-        float healAmount = SHItems.heartCrystalHealthRestored(player);
+        float healAmount = SHItems.heartCrystalHpBonusRegen();
         EntityHelper.heal(player, healAmount, true);
         int newHealth = (int) player.getHealth();
         if (!MathUtils.doublesEqual(current + healAmount, newHealth)) {
@@ -59,8 +59,8 @@ public class HeartCrystal extends StatBoosterItem {
     }
 
     @Override
-    void increaseStat(PlayerEntity player, ItemStack stack, IPlayerData data) {
-        data.addHearts(player, SHItems.heartCrystalIncreaseAmount(player));
+    void increaseStat(PlayerEntity player) {
+        SHPlayers.getPlayerData(player).addHeartsByCrystals(player, SHItems.heartCrystalIncreaseAmount());
     }
 
     @Override

@@ -1,7 +1,6 @@
 package net.silentchaos512.scalinghealth.item;
 
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -15,11 +14,10 @@ import net.minecraft.world.World;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IPlayerData;
 import net.silentchaos512.scalinghealth.capability.PetHealthCapability;
-import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
 import net.silentchaos512.scalinghealth.client.particles.ModParticles;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.init.ModSounds;
-import net.silentchaos512.scalinghealth.utils.ModifierHandler;
+import net.silentchaos512.scalinghealth.utils.SHPlayers;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -28,6 +26,8 @@ public abstract class StatBoosterItem extends Item {
     public StatBoosterItem() {
         super(new Properties().group(ScalingHealth.SH));
     }
+
+    private boolean usedForPet = false;
 
     @Override
     public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
@@ -48,10 +48,7 @@ public abstract class StatBoosterItem extends Item {
         }
 
         if (!world.isRemote) {
-            IPlayerData data = player.getCapability(PlayerDataCapability.INSTANCE).orElseThrow(() ->
-                    new IllegalStateException("Player data is null!"));
-
-            final boolean statIncreaseAllowed = isStatIncreaseAllowed(player, data);
+            final boolean statIncreaseAllowed = isStatIncreaseAllowed(player);
             final int levelRequirement = getLevelCost(player);
 
             // Does player have enough XP?
@@ -60,6 +57,7 @@ public abstract class StatBoosterItem extends Item {
                 player.sendMessage(new TranslationTextComponent(translationKey, levelRequirement));
                 return new ActionResult<>(ActionResultType.PASS, stack);
             }
+
             // May be used as a healing item even if there is no stat increase
             final boolean consumed = shouldConsume(player);
             if (consumed) {
@@ -72,15 +70,13 @@ public abstract class StatBoosterItem extends Item {
             }
 
             // Increase stat, consume item
-            return useAsStatIncreaseItem(world, player, stack, data, levelRequirement);
-        } else {
-            spawnParticlesAndPlaySound(world, player);
+            return useAsStatIncreaseItem(player, stack, levelRequirement);
         }
+        else if(shouldConsume(player) || isStatIncreaseAllowed(player))
+            spawnParticlesAndPlaySound(player);
 
         return new ActionResult<>(ActionResultType.SUCCESS, stack);
     }
-
-    private boolean usedForPet = false;
 
     public void increasePetHp(PlayerEntity player, TameableEntity pet, ItemStack stack){
         //check config
@@ -89,10 +85,11 @@ public abstract class StatBoosterItem extends Item {
         if (player.experienceLevel < levelRequirement) {
             String translationKey = "item.scalinghealth.stat_booster.notEnoughXP";
             player.sendMessage(new TranslationTextComponent(translationKey, levelRequirement));
+            return;
         }
 
         usedForPet = true;
-        pet.getCapability(PetHealthCapability.INSTANCE).ifPresent(data -> data.addHealth(Config.get(pet).pets.hpGainByCrystal.get(), pet));
+        pet.getCapability(PetHealthCapability.INSTANCE).ifPresent(data -> data.addHealth(Config.GENERAL.pets.hpGainByCrystal.get(), pet));
         stack.shrink(1);
         consumeLevels(player, levelRequirement);
         player.addStat(Stats.ITEM_USED.get(this));
@@ -100,13 +97,13 @@ public abstract class StatBoosterItem extends Item {
 
     abstract int getLevelCost(PlayerEntity player);
 
-    abstract boolean isStatIncreaseAllowed(PlayerEntity player, IPlayerData data);
+    abstract boolean isStatIncreaseAllowed(PlayerEntity player);
 
     abstract boolean shouldConsume(PlayerEntity player);
 
     abstract void extraConsumeEffect(PlayerEntity player);
 
-    abstract void increaseStat(PlayerEntity player, ItemStack stack, IPlayerData data);
+    abstract void increaseStat(PlayerEntity player);
 
     abstract ModParticles getParticleType();
 
@@ -124,8 +121,8 @@ public abstract class StatBoosterItem extends Item {
         return new ActionResult<>(ActionResultType.PASS, stack);
     }
 
-    private ActionResult<ItemStack> useAsStatIncreaseItem(World world, PlayerEntity player, ItemStack stack, IPlayerData data, int levelRequirement) {
-        increaseStat(player, stack, data);
+    private ActionResult<ItemStack> useAsStatIncreaseItem(PlayerEntity player, ItemStack stack, int levelRequirement) {
+        increaseStat(player);
         stack.shrink(1);
         consumeLevels(player, levelRequirement);
         player.addStat(Stats.ITEM_USED.get(this));
@@ -133,7 +130,7 @@ public abstract class StatBoosterItem extends Item {
         return new ActionResult<>(ActionResultType.SUCCESS, stack);
     }
 
-    private void spawnParticlesAndPlaySound(World world, PlayerEntity player) {
+    private void spawnParticlesAndPlaySound(PlayerEntity player) {
         ScalingHealth.LOGGER.debug("StatBoosterItem effect!");
         getParticleType().spawn(40, player);
         getSoundEffect().play(player);
@@ -141,5 +138,6 @@ public abstract class StatBoosterItem extends Item {
 
     private static void consumeLevels(PlayerEntity player, int amount) {
         player.addExperienceLevel(-amount);
+        SHPlayers.getPlayerData(player).updateStats(player);
     }
 }
