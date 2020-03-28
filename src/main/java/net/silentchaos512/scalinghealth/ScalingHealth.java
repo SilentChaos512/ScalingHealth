@@ -40,7 +40,7 @@ import java.util.Random;
 public class ScalingHealth {
     public static final String MOD_ID = "scalinghealth";
     public static final String MOD_NAME = "Scaling Health";
-    public static final String VERSION = "2.5.0";
+    public static final String VERSION = "3.0.0";
 
     public static final Random random = new Random();
 
@@ -55,14 +55,14 @@ public class ScalingHealth {
 
     public ScalingHealth() {
         Config.init();
+        MinecraftForge.EVENT_BUS.register(PetEventHandler.INSTANCE);
+        MinecraftForge.EVENT_BUS.register(DamageScaling.INSTANCE);
+
         Network.init();
         ModLoot.init();
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
         MinecraftForge.EVENT_BUS.addListener(this::serverAboutToStart);
-
-        MinecraftForge.EVENT_BUS.register(PetEventHandler.INSTANCE);
-        MinecraftForge.EVENT_BUS.register(DamageScaling.INSTANCE);
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
@@ -70,6 +70,7 @@ public class ScalingHealth {
         DifficultySourceCapability.register();
         PlayerDataCapability.register();
         PetHealthCapability.register();
+        //noinspection deprecation
         DeferredWorkQueue.runLater(SHWorldFeatures::addFeaturesToBiomes);
     }
 
@@ -80,7 +81,7 @@ public class ScalingHealth {
     @Mod.EventBusSubscriber(modid = MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class ClientForge {
         static {
-            MinecraftForge.EVENT_BUS.register(HeartDisplayHandler.INSTANCE);
+            MinecraftForge.EVENT_BUS.register(HeartDisplayHandler .INSTANCE);
             MinecraftForge.EVENT_BUS.register(DifficultyMeter.INSTANCE);
 
             DebugOverlay.init();

@@ -18,7 +18,7 @@
 
 package net.silentchaos512.scalinghealth.client.gui.health;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
@@ -28,8 +28,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraftforge.client.ForgeIngameGui;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.silentchaos512.lib.event.ClientTicks;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -44,7 +44,7 @@ import java.util.List;
  * Handles display of regular and absorption hearts.
  * <p>For future reference, much of the vanilla code can be found in {@link ForgeIngameGui}.
  */
-public final class HeartDisplayHandler extends Screen {
+public final class HeartDisplayHandler extends Screen{
     public static final HeartDisplayHandler INSTANCE = new HeartDisplayHandler(new StringTextComponent(""));
 
     private static final float COLOR_CHANGE_PERIOD = 150;
@@ -104,7 +104,7 @@ public final class HeartDisplayHandler extends Screen {
     private void renderHearts(RenderGameOverlayEvent event, Minecraft mc, PlayerEntity player) {
         info.update();
 
-        GlStateManager.enableBlend();
+        RenderSystem.enableBlend();
 
         float absorb = MathHelper.ceil(player.getAbsorptionAmount());
 
@@ -258,7 +258,7 @@ public final class HeartDisplayHandler extends Screen {
             }
         }
 
-        GlStateManager.disableBlend();
+        RenderSystem.disableBlend();
         mc.textureManager.bindTexture(Screen.GUI_ICONS_LOCATION);
     }
 
@@ -338,10 +338,10 @@ public final class HeartDisplayHandler extends Screen {
         mc.getProfiler().endSection();
 
         mc.getProfiler().startSection("shTextDraw");
-        GlStateManager.pushMatrix();
-        GlStateManager.scaled(scale, scale, 1);
+        RenderSystem.pushMatrix();
+        RenderSystem.scaled(scale, scale, 1);
         fontRenderer.drawStringWithShadow(healthString, left - stringWidth - 2, top, color);
-        GlStateManager.popMatrix();
+        RenderSystem.popMatrix();
         mc.getProfiler().endSection();
     }
 
@@ -352,9 +352,9 @@ public final class HeartDisplayHandler extends Screen {
         float r = ((color >> 16) & 255) / 255f;
         float g = ((color >> 8) & 255) / 255f;
         float b = (color & 255) / 255f;
-        GlStateManager.color4f(r, g, b, a);
+        RenderSystem.color4f(r, g, b, a);
         blit(x, y, textureX, textureY, width, height);
-        GlStateManager.color4f(1, 1, 1, 1);
+        RenderSystem.color4f(1, 1, 1, 1);
     }
 
     private static int getColorForRow(int row, boolean absorption) {

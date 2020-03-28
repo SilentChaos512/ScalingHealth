@@ -127,7 +127,7 @@ public final class ScalingHealthCommonEvents {
     }
 
     private static ItemEntity dropItem(LivingEntity entity, World world, ItemStack stack) {
-        return new ItemEntity(world, entity.posX, entity.posY + entity.getHeight() / 2, entity.posZ, getCorrectStack(stack));
+        return new ItemEntity(world, entity.getPosX(), entity.getPosY() + entity.getHeight() / 2, entity.getPosZ(), getCorrectStack(stack));
     }
 
     //If some items are useless, do not drop them.

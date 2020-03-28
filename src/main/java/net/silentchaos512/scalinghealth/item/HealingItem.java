@@ -27,7 +27,6 @@ import net.minecraft.item.UseAction;
 import net.minecraft.potion.EffectInstance;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.text.ITextComponent;
@@ -68,9 +67,9 @@ public class HealingItem extends Item {
         ItemStack stack = player.getHeldItem(hand);
         if (player.getHealth() < player.getMaxHealth() && !player.isPotionActive(ModPotions.BANDAGED.get())) {
             player.setActiveHand(hand);
-            return ActionResult.newResult(ActionResultType.SUCCESS, stack);
+            return ActionResult.resultSuccess( stack);
         }
-        return ActionResult.newResult(ActionResultType.FAIL, stack);
+        return ActionResult.resultFail(stack);
     }
 
     @Override

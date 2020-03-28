@@ -39,16 +39,16 @@ import java.util.function.Supplier;
 public enum ModEntities {
     BLIGHT_FIRE(() -> EntityType.Builder.create((type, world) -> new BlightFireEntity(world), EntityClassification.AMBIENT));
 
-    private final Lazy<EntityType<?>> type;
+    private final Lazy<EntityType<BlightFireEntity>> type;
 
-    ModEntities(Supplier<EntityType.Builder<?>> factory) {
+    ModEntities(Supplier<EntityType.Builder<BlightFireEntity>> factory) {
         this.type = Lazy.of(() -> {
             ResourceLocation id = ScalingHealth.getId(this.getName());
             return factory.get().build(id.toString());
         });
     }
 
-    public EntityType<?> type() {
+    public EntityType<BlightFireEntity> type() {
         return type.get();
     }
 
@@ -65,7 +65,7 @@ public enum ModEntities {
 
     @SubscribeEvent
     public static void registerRenderers(FMLClientSetupEvent event) {
-        RenderingRegistry.registerEntityRenderingHandler(BlightFireEntity.class, new BlightFireRenderer.Factory());
+        RenderingRegistry.registerEntityRenderingHandler(BLIGHT_FIRE.type.get(), new BlightFireRenderer.Factory());
     }
 
     private static void register(String name, EntityType<?> entityType) {

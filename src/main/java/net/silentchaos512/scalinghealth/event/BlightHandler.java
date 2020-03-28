@@ -56,11 +56,11 @@ public final class BlightHandler {
         if (blight.world.isRemote || getBlightFire(blight) != null) return;
 
         BlightFireEntity fire = new BlightFireEntity(blight);
-        fire.setPosition(blight.posX, blight.posY, blight.posZ);
+        fire.setPosition(blight.getPosX(), blight.getPosY(), blight.getPosZ());
         blight.world.addEntity(fire);
 
         SpawnBlightFirePacket packet = new SpawnBlightFirePacket(blight);
-        Supplier<PacketDistributor.TargetPoint> target = PacketDistributor.TargetPoint.p(blight.posX, blight.posY, blight.posZ, 128, blight.dimension);
+        Supplier<PacketDistributor.TargetPoint> target = PacketDistributor.TargetPoint.p(blight.getPosX(), blight.getPosY(), blight.getPosZ(), 128, blight.dimension);
         Network.channel.send(PacketDistributor.NEAR.with(target), packet);
 
         if (ScalingHealth.LOGGER.isDebugEnabled()) {

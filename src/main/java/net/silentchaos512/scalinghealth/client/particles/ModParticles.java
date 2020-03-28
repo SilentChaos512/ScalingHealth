@@ -41,7 +41,7 @@ public enum ModParticles {
     }
 
     public void spawn(int count, LivingEntity entity) {
-        spawn(count, entity.world, entity.posX, entity.posY + 0.65 * entity.getHeight(), entity.posZ);
+        spawn(count, entity.world, entity.getPosX(), entity.getPosY() + 0.65 * entity.getHeight(), entity.getPosZ());
     }
 
     public void spawn(int count, IWorld world, double posX, double posY, double posZ) {

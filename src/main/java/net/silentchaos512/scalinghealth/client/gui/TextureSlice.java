@@ -1,6 +1,6 @@
 package net.silentchaos512.scalinghealth.client.gui;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.AbstractGui;
 
 public class TextureSlice {
@@ -22,8 +22,8 @@ public class TextureSlice {
         float r = ((color >> 16) & 255) / 255f;
         float g = ((color >> 8) & 255) / 255f;
         float b = (color & 255) / 255f;
-        GlStateManager.color4f(r, g, b, a);
+        RenderSystem.color4f(r, g, b, a);
         gui.blit(x, y, texU, texV, width, height);
-        GlStateManager.color4f(1, 1, 1, 1);
+        RenderSystem.color4f(1, 1, 1, 1);
     }
 }

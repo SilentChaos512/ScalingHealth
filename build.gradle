@@ -117,19 +117,14 @@ dependencies {
     extraLibs "com.udojava:EvalEx:2.1"
     compile("net.silentchaos512:silent-lib-${project.mc_version}:${project.sl_version}") {
         exclude module: "forge"
-        exclude module: "jei-1.14.4"
+        exclude module: "jei-${project.mc_version}"
     }
 
     // JEI
     // compile against the JEI API but do not include it at runtime
-    compileOnly fg.deobf("mezz.jei:jei-1.14.4:${project.jei_version}:api")
+    compileOnly fg.deobf("mezz.jei:jei-${project.mc_version}:${project.jei_version}:api")
     // at runtime, use the full JEI jar
-    runtimeOnly fg.deobf("mezz.jei:jei-1.14.4:${project.jei_version}")
-
-    compileOnly "net.darkhax.bookshelf:Bookshelf-1.14.3:4.+"
-    compileOnly("net.darkhax.gamestages:GameStages-1.14.3:4.+") {
-        exclude module: "Bookshelf-1.14.3"
-    }
+    runtimeOnly fg.deobf("mezz.jei:jei-${project.mc_version}:${project.jei_version}")
 
     configurations.implementation.extendsFrom(configurations.extraLibs)
 }
@@ -173,7 +168,7 @@ artifacts {
         archives deobfJar
     }
     if (project.hasProperty('doSourceJar')) {
-        archives sourceJar
+        archives sourcesJar
     }
     if (project.hasProperty('doJavadocJar')) {
         archives javadocJar
@@ -201,45 +196,6 @@ project.ext.secret = new Secrets()
 if (secretFile.exists()) {
     secretFile.withReader {
         project.ext.secret.data = new JsonSlurper().parse it
-    }
-}
-
-curseforge {
-    if (project.hasProperty('cf_project_id') && project.hasProperty('cf_release_type') && project.hasProperty('cf_changelog_filename') &&
-            ((project.cf_release_type == 'alpha') || (project.cf_release_type == 'beta') || (project.cf_release_type == 'release'))) {
-        apiKey = secret.curseforgeAPIKey
-        project {
-            id = project.cf_project_id
-            changelog = file(project.cf_changelog_filename)
-            releaseType = project.cf_release_type
-            addGameVersion(project.mc_version)
-            mainArtifact(jar) {
-//                displayName = "$project.description $display_version"
-                relations {
-                    requiredDependency 'silent-lib'
-                }
-            }
-//            if (project.hasProperty('doAPIJar')) {
-//                addArtifact(apiJar) {
-//                    displayName = "$project.description $display_version API"
-//                }
-//            }
-//            if (project.hasProperty('doSourceJar')) {
-//                addArtifact(sourceJar) {
-//                    displayName = "$project.description $display_version Sources"
-//                }
-//            }
-//            if (project.hasProperty('doDeobfJar')) {
-//                addArtifact(deobfJar) {
-//                    displayName = "$project.description $display_version Development"
-//                }
-//            }
-//            if (project.hasProperty('doJavadocJar')) {
-//                addArtifact(javadocJar) {
-//                    displayName = "$project.description $display_version Javadoc"
-//                }
-//            }
-        }
     }
 }
 

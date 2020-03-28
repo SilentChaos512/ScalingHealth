@@ -36,9 +36,8 @@ public class HeartCrystal extends StatBoosterItem {
 
     @Override
     boolean isStatIncreaseAllowed(PlayerEntity player) {
-        //if this would increase the health by 0, we wont't process it
         return EnabledFeatures.healthCrystalEnabled() &&
-                SHPlayers.getPlayerData(player).getAllHearts() < SHPlayers.maxHeartCrystals();
+                SHPlayers.getPlayerData(player).getAllHearts() < SHPlayers.maxHealth();
     }
 
     @Override

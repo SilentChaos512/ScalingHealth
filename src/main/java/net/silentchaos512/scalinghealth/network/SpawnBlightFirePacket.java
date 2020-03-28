@@ -6,6 +6,7 @@ import net.minecraft.entity.MobEntity;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkEvent;
+import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.entity.BlightFireEntity;
 
 import javax.annotation.Nullable;
@@ -33,9 +34,10 @@ public class SpawnBlightFirePacket {
 
     public static void handle(SpawnBlightFirePacket packet, Supplier<NetworkEvent.Context> context) {
         context.get().enqueueWork(() -> {
-            if(context.get().getDirection() == NetworkDirection.PLAY_TO_SERVER){
+            if(context.get().getDirection() == NetworkDirection.PLAY_TO_CLIENT){
                 Entity entity = getTargetEntity(packet.parentId);
                 if (entity instanceof MobEntity) {
+                    ScalingHealth.LOGGER.debug("Blight fire spawn on client");
                     entity.world.addEntity(new BlightFireEntity((MobEntity) entity));
                 }
             }
@@ -45,7 +47,7 @@ public class SpawnBlightFirePacket {
 
     @Nullable
     private static Entity getTargetEntity(int entityId) {
-        //This WILL crash on server, check first
+        //This WILL crash on physical server, check first
         return Minecraft.getInstance().world.getEntityByID(entityId);
     }
 }

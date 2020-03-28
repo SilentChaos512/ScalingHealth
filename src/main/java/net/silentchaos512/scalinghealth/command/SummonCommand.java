@@ -111,12 +111,12 @@ public final class SummonCommand {
         CompoundNBT nbt = tags.copy();
         nbt.putString("id", id.toString());
         if (EntityType.getKey(EntityType.LIGHTNING_BOLT).equals(id)) {
-            LightningBoltEntity lightningBolt = new LightningBoltEntity(source.func_197023_e(), pos.x, pos.y, pos.z, false);
-            source.func_197023_e().addLightningBolt(lightningBolt);
+            LightningBoltEntity lightningBolt = new LightningBoltEntity(source.getWorld(), pos.x, pos.y, pos.z, false);
+            source.getWorld().addLightningBolt(lightningBolt);
             source.sendFeedback(new TranslationTextComponent("commands.summon.success", lightningBolt.getDisplayName()), true);
             return 1;
         } else {
-            ServerWorld world = source.func_197023_e();
+            ServerWorld world = source.getWorld();
             Entity entity = EntityType.func_220335_a(nbt, world, e -> {
                 e.setLocationAndAngles(pos.x, pos.y, pos.z, e.rotationYaw, e.rotationPitch);
                 //noinspection ReturnOfNull

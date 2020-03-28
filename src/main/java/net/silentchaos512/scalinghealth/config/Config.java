@@ -36,11 +36,11 @@ import java.util.function.Supplier;
 
 public final class Config {
     // config/scaling-health
-    private static final Path SH_CONFIG_DIR = FMLPaths.CONFIGDIR.get().resolve("scaling-health");
+    private static final Path SH_CONFIG_DIR = resolve(FMLPaths.CONFIGDIR.get(), "scaling-health");
 
-    private static final ConfigSpecWrapper WRAPPER_GAME = ConfigSpecWrapper.create(SH_CONFIG_DIR.resolve("game_settings.toml"));
-    private static final ConfigSpecWrapper WRAPPER_CLIENT = ConfigSpecWrapper.create(SH_CONFIG_DIR.resolve("client.toml"));
-    private static final ConfigSpecWrapper WRAPPER_COMMON = ConfigSpecWrapper.create(SH_CONFIG_DIR.resolve("common.toml"));
+    private static final ConfigSpecWrapper WRAPPER_GAME = ConfigSpecWrapper.create(resolve(SH_CONFIG_DIR, "game_settings.toml"));
+    private static final ConfigSpecWrapper WRAPPER_CLIENT = ConfigSpecWrapper.create(resolve(SH_CONFIG_DIR, "client.toml"));
+    private static final ConfigSpecWrapper WRAPPER_COMMON = ConfigSpecWrapper.create(resolve(SH_CONFIG_DIR, "common.toml"));
 
     public static final Client CLIENT = new Client(WRAPPER_CLIENT);
     public static final Common COMMON = new Common(WRAPPER_COMMON);

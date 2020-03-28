@@ -56,7 +56,7 @@ public class BlightFireEntity extends Entity {
     }
 
     @Override
-    public int getBrightnessForRender() {
+    public float getBrightness() {
         return 15728880;
     }
 

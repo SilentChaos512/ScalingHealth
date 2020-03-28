@@ -87,7 +87,6 @@ public final class ModLoot {
                     .quality(7)
                     .acceptFunction(SetCount.builder(new RandomValueRange(1, 2)))
             );
-
         return builder;
     }
 }

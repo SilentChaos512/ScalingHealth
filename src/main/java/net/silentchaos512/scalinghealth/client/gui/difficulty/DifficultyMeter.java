@@ -18,7 +18,7 @@
 
 package net.silentchaos512.scalinghealth.client.gui.difficulty;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.resources.I18n;
@@ -86,8 +86,8 @@ public class DifficultyMeter extends Screen {
         final double maxDifficulty = ClientHandler.maxDifficultyValue;
         if (maxDifficulty <= 0) return;
 
-        int width = mc.mainWindow.getScaledWidth();
-        int height = mc.mainWindow.getScaledHeight();
+        int width = mc.getMainWindow().getScaledWidth();
+        int height = mc.getMainWindow().getScaledHeight();
 
         AreaDifficultyMode areaMode = ClientHandler.areaMode;
         int preClampAreaDifficulty = (int) ClientHandler.areaDifficulty;
@@ -108,12 +108,10 @@ public class DifficultyMeter extends Screen {
 
         int currentTime = ClientTicks.ticksInGame();
         if (showMode == DifficultyMeterShow.ALWAYS || currentTime - lastUpdateTime < 20 * Config.CLIENT.difficultyMeterShowTime.get() || keyDown) {
-            GlStateManager.enableBlend();
+            RenderSystem.enableBlend();
 
             mc.textureManager.bindTexture(TEXTURE);
-
-            GlStateManager.pushMatrix();
-            // GlStateManager.scale(1f, 0.5f, 1f);
+            RenderSystem.pushMatrix();
 
             Anchor anchor = Config.CLIENT.difficultyMeterAnchor.get();
             int posX = anchor.getX(width, 66, 5) + Config.CLIENT.difficultyMeterOffsetX.get();
@@ -133,8 +131,8 @@ public class DifficultyMeter extends Screen {
             // Text
             final float textScale = Config.CLIENT.difficultyMeterTextScale.get().floatValue();
             if (textScale > 0) {
-                GlStateManager.pushMatrix();
-                GlStateManager.scalef(textScale, textScale, 1);
+                RenderSystem.pushMatrix();
+                RenderSystem.scalef(textScale, textScale, 1);
                 mc.fontRenderer.drawStringWithShadow(
                         I18n.format("misc.scalinghealth.difficultyMeterText"),
                         posX / textScale + 4,
@@ -148,11 +146,11 @@ public class DifficultyMeter extends Screen {
                         posX / textScale + 104 - strWidth,
                         posY / textScale - 9,
                         0xAAAAAA);
-                GlStateManager.popMatrix();
+                RenderSystem.popMatrix();
             }
 
-            GlStateManager.popMatrix();
-            GlStateManager.disableBlend();
+            RenderSystem.popMatrix();
+            RenderSystem.disableBlend();
         }
     }
 
@@ -160,8 +158,8 @@ public class DifficultyMeter extends Screen {
         float r = ((color >> 16) & 255) / 255f;
         float g = ((color >> 8) & 255) / 255f;
         float b = (color & 255) / 255f;
-        GlStateManager.color3f(r, g, b);
+        RenderSystem.color3f(r, g, b);
         blit(x, y, textureX, textureY, width, height);
-        GlStateManager.color3f(1, 1, 1);
+        RenderSystem.color4f(1, 1, 1, 1);
     }
 }

@@ -1,12 +1,12 @@
 package net.silentchaos512.scalinghealth.client.particles;
 
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.IParticleFactory;
 import net.minecraft.client.particle.IParticleRenderType;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.TexturedParticle;
 import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.particles.BasicParticleType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
@@ -36,12 +36,12 @@ public class ModParticle extends TexturedParticle {
     }
 
     @Override
-    public void renderParticle(BufferBuilder buffer, ActiveRenderInfo entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
+    public void renderParticle(IVertexBuilder builder, ActiveRenderInfo info, float v) {
         int frame = FRAMES.length * this.age / this.maxAge;
         int textureIndex = FRAMES[MathUtils.clamp(frame, 0, FRAMES.length - 1)];
         ResourceLocation texture = TEXTURES.get(textureIndex);
         Minecraft.getInstance().textureManager.bindTexture(texture);
-        super.renderParticle(buffer, entityIn, partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
+        super.renderParticle(builder, info, v);
     }
 
     @Override

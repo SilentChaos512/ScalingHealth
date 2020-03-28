@@ -18,12 +18,14 @@
 
 package net.silentchaos512.scalinghealth.client.render.entity;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.culling.ICamera;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
+import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.culling.ClippingHelperImpl;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.util.ResourceLocation;
@@ -46,12 +48,12 @@ public final class BlightFireRenderer extends EntityRenderer<BlightFireEntity> {
 
     @Nonnull
     @Override
-    protected ResourceLocation getEntityTexture(BlightFireEntity entity) {
+    public ResourceLocation getEntityTexture(BlightFireEntity entity) {
         return TEXTURE;
     }
 
     @Override
-    public boolean shouldRender(BlightFireEntity fire, ICamera camera, double camX, double camY, double camZ) {
+    public boolean shouldRender(BlightFireEntity fire, ClippingHelperImpl camera, double camX, double camY, double camZ) {
         MobEntity parent = (MobEntity) fire.getRidingEntity();
         if (parent == null)
             return false;
@@ -60,8 +62,8 @@ public final class BlightFireRenderer extends EntityRenderer<BlightFireEntity> {
 
         if (boundingBox.hasNaN() || boundingBox.getAverageEdgeLength() == 0.0D) {
             boundingBox = new AxisAlignedBB(
-                    parent.posX - 2.0D, parent.posY - 2.0D, parent.posZ - 2.0D,
-                    parent.posX + 2.0D, parent.posY + 2.0D, parent.posZ + 2.0D);
+                    parent.getPosX() - 2.0D, parent.getPosY() - 2.0D, parent.getPosZ() - 2.0D,
+                    parent.getPosX() + 2.0D, parent.getPosY() + 2.0D, parent.getPosZ() + 2.0D);
         }
 
         return parent.isInRangeToRender3d(camX, camY, camZ)
@@ -69,32 +71,29 @@ public final class BlightFireRenderer extends EntityRenderer<BlightFireEntity> {
     }
 
     @Override
-    public void doRender(BlightFireEntity fire, double x, double y, double z, float entityYaw, float partialTicks) {
-        MobEntity parent = (MobEntity) fire.getRidingEntity();
+    public void render(BlightFireEntity fire, float entityYaw, float partialTicks, MatrixStack stack, IRenderTypeBuffer bufferIn, int light) {
+        /*MobEntity parent = (MobEntity) fire.getRidingEntity();
         if (parent == null) return;
+        /*
+        stack.push();
+        stack.translate(fire.getPosX(), fire.getPosY() - parent.getHeight() + 0.5, fire.getPosZ());
+        float f = parent.getWidth() * FIRE_SCALE * 100f;
+        stack.scale(f, f, f);
 
-        GlStateManager.disableLighting();
-        GlStateManager.pushMatrix();
-        GlStateManager.translated(x, y - parent.getHeight() + 0.5, z);
-        float f = parent.getWidth() * FIRE_SCALE;
-        GlStateManager.scalef(f, f, f);
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+        IVertexBuilder vertexBuilder = bufferIn.getBuffer(RenderType.getTranslucent());
 
         float f1 = 0.5F;
         float f2 = 0.0F;
         float f3 = parent.getHeight() / f;
-        float f4 = (float) (parent.posY - parent.getBoundingBox().minY);
+        float f4 = (float) (parent.getPosY() - parent.getBoundingBox().minY);
 
-        GlStateManager.rotatef(-this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-        GlStateManager.translatef(0, 0, f3 * 0.02f);
-        GlStateManager.color4f(1, 1, 1, 1);
+        stack.rotate(new Quaternion((float) -this.renderManager.info.getRenderViewEntity().getPosY(), 0.0F, 1.0F, 0.0F));
+        stack.translate(0, 0, f3 * 0.02f);
 
         float f5 = 0.0F;
         int i = 0;
 
-        buffer.begin(7, DefaultVertexFormats.POSITION_TEX);
-        this.bindTexture(getEntityTexture(fire));
+        this.renderManager.textureManager.bindTexture(getEntityTexture(fire));
 
         while (f3 > 0.0F) {
             boolean flag = i % 2 == 0;
@@ -110,20 +109,21 @@ public final class BlightFireRenderer extends EntityRenderer<BlightFireEntity> {
                 minU = f10;
             }
 
-            buffer.pos(f1 - f2, 0.0F - f4, f5).tex(maxU, maxV).endVertex();
-            buffer.pos(-f1 - f2, 0.0F - f4, f5).tex(minU, maxV).endVertex();
-            buffer.pos(-f1 - f2, 1.4F - f4, f5).tex(minU, minV).endVertex();
-            buffer.pos(f1 - f2, 1.4F - f4, f5).tex(maxU, minV).endVertex();
+            Matrix4f matrix4f = stack.getLast().getMatrix();
+            Matrix3f matrix3f = stack.getLast().getNormal();
+
+            vertexBuilder.pos(matrix4f,f1 - f2, 0.0F - f4, f5).color(1,1, 1, 1).tex(maxU, maxV).lightmap(light).normal(matrix3f, 1 ,0, -1).endVertex();
+            vertexBuilder.pos(matrix4f, -f1 - f2, 0.0F - f4, f5).color(1,1, 1, 1).tex(minU, maxV).lightmap(light).normal(matrix3f, 1 ,0, 1).endVertex();
+            vertexBuilder.pos(matrix4f,-f1 - f2, 1.4F - f4, f5).color(1,1, 1, 1).tex(minU, minV).lightmap(light).normal(matrix3f, -1 ,0, 1).endVertex();
+            vertexBuilder.pos(matrix4f, - f2, 1.4F - f4, f5).color(1,1, 1, 1).tex(maxU, minV).lightmap(light).normal(matrix3f, -1 ,0, 1).endVertex();
             f3 -= 0.45F;
             f4 -= 0.45F;
             f1 *= 0.9F;
             f5 += 0.03F;
             ++i;
         }
-
-        tessellator.draw();
-        GlStateManager.popMatrix();
-        GlStateManager.enableLighting();
+        stack.pop();
+        */
     }
 
     public static class Factory implements IRenderFactory<BlightFireEntity> {

@@ -22,15 +22,13 @@ public class SHWorldFeatures {
     }
 
     private static void addOre(Biome biome, IBlockProvider block, int size, int count, int minHeight, int maxHeight) {
-        biome.addFeature(GenerationStage.Decoration.UNDERGROUND_ORES, Biome.createDecoratedFeature(
-                Feature.ORE,
-                new OreFeatureConfig(
+        biome.addFeature(GenerationStage.Decoration.UNDERGROUND_ORES, Feature.ORE
+                .withConfiguration(new OreFeatureConfig(
                         OreFeatureConfig.FillerBlockType.NATURAL_STONE,
                         block.asBlockState(),
                         size
-                ),
-                Placement.COUNT_RANGE,
-                new CountRangeConfig(count, minHeight, 0, maxHeight)
-        ));
+                ))
+                .withPlacement(Placement.COUNT_RANGE.configure(new CountRangeConfig(count, minHeight, 0, maxHeight)))
+        );
     }
 }

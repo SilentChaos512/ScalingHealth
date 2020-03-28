@@ -46,7 +46,7 @@ public final class DifficultyEvents {
             event.addCapability(DifficultyAffectedCapability.NAME, new DifficultyAffectedCapability());
         }
         if (EnabledFeatures.difficultyEnabled() && DifficultySourceCapability.canAttachTo(entity)) {
-            debug(() -> "attach difficulty source");
+            debug(() -> "attach source to player");
             event.addCapability(DifficultySourceCapability.NAME, new DifficultySourceCapability());
         }
         if (PlayerDataCapability.canAttachTo(entity)) {
@@ -63,6 +63,7 @@ public final class DifficultyEvents {
     public static void onAttachWorldCapabilities(AttachCapabilitiesEvent<World> event) {
         World world = event.getObject();
         if (Config.COMMON.enableDifficulty.get() && DifficultySourceCapability.canAttachTo(world)) {
+            debug(()->"attach source to world");
             DifficultySourceCapability cap = new DifficultySourceCapability();
             event.addCapability(DifficultySourceCapability.NAME, cap);
             DifficultySourceCapability.setOverworldCap(cap);

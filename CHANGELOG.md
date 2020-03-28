@@ -3,6 +3,13 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.0.0] - 2020-03-28
+Updated to 1.15.2
+### Removed
+- Blight rendering. Disabled temporarily.
+### Fixed
+- Config folders will now be created automatically
+
 ## [2.5.0] - 2020-03-20
 Major changes to config files. Save your current config in a text editor before updating!
 Else you have to change it all again.

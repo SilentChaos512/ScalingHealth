@@ -45,8 +45,8 @@ class HeartsInfo {
 
         int updateCounter = ClientTicks.ticksInGame();
         random.setSeed(updateCounter * 312871);
-        scaledWindowWidth = mc.mainWindow.getScaledWidth();
-        scaledWindowHeight = mc.mainWindow.getScaledHeight();
+        scaledWindowWidth = mc.getMainWindow().getScaledWidth();
+        scaledWindowHeight = mc.getMainWindow().getScaledHeight();
 
         health = player.getHealth();
         previousHealthInt = healthInt;
