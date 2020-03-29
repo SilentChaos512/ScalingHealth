@@ -3,8 +3,6 @@ package net.silentchaos512.scalinghealth.datagen;
 import net.minecraft.advancements.ICriterionInstance;
 import net.minecraft.advancements.criterion.InventoryChangeTrigger;
 import net.minecraft.data.*;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.IItemProvider;
 import net.minecraftforge.common.Tags;

@@ -53,7 +53,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.init.ModSounds;
 import net.silentchaos512.scalinghealth.item.DifficultyMutatorItem;
@@ -81,11 +80,14 @@ public final class ScalingHealthCommonEvents {
 
     @SubscribeEvent
     public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-        if (!(event.getPlayer() instanceof ServerPlayerEntity)) return;
-        ServerPlayerEntity player = (ServerPlayerEntity) event.getPlayer();
+        PlayerEntity player = event.getPlayer();
+        SHPlayers.getPlayerData(player).setXpHearts(player, SHPlayers.hpFromCurrentXp(player.experienceLevel));
+
+        if (!(player instanceof ServerPlayerEntity)) return;
+        ServerPlayerEntity sp = (ServerPlayerEntity) event.getPlayer();
         ScalingHealth.LOGGER.info("Sending login packet to player {}", player);
         ClientLoginMessage msg = new ClientLoginMessage(SHDifficulty.areaMode(), (float) SHDifficulty.maxValue());
-        Network.channel.sendTo(msg, player.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
+        Network.channel.sendTo(msg, sp.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
     }
 
     @SubscribeEvent
@@ -162,7 +164,7 @@ public final class ScalingHealthCommonEvents {
         if(!EnabledFeatures.healthXpEnabled() || event.isCanceled()) return;
         PlayerEntity player = event.getPlayer();
         int health = SHPlayers.hpFromCurrentXp(player.experienceLevel + event.getLevels());
-        player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> data.setXpHearts(player, health));
+        SHPlayers.getPlayerData(player).setXpHearts(player, health);
     }
 
     /**
