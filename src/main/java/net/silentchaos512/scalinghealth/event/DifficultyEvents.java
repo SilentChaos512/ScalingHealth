@@ -18,10 +18,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.capability.DifficultyAffectedCapability;
-import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
-import net.silentchaos512.scalinghealth.capability.PetHealthCapability;
-import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
+import net.silentchaos512.scalinghealth.capability.*;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.utils.EnabledFeatures;
 import net.silentchaos512.scalinghealth.utils.SHDifficulty;
@@ -76,10 +73,8 @@ public final class DifficultyEvents {
         if (entity.world.isRemote) return;
 
         // Tick mobs, which will calculate difficulty when appropriate and apply changes
-        if (entity instanceof MobEntity) {
-            entity.getCapability(DifficultyAffectedCapability.INSTANCE).ifPresent(affected ->
-                affected.tick((MobEntity) entity));
-        }
+        if (entity instanceof MobEntity)
+            SHDifficulty.affected(entity).tick((MobEntity) entity);
 
         if(entity instanceof TameableEntity) {
             if(!((TameableEntity) entity).isTamed()) return;
@@ -88,15 +83,13 @@ public final class DifficultyEvents {
         }
 
         // Tick difficulty source, such as players, except if exempted
-        if (entity.world.getGameTime() % 20 == 0) {
-            entity.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
-                //assuming all entity sources are players
-                boolean exempt = SHDifficulty.isPlayerExempt((PlayerEntity) event.getEntityLiving());
-                source.setExempt(exempt);
-                if(exempt) return;
-                float change = (float) SHDifficulty.changePerSecond();
-                source.setDifficulty(source.getDifficulty() + change);
-            });
+        if (entity instanceof PlayerEntity && entity.world.getGameTime() % 20 == 0) {
+            IDifficultySource source = SHDifficulty.source(entity);
+
+            boolean exempt = SHDifficulty.isPlayerExempt((PlayerEntity) event.getEntityLiving());
+            source.setExempt(exempt);
+            if(exempt) return;
+            source.addDifficulty((float) SHDifficulty.changePerSecond());
         }
     }
 
@@ -148,6 +141,8 @@ public final class DifficultyEvents {
         // Player is cloned. Copy capabilities before applying health/difficulty changes if needed.
         PlayerEntity original = event.getOriginal();
         PlayerEntity clone = event.getPlayer();
+        SHPlayers.getPlayerData(original).setXpHearts(original, clone.experienceLevel);
+
         debug(() -> "onPlayerClone");
         copyCapability(PlayerDataCapability.INSTANCE, original, clone);
         copyCapability(DifficultySourceCapability.INSTANCE, original, clone);
@@ -171,10 +166,8 @@ public final class DifficultyEvents {
     @SubscribeEvent
     public static void onPlayerJoinServer(PlayerEvent.PlayerLoggedInEvent event) {
         PlayerEntity player = event.getPlayer();
-        player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> {
-            ScalingHealth.LOGGER.info("Updating stats for {}", player.getScoreboardName());
-            data.updateStats(player);
-        });
+        ScalingHealth.LOGGER.info("Updating stats for {}", player.getCustomName());
+        SHPlayers.getPlayerData(player).updateStats(player);
     }
 
     private static void notifyOfChanges(PlayerEntity player, String valueName, float oldValue, float newValue) {

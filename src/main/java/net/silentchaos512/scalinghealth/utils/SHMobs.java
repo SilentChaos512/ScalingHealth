@@ -1,7 +1,6 @@
 package net.silentchaos512.scalinghealth.utils;
 
 import net.minecraft.entity.MobEntity;
-import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.MobPotionConfig;
 import net.silentchaos512.scalinghealth.lib.MobHealthMode;
