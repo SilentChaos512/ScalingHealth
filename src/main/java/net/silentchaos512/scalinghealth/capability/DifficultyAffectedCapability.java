@@ -67,10 +67,8 @@ public class DifficultyAffectedCapability implements IDifficultyAffected, ICapab
             setDifficulty(entity);
             MobDifficultyHandler.process(entity, this);
             processed = true;
-
-            if (ScalingHealth.LOGGER.isDebugEnabled() && Config.COMMON.debugLogEntitySpawns.get()) {
+            if (ScalingHealth.LOGGER.isDebugEnabled() && Config.COMMON.debugLogEntitySpawns.get())
                 ScalingHealth.LOGGER.debug(DifficultyEvents.MARKER, "Processed {} -> difficulty={}, isBlight={}", entity, difficulty, blight);
-            }
         }
     }
 

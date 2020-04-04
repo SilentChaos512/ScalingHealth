@@ -9,7 +9,7 @@ public final class SHMobs {
     private SHMobs() { throw new IllegalAccessError("Utility class"); }
 
     public static boolean allowsDifficultyChanges(MobEntity entity) {
-        return Config.GENERAL.mobs.isMobDiffExempt(entity);
+        return !Config.GENERAL.mobs.isMobDiffExempt(entity);
     }
 
     public static double blightChance() {
