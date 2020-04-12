@@ -36,3 +36,4 @@ image_test/
 .DS_Store
 
 version.properties
+secret.json
