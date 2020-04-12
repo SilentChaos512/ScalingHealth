@@ -29,11 +29,6 @@ repositories {
     jcenter()
 }
 
-lombok {
-    version = '1.18.4'
-    sha256 = ""
-}
-
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
     options.compilerArgs = ['-Xlint:deprecation']
@@ -47,6 +42,7 @@ archivesBaseName = project.archivesBaseName
 def versionInfo = getModVersion()
 System.out.println(versionInfo)
 version = "${versionInfo['version']}"
+def version_short = "${versionInfo['version_short']}"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
@@ -55,25 +51,18 @@ minecraft {
 
     runs {
         client = {
-            // recommended logging data for a userdev environment
             properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
-            // recommended logging level for the console
             properties 'forge.logging.console.level': 'debug'
             workingDirectory project.file('run').canonicalPath
             source sourceSets.main
         }
         server = {
-            // recommended logging data for a userdev environment
             properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
-            // recommended logging level for the console
             properties 'forge.logging.console.level': 'debug'
             workingDirectory project.file('run').canonicalPath
             source sourceSets.main
         }
         data = {
-            // recommended logging data for a userdev environment
-            properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
-            // recommended logging level for the console
             properties 'forge.logging.console.level': 'debug'
             workingDirectory project.file('run').canonicalPath
 
@@ -177,7 +166,6 @@ artifacts {
 
 class Secrets {
     def data = null
-
     def getProperty(String key) {
         return data ? data[key] : ''
     }
@@ -185,12 +173,7 @@ class Secrets {
 
 import groovy.json.JsonSlurper
 
-def secretFile
-if (System.getenv().SECRET_FILE) {
-    secretFile = file System.getenv().SECRET_FILE
-} else {
-    secretFile = file 'secret.json'
-}
+def secretFile = file 'secret.json'
 
 project.ext.secret = new Secrets()
 if (secretFile.exists()) {
@@ -224,39 +207,52 @@ curseforge {
     }
 }
 
-// Bintray/Maven publishing
+//commit stuff
+// remove old tag -> stage files -> commit files -> add tag back (modified or not)
+task commitMinor {
+    doFirst {
+        int minor = Integer.parseInt(versionInfo['build.minor.number'].toString())
+        minor++
+        def newVersion = versionInfo['build.major.number'] + "." + minor.toString() + ".0"
 
-publishing {
-    publications {
-        publication(MavenPublication) {
-            groupId project.group
-            artifactId project.repoName
-            version "${versionInfo['version_short']}".toString()
-
-            from components.java
-
-            artifact sourcesJar
-            artifact javadocJar
+        "git tag -d ${version_short.toString()}".execute()
+        def add = "git add *".execute()
+        if(!add.waitFor()) {
+            def commit = "git commit -m \"Minor version change\"".execute()
+            if (!commit.waitFor()) {
+                "git tag -a ${newVersion} -m \"VersionInfo\"".execute()
+            }
         }
     }
 }
 
-bintray {
-    user = secret.BINTRAY_USER ?: System.getenv('BINTRAY_USER')
-    key = secret.BINTRAY_KEY ?: System.getenv('BINTRAY_KEY')
-    publications = ['publication']
+task commitStandard {
+    doFirst {
+        int revision = Integer.parseInt(versionInfo['build.revision.number'].toString())
+        revision++
+        def newVersion = versionInfo['version_simple'] + "." + revision.toString()
 
-    pkg {
-        repo = project.repoName
-        name = "${project.repoName}-${project.mc_version}"
-        licenses = ["LGPL-3.0"]
-        vcsUrl = project.vcsUrl
+        "git tag -d ${version_short.toString()}".execute()
+        def add = "git add *".execute()
 
-        version {
-            name = "${versionInfo['version_short']}".toString()
-            desc = "${project.name} (${project.mc_version}) ${versionInfo['version_short']}".toString()
-            released = new Date()
-            vcsTag = "v${versionInfo['version_short']}".toString()
+        if(!add.waitFor()) {
+            def commit = "git commit -m \"Revision\"".execute()
+            if (!commit.waitFor()) {
+                "git tag -a ${newVersion} -m \"VersionInfo\"".execute()
+            }
+        }
+    }
+}
+
+task commitWithoutUpdatingTag {
+    doFirst {
+        "git tag -d ${version_short.toString()}".execute()
+        def add = "git add *".execute()
+        if(!add.waitFor()) {
+            def commit = "git commit -m \"Auto generated commit!\"".execute()
+            if (!commit.waitFor()) {
+                "git tag -a ${version_short.toString()} -m \"Version Info\"".execute()
+            }
         }
     }
 }
