@@ -19,6 +19,7 @@
 package net.silentchaos512.scalinghealth.client.render.entity;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.renderer.*;
@@ -41,6 +42,7 @@ public final class BlightFireRenderer extends EntityRenderer<BlightFireEntity> {
     private static final float FIRE_SCALE = 1.8F;
 
     private static final ResourceLocation TEXTURE = ScalingHealth.getId("textures/entity/blightfire.png");
+    private static final RenderType RENDER_TYPE = RenderType.getEntityCutout(TEXTURE);
 
     private BlightFireRenderer(EntityRendererManager renderManager) {
         super(renderManager);
@@ -75,7 +77,8 @@ public final class BlightFireRenderer extends EntityRenderer<BlightFireEntity> {
         if (parent == null) return;
 
         stack.push();
-        stack.translate(fire.getPosX(), fire.getPosY() - parent.getHeight() + 0.5, fire.getPosZ());
+        //stack.translate(fire.getPosX(), fire.getPosY() - parent.getHeight() + 0.5, fire.getPosZ());
+        stack.translate(0.0,-parent.getHeight() + 0.5,0.0);
         float f = parent.getWidth() * FIRE_SCALE;
         stack.scale(f, f, f);
 
@@ -84,13 +87,14 @@ public final class BlightFireRenderer extends EntityRenderer<BlightFireEntity> {
         float f3 = (float) (parent.getPosY() - parent.getBoundingBox().minY);
         float f4 = 0.0F;
 
-        Quaternion rotation = new Quaternion(-this.renderManager.info.getYaw(), 0.0F, 1.0F, 0.0F);
-        stack.rotate(rotation);
+        //Quaternion rotation = new Quaternion(0.0f, 1.0F, 0.0F, -this.renderManager.info.getPitch());
+        //stack.rotate(rotation);
         stack.translate(0, 0, f2 * 0.02f);
         int i = 0;
 
-        this.renderManager.textureManager.bindTexture(getEntityTexture(fire));
-        IVertexBuilder vertexBuilder = bufferIn.getBuffer(RenderType.getEntityGlint());
+        IVertexBuilder vertexBuilder = bufferIn.getBuffer(RENDER_TYPE);
+        Matrix4f matrix4f = stack.getLast().getMatrix();
+        Matrix3f matrix3f = stack.getLast().getNormal();
 
         while (f2 > 0.0F) {
             boolean flag = i % 2 == 0;
@@ -106,17 +110,20 @@ public final class BlightFireRenderer extends EntityRenderer<BlightFireEntity> {
                 minU = swap;
             }
 
-            Matrix4f matrix4f = stack.getLast().getMatrix();
-            vertexBuilder.pos(matrix4f, f1,0.0F - f3, f4).tex(maxU, maxV).endVertex();
-            vertexBuilder.pos(matrix4f,-f1,0.0F - f3, f4).tex(minU, maxV).endVertex();
-            vertexBuilder.pos(matrix4f,-f1,1.4F - f3, f4).tex(maxU, minV).endVertex();
-            vertexBuilder.pos(matrix4f, f1,1.4F - f3, f4).tex(minU, minV).endVertex();
+            //if(fire.world.getGameTime() % 40 == 0)
+                //ScalingHealth.LOGGER.debug("{}", matrix4f.toString());
+
+            vertexBuilder.pos(matrix4f, f1,0.0F - f3, f4).color(1,1,1,1).tex(maxU, maxV).overlay(OverlayTexture.NO_OVERLAY).lightmap(light).normal(matrix3f, 0.0F, 1.0F, 0.0F).endVertex();
+            vertexBuilder.pos(matrix4f,-f1,0.0F - f3, f4).color(1,1,1,1).tex(minU, maxV).overlay(OverlayTexture.NO_OVERLAY).lightmap(light).normal(matrix3f, 0.0F, 1.0F, 0.0F).endVertex();
+            vertexBuilder.pos(matrix4f,-f1,1.4F - f3, f4).color(1,1,1,1).tex(maxU, minV).overlay(OverlayTexture.NO_OVERLAY).lightmap(light).normal(matrix3f, 0.0F, 1.0F, 0.0F).endVertex();
+            vertexBuilder.pos(matrix4f, f1,1.4F - f3, f4).color(1,1,1,1).tex(minU, minV).overlay(OverlayTexture.NO_OVERLAY).lightmap(light).normal(matrix3f, 0.0F, 1.0F, 0.0F).endVertex();
             f2 -= 0.45F;
             f3 -= 0.45F;
             f1 *= 0.9F;
             f4 += 0.03F;
             ++i;
         }
+
         stack.pop();
         super.render(fire, entityYaw, partialTicks, stack, bufferIn, light);*/
     }

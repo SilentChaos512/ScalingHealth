@@ -10,6 +10,7 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.utils.SHDifficulty;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -45,10 +46,11 @@ public class DifficultySourceCapability implements IDifficultySource, ICapabilit
 
     @Override
     public void setDifficulty(float value) {
+        float realDiff = (float) SHDifficulty.clamp(value);
         if(exempt)
             difficulty = 0;
         else
-            difficulty = value;
+            difficulty = realDiff;
     }
 
     @Override

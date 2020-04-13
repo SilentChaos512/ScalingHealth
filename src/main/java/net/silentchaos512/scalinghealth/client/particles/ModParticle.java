@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-@OnlyIn(Dist.CLIENT)
 public class ModParticle extends TexturedParticle {
     private static final List<ResourceLocation> TEXTURES = IntStream.range(0, 4).boxed()
             .map(k -> new ResourceLocation(ScalingHealth.MOD_ID, "textures/particle/generic" + k + ".png"))
