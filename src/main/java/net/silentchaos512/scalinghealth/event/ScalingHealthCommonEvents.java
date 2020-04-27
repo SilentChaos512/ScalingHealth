@@ -40,6 +40,7 @@ import net.minecraft.world.storage.loot.LootContext;
 import net.minecraft.world.storage.loot.LootParameterSets;
 import net.minecraft.world.storage.loot.LootParameters;
 import net.minecraft.world.storage.loot.LootTable;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
@@ -74,163 +75,169 @@ import java.util.UUID;
 
 @Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID)
 public final class ScalingHealthCommonEvents {
-    private ScalingHealthCommonEvents() {}
+   private ScalingHealthCommonEvents() {}
 
-    public static List<UUID> spawnerSpawns = new ArrayList<>();
+   public static List<UUID> spawnerSpawns = new ArrayList<>();
 
-    @SubscribeEvent
-    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-        PlayerEntity player = event.getPlayer();
-        SHPlayers.getPlayerData(player).setXpHearts(player, SHPlayers.hpFromCurrentXp(player.experienceLevel));
+   @SubscribeEvent
+   public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+      PlayerEntity player = event.getPlayer();
+      SHPlayers.getPlayerData(player).updateStats(player);
 
-        if (!(player instanceof ServerPlayerEntity)) return;
-        ServerPlayerEntity sp = (ServerPlayerEntity) event.getPlayer();
-        ScalingHealth.LOGGER.info("Sending login packet to player {}", player);
-        ClientLoginMessage msg = new ClientLoginMessage(SHDifficulty.areaMode(), (float) SHDifficulty.maxValue());
-        Network.channel.sendTo(msg, sp.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
-    }
+      if (!(player instanceof ServerPlayerEntity)) return;
+      ServerPlayerEntity sp = (ServerPlayerEntity) event.getPlayer();
+      ScalingHealth.LOGGER.info("Sending login packet to player {}", player);
+      ClientLoginMessage msg = new ClientLoginMessage(SHDifficulty.areaMode(), (float) SHDifficulty.maxValue());
+      Network.channel.sendTo(msg, sp.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
+   }
 
-    @SubscribeEvent
-    public static void onSpawn(LivingSpawnEvent.CheckSpawn event){
-        if(!(event.getEntityLiving() instanceof MobEntity)) return;
-        if(event.getSpawnReason() == SpawnReason.SPAWNER) spawnerSpawns.add(event.getEntityLiving().getUniqueID());
-    }
+   @SubscribeEvent
+   public static void onSpawn(LivingSpawnEvent.CheckSpawn event){
+      if(!(event.getEntityLiving() instanceof MobEntity)) return;
+      if(event.getSpawnReason() == SpawnReason.SPAWNER) spawnerSpawns.add(event.getEntityLiving().getUniqueID());
+   }
 
-    @SubscribeEvent
-    public static void onLivingDrops(LivingDropsEvent event) {
-        if (!(event.getEntity() instanceof LivingEntity)) return;
+   @SubscribeEvent
+   public static void onLivingDrops(LivingDropsEvent event) {
+      if (!(event.getEntity() instanceof LivingEntity)) return;
 
-        LivingEntity entity = (LivingEntity) event.getEntity();
-        World world = entity.world;
-        if (world.isRemote) return;
-        MinecraftServer server = world.getServer();
-        if (server == null) return;
+      LivingEntity entity = (LivingEntity) event.getEntity();
+      World world = entity.world;
+      if (world.isRemote) return;
+      MinecraftServer server = world.getServer();
+      if (server == null) return;
 
-        // Mob loot disabled?
-        if (!world.getGameRules().getBoolean(GameRules.DO_MOB_LOOT)) return;
+      // Mob loot disabled?
+      if (!world.getGameRules().getBoolean(GameRules.DO_MOB_LOOT)) return;
 
-        PlayerEntity player = getPlayerThatCausedDeath(event.getSource());
+      PlayerEntity player = getPlayerThatCausedDeath(event.getSource());
 
-        // Get the bonus drops loot table for this mob type
-        Optional<ResourceLocation> tableName = EntityGroup.from(entity, true).getBonusDropsLootTable();
-        if (!tableName.isPresent()) return;
+      // Get the bonus drops loot table for this mob type
+      Optional<ResourceLocation> tableName = EntityGroup.from(entity, true).getBonusDropsLootTable();
+      if (!tableName.isPresent()) return;
 
-        LootTable lootTable = server.getLootTableManager().getLootTableFromLocation(tableName.get());
-        LootContext.Builder contextBuilder = new LootContext.Builder((ServerWorld) world)
-                .withParameter(LootParameters.THIS_ENTITY, entity)
-                .withParameter(LootParameters.POSITION, entity.getPosition())
-                .withParameter(LootParameters.DAMAGE_SOURCE, event.getSource())
-                .withNullableParameter(LootParameters.KILLER_ENTITY, player)
-                .withNullableParameter(LootParameters.DIRECT_KILLER_ENTITY, player)
-                .withNullableParameter(LootParameters.LAST_DAMAGE_PLAYER, player);
-        if (player != null) contextBuilder.withLuck(player.getLuck());
-        List<ItemStack> list = lootTable.generate(contextBuilder.build(LootParameterSets.ENTITY));
-        list.forEach(stack -> event.getDrops().add(dropItem(entity, world, stack)));
-    }
+      LootTable lootTable = server.getLootTableManager().getLootTableFromLocation(tableName.get());
+      LootContext.Builder contextBuilder = new LootContext.Builder((ServerWorld) world)
+              .withParameter(LootParameters.THIS_ENTITY, entity)
+              .withParameter(LootParameters.POSITION, entity.getPosition())
+              .withParameter(LootParameters.DAMAGE_SOURCE, event.getSource())
+              .withNullableParameter(LootParameters.KILLER_ENTITY, player)
+              .withNullableParameter(LootParameters.DIRECT_KILLER_ENTITY, player)
+              .withNullableParameter(LootParameters.LAST_DAMAGE_PLAYER, player);
+      if (player != null) contextBuilder.withLuck(player.getLuck());
+      List<ItemStack> list = lootTable.generate(contextBuilder.build(LootParameterSets.ENTITY));
+      list.forEach(stack -> event.getDrops().add(dropItem(entity, world, stack)));
+   }
 
-    private static ItemEntity dropItem(LivingEntity entity, World world, ItemStack stack) {
-        return new ItemEntity(world, entity.getPosX(), entity.getPosY() + entity.getHeight() / 2, entity.getPosZ(), getCorrectStack(stack));
-    }
+   private static ItemEntity dropItem(LivingEntity entity, World world, ItemStack stack) {
+      return new ItemEntity(world, entity.getPosX(), entity.getPosY() + entity.getHeight() / 2, entity.getPosZ(), getCorrectStack(stack));
+   }
 
-    //If some items are useless, do not drop them.
-    private static ItemStack getCorrectStack(ItemStack stack){
-        if((stack.getItem() instanceof DifficultyMutatorItem && !EnabledFeatures.difficultyEnabled()) ||
-                (stack.getItem() instanceof PowerCrystal && !EnabledFeatures.powerCrystalEnabled()))
-           return ItemStack.EMPTY;
-        return stack;
-    }
+   //If some items are useless, do not drop them.
+   private static ItemStack getCorrectStack(ItemStack stack){
+      if((stack.getItem() instanceof DifficultyMutatorItem && !EnabledFeatures.difficultyEnabled()) ||
+              (stack.getItem() instanceof PowerCrystal && !EnabledFeatures.powerCrystalEnabled()))
+         return ItemStack.EMPTY;
+      return stack;
+   }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public static void onMobXPDropped(LivingExperienceDropEvent event) {
-        LivingEntity entity = event.getEntityLiving();
-        // Additional XP from all mobs.
-        short difficulty = (short) SHDifficulty.areaDifficulty(entity.world, entity.getPosition());
-        float multi = (float) (1.0f + SHMobs.xpBoost() * difficulty);
+   @SubscribeEvent(priority = EventPriority.HIGHEST)
+   public static void onMobXPDropped(LivingExperienceDropEvent event) {
+      LivingEntity entity = event.getEntityLiving();
+      // Additional XP from all mobs.
+      short difficulty = (short) SHDifficulty.areaDifficulty(entity.world, entity.getPosition());
+      float multi = (float) (1.0f + SHMobs.xpBoost() * difficulty);
 
-        float amount = event.getDroppedExperience();
-        amount *= multi;
+      float amount = event.getDroppedExperience();
+      amount *= multi;
 
-        // Additional XP from blights.
-        if(entity instanceof MobEntity) {
-            if (SHMobs.isBlight((MobEntity) entity)) {
-                amount *= SHMobs.xpBlightBoost();
-            }
-        }
-        event.setDroppedExperience(Math.round(amount));
-    }
+      // Additional XP from blights.
+      if(entity instanceof MobEntity) {
+         if (SHMobs.isBlight((MobEntity) entity)) {
+            amount *= SHMobs.xpBlightBoost();
+         }
+      }
+      event.setDroppedExperience(Math.round(amount));
+   }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    public static void onLevelChange(PlayerXpEvent.LevelChange event) {
-        if(!EnabledFeatures.healthXpEnabled() || event.isCanceled()) return;
-        PlayerEntity player = event.getPlayer();
-        int health = SHPlayers.hpFromCurrentXp(player.experienceLevel + event.getLevels());
-        SHPlayers.getPlayerData(player).setXpHearts(player, health);
-    }
+   @SubscribeEvent
+   public static void playerTick(TickEvent.PlayerTickEvent event){
+      if(event.phase == TickEvent.Phase.START) return;
+      PlayerEntity player = event.player;
+      if (player.world.isRemote) return;
+      SHPlayers.getPlayerData(player).tick(player);
+   }
 
-    /**
-     * Get the player that caused a mob's death. Could be a FakePlayer or null.
-     *
-     * @return The player that caused the damage, or the owner of the tamed animal that caused the
-     * damage.
-     */
-    @Nullable
-    private static PlayerEntity getPlayerThatCausedDeath(DamageSource source) {
-        if (source == null) {
-            return null;
-        }
+   @SubscribeEvent(priority = EventPriority.LOWEST)
+   public static void onLevelChange(PlayerXpEvent.LevelChange event) {
+      if(!EnabledFeatures.healthXpEnabled() || event.isCanceled()) return;
+      SHPlayers.getPlayerData(event.getPlayer()).updateStats(event.getPlayer());
+   }
 
-        // Player is true source.S
-        Entity entitySource = source.getTrueSource();
-        if (entitySource instanceof PlayerEntity) {
-            return (PlayerEntity) entitySource;
-        }
+   /**
+    * Get the player that caused a mob's death. Could be a FakePlayer or null.
+    *
+    * @return The player that caused the damage, or the owner of the tamed animal that caused the
+    * damage.
+    */
+   @Nullable
+   private static PlayerEntity getPlayerThatCausedDeath(DamageSource source) {
+      if (source == null) {
+         return null;
+      }
 
-        // Player's pet is true source.
-        boolean isTamedAnimal = entitySource instanceof TameableEntity
-                && ((TameableEntity) entitySource).isTamed();
-        if (isTamedAnimal) {
-            TameableEntity tamed = (TameableEntity) entitySource;
-            if (tamed.getOwner() instanceof PlayerEntity) {
-                return (PlayerEntity) tamed.getOwner();
-            }
-        }
-        // No player responsible.
-        return null;
-    }
+      // Player is true source.S
+      Entity entitySource = source.getTrueSource();
+      if (entitySource instanceof PlayerEntity) {
+         return (PlayerEntity) entitySource;
+      }
 
-    @SubscribeEvent
-    public static void onPlayerDied(LivingDeathEvent event) {
-        if (event.getEntity() == null || !(event.getEntity() instanceof PlayerEntity)) {
-            return;
-        }
+      // Player's pet is true source.
+      boolean isTamedAnimal = entitySource instanceof TameableEntity
+              && ((TameableEntity) entitySource).isTamed();
+      if (isTamedAnimal) {
+         TameableEntity tamed = (TameableEntity) entitySource;
+         if (tamed.getOwner() instanceof PlayerEntity) {
+            return (PlayerEntity) tamed.getOwner();
+         }
+      }
+      // No player responsible.
+      return null;
+   }
 
-        PlayerEntity player = (PlayerEntity) event.getEntity();
-        ModSounds.PLAYER_DIED.play(player);
-    }
+   @SubscribeEvent
+   public static void onPlayerDied(LivingDeathEvent event) {
+      if (event.getEntity() == null || !(event.getEntity() instanceof PlayerEntity)) {
+         return;
+      }
 
-    @SubscribeEvent
-    public static void onPlayerSleepInBed(PlayerSleepInBedEvent event) {
-        PlayerEntity player = event.getPlayer();
-        if (!player.world.isRemote && Config.CLIENT.warnWhenSleeping.get()) {
-            double newDifficulty = SHDifficulty.diffOnPlayerSleep(player);
+      PlayerEntity player = (PlayerEntity) event.getEntity();
+      ModSounds.PLAYER_DIED.play(player);
+   }
 
-            if (!MathUtils.doublesEqual(SHDifficulty.getDifficultyOf(player), newDifficulty, 0.1)) {
-                ScalingHealth.LOGGER.debug("old={}, new={}", SHDifficulty.getDifficultyOf(player), newDifficulty);
-                // Difficulty would change (doesn't change until onPlayerWakeUp)
-                String configMsg = SHDifficulty.sleepWarningMessage();
-                ITextComponent text = configMsg.isEmpty()
-                        ? new TranslationTextComponent("misc.scalinghealth.sleepWarning")
-                        : new StringTextComponent(configMsg);
-                player.sendMessage(text);
-            }
-        }
-    }
+   @SubscribeEvent
+   public static void onPlayerSleepInBed(PlayerSleepInBedEvent event) {
+      PlayerEntity player = event.getPlayer();
+      if (!player.world.isRemote && Config.CLIENT.warnWhenSleeping.get()) {
+         double newDifficulty = SHDifficulty.diffOnPlayerSleep(player);
 
-    @SubscribeEvent
-    public static void onPlayerWakeUp(PlayerWakeUpEvent event) {
-        PlayerEntity player = event.getPlayer();
-        if (!player.world.isRemote && !event.updateWorld()) {
-            SHDifficulty.setSourceDifficulty(player, SHDifficulty.diffOnPlayerSleep(player));
-        }
-    }
+         if (!MathUtils.doublesEqual(SHDifficulty.getDifficultyOf(player), newDifficulty, 0.1)) {
+            ScalingHealth.LOGGER.debug("old={}, new={}", SHDifficulty.getDifficultyOf(player), newDifficulty);
+            // Difficulty would change (doesn't change until onPlayerWakeUp)
+            String configMsg = SHDifficulty.sleepWarningMessage();
+            ITextComponent text = configMsg.isEmpty()
+                    ? new TranslationTextComponent("misc.scalinghealth.sleepWarning")
+                    : new StringTextComponent(configMsg);
+            player.sendMessage(text);
+         }
+      }
+   }
+
+   @SubscribeEvent
+   public static void onPlayerWakeUp(PlayerWakeUpEvent event) {
+      PlayerEntity player = event.getPlayer();
+      if (!player.world.isRemote && !event.updateWorld()) {
+         SHDifficulty.setSourceDifficulty(player, SHDifficulty.diffOnPlayerSleep(player));
+      }
+   }
 }

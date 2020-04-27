@@ -13,13 +13,11 @@ import net.silentchaos512.scalinghealth.utils.SHItems;
 import net.silentchaos512.scalinghealth.utils.SHPlayers;
 
 public interface IPlayerData {
-    int getAllHearts();
+    int getBonusHearts(PlayerEntity player);
 
-    int getHeartByCrystals();
+    int getHeartCrystals();
 
-    void setXpHearts(PlayerEntity player, int amount);
-
-    void setHeartByCrystals(PlayerEntity player, int amount);
+    void setHeartCrystals(PlayerEntity player, int amount);
 
     int getPowerCrystals();
 
@@ -29,8 +27,8 @@ public interface IPlayerData {
 
     void tick(PlayerEntity player);
 
-    default void addHeartsByCrystals(PlayerEntity player, int amount) {
-        setHeartByCrystals(player, getHeartByCrystals() + amount);
+    default void addHeartCrystals(PlayerEntity player, int amount) {
+        setHeartCrystals(player, getHeartCrystals() + amount);
     }
 
     default void addPowerCrystal(PlayerEntity player) {
@@ -41,8 +39,8 @@ public interface IPlayerData {
         setPowerCrystalCount(player, getPowerCrystals() + amount);
     }
 
-    default int getHealthModifier() {
-        return 2 * getAllHearts() + SHPlayers.startingHealth() - 20;
+    default int getModifiedHealth(PlayerEntity player) {
+        return 2 * SHPlayers.clampExtraHearts(getBonusHearts(player)) + SHPlayers.startingHealth() - 20;
     }
 
     default double getAttackDamageModifier() {

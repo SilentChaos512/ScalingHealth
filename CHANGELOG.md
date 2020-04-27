@@ -3,7 +3,12 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.0.3] - 2020-13-07
+## [3.0.4] - 2020-04-26
+### Fixed
+- Disabling XP add health works on login.
+- Death hp modifier now works with other hp modifiying mods.
+
+## [3.0.3] - 2020-04-13
 - Bunch of internal work
 ### Fixed
 - Difficulty not being clamped

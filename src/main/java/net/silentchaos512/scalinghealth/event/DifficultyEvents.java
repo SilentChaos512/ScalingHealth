@@ -15,6 +15,7 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -129,20 +130,12 @@ public final class DifficultyEvents {
         }
     }
 
-    @SubscribeEvent
-    public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if(event.phase == TickEvent.Phase.START) return;
-        PlayerEntity player = event.player;
-        if (player.world.isRemote) return;
-        player.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> data.tick(player));
-    }
-
-    @SubscribeEvent
+    //Testing stuff with the priority
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onPlayerClone(PlayerEvent.Clone event) {
         // Player is cloned. Copy capabilities before applying health/difficulty changes if needed.
         PlayerEntity original = event.getOriginal();
         PlayerEntity clone = event.getPlayer();
-        SHPlayers.getPlayerData(original).setXpHearts(original, clone.experienceLevel);
 
         debug(() -> "onPlayerClone");
         copyCapability(PlayerDataCapability.INSTANCE, original, clone);
@@ -153,9 +146,10 @@ public final class DifficultyEvents {
 
         // Apply death mutators
         clone.getCapability(PlayerDataCapability.INSTANCE).ifPresent(data -> {
-            int newCrystals = SHPlayers.getCrystalCountFromHealth(SHPlayers.getHealthAfterDeath(original));
-            notifyOfChanges(clone, "heart crystal(s)", data.getHeartByCrystals(), newCrystals);
-            data.setHeartByCrystals(clone, newCrystals);
+            data.updateStats(clone);
+            int newCrystals = SHPlayers.getCrystalsAfterDeath(clone);
+            notifyOfChanges(clone, "heart crystal(s)", data.getHeartCrystals(), newCrystals);
+            data.setHeartCrystals(clone, newCrystals);
         });
         clone.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
             float newDifficulty = (float) SHDifficulty.getDifficultyAfterDeath(clone);

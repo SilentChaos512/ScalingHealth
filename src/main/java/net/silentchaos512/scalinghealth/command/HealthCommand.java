@@ -81,7 +81,7 @@ public final class HealthCommand {
                 .applyTextStyle(TextFormatting.YELLOW);
         context.getSource().sendFeedback(actualText, true);
         // Heart crystals and health modifier
-        int extraHearts = data.getHeartByCrystals();
+        int extraHearts = data.getHeartCrystals();
         String extraHealth = (extraHearts >= 0 ? "+" : "") + (2 * extraHearts);
         ITextComponent heartsValues = text("heartCrystals.values",extraHearts / SHItems.heartCrystalIncreaseAmount(), extraHealth)
                 .applyTextStyle(TextFormatting.WHITE);
@@ -96,7 +96,7 @@ public final class HealthCommand {
         for (ServerPlayerEntity player : EntityArgument.getPlayers(context, "targets")) {
             IPlayerData data = SHPlayers.getPlayerData(player);
             int intendedExtraHearts = (amount - SHPlayers.startingHealth()) / 2;
-            data.setHeartByCrystals(player, intendedExtraHearts);
+            data.setHeartCrystals(player, intendedExtraHearts);
         }
         return 1;
     }
@@ -104,7 +104,7 @@ public final class HealthCommand {
     private static int runAddHealth(CommandContext<CommandSource> context) throws CommandSyntaxException {
         int amount = IntegerArgumentType.getInteger(context, "amount");
         for (ServerPlayerEntity player : EntityArgument.getPlayers(context, "targets")) {
-            SHPlayers.getPlayerData(player).addHeartsByCrystals(player, amount);
+            SHPlayers.getPlayerData(player).addHeartCrystals(player, amount);
         }
         return 1;
     }

@@ -37,13 +37,13 @@ public class HeartCrystal extends StatBoosterItem {
     @Override
     boolean isStatIncreaseAllowed(PlayerEntity player) {
         return EnabledFeatures.healthCrystalEnabled() &&
-                SHPlayers.getPlayerData(player).getAllHearts() < SHPlayers.maxHealth();
+                SHPlayers.getPlayerData(player).getBonusHearts(player) < SHPlayers.maxHealth();
     }
 
     @Override
     boolean shouldConsume(PlayerEntity player) {
-        return EnabledFeatures.healthCrystalRegenEnabled()
-                && player.getHealth() < player.getMaxHealth();
+        return EnabledFeatures.healthCrystalRegenEnabled() &&
+                player.getHealth() < player.getMaxHealth();
     }
 
     @Override
@@ -59,7 +59,7 @@ public class HeartCrystal extends StatBoosterItem {
 
     @Override
     void increaseStat(PlayerEntity player) {
-        SHPlayers.getPlayerData(player).addHeartsByCrystals(player, SHItems.heartCrystalIncreaseAmount());
+        SHPlayers.getPlayerData(player).addHeartCrystals(player, SHItems.heartCrystalIncreaseAmount());
     }
 
     @Override
