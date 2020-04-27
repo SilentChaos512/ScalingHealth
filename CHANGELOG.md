@@ -3,7 +3,7 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [3.0.4] - 2020-04-26
+## [3.0.4] - 2020-04-27
 ### Fixed
 - Disabling XP add health works on login.
 - Death hp modifier now works with other hp modifiying mods.
