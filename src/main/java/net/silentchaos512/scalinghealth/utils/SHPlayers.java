@@ -103,6 +103,6 @@ public final class SHPlayers {
    }
 
    public static int fullHeartsFromXp(int levels) {
-      return levels / levelsPerHp() * hpPerLevel();
+      return EnabledFeatures.healthXpEnabled() ? levels / levelsPerHp() * hpPerLevel() : 0;
    }
 }
