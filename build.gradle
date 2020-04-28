@@ -43,10 +43,12 @@ javadoc {
     failOnError = false
 }
 
+archivesBaseName = project.archivesBaseName
 def versionInfo = getModVersion()
 System.out.println(versionInfo)
 version = "${versionInfo['version']}"
 def build_num = getBuildNumber()
+def version_short =  "${versionInfo['version_short']}"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
@@ -211,96 +213,84 @@ curseforge {
         project {
             id = project.cf_project_id
             changelog = file(project.cf_changelog_filename)
+            changelogType = 'markdown'
             releaseType = project.cf_release_type
             addGameVersion(project.mc_version)
             mainArtifact(jar) {
-//                displayName = "$project.description $display_version"
                 relations {
                     requiredDependency 'silent-lib'
                 }
             }
-//            if (project.hasProperty('doAPIJar')) {
-//                addArtifact(apiJar) {
-//                    displayName = "$project.description $display_version API"
-//                }
-//            }
-//            if (project.hasProperty('doSourceJar')) {
-//                addArtifact(sourceJar) {
-//                    displayName = "$project.description $display_version Sources"
-//                }
-//            }
-//            if (project.hasProperty('doDeobfJar')) {
-//                addArtifact(deobfJar) {
-//                    displayName = "$project.description $display_version Development"
-//                }
-//            }
-//            if (project.hasProperty('doJavadocJar')) {
-//                addArtifact(javadocJar) {
-//                    displayName = "$project.description $display_version Javadoc"
-//                }
-//            }
+        }
+        options {
+            debug = true
+        }
+    }
+    else {
+        System.out.println("The gradle.properties file is incorrect for cursegradle")
+    }
+}
+
+//commit stuff
+// remove old tag -> stage files -> commit files -> add tag back (modified or not)
+task commitMinor {
+    doFirst {
+        int minor = Integer.parseInt(versionInfo['build.minor.number'].toString())
+        minor++
+        def newVersion = versionInfo['build.major.number'] + "." + minor.toString() + ".0"
+
+        "git tag -d ${version_short.toString()}".execute()
+        def add = "git add *".execute()
+        if(!add.waitFor()) {
+            def commit = "git commit -m \"Minor version change\"".execute()
+            if (!commit.waitFor()) {
+                "git tag -a ${newVersion} -m \"VersionInfo\"".execute()
+            }
         }
     }
 }
 
-// Bintray/Maven publishing
+task commitStandard {
+    doFirst {
+        int revision = Integer.parseInt(versionInfo['build.revision.number'].toString())
+        revision++
+        def newVersion = versionInfo['version_simple'] + "." + revision.toString()
 
-publishing {
-    publications {
-        publication(MavenPublication) {
-            groupId project.group
-            artifactId project.repoName
-            version "${versionInfo['version_short']}".toString()
+        "git tag -d ${version_short.toString()}".execute()
+        def add = "git add *".execute()
 
-            from components.java
-
-            artifact sourcesJar
-            artifact javadocJar
+        if(!add.waitFor()) {
+            def commit = "git commit -m \"Revision\"".execute()
+            if (!commit.waitFor()) {
+                "git tag -a ${newVersion} -m \"VersionInfo\"".execute()
+            }
         }
     }
 }
 
-bintray {
-    user = secret.BINTRAY_USER ?: System.getenv('BINTRAY_USER')
-    key = secret.BINTRAY_KEY ?: System.getenv('BINTRAY_KEY')
-    publications = ['publication']
-
-    pkg {
-        repo = project.repoName
-        name = "${project.repoName}-${project.mc_version}"
-        licenses = ["LGPL-3.0"]
-        vcsUrl = project.vcsUrl
-
-        version {
-            name = "${versionInfo['version_short']}".toString()
-            desc = "${project.name} (${project.mc_version}) ${versionInfo['version_short']}".toString()
-            released = new Date()
-            vcsTag = "v${versionInfo['version_short']}".toString()
+task commitWithoutUpdatingTag {
+    doFirst {
+        "git tag -d ${version_short.toString()}".execute()
+        def add = "git add *".execute()
+        if(!add.waitFor()) {
+            def commit = "git commit -m \"Auto generated commit!\"".execute()
+            if (!commit.waitFor()) {
+                "git tag -a ${version_short.toString()} -m \"Version Info\"".execute()
+            }
         }
     }
 }
-
-// Version stuff
 
 def getModVersion() {
-    try {
-        return getGitVersion()
-    } catch (Exception ex) {
-        System.out.println("Git version failed, falling back to old method")
-        return getVersion('VERSION', getModFile())
-    }
+    return getGitVersion()
 }
 
 def getGitVersion() {
     // Call git command
-    def outStream = new ByteArrayOutputStream()
-    def result = exec {
-        executable = 'git'
-        args = [ 'describe', '--long' ]
-        standardOutput = outStream
-    }
+    def proc = "git describe --long".execute();
+    proc.waitFor();
+    def fullVersion = proc.text.trim();
 
-    def fullVersion = outStream.toString().trim()
     def matcher = fullVersion =~ /(\d+).(\d+).(\d+)-(.*)/
 
     def maj = matcher[0][1]
@@ -318,53 +308,10 @@ static def makeVersionMap(maj, min, rev, bn, githash) {
     out['build.revision.number'] = rev.toString()
     out['build.githash'] = githash
     out['build.number'] = bn.toString()
+    out['version_simple'] = "${maj}.${min}".toString()
     out['version_short'] = "${maj}.${min}.${rev}".toString()
     out['version'] = "${maj}.${min}.${rev}+${bn}".toString()
     return out
-}
-
-// Modified old version getter
-def getVersion(String type, String mod_file) {
-    String maj = '0'
-    String min = '0'
-    String rev = '0'
-    String bn = getBuildNumber()
-
-    File file = file(mod_file)
-    def prefix = ~/^(?:public|protected|private) static final String $type = ".*$/
-    file.eachLine { String s ->
-        s = s.trim()
-        if (s ==~ prefix || prefix.matcher(s).matches()) {
-            String[] bits = s.split("=")
-            String interesting = bits[1].trim()
-            interesting = interesting.substring(1, interesting.length() - 2)
-            String[] pts = interesting.trim().split("\\.")
-
-            maj = pts[0] ?: '0'
-            min = pts[1] ?: '0'
-            rev = pts[2] ?: '0'
-        }
-    }
-
-    return makeVersionMap(maj, min, rev, bn, 'unknown')
-}
-
-// Used by old getVersion
-String getModFile() {
-    String path = ''
-    FileTree tree = fileTree(dir: 'src/main/java')
-    tree.include '**/*.java'
-    tree.visit { element ->
-        if (element.file.isFile()) {
-            element.file.eachLine { String s ->
-                s = s.trim()
-                if (s.startsWith('@Mod(')) {
-                    path = "src/main/java/$element.relativePath"
-                }
-            }
-        }
-    }
-    return path
 }
 
 // Build number tracking

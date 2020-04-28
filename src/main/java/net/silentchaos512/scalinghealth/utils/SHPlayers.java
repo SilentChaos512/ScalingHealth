@@ -69,13 +69,7 @@ public final class SHPlayers {
     }
 
     public static float getHealthAfterDeath(PlayerEntity player) {
-        GameConfig config = Config.GENERAL;
-        int deathHp = (int) EvalVars.apply(player, config.player.setHealthOnDeath.get());
-        int maxHp = maxHealth();
-        int minHp = minHealth();
-        int hp = Math.max(deathHp, minHp);
-        hp = Math.min(hp, maxHp);
-        return hp;
+        return MathUtils.clamp((int) EvalVars.apply(player, Config.GENERAL.player.setHealthOnDeath.get()), minHealth(), maxHealth());
     }
 
     public static RegenConfig getRegenConfig(){
@@ -91,6 +85,6 @@ public final class SHPlayers {
     }
 
     public static int hpFromCurrentXp(int levels) {
-        return levels / levelsPerHp() * hpPerLevel();
+        return EnabledFeatures.healthXpEnabled() ? levels / levelsPerHp() * hpPerLevel() : 0;
     }
 }
