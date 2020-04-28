@@ -222,9 +222,6 @@ curseforge {
                 }
             }
         }
-        options {
-            debug = true
-        }
     }
     else {
         System.out.println("The gradle.properties file is incorrect for cursegradle")
@@ -321,7 +318,7 @@ String getBuildNumber() {
     if (versionFile.canRead()) {
         Properties versionProps = new Properties()
         versionProps.load(new FileInputStream(versionFile))
-        return versionProps['build_num'].toString()
+        return versionProps['build_number'].toString()
     }
     return "1"
 }
@@ -332,9 +329,9 @@ task incrementBuild {
         if (versionFile.canRead()) {
             Properties versionProps = new Properties()
             versionProps.load(new FileInputStream(versionFile))
-            def num = versionProps['build_num'].toInteger() + 1
+            def num = versionProps['build_number'].toInteger() + 1
             println("incrementing BuildNumber to: " + num)
-            versionProps['build_num'] = num.toString()
+            versionProps['build_number'] = num.toString()
             versionProps.store(versionFile.newWriter(), null)
         } else {
             println("version.properties file not found! Ignoring.")
