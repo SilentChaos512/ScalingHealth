@@ -53,6 +53,7 @@ minecraft {
         client = {
             properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
             properties 'forge.logging.console.level': 'debug'
+            jvmArg("-Xmx6G")
             workingDirectory project.file('run').canonicalPath
             source sourceSets.main
         }

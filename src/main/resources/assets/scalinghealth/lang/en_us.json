@@ -45,7 +45,7 @@
   "item.scalinghealth.heart_crystal": "Heart Crystal",
   "item.scalinghealth.heart_crystal.desc": "Increases maximum health",
   "item.scalinghealth.heart_dust": "Heart Dust",
-  "item.scalinghealth.healing_item.healingValue": "Restores %d%% of your health over %d seconds.",
+  "item.scalinghealth.healing_item.value": "Restores %d%% of your health over %d seconds.",
   "item.scalinghealth.healing_item.howToUse": "Use for %d seconds to apply.",
   "item.scalinghealth.medkit": "Medkit",
   "item.scalinghealth.power_crystal": "Power Crystal",
