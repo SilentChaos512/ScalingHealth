@@ -18,6 +18,7 @@
 
 package net.silentchaos512.scalinghealth.client.render.entity;
 
+import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -28,7 +29,11 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.vertex.VertexFormat;
+import net.minecraft.client.renderer.vertex.VertexFormatElement;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
@@ -73,59 +78,56 @@ public final class BlightFireRenderer extends EntityRenderer<BlightFireEntity> {
 
     @Override
     public void render(BlightFireEntity fire, float entityYaw, float partialTicks, MatrixStack stack, IRenderTypeBuffer bufferIn, int light) {
-        /*MobEntity parent = (MobEntity) fire.getRidingEntity();
-        if (parent == null) return;
+        MobEntity parent = (MobEntity) fire.getRidingEntity();
+        if(parent == null) return;
 
         stack.push();
-        //stack.translate(fire.getPosX(), fire.getPosY() - parent.getHeight() + 0.5, fire.getPosZ());
-        stack.translate(0.0,-parent.getHeight() + 0.5,0.0);
-        float f = parent.getWidth() * FIRE_SCALE;
-        stack.scale(f, f, f);
+        stack.translate(0, -parent.getHeight(),0);
+        float w = parent.getWidth() * FIRE_SCALE;
+        stack.scale(w, w, w);
 
-        float f1 = 0.5F;
-        float f2 = parent.getHeight() / f;
-        float f3 = (float) (parent.getPosY() - parent.getBoundingBox().minY);
-        float f4 = 0.0F;
+        float hwRatio = parent.getHeight() / w;
+        float xOffset = 0.5F;
+        float yOffset = (float) (parent.getPosY() - parent.getBoundingBox().minY);
+        float zOffset = 0.0F;
 
-        //Quaternion rotation = new Quaternion(0.0f, 1.0F, 0.0F, -this.renderManager.info.getPitch());
-        //stack.rotate(rotation);
-        stack.translate(0, 0, f2 * 0.02f);
+        Quaternion cam = this.renderManager.getCameraOrientation();
+        stack.rotate(new Quaternion(0, cam.getY(), 0, cam.getW()));
+
+        stack.translate(0, 0, hwRatio * 0.02f);
         int i = 0;
 
         IVertexBuilder vertexBuilder = bufferIn.getBuffer(RENDER_TYPE);
         Matrix4f matrix4f = stack.getLast().getMatrix();
         Matrix3f matrix3f = stack.getLast().getNormal();
 
-        while (f2 > 0.0F) {
-            boolean flag = i % 2 == 0;
+        while (hwRatio > 0.0F) {
+            boolean swapU = i % 2 == 0;
             int frame = ClientTicks.ticksInGame() % 32;
-            float minU = flag ? 0.5f : 0.0f;
+            float minU = swapU ? 0.5f : 0.0f;
             float minV = frame / 32f;
-            float maxU = flag ? 1.0f : 0.5f;
+            float maxU = swapU ? 1.0f : 0.5f;
             float maxV = (frame + 1) / 32f;
 
-            if (flag) {
+            if (swapU) {
                 float swap = maxU;
                 maxU = minU;
                 minU = swap;
             }
 
-            //if(fire.world.getGameTime() % 40 == 0)
-                //ScalingHealth.LOGGER.debug("{}", matrix4f.toString());
-
-            vertexBuilder.pos(matrix4f, f1,0.0F - f3, f4).color(1,1,1,1).tex(maxU, maxV).overlay(OverlayTexture.NO_OVERLAY).lightmap(light).normal(matrix3f, 0.0F, 1.0F, 0.0F).endVertex();
-            vertexBuilder.pos(matrix4f,-f1,0.0F - f3, f4).color(1,1,1,1).tex(minU, maxV).overlay(OverlayTexture.NO_OVERLAY).lightmap(light).normal(matrix3f, 0.0F, 1.0F, 0.0F).endVertex();
-            vertexBuilder.pos(matrix4f,-f1,1.4F - f3, f4).color(1,1,1,1).tex(maxU, minV).overlay(OverlayTexture.NO_OVERLAY).lightmap(light).normal(matrix3f, 0.0F, 1.0F, 0.0F).endVertex();
-            vertexBuilder.pos(matrix4f, f1,1.4F - f3, f4).color(1,1,1,1).tex(minU, minV).overlay(OverlayTexture.NO_OVERLAY).lightmap(light).normal(matrix3f, 0.0F, 1.0F, 0.0F).endVertex();
-            f2 -= 0.45F;
-            f3 -= 0.45F;
-            f1 *= 0.9F;
-            f4 += 0.03F;
+            vertexBuilder.pos(matrix4f, xOffset,0.0F - yOffset, zOffset).color(255,255,255,255).tex(maxU, maxV).overlay(OverlayTexture.NO_OVERLAY).lightmap(light).normal(matrix3f, 0.0F, 1.0F, 0.0F).endVertex();
+            vertexBuilder.pos(matrix4f,-xOffset,0.0F - yOffset, zOffset).color(255,255,255,255).tex(minU, maxV).overlay(OverlayTexture.NO_OVERLAY).lightmap(light).normal(matrix3f, 0.0F, 1.0F, 0.0F).endVertex();
+            vertexBuilder.pos(matrix4f,-xOffset,1.4F - yOffset, zOffset).color(255,255,255,255).tex(minU, minV).overlay(OverlayTexture.NO_OVERLAY).lightmap(light).normal(matrix3f, 0.0F, 1.0F, 0.0F).endVertex();
+            vertexBuilder.pos(matrix4f, xOffset,1.4F - yOffset, zOffset).color(255,255,255,255).tex(maxU, minV).overlay(OverlayTexture.NO_OVERLAY).lightmap(light).normal(matrix3f, 0.0F, 1.0F, 0.0F).endVertex();
+            hwRatio -= 0.45F;
+            yOffset -= 0.45F;
+            xOffset *= 0.9F;
+            zOffset += 0.03F;
             ++i;
         }
 
         stack.pop();
-        super.render(fire, entityYaw, partialTicks, stack, bufferIn, light);*/
+        super.render(fire, entityYaw, partialTicks, stack, bufferIn, light);
     }
 
     public static class Factory implements IRenderFactory<BlightFireEntity> {
