@@ -415,9 +415,6 @@ public class GameConfig {
 
         public final MobPotionConfig randomPotions;
 
-        // Blights
-        private final ConfigValue<List<? extends String>> mobsBlightExempt;
-        private final ConfigValue<List<? extends String>> mobsDifficultyExempt;
         public final DoubleValue blightChance;
         public final DoubleValue blightDiffModifier;
         public final MobPotionConfig blightPotions;
@@ -425,11 +422,6 @@ public class GameConfig {
         public final DoubleValue xpBlightBoost;
 
         Mobs(ConfigSpecWrapper wrapper) {
-            mobsDifficultyExempt = wrapper
-                    .builder("mob.difficultyExempt")
-                    .comment("These mobs will not be able to gain difficulty. They can still become blight however.")
-                    .defineList(ImmutableList.of("villager", "wandering_trader"), mob -> ForgeRegistries.ENTITIES.containsKey(new ResourceLocation((String) mob)));
-
             wrapper.comment("mob.health", "Mob health settings");
 
             healthMode = wrapper
@@ -480,14 +472,6 @@ public class GameConfig {
                     .add(MobPotionConfig.from(Effects.RESISTANCE, 1, 10, 40))
                     .build());
 
-            // Blights
-            mobsBlightExempt = wrapper
-                    .builder("mob.blight.exemptedMobs")
-                    .comment("These mobs won't be able to become blight, to add use - MODID:entity_name - except for mc mobs, minecraft: can be omitted as shown")
-                    .defineList(ImmutableList.of("bat", "cat", "chicken", "cod", "cow", "donkey", "fox", "horse", "mooshroom",
-                            "mule", "ocelot", "parrot", "pig", "rabbit", "salmon", "sheep", "tropical_fish", "turtle", "villager", "wandering_trader"),
-                            mob -> ForgeRegistries.ENTITIES.containsKey(new ResourceLocation((String) mob)));
-
             blightChance = wrapper
                     .builder("mob.blight.chance")
                     .comment("Chance that the mob has of becoming a blight - 0 will effectively deactivate blight",
@@ -513,46 +497,6 @@ public class GameConfig {
                     .builder("mob.blight.blightModifier")
                     .comment("Multiplier for blight difficulty, 2 will make blights have stats equal to 2 * current difficulty")
                     .defineInRange(2, 1, Double.MAX_VALUE);
-        }
-
-        //maybe a better way to cache
-        private List<ResourceLocation> blightExemptedMobs = null;
-        private List<ResourceLocation> diffExemptedMobs = null;
-
-        public boolean isMobBlightExempt(MobEntity entity) {
-            if(blightExemptedMobs == null)
-                //caching the value, so as to not generate it every mob spawn
-                blightExemptedMobs = mobsBlightExempt.get().
-                        stream().
-                        map(ResourceLocation::tryCreate).
-                        filter(Objects::nonNull).
-                        collect(Collectors.toList());
-
-            ResourceLocation rl = entity.getType().getRegistryName();
-            for (ResourceLocation rl2 : blightExemptedMobs) {
-                if (rl2.equals(rl)) {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public boolean isMobDiffExempt(MobEntity entity) {
-            if(diffExemptedMobs == null)
-                //caching the value, so as to not generate it every mob spawn
-                diffExemptedMobs = mobsDifficultyExempt.get().
-                        stream().
-                        map(ResourceLocation::tryCreate).
-                        filter(Objects::nonNull).
-                        collect(Collectors.toList());
-
-            ResourceLocation rl = entity.getType().getRegistryName();
-            for (ResourceLocation rl2 : diffExemptedMobs) {
-                if (rl2.equals(rl)) {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 

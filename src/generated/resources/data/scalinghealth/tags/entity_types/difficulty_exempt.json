@@ -1,0 +1,25 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:bat",
+    "minecraft:cat",
+    "minecraft:chicken",
+    "minecraft:cod",
+    "minecraft:cow",
+    "minecraft:donkey",
+    "minecraft:fox",
+    "minecraft:horse",
+    "minecraft:mooshroom",
+    "minecraft:mule",
+    "minecraft:ocelot",
+    "minecraft:parrot",
+    "minecraft:pig",
+    "minecraft:rabbit",
+    "minecraft:salmon",
+    "minecraft:sheep",
+    "minecraft:tropical_fish",
+    "minecraft:turtle",
+    "minecraft:villager",
+    "minecraft:wandering_trader"
+  ]
+}

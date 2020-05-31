@@ -117,7 +117,7 @@ public final class SummonCommand {
             return 1;
         } else {
             ServerWorld world = source.getWorld();
-            Entity entity = EntityType.func_220335_a(nbt, world, e -> {
+            Entity entity = EntityType.loadEntityAndExecute(nbt, world, e -> {
                 e.setLocationAndAngles(pos.x, pos.y, pos.z, e.rotationYaw, e.rotationPitch);
                 //noinspection ReturnOfNull
                 return !world.summonEntity(e) ? null : e;
