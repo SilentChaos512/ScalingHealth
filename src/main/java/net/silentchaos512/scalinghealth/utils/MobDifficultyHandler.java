@@ -6,27 +6,26 @@ import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.Style;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
+import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraftforge.fml.network.PacketDistributor;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
+import net.silentchaos512.scalinghealth.event.BlightHandler;
 import net.silentchaos512.scalinghealth.event.ScalingHealthCommonEvents;
 import net.silentchaos512.scalinghealth.lib.EntityGroup;
 import net.silentchaos512.scalinghealth.lib.MobHealthMode;
+import net.silentchaos512.scalinghealth.network.ClientBlightMessage;
+import net.silentchaos512.scalinghealth.network.Network;
 import net.silentchaos512.utils.MathUtils;
 
 public final class MobDifficultyHandler {
     private MobDifficultyHandler() {}
 
     public static void process(MobEntity entity, IDifficultyAffected data) {
-        // Already dead?
         if (!entity.isAlive()) return;
-
-        // Make blight?
-        // getDiff is used not affectiveDiff since the blight modifier has no play (deciding to make it blight or not)
-        boolean makeBlight = shouldBecomeBlight(entity, data.getDifficulty());
-        setEntityProperties(entity, data, makeBlight);
+        setEntityProperties(entity, data, shouldBecomeBlight(entity, data.getDifficulty()));
     }
 
     public static boolean shouldBecomeBlight(MobEntity entity, float difficulty) {
@@ -49,9 +48,13 @@ public final class MobDifficultyHandler {
 
         if (makeBlight) {
             data.setIsBlight(true);
+            ClientBlightMessage msg = new ClientBlightMessage(entity.getEntityId());
+            Network.channel.send(PacketDistributor.TRACKING_ENTITY.with(()->entity), msg);
+
+            BlightHandler.applyBlightPotionEffects(entity);
             if(EntityGroup.from(entity) == EntityGroup.BOSS){
-                StringTextComponent name = (StringTextComponent) new StringTextComponent("Blight " + entity.getName().getString()).setStyle(new Style().setColor(TextFormatting.DARK_PURPLE));
-                entity.setCustomName(name);
+                ITextComponent blight = new TranslationTextComponent("misc.scalinghealth.blight", entity.getDisplayName()).applyTextStyle(TextFormatting.DARK_PURPLE);
+                entity.setCustomName(blight);
             }
         }
 

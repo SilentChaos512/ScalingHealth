@@ -23,62 +23,27 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.text.*;
-import net.minecraft.world.World;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.fml.network.NetworkDirection;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.Config;
-import net.silentchaos512.scalinghealth.entity.BlightFireEntity;
+import net.silentchaos512.scalinghealth.network.ClientBlightMessage;
 import net.silentchaos512.scalinghealth.network.Network;
-import net.silentchaos512.scalinghealth.network.SpawnBlightFirePacket;
+import net.silentchaos512.scalinghealth.utils.SHDifficulty;
 import net.silentchaos512.scalinghealth.utils.SHMobs;
-
-import javax.annotation.Nullable;
-import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID)
 public final class BlightHandler {
-
-    private static final int UPDATE_DELAY = 200;
-
     private BlightHandler() {}
 
-    // ******************
-    // * Blight marking *
-    // ******************
-
-    private static void spawnBlightFire(MobEntity blight) {
-        if (blight.world.isRemote || getBlightFire(blight) != null) return;
-
-        BlightFireEntity fire = new BlightFireEntity(blight);
-        fire.setPosition(blight.getPosX(), blight.getPosY(), blight.getPosZ());
-        blight.world.addEntity(fire);
-
-        SpawnBlightFirePacket packet = new SpawnBlightFirePacket(blight);
-        Supplier<PacketDistributor.TargetPoint> target = PacketDistributor.TargetPoint.p(blight.getPosX(), blight.getPosY(), blight.getPosZ(), 128, blight.dimension);
-        Network.channel.send(PacketDistributor.NEAR.with(target), packet);
-
-        if (ScalingHealth.LOGGER.isDebugEnabled()) {
-            ScalingHealth.LOGGER.debug("Spawned blight fire for {}", blight.getName().getString());
-        }
-    }
-
-    @Nullable
-    private static BlightFireEntity getBlightFire(MobEntity blight) {
-        for (BlightFireEntity fire : blight.world.getEntitiesWithinAABB(BlightFireEntity.class, blight.getBoundingBox().grow(5))) {
-            if (blight.equals(fire.getRidingEntity())) {
-                return fire;
-            }
-        }
-        return null;
-    }
-
-    private static void applyBlightPotionEffects(MobEntity entityLiving) {
+    public static void applyBlightPotionEffects(MobEntity entityLiving) {
         Config.GENERAL.mobs.blightPotions.applyAll(entityLiving);
     }
 
@@ -159,19 +124,22 @@ public final class BlightHandler {
     }
 
     @SubscribeEvent
-    public static void onBlightUpdate(LivingUpdateEvent event) {
-        LivingEntity livingEntity = event.getEntityLiving();
-        if (!(livingEntity instanceof MobEntity)) return;
-
-        MobEntity blight = (MobEntity) livingEntity;
-        if (!blight.world.isRemote && SHMobs.isBlight(blight)) {
-            World world = blight.world;
-            // Add in entity ID so not all blights update on the same tick
-            if ((world.getGameTime() + blight.getEntityId()) % UPDATE_DELAY == 0) {
-                spawnBlightFire(blight);
-                // Refresh potion effects
-                applyBlightPotionEffects(blight);
+    public static void startTrackingBlight(PlayerEvent.StartTracking event){
+        if(event.getTarget() instanceof MobEntity) {
+            MobEntity mob = (MobEntity) event.getTarget();
+            if(SHDifficulty.affected(mob).isBlight()) {
+                ServerPlayerEntity sp = (ServerPlayerEntity) event.getPlayer();
+                ClientBlightMessage msg = new ClientBlightMessage(mob.getEntityId());
+                Network.channel.sendTo(msg, sp.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
             }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onBlightUpdate(LivingUpdateEvent event) {
+        LivingEntity blight = event.getEntityLiving();
+        if (!blight.world.isRemote && blight instanceof MobEntity && SHMobs.isBlight((MobEntity) blight) && blight.world.getGameTime() % 1000 == 0) {
+            applyBlightPotionEffects((MobEntity) blight);
         }
     }
 }
