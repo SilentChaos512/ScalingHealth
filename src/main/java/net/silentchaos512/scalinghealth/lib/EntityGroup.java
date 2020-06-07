@@ -4,14 +4,9 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ResourceLocation;
-import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.utils.EnabledFeatures;
 import net.silentchaos512.scalinghealth.utils.SHMobs;
-
-import javax.annotation.Nullable;
-import java.util.Optional;
 
 public enum EntityGroup {
     PEACEFUL,

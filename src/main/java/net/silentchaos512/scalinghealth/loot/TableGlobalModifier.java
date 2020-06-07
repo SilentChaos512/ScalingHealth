@@ -9,7 +9,6 @@ import net.minecraft.world.storage.loot.TableLootEntry;
 import net.minecraft.world.storage.loot.conditions.ILootCondition;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.common.loot.LootModifier;
-import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.item.DifficultyMutatorItem;
 import net.silentchaos512.scalinghealth.item.PowerCrystal;
 import net.silentchaos512.scalinghealth.utils.EnabledFeatures;

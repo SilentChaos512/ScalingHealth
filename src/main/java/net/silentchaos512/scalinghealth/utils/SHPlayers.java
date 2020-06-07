@@ -5,7 +5,6 @@ import net.silentchaos512.scalinghealth.capability.IPlayerData;
 import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.EvalVars;
-import net.silentchaos512.scalinghealth.config.GameConfig;
 import net.silentchaos512.scalinghealth.config.RegenConfig;
 import net.silentchaos512.utils.MathUtils;
 
