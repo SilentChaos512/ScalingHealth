@@ -1,0 +1,23 @@
+on:
+  schedule:
+  - cron: 0 0 1 * * 
+name: Issue Closing
+jobs:
+  close-incomplete-issues:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: weekly-issue-closure
+      uses: bdougie/close-issues-based-on-label@master
+      env:
+        LABEL: Incomplete Issue
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  close-can-not-reproduce-issues:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - name: weekly-issue-closure
+      uses: bdougie/close-issues-based-on-label@master
+      env:
+        LABEL: can't reproduce
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
