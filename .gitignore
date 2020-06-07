@@ -23,6 +23,8 @@ eclipse
 run
 classes
 
+*.cache
+
 /README.txt
 /forge-*-changelog.txt
 
