@@ -96,50 +96,6 @@ public final class ScalingHealthCommonEvents {
         if(event.getSpawnReason() == SpawnReason.SPAWNER) spawnerSpawns.add(event.getEntityLiving().getUniqueID());
     }
 
-    @SubscribeEvent
-    public static void onLivingDrops(LivingDropsEvent event) {
-        if (!(event.getEntity() instanceof LivingEntity)) return;
-
-        LivingEntity entity = (LivingEntity) event.getEntity();
-        World world = entity.world;
-        if (world.isRemote) return;
-        MinecraftServer server = world.getServer();
-        if (server == null) return;
-
-        // Mob loot disabled?
-        if (!world.getGameRules().getBoolean(GameRules.DO_MOB_LOOT)) return;
-
-        PlayerEntity player = getPlayerThatCausedDeath(event.getSource());
-
-        // Get the bonus drops loot table for this mob type
-        Optional<ResourceLocation> tableName = EntityGroup.from(entity, true).getBonusDropsLootTable();
-        if (!tableName.isPresent()) return;
-
-        LootTable lootTable = server.getLootTableManager().getLootTableFromLocation(tableName.get());
-        LootContext.Builder contextBuilder = new LootContext.Builder((ServerWorld) world)
-                .withParameter(LootParameters.THIS_ENTITY, entity)
-                .withParameter(LootParameters.POSITION, entity.getPosition())
-                .withParameter(LootParameters.DAMAGE_SOURCE, event.getSource())
-                .withNullableParameter(LootParameters.KILLER_ENTITY, player)
-                .withNullableParameter(LootParameters.DIRECT_KILLER_ENTITY, player)
-                .withNullableParameter(LootParameters.LAST_DAMAGE_PLAYER, player);
-        if (player != null) contextBuilder.withLuck(player.getLuck());
-        List<ItemStack> list = lootTable.generate(contextBuilder.build(LootParameterSets.ENTITY));
-        list.forEach(stack -> event.getDrops().add(dropItem(entity, world, stack)));
-    }
-
-    private static ItemEntity dropItem(LivingEntity entity, World world, ItemStack stack) {
-        return new ItemEntity(world, entity.posX, entity.posY + entity.getHeight() / 2, entity.posZ, getCorrectStack(stack));
-    }
-
-    //If some items are useless, do not drop them.
-    private static ItemStack getCorrectStack(ItemStack stack){
-        if((stack.getItem() instanceof DifficultyMutatorItem && !EnabledFeatures.difficultyEnabled()) ||
-                (stack.getItem() instanceof PowerCrystal && !EnabledFeatures.powerCrystalEnabled()))
-           return ItemStack.EMPTY;
-        return stack;
-    }
-
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onMobXPDropped(LivingExperienceDropEvent event) {
         LivingEntity entity = event.getEntityLiving();

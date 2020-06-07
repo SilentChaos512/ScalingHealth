@@ -5,15 +5,20 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.RegistryObject;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.scalinghealth.capability.DifficultyAffectedCapability;
 import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
 import net.silentchaos512.scalinghealth.capability.PetHealthCapability;
@@ -28,6 +33,7 @@ import net.silentchaos512.scalinghealth.event.DamageScaling;
 import net.silentchaos512.scalinghealth.event.PetEventHandler;
 import net.silentchaos512.scalinghealth.init.ModItems;
 import net.silentchaos512.scalinghealth.init.ModLoot;
+import net.silentchaos512.scalinghealth.loot.TableGlobalModifier;
 import net.silentchaos512.scalinghealth.network.Network;
 import net.silentchaos512.scalinghealth.world.SHWorldFeatures;
 import org.apache.logging.log4j.LogManager;
@@ -59,10 +65,15 @@ public class ScalingHealth {
         ModLoot.init();
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
-        MinecraftForge.EVENT_BUS.addListener(this::serverAboutToStart);
+        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(GlobalLootModifierSerializer.class, this::registerLootModSerializers);
 
+        MinecraftForge.EVENT_BUS.addListener(this::serverAboutToStart);
         MinecraftForge.EVENT_BUS.register(PetEventHandler.INSTANCE);
         MinecraftForge.EVENT_BUS.register(DamageScaling.INSTANCE);
+    }
+
+    private void registerLootModSerializers(RegistryEvent.Register<GlobalLootModifierSerializer<?>> event) {
+        event.getRegistry().register(new TableGlobalModifier.Serializer().setRegistryName(getId("table_loot_mod")));
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {

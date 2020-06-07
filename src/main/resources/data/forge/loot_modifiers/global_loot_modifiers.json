@@ -1,6 +1,8 @@
 {
   "replace": false,
   "entries": [
-
+    "scalinghealth:hostile",
+    "scalinghealth:boss",
+    "scalinghealth:peaceful"
   ]
 }

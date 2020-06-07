@@ -4,12 +4,13 @@ import net.minecraft.entity.MobEntity;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.MobPotionConfig;
 import net.silentchaos512.scalinghealth.lib.MobHealthMode;
+import net.silentchaos512.scalinghealth.tags.EntityTags;
 
 public final class SHMobs {
     private SHMobs() { throw new IllegalAccessError("Utility class"); }
 
     public static boolean allowsDifficultyChanges(MobEntity entity) {
-        return !Config.GENERAL.mobs.isMobDiffExempt(entity);
+        return !EntityTags.DIFFICULTY_EXEMPT.contains(entity.getType());
     }
 
     public static double blightChance() {
@@ -17,7 +18,7 @@ public final class SHMobs {
     }
 
     public static boolean canBecomeBlight(MobEntity entity) {
-        return EnabledFeatures.blightsEnabled() && !Config.GENERAL.mobs.isMobBlightExempt(entity);
+        return EnabledFeatures.blightsEnabled() && !EntityTags.BLIGHT_EXEMPT.contains(entity.getType());
     }
 
     public static boolean isBlight(MobEntity entity) {
