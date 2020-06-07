@@ -6,6 +6,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.ModContainer;
@@ -58,11 +59,6 @@ public class ScalingHealth {
 
     public static final Logger LOGGER = LogManager.getLogger(MOD_NAME);
 
-    public static final DeferredRegister<GlobalLootModifierSerializer<?>> LOOT_MOD_SERIALIZERS =
-            new DeferredRegister<>(ForgeRegistries.LOOT_MODIFIER_SERIALIZERS, MOD_ID);
-    public static final RegistryObject<TableGlobalModifier.Serializer> TABLE_LOOT_MOD =
-            LOOT_MOD_SERIALIZERS.register("table_loot_mod", TableGlobalModifier.Serializer::new);
-
     public ScalingHealth() {
         Config.init();
         MinecraftForge.EVENT_BUS.register(PetEventHandler.INSTANCE);
@@ -72,8 +68,12 @@ public class ScalingHealth {
         ModLoot.init();
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
+        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(GlobalLootModifierSerializer.class,this::registerLootModSerializers);
         MinecraftForge.EVENT_BUS.addListener(this::serverAboutToStart);
-        LOOT_MOD_SERIALIZERS.register(FMLJavaModLoadingContext.get().getModEventBus());
+    }
+
+    private void registerLootModSerializers(RegistryEvent.Register<GlobalLootModifierSerializer<?>> event){
+        event.getRegistry().register(new TableGlobalModifier.Serializer().setRegistryName(getId("table_lot_mod")));
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
