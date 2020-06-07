@@ -25,6 +25,7 @@ import net.minecraft.world.storage.loot.conditions.LootConditionManager;
 import net.minecraft.world.storage.loot.functions.SetCount;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.LootTableLoadEvent;
+import net.silentchaos512.scalinghealth.loot.conditions.EntityGroupCondition;
 import net.silentchaos512.scalinghealth.loot.conditions.SHMobProperties;
 import net.silentchaos512.scalinghealth.utils.EnabledFeatures;
 
@@ -37,6 +38,7 @@ public final class ModLoot {
         MinecraftForge.EVENT_BUS.addListener(ModLoot::onLootTableLoad);
 
         LootConditionManager.registerCondition(SHMobProperties.SERIALIZER);
+        LootConditionManager.registerCondition(EntityGroupCondition.SERIALIZER);
     }
 
     private static final List<ResourceLocation> ADD_ITEMS_TO = ImmutableList.of(

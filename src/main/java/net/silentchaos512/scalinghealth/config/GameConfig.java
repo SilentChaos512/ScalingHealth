@@ -15,7 +15,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorldReader;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.dimension.DimensionType;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.lib.util.BiomeUtils;
 import net.silentchaos512.lib.util.DimensionUtils;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -28,7 +27,6 @@ import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 public class GameConfig {
     public static class General {

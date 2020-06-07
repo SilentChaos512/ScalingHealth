@@ -27,22 +27,13 @@ import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.loot.LootContext;
-import net.minecraft.world.storage.loot.LootParameterSets;
-import net.minecraft.world.storage.loot.LootParameters;
-import net.minecraft.world.storage.loot.LootTable;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
-import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.living.LivingSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -58,7 +49,6 @@ import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.init.ModSounds;
 import net.silentchaos512.scalinghealth.item.DifficultyMutatorItem;
 import net.silentchaos512.scalinghealth.item.PowerCrystal;
-import net.silentchaos512.scalinghealth.lib.EntityGroup;
 import net.silentchaos512.scalinghealth.network.ClientLoginMessage;
 import net.silentchaos512.scalinghealth.network.Network;
 import net.silentchaos512.scalinghealth.utils.EnabledFeatures;
@@ -70,7 +60,6 @@ import net.silentchaos512.utils.MathUtils;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID)
@@ -95,50 +84,6 @@ public final class ScalingHealthCommonEvents {
    public static void onSpawn(LivingSpawnEvent.CheckSpawn event){
       if(!(event.getEntityLiving() instanceof MobEntity)) return;
       if(event.getSpawnReason() == SpawnReason.SPAWNER) spawnerSpawns.add(event.getEntityLiving().getUniqueID());
-   }
-
-   @SubscribeEvent
-   public static void onLivingDrops(LivingDropsEvent event) {
-      if (!(event.getEntity() instanceof LivingEntity)) return;
-
-      LivingEntity entity = (LivingEntity) event.getEntity();
-      World world = entity.world;
-      if (world.isRemote) return;
-      MinecraftServer server = world.getServer();
-      if (server == null) return;
-
-      // Mob loot disabled?
-      if (!world.getGameRules().getBoolean(GameRules.DO_MOB_LOOT)) return;
-
-      PlayerEntity player = getPlayerThatCausedDeath(event.getSource());
-
-      // Get the bonus drops loot table for this mob type
-      Optional<ResourceLocation> tableName = EntityGroup.from(entity, true).getBonusDropsLootTable();
-      if (!tableName.isPresent()) return;
-
-      LootTable lootTable = server.getLootTableManager().getLootTableFromLocation(tableName.get());
-      LootContext.Builder contextBuilder = new LootContext.Builder((ServerWorld) world)
-              .withParameter(LootParameters.THIS_ENTITY, entity)
-              .withParameter(LootParameters.POSITION, entity.getPosition())
-              .withParameter(LootParameters.DAMAGE_SOURCE, event.getSource())
-              .withNullableParameter(LootParameters.KILLER_ENTITY, player)
-              .withNullableParameter(LootParameters.DIRECT_KILLER_ENTITY, player)
-              .withNullableParameter(LootParameters.LAST_DAMAGE_PLAYER, player);
-      if (player != null) contextBuilder.withLuck(player.getLuck());
-      List<ItemStack> list = lootTable.generate(contextBuilder.build(LootParameterSets.ENTITY));
-      list.forEach(stack -> event.getDrops().add(dropItem(entity, world, stack)));
-   }
-
-   private static ItemEntity dropItem(LivingEntity entity, World world, ItemStack stack) {
-      return new ItemEntity(world, entity.getPosX(), entity.getPosY() + entity.getHeight() / 2, entity.getPosZ(), getCorrectStack(stack));
-   }
-
-   //If some items are useless, do not drop them.
-   private static ItemStack getCorrectStack(ItemStack stack){
-      if((stack.getItem() instanceof DifficultyMutatorItem && !EnabledFeatures.difficultyEnabled()) ||
-              (stack.getItem() instanceof PowerCrystal && !EnabledFeatures.powerCrystalEnabled()))
-         return ItemStack.EMPTY;
-      return stack;
    }
 
    @SubscribeEvent(priority = EventPriority.HIGHEST)

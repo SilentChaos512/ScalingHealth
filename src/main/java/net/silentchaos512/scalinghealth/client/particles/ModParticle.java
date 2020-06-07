@@ -10,8 +10,6 @@ import net.minecraft.client.renderer.ActiveRenderInfo;
 import net.minecraft.particles.BasicParticleType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.utils.Color;
 import net.silentchaos512.utils.MathUtils;
