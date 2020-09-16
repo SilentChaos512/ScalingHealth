@@ -6,9 +6,8 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3i;
+import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.IWorldReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.silentchaos512.lib.util.MCMathUtils;
@@ -56,7 +55,7 @@ public final class SHDifficulty {
         return affected(entity).affectiveDifficulty();
     }
 
-    public static Collection<Tuple<BlockPos, IDifficultySource>> allPlayerSources(IWorld world, Vec3i center, long radius) {
+    public static Collection<Tuple<BlockPos, IDifficultySource>> allPlayerSources(IWorld world, Vector3i center, long radius) {
         Collection<Tuple<BlockPos, IDifficultySource>> list = new ArrayList<>();
 
         // Get players
@@ -64,7 +63,7 @@ public final class SHDifficulty {
         return list;
     }
 
-    public static Stream<? extends PlayerEntity> playersInRange(IWorld world, Vec3i center, long radius) {
+    public static Stream<? extends PlayerEntity> playersInRange(IWorld world, Vector3i center, long radius) {
         return world.getPlayers().stream().filter(p -> radius <= 0 || MCMathUtils.distanceSq(p, center) < searchRadiusSquared());
     }
 
@@ -86,7 +85,7 @@ public final class SHDifficulty {
         return areaMode().getAreaDifficulty(world, pos, groupBonus);
     }
 
-    public static double locationMultiplier(IWorldReader world, BlockPos pos) {
+    public static double locationMultiplier(World world, BlockPos pos) {
         return Config.GENERAL.difficulty.getLocationMultiplier(world, pos);
     }
 
@@ -95,7 +94,7 @@ public final class SHDifficulty {
         if (!config.difficulty.lunarCyclesEnabled.get()) return 1.0;
         List<? extends Double> values = config.difficulty.lunarCycleMultipliers.get();
         if (values.isEmpty()) return 1.0;
-        int phase = world.getDimension().getMoonPhase(world.getGameTime());
+        int phase = world.func_230315_m_().func_236035_c_(world.func_241851_ab());
         return values.get(MathHelper.clamp(phase, 0, values.size() - 1));
     }
 

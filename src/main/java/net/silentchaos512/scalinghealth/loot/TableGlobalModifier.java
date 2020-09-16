@@ -4,9 +4,9 @@ import com.google.gson.JsonObject;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.storage.loot.LootContext;
-import net.minecraft.world.storage.loot.TableLootEntry;
-import net.minecraft.world.storage.loot.conditions.ILootCondition;
+import net.minecraft.loot.LootContext;
+import net.minecraft.loot.TableLootEntry;
+import net.minecraft.loot.conditions.ILootCondition;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.common.loot.LootModifier;
 import net.silentchaos512.scalinghealth.item.DifficultyMutatorItem;
@@ -43,6 +43,13 @@ public class TableGlobalModifier extends LootModifier{
          String resLoc = JSONUtils.getString(object, "table");
          TableLootEntry table = (TableLootEntry) TableLootEntry.builder(new ResourceLocation(resLoc)).build();
          return new TableGlobalModifier(lootConditions, table);
+      }
+
+      @Override
+      public JsonObject write(TableGlobalModifier instance) {
+         JsonObject json = makeConditions(instance.conditions);
+//         json.addProperty("table", instance.table.table); TODO add AT
+         return json;
       }
    }
 }

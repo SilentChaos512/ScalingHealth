@@ -20,8 +20,8 @@ package net.silentchaos512.scalinghealth.potion;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Effect;
 import net.minecraft.potion.EffectType;
@@ -36,7 +36,7 @@ public class BandagedEffect extends Effect {
 
     public BandagedEffect() {
         super(EffectType.NEUTRAL, 0xf7dcad);
-        this.addAttributesModifier(SharedMonsterAttributes.MOVEMENT_SPEED, MOD_UUID, SPEED_MODIFIER, AttributeModifier.Operation.MULTIPLY_TOTAL);
+        this.addAttributesModifier(Attributes.MOVEMENT_SPEED, MOD_UUID, SPEED_MODIFIER, AttributeModifier.Operation.MULTIPLY_TOTAL);
     }
 
     @Override

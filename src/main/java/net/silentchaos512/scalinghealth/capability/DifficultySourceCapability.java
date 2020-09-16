@@ -5,7 +5,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
@@ -85,7 +85,7 @@ public class DifficultySourceCapability implements IDifficultySource, ICapabilit
             ScalingHealth.LOGGER.error("Failed to get capabilities from {}", obj);
             return false;
         }
-        return obj instanceof PlayerEntity || (obj instanceof ServerWorld && ((ServerWorld) obj).dimension.getType() == DimensionType.OVERWORLD);
+        return obj instanceof PlayerEntity || (obj instanceof ServerWorld && ((ServerWorld) obj).getDimensionKey().equals(World.OVERWORLD));
     }
 
     public static void register() {

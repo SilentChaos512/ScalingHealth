@@ -2,7 +2,10 @@ package net.silentchaos512.scalinghealth;
 
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootConditionType;
+import net.minecraft.loot.conditions.LootConditionManager;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
@@ -31,6 +34,8 @@ import net.silentchaos512.scalinghealth.event.PetEventHandler;
 import net.silentchaos512.scalinghealth.init.ModItems;
 import net.silentchaos512.scalinghealth.init.ModLoot;
 import net.silentchaos512.scalinghealth.loot.TableGlobalModifier;
+import net.silentchaos512.scalinghealth.loot.conditions.EntityGroupCondition;
+import net.silentchaos512.scalinghealth.loot.conditions.SHMobProperties;
 import net.silentchaos512.scalinghealth.network.Network;
 import net.silentchaos512.scalinghealth.world.SHWorldFeatures;
 import org.apache.logging.log4j.LogManager;
@@ -78,8 +83,10 @@ public class ScalingHealth {
         DifficultySourceCapability.register();
         PlayerDataCapability.register();
         PetHealthCapability.register();
-        //noinspection deprecation
-        DeferredWorkQueue.runLater(SHWorldFeatures::addFeaturesToBiomes);
+        event.enqueueWork(() -> {
+            Registry.register(Registry.LOOT_CONDITION_TYPE, SHMobProperties.NAME, new LootConditionType(SHMobProperties.SERIALIZER));
+            Registry.register(Registry.LOOT_CONDITION_TYPE, EntityGroupCondition.NAME, new LootConditionType(EntityGroupCondition.SERIALIZER));
+        });
     }
 
     private void serverAboutToStart(FMLServerAboutToStartEvent event) {

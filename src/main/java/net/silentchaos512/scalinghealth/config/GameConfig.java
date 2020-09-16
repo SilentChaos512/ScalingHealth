@@ -10,13 +10,13 @@ import net.minecraft.entity.monster.IMob;
 import net.minecraft.entity.passive.AnimalEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.potion.Effects;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorldReader;
+import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.dimension.DimensionType;
 import net.silentchaos512.lib.util.BiomeUtils;
-import net.silentchaos512.lib.util.DimensionUtils;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.lib.AreaDifficultyMode;
 import net.silentchaos512.scalinghealth.lib.MobHealthMode;
@@ -240,7 +240,7 @@ public class GameConfig {
         public boolean isPlayerExempt(PlayerEntity player) {
             List<? extends String> list = difficultyExempt.get();
             for (String value : list) {
-                if (value.equalsIgnoreCase(player.getName().getFormattedText())) {
+                if (value.equalsIgnoreCase(player.getName().getUnformattedComponentText())) {
                     return true;
                 }
             }
@@ -258,8 +258,8 @@ public class GameConfig {
                     .orElseGet(() -> getDefaultKillMutator(entity));
         }
 
-        public double getLocationMultiplier(IWorldReader world, BlockPos pos) {
-            DimensionType type = world.getDimension().getType();
+        public double getLocationMultiplier(World world, BlockPos pos) {
+            RegistryKey<World> type = world.getDimensionKey();
             Biome biome = world.getBiome(pos);
             //noinspection OverlyLongLambda
             return locationMultipliers.get().stream()
@@ -269,7 +269,7 @@ public class GameConfig {
                         if (dimensions.isEmpty() && biomes.isEmpty()) {
                             return false;
                         }
-                        return DimensionUtils.containedInList(type, dimensions, true) && BiomeUtils.containedInList(biome, biomes, true);
+                        return dimensions.stream().anyMatch(s -> s.equals(type.func_240901_a_().getPath())) && BiomeUtils.containedInList(biome, biomes, true);
                     })
                     .findFirst()
                     .map(c -> c.<Double>get("scale"))

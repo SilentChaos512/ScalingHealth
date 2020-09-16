@@ -1,9 +1,9 @@
 package net.silentchaos512.scalinghealth.utils;
 
 import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
@@ -53,7 +53,7 @@ public final class MobDifficultyHandler {
 
             BlightHandler.applyBlightPotionEffects(entity);
             if(EntityGroup.from(entity) == EntityGroup.BOSS){
-                ITextComponent blight = new TranslationTextComponent("misc.scalinghealth.blight", entity.getDisplayName()).applyTextStyle(TextFormatting.DARK_PURPLE);
+                ITextComponent blight = new TranslationTextComponent("misc.scalinghealth.blight", entity.getDisplayName()).deepCopy().mergeStyle(TextFormatting.DARK_PURPLE);
                 entity.setCustomName(blight);
             }
         }
@@ -67,7 +67,7 @@ public final class MobDifficultyHandler {
         if(EnabledFeatures.mobHpIncreaseEnabled()){
 
             double healthBoost = difficulty;
-            IAttributeInstance attributeMaxHealth = entity.getAttribute(SharedMonsterAttributes.MAX_HEALTH);
+            ModifiableAttributeInstance attributeMaxHealth = entity.getAttribute(Attributes.MAX_HEALTH);
             double baseMaxHealth = attributeMaxHealth.getBaseValue();
             double healthMultiplier = isHostile
                     ? SHMobs.healthHostileMultiplier()

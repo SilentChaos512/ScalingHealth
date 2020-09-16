@@ -54,7 +54,7 @@ public abstract class StatBoosterItem extends Item {
             // Does player have enough XP?
             if (player.experienceLevel < levelRequirement) {
                 String translationKey = "item.scalinghealth.stat_booster.notEnoughXP";
-                player.sendMessage(new TranslationTextComponent(translationKey, levelRequirement));
+                player.sendMessage(new TranslationTextComponent(translationKey, levelRequirement), Util.DUMMY_UUID);
                 return new ActionResult<>(ActionResultType.PASS, stack);
             }
 
@@ -84,7 +84,7 @@ public abstract class StatBoosterItem extends Item {
         int levelRequirement = getLevelCost(player);
         if (player.experienceLevel < levelRequirement) {
             String translationKey = "item.scalinghealth.stat_booster.notEnoughXP";
-            player.sendMessage(new TranslationTextComponent(translationKey, levelRequirement));
+            player.sendMessage(new TranslationTextComponent(translationKey, levelRequirement), Util.DUMMY_UUID);
             return;
         }
 

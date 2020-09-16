@@ -78,6 +78,9 @@ repositories {
     jcenter()
     mavenLocal()
     maven {
+        url 'https://www.dogforce-games.com/maven/'
+    }
+    maven {
         url  "https://dl.bintray.com/silentchaos512/silent-lib"
     }
     maven {
@@ -105,16 +108,16 @@ dependencies {
     minecraft "net.minecraftforge:forge:${project.forge_version}"
 
     extraLibs "com.udojava:EvalEx:2.1"
-    compile("net.silentchaos512:silent-lib-${project.mc_version}:${project.sl_version}") {
+    compile("net.silentchaos512:silent-lib-${project.sl_version}") {
         exclude module: "forge"
         exclude module: "jei-${project.mc_version}"
     }
 
     // JEI
     // compile against the JEI API but do not include it at runtime
-    compileOnly fg.deobf("mezz.jei:jei-${project.mc_version}:${project.jei_version}:api")
+    compileOnly fg.deobf("mezz.jei:jei-${project.jei_version}:api")
     // at runtime, use the full JEI jar
-    runtimeOnly fg.deobf("mezz.jei:jei-${project.mc_version}:${project.jei_version}")
+    runtimeOnly fg.deobf("mezz.jei:jei-${project.jei_version}")
 
     configurations.implementation.extendsFrom(configurations.extraLibs)
 }

@@ -24,6 +24,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
+import net.minecraft.world.storage.IWorldInfo;
 import net.silentchaos512.lib.util.MCMathUtils;
 import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
 import net.silentchaos512.scalinghealth.capability.IDifficultySource;
@@ -87,11 +88,12 @@ public enum AreaDifficultyMode {
         @Override
         public double getBaseAreaDifficulty(World world, BlockPos pos, int radius) {
             double distance;
+            IWorldInfo info = world.getWorldInfo();
             //to ignore y axis, take the same y as the evaluated position
             if(SHDifficulty.ignoreYAxis()){
-                distance = MCMathUtils.distance(pos, new BlockPos(world.getSpawnPoint().getX(), pos.getY(), world.getSpawnPoint().getZ()));
+                distance = MCMathUtils.distance(pos, new BlockPos(info.getSpawnX(), pos.getY(), info.getSpawnZ()));
             } else {
-                distance = MCMathUtils.distance(pos, world.getSpawnPoint());
+                distance = MCMathUtils.distance(pos, new BlockPos(info.getSpawnX(), info.getSpawnY(), info.getSpawnZ()));
             }
             return distance * SHDifficulty.distanceFactor();
         }
@@ -104,7 +106,7 @@ public enum AreaDifficultyMode {
             if(SHDifficulty.ignoreYAxis()){
                 distance = MCMathUtils.distance(pos, new BlockPos(0, pos.getY(), 0));
             } else {
-                distance = MCMathUtils.distance(pos, new BlockPos(0, world.getSpawnPoint().getY(), 0));
+                distance = MCMathUtils.distance(pos, new BlockPos(0, world.getWorldInfo().getSpawnY(), 0));
             }
             return distance * SHDifficulty.distanceFactor();
         }

@@ -26,6 +26,7 @@ import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.Util;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -168,7 +169,7 @@ public final class ScalingHealthCommonEvents {
             ITextComponent text = configMsg.isEmpty()
                     ? new TranslationTextComponent("misc.scalinghealth.sleepWarning")
                     : new StringTextComponent(configMsg);
-            player.sendMessage(text);
+            player.sendMessage(text, Util.DUMMY_UUID);
          }
       }
    }

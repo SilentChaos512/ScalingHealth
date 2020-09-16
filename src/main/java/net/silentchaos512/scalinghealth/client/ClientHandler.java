@@ -56,7 +56,7 @@ public final class ClientHandler {
         ScalingHealth.LOGGER.info(MARKER, "Processing login packet");
         areaMode = msg.areaMode;
         maxDifficultyValue = msg.maxDifficultyValue;
-        ScalingHealth.LOGGER.info(MARKER, "World area mode: {}", areaMode.getDisplayName().getFormattedText());
+        ScalingHealth.LOGGER.info(MARKER, "World area mode: {}", areaMode.getDisplayName().getUnformattedComponentText());
         ScalingHealth.LOGGER.info(MARKER, "World max difficulty: {}", maxDifficultyValue);
     }
 }

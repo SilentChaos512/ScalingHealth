@@ -6,6 +6,7 @@ import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.INBT;
+import net.minecraft.util.Util;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
@@ -172,7 +173,7 @@ public final class DifficultyEvents {
         float diff = newValue - oldValue;
         String line = String.format("%s %.2f %s", diff > 0 ? "gained" : "lost", diff, valueName);
         if(diff != 0)
-            player.sendMessage(new StringTextComponent(line));
+            player.sendMessage(new StringTextComponent(line), Util.DUMMY_UUID);
         ScalingHealth.LOGGER.info("Player {}", line);
     }
 

@@ -18,6 +18,7 @@
 
 package net.silentchaos512.scalinghealth.client.gui.difficulty;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.Screen;
@@ -111,29 +112,30 @@ public class DifficultyMeter extends Screen {
             RenderSystem.enableBlend();
 
             mc.textureManager.bindTexture(TEXTURE);
-            RenderSystem.pushMatrix();
+            event.getMatrixStack().push();
 
             Anchor anchor = Config.CLIENT.difficultyMeterAnchor.get();
             int posX = anchor.getX(width, 66, 5) + Config.CLIENT.difficultyMeterOffsetX.get();
             int posY = anchor.getY(height, 14, 5) + Config.CLIENT.difficultyMeterOffsetY.get();
 
             // Frame
-            blitWithColor(posX, posY, 190, 0, 66, 14, 0xFFFFFF);
+            blitWithColor(event.getMatrixStack(), posX, posY, 190, 0, 66, 14, 0xFFFFFF);
 
             // Area Difficulty
             int barLength = (int) (60 * areaDifficulty / maxDifficulty);
-            blitWithColor(posX + 3, posY + 5, 193, 19, barLength, 6, 0xFFFFFF);
+            blitWithColor(event.getMatrixStack(), posX + 3, posY + 5, 193, 19, barLength, 6, 0xFFFFFF);
 
             // Player Difficulty
             barLength = (int) (60 * difficulty / maxDifficulty);
-            blitWithColor(posX + 3, posY + 3, 193, 17, barLength, 2, 0xFFFFFF);
+            blitWithColor(event.getMatrixStack(), posX + 3, posY + 3, 193, 17, barLength, 2, 0xFFFFFF);
 
             // Text
             final float textScale = Config.CLIENT.difficultyMeterTextScale.get().floatValue();
             if (textScale > 0) {
-                RenderSystem.pushMatrix();
-                RenderSystem.scalef(textScale, textScale, 1);
+                event.getMatrixStack().push();
+                event.getMatrixStack().scale(textScale, textScale, 1);
                 mc.fontRenderer.drawStringWithShadow(
+                        event.getMatrixStack(),
                         I18n.format("misc.scalinghealth.difficultyMeterText"),
                         posX / textScale + 4,
                         posY / textScale - 9,
@@ -142,24 +144,23 @@ public class DifficultyMeter extends Screen {
                 // Text Difficulty
                 String str = String.format("%d", areaDifficulty);
                 int strWidth = mc.fontRenderer.getStringWidth(str);
-                mc.fontRenderer.drawStringWithShadow(str,
+                mc.fontRenderer.drawStringWithShadow(
+                        event.getMatrixStack(), str,
                         posX / textScale + 104 - strWidth,
                         posY / textScale - 9,
                         0xAAAAAA);
-                RenderSystem.popMatrix();
+                event.getMatrixStack().pop();
             }
-
-            RenderSystem.popMatrix();
-            RenderSystem.disableBlend();
+            event.getMatrixStack().pop();
         }
     }
 
-    private void blitWithColor(int x, int y, int textureX, int textureY, int width, int height, int color) {
+    private void blitWithColor(MatrixStack stack, int x, int y, int textureX, int textureY, int width, int height, int color) {
         float r = ((color >> 16) & 255) / 255f;
         float g = ((color >> 8) & 255) / 255f;
         float b = (color & 255) / 255f;
         RenderSystem.color3f(r, g, b);
-        blit(x, y, textureX, textureY, width, height);
+        blit(stack, x, y, textureX, textureY, width, height);
         RenderSystem.color4f(1, 1, 1, 1);
     }
 }

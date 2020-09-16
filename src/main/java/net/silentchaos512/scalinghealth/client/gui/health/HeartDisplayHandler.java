@@ -18,6 +18,7 @@
 
 package net.silentchaos512.scalinghealth.client.gui.health;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -73,7 +74,7 @@ public final class HeartDisplayHandler extends Screen{
             // Draw health string?
             if (Config.CLIENT.healthTextStyle.get() != HealthTextStyle.DISABLED) {
                 mc.getProfiler().startSection("scalinghealthRenderHealthText");
-                renderHealthText(mc, info.health, info.maxHealth,
+                renderHealthText(mc, event.getMatrixStack(), info.health, info.maxHealth,
                         -91 + Config.CLIENT.healthTextOffsetX.get(),
                         -38 + Config.CLIENT.healthTextOffsetY.get(),
                         Config.CLIENT.healthTextStyle.get(),
@@ -83,7 +84,7 @@ public final class HeartDisplayHandler extends Screen{
             // Draw absorption amount string?
             if (Config.CLIENT.absorptionTextStyle.get() != HealthTextStyle.DISABLED && player.getAbsorptionAmount() > 0) {
                 mc.getProfiler().startSection("scalinghealthRenderAbsorptionText");
-                renderHealthText(mc, player.getAbsorptionAmount(), 0,
+                renderHealthText(mc, event.getMatrixStack(), player.getAbsorptionAmount(), 0,
                         -91 + Config.CLIENT.absorptionTextOffsetX.get(),
                         -49 + Config.CLIENT.absorptionTextOffsetY.get(),
                         Config.CLIENT.absorptionTextStyle.get(),
@@ -102,6 +103,7 @@ public final class HeartDisplayHandler extends Screen{
     }
 
     private void renderHearts(RenderGameOverlayEvent event, Minecraft mc, PlayerEntity player) {
+        MatrixStack stack = event.getMatrixStack();
         info.update();
 
         RenderSystem.enableBlend();
@@ -115,7 +117,7 @@ public final class HeartDisplayHandler extends Screen{
             ForgeIngameGui.left_height += 10 - info.rowHeight;
 
         // Draw vanilla hearts
-        drawVanillaHearts(left, top);
+        drawVanillaHearts(event.getMatrixStack(), left, top);
 
         int potionOffset = info.hardcoreMode ? 27 : 0;
 
@@ -133,14 +135,14 @@ public final class HeartDisplayHandler extends Screen{
             int j;
             for (j = 0; j < renderHearts; ++j) {
                 int y = info.offsetHeartPosY(j, top);
-                blitWithColor(left + 8 * j, y, 0, potionOffset, 9, 9, rowColor);
+                blitWithColor(stack,left + 8 * j, y, 0, potionOffset, 9, 9, rowColor);
             }
             boolean anythingDrawn = j > 0;
 
             // Half heart on the end?
             if (info.healthInt % 2 == 1 && renderHearts < 10) {
                 int y = info.offsetHeartPosY(j, top);
-                blitWithColor(left + 8 * renderHearts, y, 9, potionOffset, 9, 9, rowColor);
+                blitWithColor(stack,left + 8 * renderHearts, y, 9, potionOffset, 9, 9, rowColor);
                 anythingDrawn = true;
             }
 
@@ -151,7 +153,7 @@ public final class HeartDisplayHandler extends Screen{
                 if (j < 0) j += 10;
                 int y = info.offsetHeartPosY(j, top);
                 int color = Config.CLIENT.lastHeartOutlineColor.get();
-                blitWithColor(left + 8 * j, y, 17, 9, 9, 9, color);
+                blitWithColor(stack,left + 8 * j, y, 17, 9, 9, 9, color);
             }
         }
 
@@ -160,11 +162,11 @@ public final class HeartDisplayHandler extends Screen{
             // Effect hearts (poison, wither)
             if (showEffectHearts(player)) {
                 int color = effectHeartColor(player);
-                blitWithColor(left + 8 * i, y, 0, 54, 9, 9, color);
+                blitWithColor(stack,left + 8 * i, y, 0, 54, 9, 9, color);
             }
             // Shiny glint on top of the hearts, a single white pixel in the upper left <3
             if (!info.hardcoreMode) {
-                blitWithColor(left + 8 * i, y, 17, 0, 9, 9, 0xCCFFFFFF);
+                blitWithColor(stack,left + 8 * i, y, 17, 0, 9, 9, 0xCCFFFFFF);
             }
         }
 
@@ -185,9 +187,9 @@ public final class HeartDisplayHandler extends Screen{
                 int x;
                 for (x = 0; x < allTanksInRow; ++x) {
                     if (x < filledTanksInRow) {
-                        TANK_FULL.blit(left + 4 * x, top, rowColor, this);
+                        TANK_FULL.blit(stack, left + 4 * x, top, rowColor, this);
                     } else {
-                        TANK_EMPTY.blit(left + 4 * x, top, 0xFFFFFF, this);
+                        TANK_EMPTY.blit(stack, left + 4 * x, top, 0xFFFFFF, this);
                     }
                 }
                 boolean anythingDrawn = x > 0;
@@ -195,7 +197,7 @@ public final class HeartDisplayHandler extends Screen{
                 if (Config.CLIENT.lastHeartOutline.get() && anythingDrawn && row == maxTankRows - 1) {
                     x = (int) (Math.ceil(allTanksInRow)) - 1;
                     if (x < 0) x += 20;
-                    TANK_OUTLINE.blit(left + 4 * x, top, Config.CLIENT.lastHeartOutlineColor.get(), this);
+                    TANK_OUTLINE.blit(stack, left + 4 * x, top, Config.CLIENT.lastHeartOutlineColor.get(), this);
                 }
             }
         }
@@ -214,7 +216,7 @@ public final class HeartDisplayHandler extends Screen{
             int texY = absorptionIconStyle == AbsorptionIconStyle.SHIELD ? 45 : 54;
             for (int i = 0; i < 10 && i < absorb / 2; ++i) {
                 int y = info.offsetAbsorptionPosY(i, top);
-                blitWithColor(left + 8 * i, y, texX, texY, 9, 9, 0xFFFFFF);
+                blitWithColor(stack,left + 8 * i, y, texX, texY, 9, 9, 0xFFFFFF);
             }
 
             // Draw the top two absorption rows, just the basic "hearts"
@@ -229,14 +231,14 @@ public final class HeartDisplayHandler extends Screen{
                 int x;
                 for (x = 0; x < renderHearts; ++x) {
                     int y = info.offsetAbsorptionPosY(x, top);
-                    blitWithColor(left + 8 * x, y, texX, texY, 9, 9, rowColor);
+                    blitWithColor(stack,left + 8 * x, y, texX, texY, 9, 9, rowColor);
                 }
                 anythingDrawn = x > 0;
 
                 // Half heart on the end?
                 if (absorbCeil % 2 == 1 && renderHearts < 10) {
                     int y = info.offsetAbsorptionPosY(x, top);
-                    blitWithColor(left + 8 * renderHearts, y, texX + 9, texY, 9, 9, rowColor);
+                    blitWithColor(stack,left + 8 * renderHearts, y, texX + 9, texY, 9, 9, rowColor);
                     anythingDrawn = true;
                 }
             }
@@ -246,14 +248,14 @@ public final class HeartDisplayHandler extends Screen{
                 int y = info.offsetAbsorptionPosY(i, top);
                 if (absorptionIconStyle == AbsorptionIconStyle.SHIELD) {
                     // Golden hearts in center (shield style only)
-                    blitWithColor(left + 8 * i, y, 17, 36, 9, 9, 0xFFFFFF);
+                    blitWithColor(stack,left + 8 * i, y, 17, 36, 9, 9, 0xFFFFFF);
                 } else if (absorptionIconStyle == AbsorptionIconStyle.GOLD_OUTLINE) {
                     // Golden outline
-                    blitWithColor(left + 8 * i, y, 17, 27, 9, 9, 0xFFFFFF);
+                    blitWithColor(stack,left + 8 * i, y, 17, 27, 9, 9, 0xFFFFFF);
                 }
                 // Shiny glint on top, same as hearts.
                 if (!info.hardcoreMode || absorptionIconStyle == AbsorptionIconStyle.SHIELD) {
-                    blitWithColor(left + 8 * i, y, 17, 0, 9, 9, 0xCCFFFFFF);
+                    blitWithColor(stack,left + 8 * i, y, 17, 0, 9, 9, 0xCCFFFFFF);
                 }
             }
         }
@@ -262,7 +264,7 @@ public final class HeartDisplayHandler extends Screen{
         mc.textureManager.bindTexture(Screen.GUI_ICONS_LOCATION);
     }
 
-    private void drawVanillaHearts(int left, int top) {
+    private void drawVanillaHearts(MatrixStack stack, int left, int top) {
         int textureX = info.recentlyHurtHighlight ? 25 : 16;
         int textureY = 9 * (info.hardcoreMode ? 5 : 0);
         int margin = 16;
@@ -277,35 +279,35 @@ public final class HeartDisplayHandler extends Screen{
             int x = left + i % 10 * 8;
             int y = info.offsetHeartPosY(i, top - row * info.rowHeight);
 
-            blit(x, y, textureX, textureY, 9, 9);
+            blit(stack, x, y, textureX, textureY, 9, 9);
 
             if (info.recentlyHurtHighlight) {
                 if (i * 2 + 1 < info.previousHealthInt)
-                    blit(x, y, margin + 54, textureY, 9, 9);
+                    blit(stack, x, y, margin + 54, textureY, 9, 9);
                 else if (i * 2 + 1 == info.previousHealthInt)
-                    blit(x, y, margin + 63, textureY, 9, 9);
+                    blit(stack, x, y, margin + 63, textureY, 9, 9);
             }
 
             if (absorbRemaining > 0f && info.absorptionStyle == AbsorptionIconStyle.VANILLA) {
                 if (MathUtils.doublesEqual(absorbRemaining, info.absorption) && MathUtils.doublesEqual(info.absorption % 2f, 1f)) {
-                    blit(x, y, margin + 153, textureY, 9, 9);
+                    blit(stack, x, y, margin + 153, textureY, 9, 9);
                     absorbRemaining -= 1f;
                 } else {
                     if (i * 2 + 1 < healthTotal)
-                        blit(x, y, margin + 144, textureY, 9, 9);
+                        blit(stack, x, y, margin + 144, textureY, 9, 9);
                     absorbRemaining -= 2f;
                 }
             } else {
                 if (i * 2 + 1 < info.healthInt)
-                    blit(x, y, margin + 36, textureY, 9, 9);
+                    blit(stack,x, y, margin + 36, textureY, 9, 9);
                 else if (i * 2 + 1 == info.healthInt)
-                    blit(x, y, margin + 45, textureY, 9, 9);
+                    blit(stack,x, y, margin + 45, textureY, 9, 9);
             }
         }
     }
 
-    private void renderHealthText(Minecraft mc, float current, float max, int offsetX, int offsetY, HealthTextStyle style, HealthTextColor styleColor) {
-        final double scale = style.getScale();
+    private void renderHealthText(Minecraft mc, MatrixStack stack, float current, float max, int offsetX, int offsetY, HealthTextStyle style, HealthTextColor styleColor) {
+        final float scale = (float) style.getScale();
         final int left = (int) ((info.scaledWindowWidth / 2 + offsetX) / scale);
         // GuiIngameForge.left_height == 59 in normal cases. Making it a constant should fix some issues.
         final int top = (int) ((info.scaledWindowHeight + offsetY + (1 / scale)) / scale);
@@ -338,14 +340,14 @@ public final class HeartDisplayHandler extends Screen{
         mc.getProfiler().endSection();
 
         mc.getProfiler().startSection("shTextDraw");
-        RenderSystem.pushMatrix();
-        RenderSystem.scaled(scale, scale, 1);
-        fontRenderer.drawStringWithShadow(healthString, left - stringWidth - 2, top, color);
-        RenderSystem.popMatrix();
+        stack.push();
+        stack.scale(scale, scale, 1);
+        fontRenderer.drawStringWithShadow(stack, healthString, left - stringWidth - 2, top, color);
+        stack.pop();
         mc.getProfiler().endSection();
     }
 
-    private void blitWithColor(int x, int y, int textureX, int textureY, int width, int height, int color) {
+    private void blitWithColor(MatrixStack stack, int x, int y, int textureX, int textureY, int width, int height, int color) {
         float a = ((color >> 24) & 255) / 255f;
         if (a <= 0f)
             a = 1f;
@@ -353,7 +355,7 @@ public final class HeartDisplayHandler extends Screen{
         float g = ((color >> 8) & 255) / 255f;
         float b = (color & 255) / 255f;
         RenderSystem.color4f(r, g, b, a);
-        blit(x, y, textureX, textureY, width, height);
+        blit(stack, x, y, textureX, textureY, width, height);
         RenderSystem.color4f(1, 1, 1, 1);
     }
 

@@ -7,6 +7,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Util;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.common.capabilities.*;
@@ -94,7 +95,7 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
         if(timeAfk > SHDifficulty.timeBeforeAfk()){
             if(!afk) {
                 afk = true;
-                if(SHDifficulty.afkMessage()) player.sendMessage(new TranslationTextComponent("misc.scalinghealth.afkmessage"));
+                if(SHDifficulty.afkMessage()) player.sendMessage(new TranslationTextComponent("misc.scalinghealth.afkmessage"), Util.DUMMY_UUID);
             }
         }
 

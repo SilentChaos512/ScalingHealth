@@ -19,7 +19,7 @@
 package net.silentchaos512.scalinghealth.event;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraftforge.event.TickEvent;
@@ -97,7 +97,7 @@ public final class DamageScaling {
             case MAX_HEALTH:
                 double baseHealth = entity instanceof PlayerEntity
                         ? config.player.startingHealth.get()
-                        : entity.getAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue();
+                        : entity.getAttribute(Attributes.MAX_HEALTH).getBaseValue();
                 return (entity.getMaxHealth() - baseHealth) / baseHealth;
             case DIFFICULTY:
                 return SHDifficulty.getDifficultyOf(entity) * config.damageScaling.difficultyWeight.get();

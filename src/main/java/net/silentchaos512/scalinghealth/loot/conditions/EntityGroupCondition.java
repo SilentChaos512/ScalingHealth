@@ -5,15 +5,20 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.loot.ILootSerializer;
+import net.minecraft.loot.LootConditionType;
 import net.minecraft.util.JSONUtils;
-import net.minecraft.world.storage.loot.LootContext;
-import net.minecraft.world.storage.loot.LootParameters;
-import net.minecraft.world.storage.loot.conditions.ILootCondition;
+import net.minecraft.loot.LootContext;
+import net.minecraft.loot.LootParameters;
+import net.minecraft.loot.conditions.ILootCondition;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.registry.Registry;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.lib.EntityGroup;
 
 public class EntityGroupCondition implements ILootCondition {
    public static final Serializer SERIALIZER = new Serializer();
+   public static final ResourceLocation NAME = new ResourceLocation(ScalingHealth.MOD_ID, "entity_group_condition");
 
    private final EntityGroup group;
 
@@ -30,18 +35,19 @@ public class EntityGroupCondition implements ILootCondition {
       return false;
    }
 
-   public static class Serializer extends AbstractSerializer<EntityGroupCondition> {
-      protected Serializer() {
-         super(ScalingHealth.getId("entity_group_condition"), EntityGroupCondition.class);
-      }
+   @Override
+   public LootConditionType func_230419_b_() {
+      return Registry.LOOT_CONDITION_TYPE.func_241873_b(NAME).orElseThrow(RuntimeException::new);
+   }
 
+   public static class Serializer implements ILootSerializer<EntityGroupCondition> {
       @Override
-      public void serialize(JsonObject json, EntityGroupCondition condition, JsonSerializationContext context) {
+      public void func_230424_a_(JsonObject json, EntityGroupCondition condition, JsonSerializationContext context) {
          json.addProperty("entity_group", condition.group.toString());
       }
 
       @Override
-      public EntityGroupCondition deserialize(JsonObject json, JsonDeserializationContext context) {
+      public EntityGroupCondition func_230423_a_(JsonObject json, JsonDeserializationContext context) {
          String group = JSONUtils.getString(json, "entity_group");
          return new EntityGroupCondition(EntityGroup.from(group));
       }

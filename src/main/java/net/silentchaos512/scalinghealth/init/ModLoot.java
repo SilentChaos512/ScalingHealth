@@ -20,9 +20,9 @@ package net.silentchaos512.scalinghealth.init;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.storage.loot.*;
-import net.minecraft.world.storage.loot.conditions.LootConditionManager;
-import net.minecraft.world.storage.loot.functions.SetCount;
+import net.minecraft.loot.*;
+import net.minecraft.loot.conditions.LootConditionManager;
+import net.minecraft.loot.functions.SetCount;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.silentchaos512.scalinghealth.loot.conditions.EntityGroupCondition;
@@ -36,9 +36,6 @@ public final class ModLoot {
 
     public static void init() {
         MinecraftForge.EVENT_BUS.addListener(ModLoot::onLootTableLoad);
-
-        LootConditionManager.registerCondition(SHMobProperties.SERIALIZER);
-        LootConditionManager.registerCondition(EntityGroupCondition.SERIALIZER);
     }
 
     private static final List<ResourceLocation> ADD_ITEMS_TO = ImmutableList.of(

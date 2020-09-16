@@ -8,8 +8,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.command.arguments.EntityArgument;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.text.ITextComponent;
@@ -77,17 +77,17 @@ public final class PowerCommand {
         IPlayerData data = SHPlayers.getPlayerData(player);
         context.getSource().sendFeedback(ModCommands.playerNameText(player), true);
         // Actual power
-        IAttributeInstance attr = player.getAttribute(SharedMonsterAttributes.ATTACK_DAMAGE);
+        ModifiableAttributeInstance attr = player.getAttribute(Attributes.ATTACK_DAMAGE);
         ITextComponent actualText = text("actual", String.format("%.1f", attr.getValue()))
-                .applyTextStyle(TextFormatting.YELLOW);
+                .deepCopy().mergeStyle(TextFormatting.YELLOW);
         context.getSource().sendFeedback(actualText, true);
         // Crystals and modifier
         int crystals = data.getPowerCrystals();
         String extraPower = (crystals >= 0 ? "+" : "") + (data.getAttackDamageModifier());
         ITextComponent crystalsValues = text("powerCrystals.values", crystals, extraPower)
-                .applyTextStyle(TextFormatting.WHITE);
+                .deepCopy().mergeStyle(TextFormatting.WHITE);
         ITextComponent crystalsText = text("powerCrystals", crystalsValues)
-                .applyTextStyle(TextFormatting.YELLOW);
+                .deepCopy().mergeStyle(TextFormatting.YELLOW);
         context.getSource().sendFeedback(crystalsText, true);
         return 1;
     }

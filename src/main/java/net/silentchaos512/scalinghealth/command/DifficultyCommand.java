@@ -10,10 +10,7 @@ import net.minecraft.command.Commands;
 import net.minecraft.command.arguments.EntityArgument;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.text.*;
 import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
 import net.silentchaos512.scalinghealth.capability.IDifficultySource;
 import net.silentchaos512.scalinghealth.utils.SHDifficulty;
@@ -97,23 +94,23 @@ public final class DifficultyCommand {
 
         // Player difficulty
         float difficulty = source.getDifficulty();
-        ITextComponent playerValues = ModCommands.valueText(difficulty, maxDifficulty);
-        ITextComponent playerText = text("player", playerValues)
-                .applyTextStyle(TextFormatting.YELLOW);
+        IFormattableTextComponent playerValues = ModCommands.valueText(difficulty, maxDifficulty);
+        IFormattableTextComponent playerText = text("player", playerValues)
+                .mergeStyle(TextFormatting.YELLOW);
         context.getSource().sendFeedback(playerText, true);
 
         // Area difficulty
         double areaDifficulty = SHDifficulty.areaDifficulty(player.world, player.getPosition());
-        ITextComponent areaValues = ModCommands.valueText(areaDifficulty, maxDifficulty);
-        ITextComponent areaText = text("area", areaValues)
-                .applyTextStyle(TextFormatting.YELLOW);
+        IFormattableTextComponent areaValues = ModCommands.valueText(areaDifficulty, maxDifficulty);
+        IFormattableTextComponent areaText = text("area", areaValues)
+                .mergeStyle(TextFormatting.YELLOW);
 
         // Area mode
         ITextComponent modeText = new StringTextComponent(" (")
-                .applyTextStyle(TextFormatting.GRAY)
-                .appendSibling(SHDifficulty.areaMode().getDisplayName())
-                .appendText(")");
-        areaText.appendSibling(modeText);
+                .mergeStyle(TextFormatting.GRAY)
+                .append(SHDifficulty.areaMode().getDisplayName())
+                .appendString(")");
+        areaText.append(modeText);
         context.getSource().sendFeedback(areaText, true);
         return 1;
     }
@@ -124,9 +121,9 @@ public final class DifficultyCommand {
         // Difficulty
         double difficulty = source.getDifficulty();
         double maxDifficulty = SHDifficulty.maxValue();
-        ITextComponent textValues = ModCommands.valueText(difficulty, maxDifficulty);
-        ITextComponent textDifficulty = text("server", textValues)
-                .applyTextStyle(TextFormatting.YELLOW);
+        IFormattableTextComponent textValues = ModCommands.valueText(difficulty, maxDifficulty);
+        IFormattableTextComponent textDifficulty = text("server", textValues)
+                .mergeStyle(TextFormatting.YELLOW);
         context.getSource().sendFeedback(textDifficulty, true);
         return 1;
     }
@@ -159,7 +156,7 @@ public final class DifficultyCommand {
         return 1;
     }
 
-    private static ITextComponent text(String key, Object... args) {
+    private static IFormattableTextComponent text(String key, Object... args) {
         return new TranslationTextComponent("command.scalinghealth.difficulty." + key, args);
     }
 }

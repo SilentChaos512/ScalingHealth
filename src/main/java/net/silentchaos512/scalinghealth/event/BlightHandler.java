@@ -24,6 +24,7 @@ import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.Util;
 import net.minecraft.util.text.*;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
@@ -54,33 +55,33 @@ public final class BlightHandler {
             TranslationTextComponent original = (TranslationTextComponent) deathMessage;
 
             StringTextComponent s = new StringTextComponent("Blight " + blight.getName().getString());
-            s.setStyle(new Style().setColor(TextFormatting.DARK_PURPLE));
+            s.setStyle(Style.EMPTY.setFormatting(TextFormatting.DARK_PURPLE));
 
             TranslationTextComponent newMessage = new TranslationTextComponent(original.getKey(), s);
-            StringTextComponent almostFinalMessage = new StringTextComponent(newMessage.getFormattedText());
+            StringTextComponent almostFinalMessage = new StringTextComponent(newMessage.getString());
             String message = newMessage.getString();
 
             if(message.contains("drowned")){
                 if(message.startsWith("Blight Squid")){
-                    almostFinalMessage = new StringTextComponent(almostFinalMessage.getFormattedText() + "... again");
+                    almostFinalMessage = new StringTextComponent(almostFinalMessage.getString() + "... again");
                 }
                 else
-                    almostFinalMessage = new StringTextComponent(almostFinalMessage.getFormattedText() + "... gg");
+                    almostFinalMessage = new StringTextComponent(almostFinalMessage.getString() + "... gg");
             } else if(message.contains("suffocated in a wall")){
-                almostFinalMessage = new StringTextComponent(almostFinalMessage.getFormattedText() + " *slow clap*");
+                almostFinalMessage = new StringTextComponent(almostFinalMessage.getString() + " *slow clap*");
             }
 
             StringTextComponent finalMessage = almostFinalMessage;
 
             if(slayer != null)  {
-                if(almostFinalMessage.getFormattedText().contains("  "))
-                    finalMessage = new StringTextComponent(almostFinalMessage.getFormattedText().replace("  ", " " + slayer.getName().getFormattedText() + " ")) ;
+                if(almostFinalMessage.getString().contains("  "))
+                    finalMessage = new StringTextComponent(almostFinalMessage.getString().replace("  ", " " + slayer.getName().getString() + " ")) ;
                 else
-                    finalMessage = new StringTextComponent(almostFinalMessage.getFormattedText() + slayer.getName().getFormattedText());
+                    finalMessage = new StringTextComponent(almostFinalMessage.getString() + slayer.getName().getString());
             }
 
             for (PlayerEntity p : blight.world.getPlayers())
-                p.sendMessage(finalMessage);
+                p.sendMessage(finalMessage, Util.DUMMY_UUID);
         }
     }
 

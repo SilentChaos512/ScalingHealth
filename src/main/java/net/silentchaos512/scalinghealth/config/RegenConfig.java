@@ -1,8 +1,8 @@
 package net.silentchaos512.scalinghealth.config;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.silentchaos512.utils.config.BooleanValue;
 import net.silentchaos512.utils.config.ConfigSpecWrapper;
@@ -84,7 +84,7 @@ public class RegenConfig {
 
     public float getHealTickAmount(LivingEntity entity) {
         if (this.proportionalToMaxHealth.get()) {
-            IAttributeInstance attr = entity.getAttribute(SharedMonsterAttributes.MAX_HEALTH);
+            ModifiableAttributeInstance attr = entity.getAttribute(Attributes.MAX_HEALTH);
             double base = attr.getBaseValue();
             double max = attr.getValue();
             return (float) (max / base);

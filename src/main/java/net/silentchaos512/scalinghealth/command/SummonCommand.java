@@ -16,11 +16,9 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.effect.LightningBoltEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.server.ServerWorld;
 import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
@@ -107,39 +105,32 @@ public final class SummonCommand {
     }
 
     // Mostly a copy of vanilla summon command
-    private static int summonEntity(CommandSource source, ResourceLocation id, int difficulty, boolean forceBlight, Vec3d pos, CompoundNBT tags, boolean randomizeProperties) throws CommandSyntaxException {
+    private static int summonEntity(CommandSource source, ResourceLocation id, int difficulty, boolean forceBlight, Vector3d pos, CompoundNBT tags, boolean randomizeProperties) throws CommandSyntaxException {
         CompoundNBT nbt = tags.copy();
         nbt.putString("id", id.toString());
-        if (EntityType.getKey(EntityType.LIGHTNING_BOLT).equals(id)) {
-            LightningBoltEntity lightningBolt = new LightningBoltEntity(source.getWorld(), pos.x, pos.y, pos.z, false);
-            source.getWorld().addLightningBolt(lightningBolt);
-            source.sendFeedback(new TranslationTextComponent("commands.summon.success", lightningBolt.getDisplayName()), true);
-            return 1;
+        ServerWorld world = source.getWorld();
+        Entity entity = EntityType.loadEntityAndExecute(nbt, world, e -> {
+            e.setLocationAndAngles(pos.x, pos.y, pos.z, e.rotationYaw, e.rotationPitch);
+            //noinspection ReturnOfNull
+            return !world.summonEntity(e) ? null : e;
+        });
+        if (entity == null) {
+            throw SUMMON_FAILED.create();
         } else {
-            ServerWorld world = source.getWorld();
-            Entity entity = EntityType.loadEntityAndExecute(nbt, world, e -> {
-                e.setLocationAndAngles(pos.x, pos.y, pos.z, e.rotationYaw, e.rotationPitch);
-                //noinspection ReturnOfNull
-                return !world.summonEntity(e) ? null : e;
-            });
-            if (entity == null) {
-                throw SUMMON_FAILED.create();
-            } else {
-                if (randomizeProperties && entity instanceof MobEntity) {
-                    MobEntity mob = (MobEntity) entity;
-                    mob.onInitialSpawn(world, world.getDifficultyForLocation(new BlockPos(entity)), SpawnReason.COMMAND, null, null);
+            if (randomizeProperties && entity instanceof MobEntity) {
+                MobEntity mob = (MobEntity) entity;
+                mob.onInitialSpawn(world, world.getDifficultyForLocation(entity.getPosition()), SpawnReason.COMMAND, null, null);
 
-                    if (difficulty > 0) {
-                        IDifficultyAffected affected = SHDifficulty.affected(entity);
-                        boolean blight = forceBlight || MobDifficultyHandler.shouldBecomeBlight(mob, difficulty);
-                        affected.forceDifficulty(difficulty);
-                        MobDifficultyHandler.setEntityProperties(mob, affected, blight);
-                        affected.setProcessed(true);
-                    }
+                if (difficulty > 0) {
+                    IDifficultyAffected affected = SHDifficulty.affected(entity);
+                    boolean blight = forceBlight || MobDifficultyHandler.shouldBecomeBlight(mob, difficulty);
+                    affected.forceDifficulty(difficulty);
+                    MobDifficultyHandler.setEntityProperties(mob, affected, blight);
+                    affected.setProcessed(true);
                 }
-                source.sendFeedback(new TranslationTextComponent("commands.summon.success", entity.getDisplayName()), true);
-                return 1;
             }
+            source.sendFeedback(new TranslationTextComponent("commands.summon.success", entity.getDisplayName()), true);
+            return 1;
         }
     }
 }

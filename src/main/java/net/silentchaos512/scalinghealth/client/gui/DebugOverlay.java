@@ -28,7 +28,7 @@ public class DebugOverlay extends DebugRenderOverlay {
 
         return ImmutableList.of(
                 "Difficulty (/" + ClientHandler.maxDifficultyValue + ")",
-                "- Mode=" + ClientHandler.areaMode.getDisplayName().getFormattedText(),
+                "- Mode=" + ClientHandler.areaMode.getDisplayName().getUnformattedComponentText(),
                 "- Player=" + String.format(FLOAT_FORMAT, ClientHandler.playerDifficulty),
                 "- Server=" + String.format(FLOAT_FORMAT, DifficultySourceCapability.getOverworldCap().orElseGet(DifficultySourceCapability::new).getDifficulty()),
                 "- Area=" + String.format(FLOAT_FORMAT + " (x%.1f, ☽x%.1f)",

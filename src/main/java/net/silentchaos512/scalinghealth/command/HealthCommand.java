@@ -10,6 +10,7 @@ import net.minecraft.command.Commands;
 import net.minecraft.command.arguments.EntityArgument;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -76,17 +77,17 @@ public final class HealthCommand {
 
         context.getSource().sendFeedback(ModCommands.playerNameText(player), true);
         // Actual health
-        ITextComponent actualValues = ModCommands.valueText(player.getHealth(), player.getMaxHealth());
-        ITextComponent actualText = text("actual", actualValues)
-                .applyTextStyle(TextFormatting.YELLOW);
+        IFormattableTextComponent actualValues = ModCommands.valueText(player.getHealth(), player.getMaxHealth());
+        IFormattableTextComponent actualText = text("actual", actualValues)
+                .mergeStyle(TextFormatting.YELLOW);
         context.getSource().sendFeedback(actualText, true);
         // Heart crystals and health modifier
         int extraHearts = data.getHeartCrystals();
         String extraHealth = (extraHearts >= 0 ? "+" : "") + (2 * extraHearts);
-        ITextComponent heartsValues = text("heartCrystals.values",extraHearts / SHItems.heartCrystalIncreaseAmount(), extraHealth)
-                .applyTextStyle(TextFormatting.WHITE);
-        ITextComponent heartsText = text("heartCrystals", heartsValues)
-                .applyTextStyle(TextFormatting.YELLOW);
+        IFormattableTextComponent heartsValues = text("heartCrystals.values",extraHearts / SHItems.heartCrystalIncreaseAmount(), extraHealth)
+                .mergeStyle(TextFormatting.WHITE);
+        IFormattableTextComponent heartsText = text("heartCrystals", heartsValues)
+                .mergeStyle(TextFormatting.YELLOW);
         context.getSource().sendFeedback(heartsText, true);
         return 1;
     }
@@ -109,7 +110,7 @@ public final class HealthCommand {
         return 1;
     }
 
-    private static ITextComponent text(String key, Object... args) {
+    private static IFormattableTextComponent text(String key, Object... args) {
         return new TranslationTextComponent("command.scalinghealth.health." + key, args);
     }
 }

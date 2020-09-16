@@ -20,10 +20,10 @@ package net.silentchaos512.scalinghealth.utils;
 
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.SharedMonsterAttributes;
+import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.IAttribute;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.lib.util.EntityHelper;
 
@@ -38,18 +38,17 @@ public final class ModifierHandler {
 
     private ModifierHandler() {throw new IllegalAccessError("Utility class");}
 
-    public static void setModifier(LivingEntity entity, IAttribute attribute, UUID uuid, String name, double amount, AttributeModifier.Operation op) {
-        IAttributeInstance instance = entity.getAttribute(attribute);
-        //noinspection ConstantConditions -- instance CAN be null!
+    public static void setModifier(LivingEntity entity, Attribute attribute, UUID uuid, String name, double amount, AttributeModifier.Operation op) {
+        ModifiableAttributeInstance instance = entity.getAttribute(attribute);
         if (instance == null) return;
         AttributeModifier mod = instance.getModifier(uuid);
         if (mod != null) instance.removeModifier(mod);
-        instance.applyModifier(new AttributeModifier(uuid, name, amount, op));
+        instance.applyPersistentModifier(new AttributeModifier(uuid, name, amount, op));
     }
 
     public static void setMaxHealth(LivingEntity entity, double amount, AttributeModifier.Operation op) {
         double oldMax = entity.getMaxHealth();
-        setModifier(entity, SharedMonsterAttributes.MAX_HEALTH, MODIFIER_ID_HEALTH, MODIFIER_NAME_HEALTH, amount, op);
+        setModifier(entity, Attributes.MAX_HEALTH, MODIFIER_ID_HEALTH, MODIFIER_NAME_HEALTH, amount, op);
         double newMax = entity.getMaxHealth();
 
         // Heal entity when increasing max health
@@ -70,6 +69,6 @@ public final class ModifierHandler {
             }
         }
         if(stop) return;
-        setModifier(entity, SharedMonsterAttributes.ATTACK_DAMAGE, MODIFIER_ID_DAMAGE, MODIFIER_NAME_DAMAGE, amount, op);
+        setModifier(entity, Attributes.ATTACK_DAMAGE, MODIFIER_ID_DAMAGE, MODIFIER_NAME_DAMAGE, amount, op);
     }
 }
