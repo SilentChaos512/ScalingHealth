@@ -48,7 +48,7 @@ public class TableGlobalModifier extends LootModifier{
       @Override
       public JsonObject write(TableGlobalModifier instance) {
          JsonObject json = makeConditions(instance.conditions);
-//         json.addProperty("table", instance.table.table); TODO add AT
+         json.addProperty("table", instance.table.table.toString());
          return json;
       }
    }

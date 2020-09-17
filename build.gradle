@@ -46,30 +46,38 @@ def version_short = "${versionInfo['version_short']}"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
+println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
+     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
     mappings channel: project.mcp_channel.toString(), version: project.mcp_mappings.toString()
 
     runs {
-        client = {
+        client {
+            workingDirectory project.file('run')
+
             properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
             properties 'forge.logging.console.level': 'debug'
             jvmArg("-Xmx6G")
-            workingDirectory project.file('run').canonicalPath
-            source sourceSets.main
+
+            mods { scalinghealth { source sourceSets.main} }
         }
-        server = {
+        server {
+            workingDirectory project.file('run')
+
             properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
             properties 'forge.logging.console.level': 'debug'
-            workingDirectory project.file('run').canonicalPath
-            source sourceSets.main
+
+            mods { scalinghealth { source sourceSets.main} }
         }
-        data = {
+        data {
+            workingDirectory project.file('run')
+
             properties 'forge.logging.console.level': 'debug'
-            workingDirectory project.file('run').canonicalPath
 
             args '--mod', 'scalinghealth', '--all', '--output', file('src/generated/resources/'), '--existing', sourceSets.main.resources.srcDirs[0]
 
-            source sourceSets.main
+            mods { scalinghealth { source sourceSets.main} }
         }
     }
 }

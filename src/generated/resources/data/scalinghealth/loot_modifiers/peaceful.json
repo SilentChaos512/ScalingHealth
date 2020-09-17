@@ -5,5 +5,6 @@
       "entity_group": "peaceful"
     }
   ],
+  "table": "scalinghealth:bonus_drops/peaceful",
   "type": "scalinghealth:table_loot_mod"
 }
