@@ -1,8 +1,8 @@
 modLoader="javafml"
-loaderVersion="[31,)"
+loaderVersion="[34,)"
+license="MIT"
 issueTrackerURL="https://github.com/SilentChaos512/ScalingHealth"
 displayURL="https://minecraft.curseforge.com/projects/scaling-health"
-logoFile="examplemod.png"
 credits="SilentChaos512, Cyborgmas"
 authors="SilentChaos512"
 
@@ -11,22 +11,21 @@ authors="SilentChaos512"
     version="${file.jarVersion}"
     displayName="Scaling Health"
     description='''Extra health and damage for players and mobs. Highly customizable difficulty system.'''
-
 [[dependencies.scalinghealth]]
     modId="forge"
     mandatory=true
-    versionRange="[31,)"
+    versionRange="[34,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.scalinghealth]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.15.2]"
+    versionRange="[1.16.3,1.17)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.scalinghealth]]
     modId="silentlib"
     mandatory=true
-    versionRange="[4.6,)"
+    versionRange="[4.8,)"
     ordering="NONE"
     side="BOTH"

@@ -19,7 +19,7 @@ import java.util.List;
 public class TableGlobalModifier extends LootModifier{
    private final TableLootEntry table;
 
-   protected TableGlobalModifier(ILootCondition[] conditions, TableLootEntry table) {
+   public TableGlobalModifier(ILootCondition[] conditions, TableLootEntry table) {
       super(conditions);
       this.table = table;
    }

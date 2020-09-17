@@ -38,9 +38,9 @@ public class SHMobProperties implements ILootCondition {
     }
 
     @Override
-    public LootConditionType func_230419_b_()
-    {
-        return Registry.LOOT_CONDITION_TYPE.func_241873_b(NAME).orElseThrow(RuntimeException::new);
+    public LootConditionType func_230419_b_() {
+        return Registry.LOOT_CONDITION_TYPE.func_241873_b(NAME)
+                .orElseThrow(() -> new RuntimeException("Loot condition type did not register for some reason"));
     }
 
     @Override

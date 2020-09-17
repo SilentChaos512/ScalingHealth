@@ -16,6 +16,8 @@ import net.minecraft.util.registry.Registry;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.lib.EntityGroup;
 
+import java.util.Locale;
+
 public class EntityGroupCondition implements ILootCondition {
    public static final Serializer SERIALIZER = new Serializer();
    public static final ResourceLocation NAME = new ResourceLocation(ScalingHealth.MOD_ID, "entity_group_condition");
@@ -37,13 +39,14 @@ public class EntityGroupCondition implements ILootCondition {
 
    @Override
    public LootConditionType func_230419_b_() {
-      return Registry.LOOT_CONDITION_TYPE.func_241873_b(NAME).orElseThrow(RuntimeException::new);
+      return Registry.LOOT_CONDITION_TYPE.func_241873_b(NAME)
+              .orElseThrow(() -> new RuntimeException("Loot condition type did not register for some reason"));
    }
 
    public static class Serializer implements ILootSerializer<EntityGroupCondition> {
       @Override
       public void func_230424_a_(JsonObject json, EntityGroupCondition condition, JsonSerializationContext context) {
-         json.addProperty("entity_group", condition.group.toString());
+         json.addProperty("entity_group", condition.group.toString().toLowerCase(Locale.ROOT));
       }
 
       @Override

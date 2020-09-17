@@ -57,8 +57,8 @@ public class LootTables extends BaseLootTable {
                 createSHDropsTable(
                         createSHDropsPool("crystals", 1,
                                 new MobLootCondition(true, false, 0, 0.055f, 0.005f),
-                                new MobLootEntry(ModItems.HEART_CRYSTAL_SHARD.asItem(), 2, 1, 8),
-                                new MobLootEntry(ModItems.POWER_CRYSTAL_SHARD.asItem(), 1, 0, 5)),
+                                new MobLootEntry(ModItems.HEART_CRYSTAL_SHARD.asItem(), 2, 8, 1),
+                                new MobLootEntry(ModItems.POWER_CRYSTAL_SHARD.asItem(), 1, 5, 0)),
                         createSHDropsPool("difficulty_mutators", 1,
                                 new MobLootCondition(false, false, 0, 0.015f, 0.025f),
                                 new MobLootEntry(ModItems.CURSED_HEART.asItem(), 1, 1, 0)),

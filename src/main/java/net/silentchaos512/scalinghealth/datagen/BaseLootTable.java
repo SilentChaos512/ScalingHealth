@@ -108,7 +108,7 @@ public abstract class BaseLootTable extends LootTableProvider {
             tables.put(entry.getKey().getLootTable(), entry.getValue().setParameterSet(LootParameterSets.BLOCK).build());
         }
         for(Map.Entry<EntityGroup, LootTable.Builder> entry : mobLootTable.entrySet()){
-            tables.put(ScalingHealth.getId(entry.getKey().name().toLowerCase(Locale.ROOT)), entry.getValue().setParameterSet(LootParameterSets.GENERIC).build());
+            tables.put(ScalingHealth.getId("bonus_drops/" + entry.getKey().name().toLowerCase(Locale.ROOT)), entry.getValue().setParameterSet(LootParameterSets.GENERIC).build());
         }
         writeTables(cache, tables);
     }

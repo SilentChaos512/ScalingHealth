@@ -1,14 +1,15 @@
 package net.silentchaos512.scalinghealth.datagen;
 
-import net.minecraft.data.DataGenerator;
 import net.minecraft.data.EntityTypeTagsProvider;
+import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
+import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.tags.EntityTags;
 
 import static net.minecraft.entity.EntityType.*;
 
-public class SHTags extends EntityTypeTagsProvider {
-   public SHTags(DataGenerator generator) {
-      super(generator);
+public class SHEntityTags extends EntityTypeTagsProvider {
+   public SHEntityTags(GatherDataEvent event) {
+      super(event.getGenerator(), ScalingHealth.MOD_ID, event.getExistingFileHelper());
    }
 
    @Override

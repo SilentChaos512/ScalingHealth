@@ -1,7 +1,6 @@
 {
     "pack": {
         "description": "Scaling Health resources",
-        "pack_format": 5,
-        "_comment": "A pack_format of 5 for 1.15.2 i think."
+        "pack_format": 6,
     }
 }

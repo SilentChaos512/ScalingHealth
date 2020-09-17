@@ -72,10 +72,13 @@ public class ScalingHealth {
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(GlobalLootModifierSerializer.class,this::registerLootModSerializers);
         MinecraftForge.EVENT_BUS.addListener(this::serverAboutToStart);
+
+        Registry.register(Registry.LOOT_CONDITION_TYPE, SHMobProperties.NAME, new LootConditionType(new SHMobProperties.Serializer()));
+        Registry.register(Registry.LOOT_CONDITION_TYPE, EntityGroupCondition.NAME, new LootConditionType(new EntityGroupCondition.Serializer()));
     }
 
     private void registerLootModSerializers(RegistryEvent.Register<GlobalLootModifierSerializer<?>> event){
-        event.getRegistry().register(new TableGlobalModifier.Serializer().setRegistryName(getId("table_lot_mod")));
+        event.getRegistry().register(new TableGlobalModifier.Serializer().setRegistryName(getId("table_loot_mod")));
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
@@ -83,10 +86,6 @@ public class ScalingHealth {
         DifficultySourceCapability.register();
         PlayerDataCapability.register();
         PetHealthCapability.register();
-        event.enqueueWork(() -> {
-            Registry.register(Registry.LOOT_CONDITION_TYPE, SHMobProperties.NAME, new LootConditionType(SHMobProperties.SERIALIZER));
-            Registry.register(Registry.LOOT_CONDITION_TYPE, EntityGroupCondition.NAME, new LootConditionType(EntityGroupCondition.SERIALIZER));
-        });
     }
 
     private void serverAboutToStart(FMLServerAboutToStartEvent event) {
