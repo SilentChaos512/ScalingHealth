@@ -56,7 +56,7 @@ minecraft {
         client {
             workingDirectory project.file('run')
 
-            properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
+            //properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
             properties 'forge.logging.console.level': 'debug'
             jvmArg("-Xmx6G")
 
@@ -65,7 +65,7 @@ minecraft {
         server {
             workingDirectory project.file('run')
 
-            properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
+            //properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
             properties 'forge.logging.console.level': 'debug'
 
             mods { scalinghealth { source sourceSets.main} }

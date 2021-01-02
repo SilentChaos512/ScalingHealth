@@ -30,12 +30,12 @@ public class SHWorldFeatures {
         {
             if(!info.test.getAsBoolean())
                 continue;
-            event.getGeneration().func_242513_a(GenerationStage.Decoration.UNDERGROUND_ORES,
+            event.getGeneration().withFeature(GenerationStage.Decoration.UNDERGROUND_ORES,
                     Feature.ORE.withConfiguration(new OreFeatureConfig(
-                            OreFeatureConfig.FillerBlockType.field_241882_a,
+                            OreFeatureConfig.FillerBlockType.BASE_STONE_OVERWORLD,
                             info.block.asBlockState(),
                             info.size
-                    )).func_242733_d(info.height).func_242728_a().func_242731_b(info.count)
+                    )).range(info.height).square().func_242731_b(info.count)
             );
         }
     }

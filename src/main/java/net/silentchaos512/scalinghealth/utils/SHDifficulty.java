@@ -94,7 +94,7 @@ public final class SHDifficulty {
         if (!config.difficulty.lunarCyclesEnabled.get()) return 1.0;
         List<? extends Double> values = config.difficulty.lunarCycleMultipliers.get();
         if (values.isEmpty()) return 1.0;
-        int phase = world.func_230315_m_().func_236035_c_(world.func_241851_ab());
+        int phase = world.getDimensionType().getMoonPhase(world.func_241851_ab());
         return values.get(MathHelper.clamp(phase, 0, values.size() - 1));
     }
 

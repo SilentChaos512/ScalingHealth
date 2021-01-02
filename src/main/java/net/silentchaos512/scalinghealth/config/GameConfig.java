@@ -269,7 +269,7 @@ public class GameConfig {
                         if (dimensions.isEmpty() && biomes.isEmpty()) {
                             return false;
                         }
-                        return dimensions.stream().anyMatch(s -> s.equals(type.func_240901_a_().getPath())) && BiomeUtils.containedInList(biome, biomes, true);
+                        return dimensions.stream().anyMatch(s -> s.equals(type.getLocation().getPath())) && BiomeUtils.containedInList(biome, biomes, true);
                     })
                     .findFirst()
                     .map(c -> c.<Double>get("scale"))

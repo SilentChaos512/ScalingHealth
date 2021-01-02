@@ -79,6 +79,8 @@ public final class Config {
         public final IntValue absorptionTextOffsetY;
         public final IntValue absorptionTextColor;
 
+        //Blights
+        public final BooleanValue displayBlightEffect;
         // Difficulty
         public final BooleanValue warnWhenSleeping;
         // Difficulty Meter
@@ -265,7 +267,11 @@ public final class Config {
                     .builder("difficulty.meter.text.scale")
                     .comment("Scale of text on the difficulty meter")
                     .defineInRange(0.6, 0, Double.MAX_VALUE);
-
+            displayBlightEffect = wrapper
+                    .builder("blights.render")
+                    .comment("whether the purple flame should render on blights or not.",
+                            "This does not change whether the mob is a blight, only hides the effect.")
+                    .define(true);
             //endregion
         }
     }
@@ -275,6 +281,7 @@ public final class Config {
         public final Supplier<Boolean> debugShowOverlay;
         public final Supplier<Boolean> debugLogEntitySpawns;
         public final Supplier<Boolean> debugLogScaledDamage;
+        public final Supplier<Boolean> debugMobPotionEffects;
 
         public final BooleanValue crystalsAddHealth;
         public final BooleanValue xpAddHealth;
@@ -382,6 +389,10 @@ public final class Config {
                     .builder("debug.logEntitySpawns")
                     .comment("Log details of entity spawns, including effects of difficulty.",
                             "This creates a lot of log spam, and will likely lag the game.")
+                    .define(false));
+            debugMobPotionEffects = withMasterCheck(wrapper
+                    .builder("debug.logApplyingMobPotions")
+                    .comment("Logs details of potions effects added to mobs.")
                     .define(false));
             debugLogScaledDamage = withMasterCheck(wrapper
                     .builder("debug.logDamageScaling")

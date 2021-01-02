@@ -41,7 +41,7 @@ public class MobPotionConfig {
         if (!temp.isEmpty()) {
             EffectEntry entry = temp.get(MathUtils.nextInt(temp.size()));
             entry.applyTo(entity);
-            if (ScalingHealth.LOGGER.isDebugEnabled()) {
+            if (ScalingHealth.LOGGER.isDebugEnabled() && Config.COMMON.debugMobPotionEffects.get()) {
                 ScalingHealth.LOGGER.debug(MARKER, "Applied {} from {} effects to {}", entry, temp.size(), entity.getScoreboardName());
             }
         }
@@ -49,7 +49,7 @@ public class MobPotionConfig {
 
     public void applyAll(LivingEntity entity) {
         this.potions.get().forEach(entry -> entry.applyTo(entity));
-        if (ScalingHealth.LOGGER.isDebugEnabled()) {
+        if (ScalingHealth.LOGGER.isDebugEnabled() && Config.COMMON.debugMobPotionEffects.get()) {
             ScalingHealth.LOGGER.debug(MARKER, "Applied all {} effects to {}", potions.get().size(), entity.getScoreboardName());
         }
     }

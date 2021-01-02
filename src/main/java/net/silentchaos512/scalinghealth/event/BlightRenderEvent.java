@@ -17,6 +17,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.silentchaos512.lib.event.ClientTicks;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.utils.EnabledFeatures;
 import net.silentchaos512.scalinghealth.utils.SHDifficulty;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = ScalingHealth.MOD_ID)
@@ -26,9 +27,9 @@ public class BlightRenderEvent {
    private static final RenderType RENDER_TYPE = RenderType.getEntityCutout(TEXTURE);
 
    @SubscribeEvent
-   public static void renderBlight(RenderLivingEvent<MobEntity, ? extends EntityModel<? extends MobEntity>> event){
+   public static void renderBlight(RenderLivingEvent<MobEntity, ? extends EntityModel<? extends MobEntity>> event) {
       LivingEntity entity = event.getEntity();
-      if(entity instanceof MobEntity && SHDifficulty.affected(entity).isBlight()){
+      if(EnabledFeatures.shouldRenderBlights() && entity instanceof MobEntity && SHDifficulty.affected(entity).isBlight()){
          MatrixStack stack = event.getMatrixStack();
          int light = event.getLight();
          MobEntity mob = (MobEntity) entity;

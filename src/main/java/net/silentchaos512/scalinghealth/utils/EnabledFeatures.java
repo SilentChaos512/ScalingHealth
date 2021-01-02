@@ -64,4 +64,8 @@ public class EnabledFeatures {
     public static boolean blightsEnabled(){
         return common.enableBlights.get() && SHMobs.blightChance() > 0;
     }
+
+    public static boolean shouldRenderBlights() {
+        return Config.CLIENT.displayBlightEffect.get();
+    }
 }

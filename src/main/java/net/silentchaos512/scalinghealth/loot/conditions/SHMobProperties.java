@@ -39,7 +39,7 @@ public class SHMobProperties implements ILootCondition {
 
     @Override
     public LootConditionType func_230419_b_() {
-        return Registry.LOOT_CONDITION_TYPE.func_241873_b(NAME)
+        return Registry.LOOT_CONDITION_TYPE.getOptional(NAME)
                 .orElseThrow(() -> new RuntimeException("Loot condition type did not register for some reason"));
     }
 
@@ -59,7 +59,7 @@ public class SHMobProperties implements ILootCondition {
 
     public static class Serializer implements ILootSerializer<SHMobProperties> {
         @Override
-        public void func_230424_a_(JsonObject json, SHMobProperties value, JsonSerializationContext context) {
+        public void serialize(JsonObject json, SHMobProperties value, JsonSerializationContext context) {
             json.add("entity", context.serialize(value.target));
             json.addProperty("is_blight", value.isBlight);
             JsonObject difficultyObj = new JsonObject();
@@ -69,7 +69,7 @@ public class SHMobProperties implements ILootCondition {
         }
 
         @Override
-        public SHMobProperties func_230423_a_(JsonObject json, JsonDeserializationContext context) {
+        public SHMobProperties deserialize(JsonObject json, JsonDeserializationContext context) {
             LootContext.EntityTarget target = JSONUtils.deserializeClass(json, "entity", context, LootContext.EntityTarget.class);
             boolean isBlight = JSONUtils.getBoolean(json, "is_blight", false);
             float minDifficulty = 0;

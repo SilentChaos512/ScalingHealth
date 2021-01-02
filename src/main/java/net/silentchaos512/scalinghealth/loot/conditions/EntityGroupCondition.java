@@ -39,18 +39,18 @@ public class EntityGroupCondition implements ILootCondition {
 
    @Override
    public LootConditionType func_230419_b_() {
-      return Registry.LOOT_CONDITION_TYPE.func_241873_b(NAME)
+      return Registry.LOOT_CONDITION_TYPE.getOptional(NAME)
               .orElseThrow(() -> new RuntimeException("Loot condition type did not register for some reason"));
    }
 
    public static class Serializer implements ILootSerializer<EntityGroupCondition> {
       @Override
-      public void func_230424_a_(JsonObject json, EntityGroupCondition condition, JsonSerializationContext context) {
+      public void serialize(JsonObject json, EntityGroupCondition condition, JsonSerializationContext context) {
          json.addProperty("entity_group", condition.group.toString().toLowerCase(Locale.ROOT));
       }
 
       @Override
-      public EntityGroupCondition func_230423_a_(JsonObject json, JsonDeserializationContext context) {
+      public EntityGroupCondition deserialize(JsonObject json, JsonDeserializationContext context) {
          String group = JSONUtils.getString(json, "entity_group");
          return new EntityGroupCondition(EntityGroup.from(group));
       }
