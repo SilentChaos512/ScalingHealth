@@ -186,7 +186,7 @@ public final class DifficultyEvents {
     }
 
     private static void debug(Supplier<?> msg) {
-        if (PRINT_DEBUG_INFO && ScalingHealth.LOGGER.isDebugEnabled())
+        if (Config.COMMON.debugMaster.get())
             ScalingHealth.LOGGER.debug(MARKER, msg.get());
     }
 }
