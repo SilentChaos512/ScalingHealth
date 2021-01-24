@@ -258,13 +258,12 @@ public class DifficultyHandler {
 
         float totalDifficulty = difficulty;
 
-        float genAddedHealth = difficulty;
         float baseMaxHealth = (float) entityLiving
                 .getEntityAttribute(SharedMonsterAttributes.MAX_HEALTH).getBaseValue();
         float healthMultiplier = isHostile ? Config.Mob.Health.hostileHealthMultiplier
                 : Config.Mob.Health.peacefulHealthMultiplier;
 
-        genAddedHealth *= healthMultiplier;
+        float genAddedHealth = difficulty * healthMultiplier;
 
         if (Config.Difficulty.statsConsumeDifficulty) difficulty -= genAddedHealth;
 
@@ -300,21 +299,20 @@ public class DifficultyHandler {
 
         // Apply extra health and damage.
         float healthMulti;
-        float healthScaleDiff = Math.max(0, baseMaxHealth - 20f);
         switch (Config.Mob.Health.healthScalingMode) {
             case ADD:
                 ModifierHandler.setMaxHealth(entityLiving, genAddedHealth + baseMaxHealth, 0);
                 break;
             case MULTI:
-                healthMulti = genAddedHealth / 20f;
+                healthMulti = genAddedHealth * baseMaxHealth;
                 ModifierHandler.setMaxHealth(entityLiving, healthMulti + baseMaxHealth, 1);
                 break;
             case MULTI_HALF:
-                healthMulti = genAddedHealth / (20f + healthScaleDiff * 0.5f);
+                healthMulti = genAddedHealth * baseMaxHealth * 0.5f;
                 ModifierHandler.setMaxHealth(entityLiving, healthMulti + baseMaxHealth, 1);
                 break;
             case MULTI_QUARTER:
-                healthMulti = genAddedHealth / (20f + healthScaleDiff * 0.75f);
+                healthMulti = genAddedHealth * baseMaxHealth *  0.25f;
                 ModifierHandler.setMaxHealth(entityLiving, healthMulti + baseMaxHealth, 1);
                 break;
             default:
