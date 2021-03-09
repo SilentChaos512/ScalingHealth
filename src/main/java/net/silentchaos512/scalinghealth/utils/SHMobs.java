@@ -1,6 +1,11 @@
 package net.silentchaos512.scalinghealth.utils;
 
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MobEntity;
+import net.minecraft.tags.ITag;
+import net.silentchaos512.lib.SilentLib;
+import net.silentchaos512.lib.util.TagUtils;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.MobPotionConfig;
 import net.silentchaos512.scalinghealth.lib.MobHealthMode;
@@ -10,7 +15,7 @@ public final class SHMobs {
     private SHMobs() { throw new IllegalAccessError("Utility class"); }
 
     public static boolean allowsDifficultyChanges(MobEntity entity) {
-        return !EntityTags.DIFFICULTY_EXEMPT.contains(entity.getType());
+        return !tagContainsSafe(EntityTags.DIFFICULTY_EXEMPT, entity);
     }
 
     public static double blightChance() {
@@ -18,7 +23,7 @@ public final class SHMobs {
     }
 
     public static boolean canBecomeBlight(MobEntity entity) {
-        return EnabledFeatures.blightsEnabled() && !EntityTags.BLIGHT_EXEMPT.contains(entity.getType());
+        return EnabledFeatures.blightsEnabled() && !tagContainsSafe(EntityTags.BLIGHT_EXEMPT, entity);
     }
 
     public static boolean isBlight(MobEntity entity) {
@@ -76,4 +81,21 @@ public final class SHMobs {
     public static double maxDamageBoost() {
         return Config.GENERAL.mobs.maxDamageBoost.get();
     }
+
+    //region "tag used before bound" workaround
+
+    private static boolean tagContainsSafe(ITag.INamedTag<EntityType<?>> tag, Entity entity) {
+        return tagContainsSafe(tag, entity, true);
+    }
+
+    private static boolean tagContainsSafe(ITag.INamedTag<EntityType<?>> tag, Entity entity, boolean firstAttempt) {
+        try {
+            return tag.contains(entity.getType());
+        } catch (IllegalStateException ex) {
+            SilentLib.PROXY.tryFetchTagsHack();
+        }
+        return firstAttempt && tagContainsSafe(tag, entity, false);
+    }
+
+    //endregion
 }
