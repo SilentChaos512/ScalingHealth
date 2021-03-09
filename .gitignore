@@ -39,3 +39,5 @@ version.properties
 secret.json
 
 src/generated/resources/.cache/
+
+logs/
