@@ -5,7 +5,6 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.tags.ITag;
 import net.silentchaos512.lib.SilentLib;
-import net.silentchaos512.lib.util.TagUtils;
 import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.config.MobPotionConfig;
 import net.silentchaos512.scalinghealth.lib.MobHealthMode;

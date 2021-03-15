@@ -19,7 +19,6 @@ import net.silentchaos512.scalinghealth.lib.EntityGroup;
 import java.util.Locale;
 
 public class EntityGroupCondition implements ILootCondition {
-   public static final Serializer SERIALIZER = new Serializer();
    public static final ResourceLocation NAME = new ResourceLocation(ScalingHealth.MOD_ID, "entity_group_condition");
 
    private final EntityGroup group;
@@ -38,7 +37,7 @@ public class EntityGroupCondition implements ILootCondition {
    }
 
    @Override
-   public LootConditionType func_230419_b_() {
+   public LootConditionType getConditionType() {
       return Registry.LOOT_CONDITION_TYPE.getOptional(NAME)
               .orElseThrow(() -> new RuntimeException("Loot condition type did not register for some reason"));
    }

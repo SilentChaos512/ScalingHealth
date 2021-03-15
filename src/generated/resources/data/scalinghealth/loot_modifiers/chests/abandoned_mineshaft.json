@@ -1,0 +1,10 @@
+{
+  "conditions": [
+    {
+      "condition": "forge:loot_table_id",
+      "loot_table_id": "minecraft:chests/abandoned_mineshaft"
+    }
+  ],
+  "table": "scalinghealth:chests_addition/abandoned_mineshaft",
+  "type": "scalinghealth:table_loot_mod"
+}

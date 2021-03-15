@@ -33,15 +33,16 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public abstract class BaseLootTable extends LootTableProvider {
+public abstract class BaseLootTableGenerator extends LootTableProvider {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
-    protected final Map<Block, LootTable.Builder> lootTables = new HashMap<>();
+    protected final Map<ResourceLocation, LootTable.Builder> lootTables = new HashMap<>();
+    protected final Map<Block, LootTable.Builder> blockLootTables = new HashMap<>();
     protected final Map<EntityGroup, LootTable.Builder> mobLootTable = new HashMap<>();
     private final DataGenerator generator;
 
-    public BaseLootTable(DataGenerator dataGeneratorIn) {
+    public BaseLootTableGenerator(DataGenerator dataGeneratorIn) {
         super(dataGeneratorIn);
         this.generator = dataGeneratorIn;
     }
@@ -104,12 +105,13 @@ public abstract class BaseLootTable extends LootTableProvider {
         addTables();
 
         Map<ResourceLocation, LootTable> tables = new HashMap<>();
-        for (Map.Entry<Block, LootTable.Builder> entry : lootTables.entrySet()) {
+        for (Map.Entry<Block, LootTable.Builder> entry : blockLootTables.entrySet()) {
             tables.put(entry.getKey().getLootTable(), entry.getValue().setParameterSet(LootParameterSets.BLOCK).build());
         }
-        for(Map.Entry<EntityGroup, LootTable.Builder> entry : mobLootTable.entrySet()){
-            tables.put(ScalingHealth.getId("bonus_drops/" + entry.getKey().name().toLowerCase(Locale.ROOT)), entry.getValue().setParameterSet(LootParameterSets.GENERIC).build());
+        for(Map.Entry<EntityGroup, LootTable.Builder> entry : mobLootTable.entrySet()) {
+            tables.put(ScalingHealth.getId("bonus_drops/" + entry.getKey().name().toLowerCase(Locale.ROOT)), entry.getValue().build());
         }
+        lootTables.forEach((rl, b) -> tables.put(rl, b.build()));
         writeTables(cache, tables);
     }
 

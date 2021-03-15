@@ -31,7 +31,7 @@ public enum EntityGroup {
     public static EntityGroup from(LivingEntity entity, boolean ignoreBlightStatus) {
         if (entity instanceof PlayerEntity)
             return PLAYER;
-        if (!entity.isNonBoss())
+        if (!entity.canChangeDimension()) //TODO fix, was named "is non boss" but was wrong so no way to know if its a boss.
             return BOSS;
         if (entity instanceof IMob) {
             if (!ignoreBlightStatus && SHMobs.isBlight((MobEntity) entity))

@@ -3,7 +3,6 @@ package net.silentchaos512.scalinghealth;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.LootConditionType;
-import net.minecraft.loot.conditions.LootConditionManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.minecraftforge.api.distmarker.Dist;
@@ -11,7 +10,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DeferredWorkQueue;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
@@ -32,12 +30,10 @@ import net.silentchaos512.scalinghealth.config.Config;
 import net.silentchaos512.scalinghealth.event.DamageScaling;
 import net.silentchaos512.scalinghealth.event.PetEventHandler;
 import net.silentchaos512.scalinghealth.init.ModItems;
-import net.silentchaos512.scalinghealth.init.ModLoot;
 import net.silentchaos512.scalinghealth.loot.TableGlobalModifier;
 import net.silentchaos512.scalinghealth.loot.conditions.EntityGroupCondition;
 import net.silentchaos512.scalinghealth.loot.conditions.SHMobProperties;
 import net.silentchaos512.scalinghealth.network.Network;
-import net.silentchaos512.scalinghealth.world.SHWorldFeatures;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -67,7 +63,6 @@ public class ScalingHealth {
         MinecraftForge.EVENT_BUS.register(DamageScaling.INSTANCE);
 
         Network.init();
-        ModLoot.init();
 
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::commonSetup);
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(GlobalLootModifierSerializer.class,this::registerLootModSerializers);

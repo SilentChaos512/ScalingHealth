@@ -38,7 +38,7 @@ public class SHMobProperties implements ILootCondition {
     }
 
     @Override
-    public LootConditionType func_230419_b_() {
+    public LootConditionType getConditionType() {
         return Registry.LOOT_CONDITION_TYPE.getOptional(NAME)
                 .orElseThrow(() -> new RuntimeException("Loot condition type did not register for some reason"));
     }

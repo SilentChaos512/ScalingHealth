@@ -1,19 +1,70 @@
 package net.silentchaos512.scalinghealth.datagen;
 
+import com.google.common.collect.Lists;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.loot.*;
+import net.minecraft.loot.functions.SetCount;
+import net.minecraft.util.ResourceLocation;
+import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.init.ModBlocks;
 import net.silentchaos512.scalinghealth.init.ModItems;
 import net.silentchaos512.scalinghealth.lib.EntityGroup;
 
-public class LootTables extends BaseLootTable {
-    public LootTables(DataGenerator generator) {
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+public class LootTablesGenerator extends BaseLootTableGenerator {
+    public LootTablesGenerator(DataGenerator generator) {
         super(generator);
     }
 
+    public static final List<ResourceLocation> CHESTS = Lists.newArrayList(
+            LootTables.CHESTS_ABANDONED_MINESHAFT,
+            LootTables.CHESTS_BURIED_TREASURE,
+            LootTables.CHESTS_NETHER_BRIDGE,
+            LootTables.CHESTS_SIMPLE_DUNGEON,
+            LootTables.CHESTS_STRONGHOLD_LIBRARY,
+            LootTables.CHESTS_UNDERWATER_RUIN_BIG,
+            LootTables.CHESTS_WOODLAND_MANSION
+    );
+
+    public static final Map<ResourceLocation, ResourceLocation> VANILLA_TO_SH = CHESTS
+            .stream()
+            .collect(Collectors.toMap(Function.identity(),
+                    rl -> ScalingHealth.getId("chests_addition/" + rl.getPath().substring(rl.getPath().indexOf("/")+1))
+            ));
+
     @Override
     protected void addTables() {
-        lootTables.put(ModBlocks.HEART_CRYSTAL_ORE.asBlock(), createSilkTouchTable("heart_crystal_ore", ModBlocks.HEART_CRYSTAL_ORE.asBlock(), ModItems.HEART_CRYSTAL_SHARD.asItem()));
-        lootTables.put(ModBlocks.POWER_CRYSTAL_ORE.asBlock(), createSilkTouchTable("power_crystal_ore", ModBlocks.POWER_CRYSTAL_ORE.asBlock(), ModItems.POWER_CRYSTAL_SHARD.asItem()));
+        blockLootTables.put(ModBlocks.HEART_CRYSTAL_ORE.asBlock(),
+                createSilkTouchTable("heart_crystal_ore", ModBlocks.HEART_CRYSTAL_ORE.asBlock(), ModItems.HEART_CRYSTAL_SHARD.asItem()));
+        blockLootTables.put(ModBlocks.POWER_CRYSTAL_ORE.asBlock(),
+                createSilkTouchTable("power_crystal_ore", ModBlocks.POWER_CRYSTAL_ORE.asBlock(), ModItems.POWER_CRYSTAL_SHARD.asItem()));
+
+        LootTable.Builder builder = LootTable.builder().addLootPool(
+                new LootPool.Builder()
+                        .rolls(new RandomValueRange(1))
+                        .addEntry(ItemLootEntry.builder(ModItems.HEART_CRYSTAL)
+                                .weight(3).quality(2)
+                                .acceptFunction(SetCount.builder(new RandomValueRange(1,2)))
+                        ).addEntry(ItemLootEntry.builder(ModItems.CURSED_HEART)
+                        .weight(1).quality(5)
+                        .acceptFunction(SetCount.builder(new RandomValueRange(1, 3)))
+                ).addEntry(ItemLootEntry.builder(ModItems.ENCHANTED_HEART)
+                        .weight(1).quality(5)
+                        .acceptFunction(SetCount.builder(new RandomValueRange(1, 3)))
+                ).addEntry(ItemLootEntry.builder(ModItems.CHANCE_HEART)
+                        .weight(1).quality(5)
+                        .acceptFunction(SetCount.builder(new RandomValueRange(1, 3)))
+                ).addEntry(ItemLootEntry.builder(ModItems.POWER_CRYSTAL)
+                        .weight(2).quality(7)
+                        .acceptFunction(SetCount.builder(new RandomValueRange(1, 2)))
+                ).addEntry(EmptyLootEntry.func_216167_a().weight(10)));
+
+        VANILLA_TO_SH.values().forEach(rl -> lootTables.put(rl, builder));
+
         mobLootTable.put(EntityGroup.HOSTILE,
                 createSHDropsTable(
                         createSHDropsPool("crystals", 1,

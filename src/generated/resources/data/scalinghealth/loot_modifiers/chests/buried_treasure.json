@@ -1,0 +1,10 @@
+{
+  "conditions": [
+    {
+      "condition": "forge:loot_table_id",
+      "loot_table_id": "minecraft:chests/buried_treasure"
+    }
+  ],
+  "table": "scalinghealth:chests_addition/buried_treasure",
+  "type": "scalinghealth:table_loot_mod"
+}

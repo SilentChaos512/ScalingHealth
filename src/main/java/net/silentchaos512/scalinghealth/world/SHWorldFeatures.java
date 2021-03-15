@@ -48,7 +48,7 @@ public class SHWorldFeatures {
                             OreFeatureConfig.FillerBlockType.BASE_STONE_OVERWORLD,
                             block.asBlockState(),
                             size
-                    )).range(height).square().func_242731_b(count)
+                    )).range(height).square().count(count)
             ));
             this.test = test;
         }

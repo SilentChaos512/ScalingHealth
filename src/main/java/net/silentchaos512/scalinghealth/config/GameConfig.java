@@ -278,7 +278,7 @@ public class GameConfig {
 
         @SuppressWarnings("ChainOfInstanceofChecks")
         public Expression getDefaultKillMutator(LivingEntity entity) {
-            if (!entity.isNonBoss())
+            if (!entity.canChangeDimension()) //TODO fix, was named "is non boss" but was wrong so no way to know if its a boss.
                 return onBossKilled.get();
             if (entity instanceof MobEntity && SHMobs.isBlight((MobEntity) entity))
                 return onBlightKilled.get();

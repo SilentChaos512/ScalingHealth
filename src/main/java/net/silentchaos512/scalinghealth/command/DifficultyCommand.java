@@ -108,9 +108,9 @@ public final class DifficultyCommand {
         // Area mode
         ITextComponent modeText = new StringTextComponent(" (")
                 .mergeStyle(TextFormatting.GRAY)
-                .append(SHDifficulty.areaMode().getDisplayName())
+                .appendSibling(SHDifficulty.areaMode().getDisplayName())
                 .appendString(")");
-        areaText.append(modeText);
+        areaText.appendSibling(modeText);
         context.getSource().sendFeedback(areaText, true);
         return 1;
     }

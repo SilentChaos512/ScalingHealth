@@ -2,11 +2,11 @@ package net.silentchaos512.scalinghealth.loot;
 
 import com.google.gson.JsonObject;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.loot.LootContext;
 import net.minecraft.loot.TableLootEntry;
 import net.minecraft.loot.conditions.ILootCondition;
+import net.minecraft.util.JSONUtils;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.common.loot.LootModifier;
 import net.silentchaos512.scalinghealth.item.DifficultyMutatorItem;
