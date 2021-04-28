@@ -8,9 +8,9 @@ import net.minecraftforge.fml.network.NetworkDirection;
 import net.silentchaos512.scalinghealth.event.PlayerBonusRegenHandler;
 import net.silentchaos512.scalinghealth.network.ClientSyncMessage;
 import net.silentchaos512.scalinghealth.network.Network;
-import net.silentchaos512.scalinghealth.utils.SHDifficulty;
-import net.silentchaos512.scalinghealth.utils.SHItems;
-import net.silentchaos512.scalinghealth.utils.SHPlayers;
+import net.silentchaos512.scalinghealth.utils.config.SHDifficulty;
+import net.silentchaos512.scalinghealth.utils.config.SHItems;
+import net.silentchaos512.scalinghealth.utils.config.SHPlayers;
 
 public interface IPlayerData {
     int getBonusHearts(PlayerEntity player);

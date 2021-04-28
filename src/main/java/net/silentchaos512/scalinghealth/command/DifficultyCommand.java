@@ -13,7 +13,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.text.*;
 import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
 import net.silentchaos512.scalinghealth.capability.IDifficultySource;
-import net.silentchaos512.scalinghealth.utils.SHDifficulty;
+import net.silentchaos512.scalinghealth.utils.config.SHDifficulty;
 
 public final class DifficultyCommand {
     private DifficultyCommand() {}
@@ -107,10 +107,9 @@ public final class DifficultyCommand {
 
         // Area mode
         ITextComponent modeText = new StringTextComponent(" (")
-                .mergeStyle(TextFormatting.GRAY)
-                .append(SHDifficulty.areaMode().getDisplayName())
+                .appendSibling(new TranslationTextComponent("scalinghealth.modes.difficulty." + SHDifficulty.areaMode().getName()).mergeStyle(TextFormatting.GRAY))
                 .appendString(")");
-        areaText.append(modeText);
+        areaText.appendSibling(modeText);
         context.getSource().sendFeedback(areaText, true);
         return 1;
     }

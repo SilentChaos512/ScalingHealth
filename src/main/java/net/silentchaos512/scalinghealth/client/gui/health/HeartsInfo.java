@@ -5,7 +5,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.potion.Effects;
 import net.minecraft.util.math.MathHelper;
 import net.silentchaos512.lib.event.ClientTicks;
-import net.silentchaos512.scalinghealth.config.Config;
+import net.silentchaos512.scalinghealth.config.SHConfig;
 
 import java.util.Random;
 
@@ -29,8 +29,8 @@ class HeartsInfo {
     private final int[] lowHealthBob = new int[10];
     private int regenTimer;
     // Configs
-    HeartIconStyle heartStyle = Config.CLIENT.heartIconStyle.get();
-    AbsorptionIconStyle absorptionStyle = Config.CLIENT.absorptionIconStyle.get();
+    HeartIconStyle heartStyle = SHConfig.CLIENT.heartIconStyle.get();
+    AbsorptionIconStyle absorptionStyle = SHConfig.CLIENT.absorptionIconStyle.get();
     // Other
     private final Random random = new Random();
     int scaledWindowWidth;
@@ -63,8 +63,8 @@ class HeartsInfo {
         for (int i = 0; i < lowHealthBob.length; ++i) lowHealthBob[i] = random.nextInt(2);
         regenTimer = player.isPotionActive(Effects.REGENERATION) ? updateCounter % 20 : -1;
 
-        heartStyle = Config.CLIENT.heartIconStyle.get();
-        absorptionStyle = Config.CLIENT.absorptionIconStyle.get();
+        heartStyle = SHConfig.CLIENT.heartIconStyle.get();
+        absorptionStyle = SHConfig.CLIENT.absorptionIconStyle.get();
     }
 
     private boolean hasLowHealth() {

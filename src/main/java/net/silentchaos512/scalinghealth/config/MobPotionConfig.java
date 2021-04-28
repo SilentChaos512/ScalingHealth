@@ -9,7 +9,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.lib.util.TimeUtils;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.lib.EntityGroup;
+import net.silentchaos512.scalinghealth.utils.EntityGroup;
 import net.silentchaos512.utils.Lazy;
 import net.silentchaos512.utils.MathUtils;
 import net.silentchaos512.utils.config.ConfigSpecWrapper;
@@ -41,7 +41,7 @@ public class MobPotionConfig {
         if (!temp.isEmpty()) {
             EffectEntry entry = temp.get(MathUtils.nextInt(temp.size()));
             entry.applyTo(entity);
-            if (ScalingHealth.LOGGER.isDebugEnabled() && Config.COMMON.debugMobPotionEffects.get()) {
+            if (ScalingHealth.LOGGER.isDebugEnabled() && SHConfig.SERVER.debugMobPotionEffects.get()) {
                 ScalingHealth.LOGGER.debug(MARKER, "Applied {} from {} effects to {}", entry, temp.size(), entity.getScoreboardName());
             }
         }
@@ -49,7 +49,7 @@ public class MobPotionConfig {
 
     public void applyAll(LivingEntity entity) {
         this.potions.get().forEach(entry -> entry.applyTo(entity));
-        if (ScalingHealth.LOGGER.isDebugEnabled() && Config.COMMON.debugMobPotionEffects.get()) {
+        if (ScalingHealth.LOGGER.isDebugEnabled() && SHConfig.SERVER.debugMobPotionEffects.get()) {
             ScalingHealth.LOGGER.debug(MARKER, "Applied all {} effects to {}", potions.get().size(), entity.getScoreboardName());
         }
     }

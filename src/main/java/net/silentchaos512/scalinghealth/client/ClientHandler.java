@@ -4,9 +4,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.minecraftforge.fml.network.NetworkEvent;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.lib.AreaDifficultyMode;
 import net.silentchaos512.scalinghealth.network.ClientLoginMessage;
 import net.silentchaos512.scalinghealth.network.ClientSyncMessage;
+import net.silentchaos512.scalinghealth.utils.mode.AreaDifficultyMode;
+import net.silentchaos512.scalinghealth.utils.mode.AreaDifficultyModes;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
@@ -24,7 +25,7 @@ public final class ClientHandler {
     public static int regenTimer;
     public static int locationMultiPercent;
     // Infrequent updates (join server/world, travel to new dimension)
-    public static AreaDifficultyMode areaMode = AreaDifficultyMode.WEIGHTED_AVERAGE;
+    public static AreaDifficultyMode areaMode = AreaDifficultyModes.ServerWide.INSTANCE;
     public static float maxDifficultyValue;
 
     private ClientHandler() {}
@@ -56,7 +57,7 @@ public final class ClientHandler {
         ScalingHealth.LOGGER.info(MARKER, "Processing login packet");
         areaMode = msg.areaMode;
         maxDifficultyValue = msg.maxDifficultyValue;
-        ScalingHealth.LOGGER.info(MARKER, "World area mode: {}", areaMode.getDisplayName().getUnformattedComponentText());
+        ScalingHealth.LOGGER.info(MARKER, "World area mode: {}", areaMode.getName());
         ScalingHealth.LOGGER.info(MARKER, "World max difficulty: {}", maxDifficultyValue);
     }
 }

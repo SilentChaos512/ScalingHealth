@@ -8,11 +8,11 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.config.Config;
+import net.silentchaos512.scalinghealth.config.SHConfig;
 import net.silentchaos512.scalinghealth.event.DifficultyEvents;
 import net.silentchaos512.scalinghealth.utils.MobDifficultyHandler;
-import net.silentchaos512.scalinghealth.utils.SHDifficulty;
-import net.silentchaos512.scalinghealth.utils.SHMobs;
+import net.silentchaos512.scalinghealth.utils.config.SHDifficulty;
+import net.silentchaos512.scalinghealth.utils.config.SHMobs;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -68,7 +68,7 @@ public class DifficultyAffectedCapability implements IDifficultyAffected, ICapab
             MobDifficultyHandler.process(entity, this);
             processed = true;
 
-            if (ScalingHealth.LOGGER.isDebugEnabled() && Config.COMMON.debugLogEntitySpawns.get()) {
+            if (ScalingHealth.LOGGER.isDebugEnabled() && SHConfig.SERVER.debugLogEntitySpawns.get()) {
                 ScalingHealth.LOGGER.debug(DifficultyEvents.MARKER, "Processed {} -> difficulty={}, isBlight={}", entity, difficulty, blight);
             }
         }

@@ -6,8 +6,8 @@ import net.minecraft.client.entity.player.ClientPlayerEntity;
 import net.silentchaos512.lib.client.gui.DebugRenderOverlay;
 import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
 import net.silentchaos512.scalinghealth.client.ClientHandler;
-import net.silentchaos512.scalinghealth.config.Config;
-import net.silentchaos512.scalinghealth.utils.SHDifficulty;
+import net.silentchaos512.scalinghealth.config.SHConfig;
+import net.silentchaos512.scalinghealth.utils.config.SHDifficulty;
 import net.silentchaos512.utils.Anchor;
 
 import javax.annotation.Nonnull;
@@ -28,7 +28,7 @@ public class DebugOverlay extends DebugRenderOverlay {
 
         return ImmutableList.of(
                 "Difficulty (/" + ClientHandler.maxDifficultyValue + ")",
-                "- Mode=" + ClientHandler.areaMode.getDisplayName().getUnformattedComponentText(),
+                "- Mode=" + ClientHandler.areaMode.getName(),
                 "- Player=" + String.format(FLOAT_FORMAT, ClientHandler.playerDifficulty),
                 "- Server=" + String.format(FLOAT_FORMAT, DifficultySourceCapability.getOverworldCap().orElseGet(DifficultySourceCapability::new).getDifficulty()),
                 "- Area=" + String.format(FLOAT_FORMAT + " (x%.1f, ☽x%.1f)",
@@ -48,11 +48,11 @@ public class DebugOverlay extends DebugRenderOverlay {
 
     @Override
     public boolean isHidden() {
-        return !Config.COMMON.debugShowOverlay.get();
+        return !SHConfig.SERVER.debugShowOverlay.get();
     }
 
     @Override
     public Anchor getAnchorPoint() {
-        return Config.CLIENT.debugOverlayAnchor.get();
+        return SHConfig.CLIENT.debugOverlayAnchor.get();
     }
 }

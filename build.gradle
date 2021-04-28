@@ -1,37 +1,31 @@
 buildscript {
     repositories {
-        maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = 'https://maven.minecraftforge.net/' }
         jcenter()
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
     }
 }
 
 plugins {
-    id 'io.franzbecker.gradle-lombok' version '2.0'
+    id 'eclipse'
     id 'maven'
     id 'maven-publish'
-    id "com.jfrog.bintray" version "1.8.4"
-    id "com.matthewprenger.cursegradle" version "1.4.0"
+    id 'com.matthewprenger.cursegradle' version '1.4.0'
 }
 
 apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'eclipse'
 
 repositories {
-    flatDir {
-        name "fileRepo"
-        dirs "repo"
-    }
+    maven { url = 'https://maven.minecraftforge.net/' }
     mavenLocal()
     jcenter()
 }
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
-    options.compilerArgs = ['-Xlint:deprecation']
 }
 
 javadoc {
@@ -43,8 +37,6 @@ def versionInfo = getModVersion()
 System.out.println(versionInfo)
 version = "${versionInfo['version']}"
 def version_short = "${versionInfo['version_short']}"
-
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
@@ -82,12 +74,11 @@ minecraft {
     }
 }
 
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
 repositories {
     jcenter()
     mavenLocal()
-    maven {
-        url 'https://www.dogforce-games.com/maven/'
-    }
     maven {
         url  "https://dl.bintray.com/silentchaos512/silent-lib"
     }
@@ -210,6 +201,7 @@ curseforge {
                 }
             }
         }
+        curseGradleOptions.debug = true
     }
 }
 
@@ -323,8 +315,6 @@ task incrementBuild {
     }
 }
 
-build.finalizedBy incrementBuild // only increment on successful builds
-
 import groovy.json.JsonOutput
 
 def writeUpdateJson() {
@@ -349,4 +339,11 @@ task createUpdateJson {
     }
 }
 
-build.finalizedBy createUpdateJson
+tasks.configureEach { task ->
+    if (task.name == 'curseforge' + project.cf_project_id) {
+        task.finalizedBy {
+            incrementBuild
+            createUpdateJson
+        }
+    }
+}

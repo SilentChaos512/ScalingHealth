@@ -1,6 +1,6 @@
 package net.silentchaos512.scalinghealth.client.gui.health;
 
-import net.silentchaos512.scalinghealth.config.Config;
+import net.silentchaos512.scalinghealth.config.SHConfig;
 
 public enum HealthTextStyle {
     DISABLED(1f) {
@@ -38,6 +38,6 @@ public enum HealthTextStyle {
     public abstract String textFor(float current, float max);
 
     public double getScale() {
-        return scale * Config.CLIENT.healthTextScale.get();
+        return scale * SHConfig.CLIENT.healthTextScale.get();
     }
 }

@@ -13,11 +13,13 @@ import net.minecraftforge.fml.network.PacketDistributor;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
 import net.silentchaos512.scalinghealth.event.BlightHandler;
-import net.silentchaos512.scalinghealth.event.ScalingHealthCommonEvents;
-import net.silentchaos512.scalinghealth.lib.EntityGroup;
-import net.silentchaos512.scalinghealth.lib.MobHealthMode;
+import net.silentchaos512.scalinghealth.event.CommonEvents;
 import net.silentchaos512.scalinghealth.network.ClientBlightMessage;
 import net.silentchaos512.scalinghealth.network.Network;
+import net.silentchaos512.scalinghealth.utils.config.EnabledFeatures;
+import net.silentchaos512.scalinghealth.utils.config.SHDifficulty;
+import net.silentchaos512.scalinghealth.utils.config.SHMobs;
+import net.silentchaos512.scalinghealth.utils.mode.MobHealthMode;
 import net.silentchaos512.utils.MathUtils;
 
 public final class MobDifficultyHandler {
@@ -34,7 +36,7 @@ public final class MobDifficultyHandler {
         double chance = getBlightChance(difficulty);
         if(chance == 1)    return true;
 
-        return MathUtils.tryPercentage(ScalingHealth.random, chance);
+        return MathUtils.tryPercentage(ScalingHealth.RANDOM, chance);
     }
 
     private static double getBlightChance(float difficulty) {
@@ -59,13 +61,13 @@ public final class MobDifficultyHandler {
         }
 
         //Get difficulty after making blight or not. This will determine if a blight's diff is multiplied
-        final float difficulty = data.affectiveDifficulty(); if(difficulty <= 0) return;
+        final float difficulty = data.affectiveDifficulty();
+        if(difficulty <= 0) return;
 
         // Random potion effect
-        SHMobs.getMobPotionConfig().tryApply(entity, difficulty);
+        SHMobs.getMobEffects().forEach(c -> c.apply(entity, difficulty));
 
-        if(EnabledFeatures.mobHpIncreaseEnabled()){
-
+        if(EnabledFeatures.mobHpIncreaseEnabled()) {
             double healthBoost = difficulty;
             ModifiableAttributeInstance attributeMaxHealth = entity.getAttribute(Attributes.MAX_HEALTH);
             double baseMaxHealth = attributeMaxHealth.getBaseValue();
@@ -75,25 +77,23 @@ public final class MobDifficultyHandler {
 
             healthBoost *= healthMultiplier;
 
-            double diffIncrease = 2 * healthMultiplier * difficulty * ScalingHealth.random.nextFloat();
-            healthBoost += diffIncrease;
+            healthBoost += 2 * healthMultiplier * difficulty * ScalingHealth.RANDOM.nextFloat();;
 
-            if(ScalingHealthCommonEvents.spawnerSpawns.contains(entity.getUniqueID())){
-                healthBoost *= SHMobs.spawnerHealth();
-                ScalingHealthCommonEvents.spawnerSpawns.remove(entity.getUniqueID());
+            if(CommonEvents.spawnerSpawns.contains(entity.getUniqueID())){
+                healthBoost *= SHMobs.spawnerModifier();
+                CommonEvents.spawnerSpawns.remove(entity.getUniqueID());
             }
 
             // Apply extra health and damage.
-            MobHealthMode mode = EntityGroup.from(entity).getHealthMode();
-            double healthModAmount = mode.getModifierValue(healthBoost, baseMaxHealth);
-            ModifierHandler.setMaxHealth(entity, healthModAmount, mode.getOperator());
+            MobHealthMode mode = SHMobs.getHealthMode();
+            ModifierHandler.setMaxHealth(entity, mode.getModifierHealth(healthBoost, baseMaxHealth), mode.getOp());
         }
 
         // Increase attack damage.
-        if(EnabledFeatures.mobDamageIncreaseEnabled()){
+        if(EnabledFeatures.mobDamageIncreaseEnabled()) {
             double damageBoost;
 
-            float diffIncrease = difficulty * ScalingHealth.random.nextFloat();
+            float diffIncrease = difficulty * ScalingHealth.RANDOM.nextFloat();
             damageBoost = diffIncrease * SHMobs.damageBoostScale();
             // Clamp the value so it doesn't go over the maximum config.
             double max = SHMobs.maxDamageBoost();

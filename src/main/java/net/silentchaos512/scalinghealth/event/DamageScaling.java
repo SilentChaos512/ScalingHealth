@@ -18,38 +18,42 @@
 
 package net.silentchaos512.scalinghealth.event;
 
+import com.mojang.datafixers.util.Pair;
+import com.mojang.serialization.Codec;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.DamageSource;
+import net.minecraft.util.IStringSerializable;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.config.Config;
-import net.silentchaos512.scalinghealth.config.GameConfig;
-import net.silentchaos512.scalinghealth.lib.EntityGroup;
-import net.silentchaos512.scalinghealth.utils.EnabledFeatures;
-import net.silentchaos512.scalinghealth.utils.SHDifficulty;
+import net.silentchaos512.scalinghealth.config.SHConfig;
+import net.silentchaos512.scalinghealth.resources.mechanics.DamageScalingMechanics;
+import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanicListener;
+import net.silentchaos512.scalinghealth.utils.EntityGroup;
+import net.silentchaos512.scalinghealth.utils.config.EnabledFeatures;
+import net.silentchaos512.scalinghealth.utils.config.SHDifficulty;
+import net.silentchaos512.scalinghealth.utils.config.SHPlayers;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+@Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID)
 public final class DamageScaling {
     private static final Marker MARKER = MarkerManager.getMarker("DamageScaling");
 
-    public static final DamageScaling INSTANCE = new DamageScaling();
-
-    private final Set<UUID> entityAttackedThisTick = new HashSet<>();
-
-    private DamageScaling() {}
+    private static final Set<UUID> ENTITY_ATTACKED_THIS_TICK = new HashSet<>();
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public void onEntityHurt(LivingAttackEvent event) {
+    public static void onEntityHurt(LivingAttackEvent event) {
         if(!EnabledFeatures.mobDamageScalingEnabled() && !EnabledFeatures.playerDamageScalingEnabled()) return;
         LivingEntity entity = event.getEntityLiving();
         if (entity.world.isRemote) return;
@@ -58,14 +62,20 @@ public final class DamageScaling {
             return;
 
         // Check entity has already been processed from original event, or is not allowed to be affected
-        if (entityAttackedThisTick.contains(entity.getUniqueID()) || !EntityGroup.from(entity).isAffectedByDamageScaling())
+        if (ENTITY_ATTACKED_THIS_TICK.contains(entity.getUniqueID()) || !EntityGroup.from(entity).isAffectedByDamageScaling())
             return;
 
         DamageSource source = event.getSource();
         if (source == null) return;
 
         // Get scaling factor from map, if it exists. Otherwise, use the generic scale.
-        float scale = (float) Config.GENERAL.damageScaling.getScale(source.getDamageType());
+        float scale = SHMechanicListener.getDamageScalingMechanics().scales
+                .stream()
+                .filter(p -> p.getFirst().contains(source.getDamageType()))
+                .map(Pair::getSecond)
+                .reduce((s1, s2) -> s1 * s2)
+                .orElseGet(() -> SHMechanicListener.getDamageScalingMechanics().genericScale)
+                .floatValue();
 
         // Get the amount of the damage to affect. Can be many times the base value.
         final float affectedAmount = (float) getEffectScale(entity);
@@ -78,29 +88,34 @@ public final class DamageScaling {
             final float newAmount = makeSane(event.getAmount() + change);
 
             event.setCanceled(true);
-            entityAttackedThisTick.add(entity.getUniqueID());
+            ENTITY_ATTACKED_THIS_TICK.add(entity.getUniqueID());
             entity.attackEntityFrom(event.getSource(), newAmount);
 
-            if (Config.COMMON.debugLogScaledDamage.get()) {
-                ScalingHealth.LOGGER.info(MARKER, "{} on {}: {} -> {} (scale={}, affected={}, change={})",
+            if (SHConfig.SERVER.debugLogScaledDamage.get()) {
+                ScalingHealth.LOGGER.debug(MARKER, "{} on {}: {} -> {} (scale={}, affected={}, change={})",
                         source.damageType, entity.getScoreboardName(), original, newAmount, scale, affectedAmount, change);
             }
         }
     }
 
     private static double getEffectScale(LivingEntity entity) {
-        GameConfig config = Config.GENERAL;
-        Mode mode = config.damageScaling.mode.get();
+        DamageScalingMechanics config = SHMechanicListener.getDamageScalingMechanics();
+        Mode mode = config.mode;
         switch (mode) {
             case AREA_DIFFICULTY:
-                return SHDifficulty.areaDifficulty(entity.world, entity.getPosition()) * config.damageScaling.difficultyWeight.get();
+                return SHDifficulty.areaDifficulty(entity.world, entity.getPosition()) * config.difficultyWeight;
             case MAX_HEALTH:
+                ModifiableAttributeInstance attr = entity.getAttribute(Attributes.MAX_HEALTH);
+                if (attr == null) {
+                    ScalingHealth.LOGGER.warn("Living Entity {} has no max health attribute", entity.getType().getRegistryName());
+                    return 1;
+                }
                 double baseHealth = entity instanceof PlayerEntity
-                        ? config.player.startingHealth.get()
-                        : entity.getAttribute(Attributes.MAX_HEALTH).getBaseValue();
+                        ? SHPlayers.startingHealth()
+                        : attr.getBaseValue();
                 return (entity.getMaxHealth() - baseHealth) / baseHealth;
             case DIFFICULTY:
-                return SHDifficulty.getDifficultyOf(entity) * config.damageScaling.difficultyWeight.get();
+                return SHDifficulty.getDifficultyOf(entity) * config.difficultyWeight;
             default:
                 throw new IllegalStateException("Unknown damage scaling mode: " + mode);
         }
@@ -116,13 +131,22 @@ public final class DamageScaling {
     }
 
     @SubscribeEvent
-    public void onServerTick(TickEvent.ServerTickEvent event) {
-        entityAttackedThisTick.clear();
+    public static void onServerTick(TickEvent.ServerTickEvent event) {
+        ENTITY_ATTACKED_THIS_TICK.clear();
     }
 
-    public enum Mode {
+    public enum Mode implements IStringSerializable {
         MAX_HEALTH,
         DIFFICULTY,
-        AREA_DIFFICULTY
+        AREA_DIFFICULTY;
+
+        private static final Map<String, Mode> BY_NAME = Arrays.stream(values())
+                .collect(Collectors.toMap(Mode::getString, Function.identity()));
+        public static final Codec<Mode> CODEC = IStringSerializable.createEnumCodec(Mode::values, BY_NAME::get);
+
+        @Override
+        public String getString() {
+            return name();
+        }
     }
 }

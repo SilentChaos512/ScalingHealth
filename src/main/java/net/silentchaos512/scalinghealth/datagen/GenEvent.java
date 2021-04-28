@@ -12,8 +12,10 @@ public class GenEvent {
     public static void gatherData(GatherDataEvent event) {
         DataGenerator generator = event.getGenerator();
         generator.addProvider(new Recipes(generator));
-        generator.addProvider(new LootTables(generator));
+        generator.addProvider(new LootTablesGenerator(generator));
         generator.addProvider(new SHEntityTags(event));
         generator.addProvider(new LootModifierGen(event.getGenerator()));
+        generator.addProvider(new EnglishLocalization(event.getGenerator()));
+        generator.addProvider(new BlockStateGen(event));
     }
 }

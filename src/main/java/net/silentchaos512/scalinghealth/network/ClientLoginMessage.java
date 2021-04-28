@@ -1,7 +1,7 @@
 package net.silentchaos512.scalinghealth.network;
 
-import io.netty.buffer.ByteBuf;
-import net.silentchaos512.scalinghealth.lib.AreaDifficultyMode;
+import net.minecraft.network.PacketBuffer;
+import net.silentchaos512.scalinghealth.utils.mode.AreaDifficultyMode;
 
 public class ClientLoginMessage {
     public AreaDifficultyMode areaMode;
@@ -14,15 +14,23 @@ public class ClientLoginMessage {
         this.maxDifficultyValue = maxDifficultyValue;
     }
 
-    public static ClientLoginMessage fromBytes(ByteBuf buf) {
+    public static ClientLoginMessage fromBytes(PacketBuffer buf) {
         ClientLoginMessage msg = new ClientLoginMessage();
-        msg.areaMode = AreaDifficultyMode.fromOrdinal(buf.readByte());
+        try {
+            msg.areaMode = buf.func_240628_a_(AreaDifficultyMode.CODEC);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to receive difficulty mode packet!", e);
+        }
         msg.maxDifficultyValue = buf.readFloat();
         return msg;
     }
 
-    public void toBytes(ByteBuf buf) {
-        buf.writeByte(areaMode.ordinal());
+    public void toBytes(PacketBuffer buf) {
+        try {
+            buf.func_240629_a_(AreaDifficultyMode.CODEC, areaMode);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to send difficulty mode packet!", e);
+        }
         buf.writeFloat(maxDifficultyValue);
     }
 }

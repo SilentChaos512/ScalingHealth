@@ -23,7 +23,7 @@ public class TextureSlice {
         float r = ((color >> 16) & 255) / 255f;
         float g = ((color >> 8) & 255) / 255f;
         float b = (color & 255) / 255f;
-        RenderSystem.color4f(r, g, b, a); //TODO figure out what to use properly.
+        RenderSystem.color4f(r, g, b, a);
         gui.blit(stack, x, y, texU, texV, width, height);
         RenderSystem.color4f(1, 1, 1, 1);
     }
