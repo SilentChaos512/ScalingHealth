@@ -6,7 +6,7 @@ public interface IDifficultySource {
      *
      * @return The source's difficulty
      */
-    float getDifficulty();
+    float getDifficulty(); //TODO change to double when updating to 1.17.
 
     void setExempt(boolean exempt);
 

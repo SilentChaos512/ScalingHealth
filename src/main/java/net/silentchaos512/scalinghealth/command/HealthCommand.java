@@ -14,8 +14,8 @@ import net.minecraft.util.text.IFormattableTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.silentchaos512.scalinghealth.capability.IPlayerData;
-import net.silentchaos512.scalinghealth.utils.SHItems;
-import net.silentchaos512.scalinghealth.utils.SHPlayers;
+import net.silentchaos512.scalinghealth.utils.config.SHItems;
+import net.silentchaos512.scalinghealth.utils.config.SHPlayers;
 
 public final class HealthCommand {
     private HealthCommand() {}

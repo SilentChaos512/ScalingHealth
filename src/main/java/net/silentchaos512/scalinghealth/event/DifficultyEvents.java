@@ -24,10 +24,10 @@ import net.silentchaos512.scalinghealth.capability.DifficultyAffectedCapability;
 import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
 import net.silentchaos512.scalinghealth.capability.PetHealthCapability;
 import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
-import net.silentchaos512.scalinghealth.config.Config;
-import net.silentchaos512.scalinghealth.utils.EnabledFeatures;
-import net.silentchaos512.scalinghealth.utils.SHDifficulty;
-import net.silentchaos512.scalinghealth.utils.SHPlayers;
+import net.silentchaos512.scalinghealth.config.SHConfig;
+import net.silentchaos512.scalinghealth.utils.config.EnabledFeatures;
+import net.silentchaos512.scalinghealth.utils.config.SHDifficulty;
+import net.silentchaos512.scalinghealth.utils.config.SHPlayers;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
@@ -64,7 +64,7 @@ public final class DifficultyEvents {
     @SubscribeEvent
     public static void onAttachWorldCapabilities(AttachCapabilitiesEvent<World> event) {
         World world = event.getObject();
-        if (Config.COMMON.enableDifficulty.get() && DifficultySourceCapability.canAttachTo(world)) {
+        if (SHConfig.SERVER.enableDifficulty.get() && DifficultySourceCapability.canAttachTo(world)) {
             debug(()->"attach source to world");
             DifficultySourceCapability cap = new DifficultySourceCapability();
             event.addCapability(DifficultySourceCapability.NAME, cap);
@@ -90,10 +90,7 @@ public final class DifficultyEvents {
 
         // Tick difficulty source, such as players, except if exempted
         if (entity instanceof PlayerEntity && entity.world.getGameTime() % 20 == 0) {
-            entity.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source->{
-                boolean exempt = SHDifficulty.isPlayerExempt((PlayerEntity) event.getEntityLiving());
-                source.setExempt(exempt);
-                if(exempt) return;
+            entity.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source-> {
                 source.addDifficulty((float) SHDifficulty.changePerSecond());
             });
         }
@@ -186,7 +183,7 @@ public final class DifficultyEvents {
     }
 
     private static void debug(Supplier<?> msg) {
-        if (Config.COMMON.debugMaster.get())
+        if (SHConfig.SERVER.debugMaster.get())
             ScalingHealth.LOGGER.debug(MARKER, msg.get());
     }
 }

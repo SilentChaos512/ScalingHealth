@@ -3,7 +3,7 @@ package net.silentchaos512.scalinghealth.datagen;
 import net.minecraft.data.EntityTypeTagsProvider;
 import net.minecraftforge.fml.event.lifecycle.GatherDataEvent;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.tags.EntityTags;
+import net.silentchaos512.scalinghealth.resources.tags.EntityTags;
 
 import static net.minecraft.entity.EntityType.*;
 

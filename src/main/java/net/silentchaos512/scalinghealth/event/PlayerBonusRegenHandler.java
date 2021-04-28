@@ -19,6 +19,8 @@
 package net.silentchaos512.scalinghealth.event;
 
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.ai.attributes.Attributes;
+import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -26,8 +28,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.config.RegenConfig;
-import net.silentchaos512.scalinghealth.utils.SHPlayers;
+import net.silentchaos512.scalinghealth.resources.mechanics.PlayerMechanics;
+import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanicListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -51,22 +53,22 @@ public final class PlayerBonusRegenHandler {
         if (event.side == LogicalSide.CLIENT) return;
 
         PlayerEntity player = event.player;
-        RegenConfig config = SHPlayers.getRegenConfig();
+        PlayerMechanics.RegenMechanics config = SHMechanicListener.getPlayerMechanics().regenMechanics;
 
         UUID uuid = player.getUniqueID();
 
         // Add player timer if needed.
         if (!TIMERS.containsKey(uuid)) {
-            TIMERS.put(uuid, config.getInitialDelay());
+            TIMERS.put(uuid, (int) (config.initialDelay * 20));
         }
 
-        if (config.isActive(player)) {
+        if (isActive(player)) {
             // Tick timer, heal player and reset on 0.
             int timer = TIMERS.get(uuid);
             if (--timer <= 0) {
-                player.heal(config.getHealTickAmount(player));
-                player.addExhaustion(config.getExhaustion());
-                timer = config.getTickDelay();
+                player.heal(getHealTickAmount(player));
+                player.addExhaustion((float) config.exhaustion);
+                timer = (int) (20 * config.tickDelay);
             }
             TIMERS.put(uuid, timer);
         }
@@ -76,7 +78,39 @@ public final class PlayerBonusRegenHandler {
     public static void onPlayerHurt(LivingHurtEvent event) {
         LivingEntity entity = event.getEntityLiving();
         if (!entity.world.isRemote && entity instanceof PlayerEntity) {
-            TIMERS.put(entity.getUniqueID(), SHPlayers.getRegenConfig().getInitialDelay());
+            TIMERS.put(entity.getUniqueID(), (int) (SHMechanicListener.getPlayerMechanics().regenMechanics.initialDelay * 20));
         }
+    }
+
+    private static float getHealTickAmount(LivingEntity entity) {
+        if (SHMechanicListener.getPlayerMechanics().regenMechanics.proportionaltoMaxHp) {
+            ModifiableAttributeInstance attr = entity.getAttribute(Attributes.MAX_HEALTH);
+            if (attr == null) {
+                ScalingHealth.LOGGER.warn("LivingEntity {} does not have a max hp attribute!", entity.getType().getRegistryName());
+                return 0;
+            }
+            double base = attr.getBaseValue();
+            double max = attr.getValue();
+            return (float) (max / base);
+        }
+        return 1;
+    }
+
+    private static boolean isActive(LivingEntity entity) {
+        PlayerMechanics.RegenMechanics config = SHMechanicListener.getPlayerMechanics().regenMechanics;
+        if (!entity.isAlive() || entity.getHealth() >= entity.getMaxHealth()) {
+            return false;
+        }
+
+        if (entity instanceof PlayerEntity) {
+            PlayerEntity player = (PlayerEntity) entity;
+            int food = player.getFoodStats().getFoodLevel();
+            if (food < config.minFood || food > config.maxFood) {
+                return false;
+            }
+        }
+
+        float health = entity.getHealth();
+        return health >= config.regenMinHealth && health <= config.regenMaxHealth;
     }
 }

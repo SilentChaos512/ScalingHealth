@@ -10,7 +10,7 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.utils.SHDifficulty;
+import net.silentchaos512.scalinghealth.utils.config.SHDifficulty;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -31,8 +31,7 @@ public class DifficultySourceCapability implements IDifficultySource, ICapabilit
     private boolean exempt = false;
 
     public static Optional<IDifficultySource> getOverworldCap(){
-        if(overworldCap == null) return Optional.empty();
-        return Optional.of(overworldCap);
+        return Optional.ofNullable(overworldCap);
     }
 
     public static void setOverworldCap(IDifficultySource source){
@@ -41,16 +40,12 @@ public class DifficultySourceCapability implements IDifficultySource, ICapabilit
 
     @Override
     public float getDifficulty() {
-        return difficulty;
+        return exempt ? 0 : difficulty;
     }
 
     @Override
     public void setDifficulty(float value) {
-        float realDiff = (float) SHDifficulty.clamp(value);
-        if(exempt)
-            difficulty = 0;
-        else
-            difficulty = realDiff;
+        difficulty = (float) SHDifficulty.clamp(value);
     }
 
     @Override

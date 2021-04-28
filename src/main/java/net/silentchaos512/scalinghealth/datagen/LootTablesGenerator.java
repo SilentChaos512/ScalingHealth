@@ -6,9 +6,8 @@ import net.minecraft.loot.*;
 import net.minecraft.loot.functions.SetCount;
 import net.minecraft.util.ResourceLocation;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.init.ModBlocks;
-import net.silentchaos512.scalinghealth.init.ModItems;
-import net.silentchaos512.scalinghealth.lib.EntityGroup;
+import net.silentchaos512.scalinghealth.objects.Registration;
+import net.silentchaos512.scalinghealth.utils.EntityGroup;
 
 import java.util.List;
 import java.util.Map;
@@ -38,27 +37,27 @@ public class LootTablesGenerator extends BaseLootTableGenerator {
 
     @Override
     protected void addTables() {
-        blockLootTables.put(ModBlocks.HEART_CRYSTAL_ORE.asBlock(),
-                createSilkTouchTable("heart_crystal_ore", ModBlocks.HEART_CRYSTAL_ORE.asBlock(), ModItems.HEART_CRYSTAL_SHARD.asItem()));
-        blockLootTables.put(ModBlocks.POWER_CRYSTAL_ORE.asBlock(),
-                createSilkTouchTable("power_crystal_ore", ModBlocks.POWER_CRYSTAL_ORE.asBlock(), ModItems.POWER_CRYSTAL_SHARD.asItem()));
+        blockLootTables.put(Registration.HEART_CRYSTAL_ORE.get(),
+                createSilkTouchTable("heart_crystal_ore", Registration.HEART_CRYSTAL_ORE.get(), Registration.HEART_CRYSTAL_SHARD.get()));
+        blockLootTables.put(Registration.POWER_CRYSTAL_ORE.get(),
+                createSilkTouchTable("power_crystal_ore", Registration.POWER_CRYSTAL_ORE.get(), Registration.POWER_CRYSTAL_SHARD.get()));
 
         LootTable.Builder builder = LootTable.builder().addLootPool(
                 new LootPool.Builder()
                         .rolls(new RandomValueRange(1))
-                        .addEntry(ItemLootEntry.builder(ModItems.HEART_CRYSTAL)
+                        .addEntry(ItemLootEntry.builder(Registration.HEART_CRYSTAL.get())
                                 .weight(3).quality(2)
                                 .acceptFunction(SetCount.builder(new RandomValueRange(1,2)))
-                        ).addEntry(ItemLootEntry.builder(ModItems.CURSED_HEART)
+                        ).addEntry(ItemLootEntry.builder(Registration.CURSED_HEART.get())
                         .weight(1).quality(5)
                         .acceptFunction(SetCount.builder(new RandomValueRange(1, 3)))
-                ).addEntry(ItemLootEntry.builder(ModItems.ENCHANTED_HEART)
+                ).addEntry(ItemLootEntry.builder(Registration.ENCHANTED_HEART.get())
                         .weight(1).quality(5)
                         .acceptFunction(SetCount.builder(new RandomValueRange(1, 3)))
-                ).addEntry(ItemLootEntry.builder(ModItems.CHANCE_HEART)
+                ).addEntry(ItemLootEntry.builder(Registration.CHANCE_HEART.get())
                         .weight(1).quality(5)
                         .acceptFunction(SetCount.builder(new RandomValueRange(1, 3)))
-                ).addEntry(ItemLootEntry.builder(ModItems.POWER_CRYSTAL)
+                ).addEntry(ItemLootEntry.builder(Registration.POWER_CRYSTAL.get())
                         .weight(2).quality(7)
                         .acceptFunction(SetCount.builder(new RandomValueRange(1, 2)))
                 ).addEntry(EmptyLootEntry.func_216167_a().weight(10)));
@@ -69,54 +68,54 @@ public class LootTablesGenerator extends BaseLootTableGenerator {
                 createSHDropsTable(
                         createSHDropsPool("crystals", 1,
                                 new MobLootCondition(true, false, 0, 0.055f, 0.005f),
-                                new MobLootEntry(ModItems.HEART_CRYSTAL.asItem(), 12, 1, 0),
-                                new MobLootEntry(ModItems.POWER_CRYSTAL.asItem(), 4, 1, 0),
-                                new MobLootEntry(ModItems.HEART_CRYSTAL_SHARD.asItem(), 2, 11, 3),
-                                new MobLootEntry(ModItems.POWER_CRYSTAL_SHARD.asItem(), 1, 12, 2)),
+                                new MobLootEntry(Registration.HEART_CRYSTAL.get(), 12, 1, 0),
+                                new MobLootEntry(Registration.POWER_CRYSTAL.get(), 4, 1, 0),
+                                new MobLootEntry(Registration.HEART_CRYSTAL_SHARD.get(), 2, 11, 3),
+                                new MobLootEntry(Registration.POWER_CRYSTAL_SHARD.get(), 1, 12, 2)),
                         createSHDropsPool("extras", 1,
                                 new MobLootCondition(false, false, 10, 0.025f, 0.005f),
-                                new MobLootEntry(ModItems.BANDAGES.asItem(), 10, 2, 0),
-                                new MobLootEntry(ModItems.MEDKIT.asItem(), 1, 1, 0)),
+                                new MobLootEntry(Registration.BANDAGES.get(), 10, 2, 0),
+                                new MobLootEntry(Registration.MEDKIT.get(), 1, 1, 0)),
                         createSHDropsPool("difficulty_mutators", 1,
                                 new MobLootCondition(false, false, 70, 0.015f, 0.025f),
-                                new MobLootEntry(ModItems.CHANCE_HEART.asItem(), 1, 1, 0),
-                                new MobLootEntry(ModItems.ENCHANTED_HEART.asItem(), 1, 1, 0)),
+                                new MobLootEntry(Registration.CHANCE_HEART.get(), 1, 1, 0),
+                                new MobLootEntry(Registration.ENCHANTED_HEART.get(), 1, 1, 0)),
                         createSHDropsPool("blights", 1,
                                 new MobLootCondition(true, true, 0, 0, 0),
-                                new MobLootEntry(ModItems.HEART_CRYSTAL.asItem(), 10, 3, 1),
-                                new MobLootEntry(ModItems.POWER_CRYSTAL.asItem(), 5, 2, 1))
+                                new MobLootEntry(Registration.HEART_CRYSTAL.get(), 10, 3, 1),
+                                new MobLootEntry(Registration.POWER_CRYSTAL.get(), 5, 2, 1))
                 ));
-        mobLootTable.put(EntityGroup.BOSS,
-                createSHDropsTable(
-                        createSHDropsPool("crystals", 3,
-                                new MobLootCondition(true, false, 0, 0.055f, 0.005f),
-                                new MobLootEntry(ModItems.HEART_CRYSTAL.asItem(), 12, 4, 2),
-                                new MobLootEntry(ModItems.POWER_CRYSTAL.asItem(), 6, 2, 1),
-                                new MobLootEntry(ModItems.HEART_CRYSTAL_SHARD.asItem(), 2, 40, 12),
-                                new MobLootEntry(ModItems.POWER_CRYSTAL_SHARD.asItem(), 1, 32, 10)),
-                        createSHDropsPool("difficulty_mutators", 1,
-                                new MobLootCondition(false, false, 125, 0.5f, 0.01f),
-                                new MobLootEntry(ModItems.CURSED_HEART.asItem(), 1, 2, 0),
-                                new MobLootEntry(ModItems.CHANCE_HEART.asItem(), 2, 2, 0),
-                                new MobLootEntry(ModItems.ENCHANTED_HEART.asItem(), 1, 2, 0)),
-                        createSHDropsPool("blights", 1,
-                                new MobLootCondition(true, true, 0, 0, 0),
-                                new MobLootEntry(ModItems.HEART_CRYSTAL.asItem(), 10, 3, 1),
-                                new MobLootEntry(ModItems.POWER_CRYSTAL.asItem(), 5, 2, 1))
-                ));
+//        mobLootTable.put(EntityGroup.BOSS,
+//                createSHDropsTable(
+//                        createSHDropsPool("crystals", 3,
+//                                new MobLootCondition(true, false, 0, 0.055f, 0.005f),
+//                                new MobLootEntry(Registration.HEART_CRYSTAL.get(), 12, 4, 2),
+//                                new MobLootEntry(Registration.POWER_CRYSTAL.get(), 6, 2, 1),
+//                                new MobLootEntry(Registration.HEART_CRYSTAL_SHARD.get(), 2, 40, 12),
+//                                new MobLootEntry(Registration.POWER_CRYSTAL_SHARD.get(), 1, 32, 10)),
+//                        createSHDropsPool("difficulty_mutators", 1,
+//                                new MobLootCondition(false, false, 125, 0.5f, 0.01f),
+//                                new MobLootEntry(Registration.CURSED_HEART.get(), 1, 2, 0),
+//                                new MobLootEntry(Registration.CHANCE_HEART.get(), 2, 2, 0),
+//                                new MobLootEntry(Registration.ENCHANTED_HEART.get(), 1, 2, 0)),
+//                        createSHDropsPool("blights", 1,
+//                                new MobLootCondition(true, true, 0, 0, 0),
+//                                new MobLootEntry(Registration.HEART_CRYSTAL.get(), 10, 3, 1),
+//                                new MobLootEntry(Registration.POWER_CRYSTAL.get(), 5, 2, 1))
+//                ));
         mobLootTable.put(EntityGroup.PEACEFUL,
                 createSHDropsTable(
                         createSHDropsPool("crystals", 1,
                                 new MobLootCondition(true, false, 0, 0.055f, 0.005f),
-                                new MobLootEntry(ModItems.HEART_CRYSTAL_SHARD.asItem(), 2, 8, 1),
-                                new MobLootEntry(ModItems.POWER_CRYSTAL_SHARD.asItem(), 1, 5, 0)),
+                                new MobLootEntry(Registration.HEART_CRYSTAL_SHARD.get(), 2, 8, 1),
+                                new MobLootEntry(Registration.POWER_CRYSTAL_SHARD.get(), 1, 5, 0)),
                         createSHDropsPool("difficulty_mutators", 1,
                                 new MobLootCondition(false, false, 0, 0.015f, 0.025f),
-                                new MobLootEntry(ModItems.CURSED_HEART.asItem(), 1, 1, 0)),
+                                new MobLootEntry(Registration.CURSED_HEART.get(), 1, 1, 0)),
                         createSHDropsPool("blights", 1,
                                 new MobLootCondition(true, true, 0, 0, 0),
-                                new MobLootEntry(ModItems.HEART_CRYSTAL.asItem(), 5, 1, -1),
-                                new MobLootEntry(ModItems.POWER_CRYSTAL.asItem(), 2, 1, -1))
+                                new MobLootEntry(Registration.HEART_CRYSTAL.get(), 5, 1, -1),
+                                new MobLootEntry(Registration.POWER_CRYSTAL.get(), 2, 1, -1))
                 ));
     }
 }

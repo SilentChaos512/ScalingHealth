@@ -2,7 +2,6 @@
   "replace": false,
   "entries": [
     "scalinghealth:chests/stronghold_library",
-    "scalinghealth:boss",
     "scalinghealth:chests/abandoned_mineshaft",
     "scalinghealth:chests/simple_dungeon",
     "scalinghealth:hostile",

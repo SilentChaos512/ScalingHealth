@@ -28,18 +28,18 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.StringTextComponent;
-import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.silentchaos512.lib.event.ClientTicks;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.client.ClientHandler;
-import net.silentchaos512.scalinghealth.client.KeyBinds.KeyManager;
-import net.silentchaos512.scalinghealth.config.Config;
-import net.silentchaos512.scalinghealth.lib.AreaDifficultyMode;
-import net.silentchaos512.scalinghealth.utils.EnabledFeatures;
+import net.silentchaos512.scalinghealth.client.KeyManager;
+import net.silentchaos512.scalinghealth.config.SHConfig;
+import net.silentchaos512.scalinghealth.utils.config.EnabledFeatures;
+import net.silentchaos512.scalinghealth.utils.mode.AreaDifficultyMode;
+import net.silentchaos512.scalinghealth.utils.mode.AreaDifficultyModes;
 import net.silentchaos512.utils.Anchor;
-import org.lwjgl.glfw.GLFW;
 
 public class DifficultyMeter extends Screen {
     public static final DifficultyMeter INSTANCE = new DifficultyMeter(new StringTextComponent(""));
@@ -57,25 +57,17 @@ public class DifficultyMeter extends Screen {
     }
 
     @SubscribeEvent
-    public void onTick(InputEvent.KeyInputEvent event){
+    public void onTick(TickEvent.ClientTickEvent event) {
         if(!EnabledFeatures.difficultyEnabled()) return;
 
-        DifficultyMeterShow showMode = Config.CLIENT.difficultyMeterShow.get();
-        if(event.getKey() != KeyManager.toggleDiff.getKey().getKeyCode()  || showMode != DifficultyMeterShow.KEYPRESS)
-            return;
-        if(event.getAction() == GLFW.GLFW_PRESS){
-            keyDown = true;
-        }
-        if(event.getAction() == GLFW.GLFW_RELEASE){
-            keyDown = false;
-        }
+        this.keyDown = KeyManager.TOGGLE_DIFF.isKeyDown();
     }
 
     @SubscribeEvent
     public void onRenderOverlay(RenderGameOverlayEvent.Post event) {
         if(!EnabledFeatures.difficultyEnabled()) return;
 
-        DifficultyMeterShow showMode = Config.CLIENT.difficultyMeterShow.get();
+        DifficultyMeterShow showMode = SHConfig.CLIENT.difficultyMeterShow.get();
         if (event.getType() != RenderGameOverlayEvent.ElementType.TEXT || showMode == DifficultyMeterShow.NEVER) {
             return;
         }
@@ -93,7 +85,7 @@ public class DifficultyMeter extends Screen {
         AreaDifficultyMode areaMode = ClientHandler.areaMode;
         int preClampAreaDifficulty = (int) ClientHandler.areaDifficulty;
         int areaDifficulty = MathHelper.clamp(preClampAreaDifficulty, 0, (int) maxDifficulty);
-        int difficulty = areaMode == AreaDifficultyMode.SERVER_WIDE
+        int difficulty = areaMode == AreaDifficultyModes.ServerWide.INSTANCE
                 ? areaDifficulty
                 : (int) ClientHandler.playerDifficulty;
         int timeSinceLastUpdate = ClientTicks.ticksInGame() - lastUpdateTime;
@@ -108,15 +100,15 @@ public class DifficultyMeter extends Screen {
         }
 
         int currentTime = ClientTicks.ticksInGame();
-        if (showMode == DifficultyMeterShow.ALWAYS || currentTime - lastUpdateTime < 20 * Config.CLIENT.difficultyMeterShowTime.get() || keyDown) {
+        if (showMode == DifficultyMeterShow.ALWAYS || keyDown || currentTime - lastUpdateTime < 20 * SHConfig.CLIENT.difficultyMeterShowTime.get()) {
             RenderSystem.enableBlend();
 
             mc.textureManager.bindTexture(TEXTURE);
             event.getMatrixStack().push();
 
-            Anchor anchor = Config.CLIENT.difficultyMeterAnchor.get();
-            int posX = anchor.getX(width, 66, 5) + Config.CLIENT.difficultyMeterOffsetX.get();
-            int posY = anchor.getY(height, 14, 5) + Config.CLIENT.difficultyMeterOffsetY.get();
+            Anchor anchor = SHConfig.CLIENT.difficultyMeterAnchor.get();
+            int posX = anchor.getX(width, 66, 5) + SHConfig.CLIENT.difficultyMeterOffsetX.get();
+            int posY = anchor.getY(height, 14, 5) + SHConfig.CLIENT.difficultyMeterOffsetY.get();
 
             // Frame
             blitWithColor(event.getMatrixStack(), posX, posY, 190, 0, 66, 14, 0xFFFFFF);
@@ -130,7 +122,7 @@ public class DifficultyMeter extends Screen {
             blitWithColor(event.getMatrixStack(), posX + 3, posY + 3, 193, 17, barLength, 2, 0xFFFFFF);
 
             // Text
-            final float textScale = Config.CLIENT.difficultyMeterTextScale.get().floatValue();
+            final float textScale = SHConfig.CLIENT.difficultyMeterTextScale.get().floatValue();
             if (textScale > 0) {
                 event.getMatrixStack().push();
                 event.getMatrixStack().scale(textScale, textScale, 1);

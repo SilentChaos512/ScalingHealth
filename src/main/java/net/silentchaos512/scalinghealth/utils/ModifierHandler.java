@@ -19,15 +19,13 @@
 package net.silentchaos512.scalinghealth.utils;
 
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.ai.attributes.Attribute;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
-import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.lib.util.EntityHelper;
+import net.silentchaos512.scalinghealth.utils.config.SHDifficulty;
 
-import java.util.List;
 import java.util.UUID;
 
 public final class ModifierHandler {
@@ -36,7 +34,7 @@ public final class ModifierHandler {
     private static final String MODIFIER_NAME_HEALTH = "ScalingHealth.HealthModifier";
     private static final String MODIFIER_NAME_DAMAGE = "ScalingHealth.DamageModifier";
 
-    private ModifierHandler() {throw new IllegalAccessError("Utility class");}
+    private ModifierHandler() { throw new IllegalAccessError("Utility class"); }
 
     public static void setModifier(LivingEntity entity, Attribute attribute, UUID uuid, String name, double amount, AttributeModifier.Operation op) {
         ModifiableAttributeInstance instance = entity.getAttribute(attribute);
@@ -60,15 +58,10 @@ public final class ModifierHandler {
         }
     }
 
+    @SuppressWarnings("ConstantConditions")
     public static void addAttackDamage(LivingEntity entity, double amount, AttributeModifier.Operation op) {
-        boolean stop = false;
-        if(entity instanceof MobEntity){
-            List<? extends String> mods = SHDifficulty.getDamageBlacklistedMods();
-            for (String mod : mods) {
-                if (mod.equals(ForgeRegistries.ENTITIES.getKey(entity.getType()).getNamespace())) stop = true;
-            }
-        }
-        if(stop) return;
-        setModifier(entity, Attributes.ATTACK_DAMAGE, MODIFIER_ID_DAMAGE, MODIFIER_NAME_DAMAGE, amount, op);
+        String modNamespace = entity.getType().getRegistryName().getNamespace();
+        if (!SHDifficulty.getDamageBlacklistedMods().contains(modNamespace))
+            setModifier(entity, Attributes.ATTACK_DAMAGE, MODIFIER_ID_DAMAGE, MODIFIER_NAME_DAMAGE, amount, op);
     }
 }

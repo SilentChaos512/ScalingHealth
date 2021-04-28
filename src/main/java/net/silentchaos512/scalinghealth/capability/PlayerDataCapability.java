@@ -14,8 +14,8 @@ import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.utils.ModifierHandler;
-import net.silentchaos512.scalinghealth.utils.SHDifficulty;
-import net.silentchaos512.scalinghealth.utils.SHPlayers;
+import net.silentchaos512.scalinghealth.utils.config.SHDifficulty;
+import net.silentchaos512.scalinghealth.utils.config.SHPlayers;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

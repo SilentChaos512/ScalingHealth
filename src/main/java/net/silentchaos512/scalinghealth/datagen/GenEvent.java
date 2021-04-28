@@ -15,5 +15,7 @@ public class GenEvent {
         generator.addProvider(new LootTablesGenerator(generator));
         generator.addProvider(new SHEntityTags(event));
         generator.addProvider(new LootModifierGen(event.getGenerator()));
+        generator.addProvider(new EnglishLocalization(event.getGenerator()));
+        generator.addProvider(new BlockStateGen(event));
     }
 }

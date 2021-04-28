@@ -26,17 +26,15 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.config.Config;
-import net.silentchaos512.scalinghealth.item.HeartCrystal;
-import net.silentchaos512.scalinghealth.utils.EnabledFeatures;
+import net.silentchaos512.scalinghealth.objects.item.HeartCrystal;
+import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanicListener;
+import net.silentchaos512.scalinghealth.utils.config.EnabledFeatures;
 
 @Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class PetEventHandler {
-    public static PetEventHandler INSTANCE = new PetEventHandler();
-
     @SubscribeEvent
-    public void onLivingUpdate(LivingUpdateEvent event) {
-        double regenDelay = Config.GENERAL.pets.regenDelay.get();
+    public static void onLivingUpdate(LivingUpdateEvent event) {
+        double regenDelay = SHMechanicListener.getMobMechanics().pets.petsRegenDelay;
         if (regenDelay <= 0) {
             return;
         }
@@ -53,7 +51,7 @@ public class PetEventHandler {
     }
 
     @SubscribeEvent
-    public void onPetInteraction(PlayerInteractEvent.EntityInteractSpecific event){
+    public static void onPetInteraction(PlayerInteractEvent.EntityInteractSpecific event){
         if(!(event.getItemStack().getItem() instanceof HeartCrystal) ||
                 !(event.getTarget() instanceof TameableEntity)       ||
                 !EnabledFeatures.petBonusHpEnabled())

@@ -8,17 +8,16 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.loot.ILootSerializer;
 import net.minecraft.loot.LootConditionType;
+import net.minecraft.loot.LootContext;
 import net.minecraft.loot.conditions.ILootCondition;
 import net.minecraft.util.JSONUtils;
-import net.minecraft.loot.LootContext;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.registry.Registry;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
-import net.silentchaos512.scalinghealth.utils.SHDifficulty;
+import net.silentchaos512.scalinghealth.utils.config.SHDifficulty;
 
 public class SHMobProperties implements ILootCondition {
-    public static final Serializer SERIALIZER = new Serializer();
     public static final ResourceLocation NAME = new ResourceLocation(ScalingHealth.MOD_ID, "mob_properties");
 
     private final LootContext.EntityTarget target;

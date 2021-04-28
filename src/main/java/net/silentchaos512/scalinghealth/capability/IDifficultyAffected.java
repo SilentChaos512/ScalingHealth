@@ -1,7 +1,7 @@
 package net.silentchaos512.scalinghealth.capability;
 
 import net.minecraft.entity.MobEntity;
-import net.silentchaos512.scalinghealth.utils.SHMobs;
+import net.silentchaos512.scalinghealth.utils.config.SHMobs;
 
 public interface IDifficultyAffected {
     float getDifficulty();

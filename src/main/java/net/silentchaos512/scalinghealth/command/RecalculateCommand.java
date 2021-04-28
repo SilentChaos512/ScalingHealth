@@ -7,7 +7,7 @@ import net.minecraft.command.Commands;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.silentchaos512.scalinghealth.utils.MobDifficultyHandler;
-import net.silentchaos512.scalinghealth.utils.SHDifficulty;
+import net.silentchaos512.scalinghealth.utils.config.SHDifficulty;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

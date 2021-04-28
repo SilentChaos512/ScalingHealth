@@ -9,9 +9,9 @@ import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.common.loot.LootTableIdCondition;
 import net.minecraftforge.registries.ObjectHolder;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.lib.EntityGroup;
 import net.silentchaos512.scalinghealth.loot.TableGlobalModifier;
 import net.silentchaos512.scalinghealth.loot.conditions.EntityGroupCondition;
+import net.silentchaos512.scalinghealth.utils.EntityGroup;
 
 public class LootModifierGen extends GlobalLootModifierProvider {
     @ObjectHolder("scalinghealth:table_loot_mod")
@@ -21,14 +21,15 @@ public class LootModifierGen extends GlobalLootModifierProvider {
         super(gen, ScalingHealth.MOD_ID);
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     @SuppressWarnings("ConstantConditions")
     protected void start() {
-        this.add("boss", tableGlobalModifier,
-                new TableGlobalModifier(
-                        new ILootCondition[]{new EntityGroupCondition(EntityGroup.BOSS)},
-                        (TableLootEntry) TableLootEntry.builder(ScalingHealth.getId("bonus_drops/boss")).build()
-                ));
+//        this.add("boss", tableGlobalModifier,
+//                new TableGlobalModifier(
+//                        new ILootCondition[]{new EntityGroupCondition(EntityGroup.BOSS)},
+//                        (TableLootEntry) TableLootEntry.builder(ScalingHealth.getId("bonus_drops/boss")).build()
+//                ));
         this.add("hostile", tableGlobalModifier,
                 new TableGlobalModifier(
                         new ILootCondition[]{new EntityGroupCondition(EntityGroup.HOSTILE)},

@@ -1,6 +1,6 @@
 buildscript {
     repositories {
-        maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = 'https://maven.minecraftforge.net/' }
         jcenter()
         mavenCentral()
     }
@@ -10,28 +10,22 @@ buildscript {
 }
 
 plugins {
-    id 'io.franzbecker.gradle-lombok' version '2.0'
+    id 'eclipse'
     id 'maven'
     id 'maven-publish'
-    id "com.jfrog.bintray" version "1.8.4"
-    id "com.matthewprenger.cursegradle" version "1.4.0"
+    id 'com.matthewprenger.cursegradle' version '1.4.0'
 }
 
 apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'eclipse'
 
 repositories {
-    flatDir {
-        name "fileRepo"
-        dirs "repo"
-    }
+    maven { url = 'https://maven.minecraftforge.net/' }
     mavenLocal()
     jcenter()
 }
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
-    options.compilerArgs = ['-Xlint:deprecation']
 }
 
 javadoc {
@@ -87,9 +81,6 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 repositories {
     jcenter()
     mavenLocal()
-    maven {
-        url 'https://www.dogforce-games.com/maven/'
-    }
     maven {
         url  "https://dl.bintray.com/silentchaos512/silent-lib"
     }
@@ -213,6 +204,7 @@ curseforge {
                 }
             }
         }
+        curseGradleOptions.debug = true
     }
 }
 
@@ -326,8 +318,6 @@ task incrementBuild {
     }
 }
 
-build.finalizedBy incrementBuild // only increment on successful builds
-
 import groovy.json.JsonOutput
 
 def writeUpdateJson() {
@@ -352,4 +342,11 @@ task createUpdateJson {
     }
 }
 
-build.finalizedBy createUpdateJson
+tasks.configureEach { task ->
+    if (task.name == 'curseforge' + project.cf_project_id) {
+        task.finalizedBy {
+            incrementBuild
+            createUpdateJson
+        }
+    }
+}

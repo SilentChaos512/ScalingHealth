@@ -22,7 +22,7 @@ import net.minecraft.loot.functions.ApplyBonus;
 import net.minecraft.loot.functions.ExplosionDecay;
 import net.minecraft.loot.functions.SetCount;
 import net.silentchaos512.scalinghealth.ScalingHealth;
-import net.silentchaos512.scalinghealth.lib.EntityGroup;
+import net.silentchaos512.scalinghealth.utils.EntityGroup;
 import net.silentchaos512.scalinghealth.loot.conditions.SHMobProperties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

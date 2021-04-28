@@ -9,9 +9,9 @@ import net.minecraft.util.JSONUtils;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.common.loot.LootModifier;
-import net.silentchaos512.scalinghealth.item.DifficultyMutatorItem;
-import net.silentchaos512.scalinghealth.item.PowerCrystal;
-import net.silentchaos512.scalinghealth.utils.EnabledFeatures;
+import net.silentchaos512.scalinghealth.objects.item.DifficultyMutatorItem;
+import net.silentchaos512.scalinghealth.objects.item.PowerCrystal;
+import net.silentchaos512.scalinghealth.utils.config.EnabledFeatures;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -29,8 +29,8 @@ public class TableGlobalModifier extends LootModifier{
    protected List<ItemStack> doApply(List<ItemStack> generatedLoot, LootContext context) {
       table.func_216154_a(generatedLoot::add, context);
       generatedLoot.forEach(stack -> {
-         if((EnabledFeatures.powerCrystalEnabled() && stack.getItem() instanceof PowerCrystal)
-                 || (!EnabledFeatures.difficultyEnabled() && stack.getItem() instanceof DifficultyMutatorItem)){
+         if ((EnabledFeatures.powerCrystalEnabled() && stack.getItem() instanceof PowerCrystal)
+                 || (!EnabledFeatures.difficultyEnabled() && stack.getItem() instanceof DifficultyMutatorItem)) {
             stack.setCount(0);
          }
       });

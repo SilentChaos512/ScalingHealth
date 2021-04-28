@@ -35,7 +35,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.silentchaos512.lib.event.ClientTicks;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.client.gui.TextureSlice;
-import net.silentchaos512.scalinghealth.config.Config;
+import net.silentchaos512.scalinghealth.config.SHConfig;
 import net.silentchaos512.utils.Color;
 import net.silentchaos512.utils.MathUtils;
 
@@ -43,9 +43,9 @@ import java.util.List;
 
 /**
  * Handles display of regular and absorption hearts.
- * <p>For future reference, much of the vanilla code can be found in {@link ForgeIngameGui}.
+ * Much of the code can be found in {@link ForgeIngameGui}.
  */
-public final class HeartDisplayHandler extends Screen{
+public final class HeartDisplayHandler extends Screen {
     public static final HeartDisplayHandler INSTANCE = new HeartDisplayHandler(new StringTextComponent(""));
 
     private static final float COLOR_CHANGE_PERIOD = 150;
@@ -72,22 +72,22 @@ public final class HeartDisplayHandler extends Screen{
         // Health text
         if (event.getType() == RenderGameOverlayEvent.ElementType.TEXT && mc.playerController.gameIsSurvivalOrAdventure()) {
             // Draw health string?
-            if (Config.CLIENT.healthTextStyle.get() != HealthTextStyle.DISABLED) {
+            if (SHConfig.CLIENT.healthTextStyle.get() != HealthTextStyle.DISABLED) {
                 mc.getProfiler().startSection("scalinghealthRenderHealthText");
                 renderHealthText(mc, event.getMatrixStack(), info.health, info.maxHealth,
-                        -91 + Config.CLIENT.healthTextOffsetX.get(),
-                        -38 + Config.CLIENT.healthTextOffsetY.get(),
-                        Config.CLIENT.healthTextStyle.get(),
-                        Config.CLIENT.healthTextColorStyle.get());
+                        -91 + SHConfig.CLIENT.healthTextOffsetX.get(),
+                        -38 + SHConfig.CLIENT.healthTextOffsetY.get(),
+                        SHConfig.CLIENT.healthTextStyle.get(),
+                        SHConfig.CLIENT.healthTextColorStyle.get());
                 mc.getProfiler().endSection();
             }
             // Draw absorption amount string?
-            if (Config.CLIENT.absorptionTextStyle.get() != HealthTextStyle.DISABLED && player.getAbsorptionAmount() > 0) {
+            if (SHConfig.CLIENT.absorptionTextStyle.get() != HealthTextStyle.DISABLED && player.getAbsorptionAmount() > 0) {
                 mc.getProfiler().startSection("scalinghealthRenderAbsorptionText");
                 renderHealthText(mc, event.getMatrixStack(), player.getAbsorptionAmount(), 0,
-                        -91 + Config.CLIENT.absorptionTextOffsetX.get(),
-                        -49 + Config.CLIENT.absorptionTextOffsetY.get(),
-                        Config.CLIENT.absorptionTextStyle.get(),
+                        -91 + SHConfig.CLIENT.absorptionTextOffsetX.get(),
+                        -49 + SHConfig.CLIENT.absorptionTextOffsetY.get(),
+                        SHConfig.CLIENT.absorptionTextStyle.get(),
                         HealthTextColor.SOLID);
                 mc.getProfiler().endSection();
             }
@@ -147,12 +147,12 @@ public final class HeartDisplayHandler extends Screen{
             }
 
             // Outline for last heart, to make seeing max health a little easier.
-            if (Config.CLIENT.lastHeartOutline.get() && anythingDrawn && row == maxHealthRows - 1) {
+            if (SHConfig.CLIENT.lastHeartOutline.get() && anythingDrawn && row == maxHealthRows - 1) {
                 // Get position of last partial/full heart
                 j = (int) (Math.ceil(player.getMaxHealth() % 20f / 2f)) - 1;
                 if (j < 0) j += 10;
                 int y = info.offsetHeartPosY(j, top);
-                int color = Config.CLIENT.lastHeartOutlineColor.get();
+                int color = SHConfig.CLIENT.lastHeartOutlineColor.get();
                 blitWithColor(stack,left + 8 * j, y, 17, 9, 9, 9, color);
             }
         }
@@ -172,7 +172,7 @@ public final class HeartDisplayHandler extends Screen{
 
         // Tanks
 
-        if (info.getMaxHeartTanks() > 0 && Config.CLIENT.heartTanks.get()) {
+        if (info.getMaxHeartTanks() > 0 && SHConfig.CLIENT.heartTanks.get()) {
             int tankRows = info.getHeartTankRowCount();
             int maxTankRows = info.getMaxHeartTankRowCount();
 
@@ -194,10 +194,10 @@ public final class HeartDisplayHandler extends Screen{
                 }
                 boolean anythingDrawn = x > 0;
 
-                if (Config.CLIENT.lastHeartOutline.get() && anythingDrawn && row == maxTankRows - 1) {
+                if (SHConfig.CLIENT.lastHeartOutline.get() && anythingDrawn && row == maxTankRows - 1) {
                     x = (int) (Math.ceil(allTanksInRow)) - 1;
                     if (x < 0) x += 20;
-                    TANK_OUTLINE.blit(stack, left + 4 * x, top, Config.CLIENT.lastHeartOutlineColor.get(), this);
+                    TANK_OUTLINE.blit(stack, left + 4 * x, top, SHConfig.CLIENT.lastHeartOutlineColor.get(), this);
                 }
             }
         }
@@ -206,7 +206,7 @@ public final class HeartDisplayHandler extends Screen{
         // Absorption hearts override
         // ==========================
 
-        AbsorptionIconStyle absorptionIconStyle = Config.CLIENT.absorptionIconStyle.get();
+        AbsorptionIconStyle absorptionIconStyle = SHConfig.CLIENT.absorptionIconStyle.get();
         if (absorptionIconStyle != AbsorptionIconStyle.VANILLA) {
             int absorbCeil = (int) Math.ceil(absorb);
             rowCount = (int) Math.ceil(absorb / 20);
@@ -323,8 +323,8 @@ public final class HeartDisplayHandler extends Screen{
             case TRANSITION:
 //                color = Color.HSBtoRGB(0.34f * current / divisor, 0.7f, 1.0f);
                 color = Color.blend(
-                        Config.CLIENT.healthTextEmptyColor.get(),
-                        Config.CLIENT.healthTextFullColor.get(),
+                        SHConfig.CLIENT.healthTextEmptyColor.get(),
+                        SHConfig.CLIENT.healthTextFullColor.get(),
                         current / divisor);
                 break;
             case PSYCHEDELIC:
@@ -334,7 +334,7 @@ public final class HeartDisplayHandler extends Screen{
                 break;
             case SOLID:
             default:
-                color = Config.CLIENT.healthTextFullColor.get();
+                color = SHConfig.CLIENT.healthTextFullColor.get();
                 break;
         }
         mc.getProfiler().endSection();
@@ -360,8 +360,8 @@ public final class HeartDisplayHandler extends Screen{
     }
 
     private static int getColorForRow(int row, boolean absorption) {
-        List<Integer> colors = absorption ? Config.CLIENT.absorptionHeartColors.get() : Config.CLIENT.heartColors.get();
-        int index = Config.CLIENT.heartColorLooping.get()
+        List<Integer> colors = absorption ? SHConfig.CLIENT.absorptionHeartColors.get() : SHConfig.CLIENT.heartColors.get();
+        int index = SHConfig.CLIENT.heartColorLooping.get()
                 ? row % colors.size()
                 : MathUtils.clamp(row, 0, colors.size() - 1);
         return colors.get(index);
