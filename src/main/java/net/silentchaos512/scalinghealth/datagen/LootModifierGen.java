@@ -1,7 +1,6 @@
 package net.silentchaos512.scalinghealth.datagen;
 
 import net.minecraft.data.DataGenerator;
-import net.minecraft.loot.LootTables;
 import net.minecraft.loot.TableLootEntry;
 import net.minecraft.loot.conditions.ILootCondition;
 import net.minecraftforge.common.data.GlobalLootModifierProvider;
@@ -21,7 +20,6 @@ public class LootModifierGen extends GlobalLootModifierProvider {
         super(gen, ScalingHealth.MOD_ID);
     }
 
-    @SuppressWarnings("ConstantConditions")
     @Override
     @SuppressWarnings("ConstantConditions")
     protected void start() {
