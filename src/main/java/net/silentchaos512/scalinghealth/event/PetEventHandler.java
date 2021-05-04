@@ -35,37 +35,36 @@ public class PetEventHandler {
     @SubscribeEvent
     public static void onLivingUpdate(LivingUpdateEvent event) {
         double regenDelay = SHMechanicListener.getMobMechanics().pets.petsRegenDelay;
-        if (regenDelay <= 0) {
+        if (regenDelay <= 0)
             return;
-        }
 
         LivingEntity entity = event.getEntityLiving();
         if (entity != null && !entity.world.isRemote) {
             boolean fullHp = entity.getHealth() == entity.getMaxHealth();
             boolean isTamed = entity instanceof TameableEntity && ((TameableEntity) entity).isTamed();
             boolean isRegenTime = entity.hurtResistantTime <= 0 && entity.ticksExisted % regenDelay == 0;
-            if (isTamed && isRegenTime && !fullHp) {
+            if (isTamed && isRegenTime && !fullHp)
                 entity.heal(2f);
-            }
         }
     }
 
     @SubscribeEvent
     public static void onPetInteraction(PlayerInteractEvent.EntityInteractSpecific event){
-        if(!(event.getItemStack().getItem() instanceof HeartCrystal) ||
-                !(event.getTarget() instanceof TameableEntity)       ||
-                !EnabledFeatures.petBonusHpEnabled())
+        if(!EnabledFeatures.petBonusHpEnabled() ||
+                !(event.getItemStack().getItem() instanceof HeartCrystal) ||
+                !(event.getTarget() instanceof TameableEntity))
             return;
 
         TameableEntity pet = (TameableEntity) event.getTarget();
-        if(!pet.isTamed()) {
+        if(!pet.isTamed())
             return;
-        }
-        if(pet.world.isRemote){
+
+        if(pet.world.isRemote) {
             event.setCancellationResult(ActionResultType.SUCCESS);
             event.setCanceled(true);
             return;
         }
+
         HeartCrystal heart = (HeartCrystal) event.getItemStack().getItem();
         heart.increasePetHp(event.getPlayer(), pet, event.getItemStack());
     }

@@ -44,8 +44,6 @@ public final class Network {
                         Entity e = Minecraft.getInstance().world.getEntityByID(msg.entityId);
                         if(e instanceof MobEntity)
                             SHDifficulty.affected(e).setIsBlight(true);
-                        else
-                            ScalingHealth.LOGGER.error("Entity Could ");
                     });
                     return true;
                 })

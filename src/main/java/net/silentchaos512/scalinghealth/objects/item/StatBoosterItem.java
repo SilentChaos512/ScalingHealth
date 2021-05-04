@@ -65,7 +65,7 @@ public abstract class StatBoosterItem extends Item {
                 extraConsumeEffect(player);
             }
 
-            // End here is stat increases are not allowed
+            // End here if stat increases are not allowed
             if (!statIncreaseAllowed) {
                 return useAsConsumable(world, player, stack, levelRequirement, consumed);
             }

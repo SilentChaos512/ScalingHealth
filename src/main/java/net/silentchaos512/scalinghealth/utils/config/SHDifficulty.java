@@ -96,8 +96,9 @@ public final class SHDifficulty {
     }
 
     public static double lunarMultiplier(World world) {
-        return world.isDaytime() ? 1 : SHMechanicListener.getDifficultyMechanics().multipliers
-                .getLunarMultiplier(world.getDimensionType().getMoonPhase(world.func_241851_ab()));
+        return (world.getDimensionKey() != World.OVERWORLD || world.isDaytime()) ? 1 :
+                SHMechanicListener.getDifficultyMechanics().multipliers
+                        .getLunarMultiplier(world.getDimensionType().getMoonPhase(world.func_241851_ab()));
     }
 
     public static double groupMultiplier(World world, BlockPos pos) {
