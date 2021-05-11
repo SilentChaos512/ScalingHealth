@@ -79,7 +79,7 @@ public final class DifficultyEvents {
 
         // Tick mobs, which will calculate difficulty when appropriate and apply changes
         if (entity instanceof MobEntity)
-            entity.getCapability(DifficultyAffectedCapability.INSTANCE).ifPresent(data->
+            entity.getCapability(DifficultyAffectedCapability.INSTANCE).ifPresent(data ->
                     data.tick((MobEntity)entity));
 
         if(entity instanceof TameableEntity) {
@@ -88,9 +88,8 @@ public final class DifficultyEvents {
                         data.tick((TameableEntity) entity));
         }
 
-        // Tick difficulty source, such as players, except if exempted
         if (entity instanceof PlayerEntity && entity.world.getGameTime() % 20 == 0) {
-            entity.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source-> {
+            entity.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
                 source.addDifficulty((float) SHDifficulty.changePerSecond());
             });
         }

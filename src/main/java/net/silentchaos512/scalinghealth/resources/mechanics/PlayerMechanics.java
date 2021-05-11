@@ -82,34 +82,4 @@ public class PlayerMechanics {
             this.regenMaxHealth = regenMaxHealth;
         }
     }
-
-    private static class HpInfo {
-        private static final Function<HpInfo, DataResult<HpInfo>> VERIFY = info -> {
-            if (info.minHealth > info.startingHp)
-                return DataResult.error("startingHp can't be smaller than minimum hp!");
-            if (info.minHealth > info.maxHealth)
-                return DataResult.error("minimumHp can't be greater than maximum hp!");
-            if (info.startingHp > info.maxHealth)
-                return DataResult.error("startingHp can't be greater than maximumHp!");
-            return DataResult.success(info);
-        };
-
-        private static final MapCodec<HpInfo> CODEC = RecordCodecBuilder.<HpInfo>mapCodec(inst ->
-                inst.group(
-                        SerializationUtils.positiveInt(1).fieldOf("startingHealth").forGetter(i -> i.startingHp),
-                        SerializationUtils.positiveInt(1).fieldOf("minHealth").forGetter(i -> i.minHealth),
-                        SerializationUtils.positiveInt(2).fieldOf("maxHealth").forGetter(i -> i.maxHealth)
-                ).apply(inst, HpInfo::new)
-        ).flatXmap(VERIFY, VERIFY);
-
-        private final int startingHp;
-        private final int minHealth;
-        private final int maxHealth;
-
-        private HpInfo(int startingHp, int minHealth, int maxHealth) {
-            this.startingHp = startingHp;
-            this.minHealth = minHealth;
-            this.maxHealth = maxHealth;
-        }
-    }
 }

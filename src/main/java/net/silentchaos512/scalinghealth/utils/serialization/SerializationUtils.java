@@ -42,11 +42,11 @@ public class SerializationUtils {
                 }
             }, AttributeModifier.Operation::name);
 
-    public static Codec<Integer> positiveInt(){
+    public static Codec<Integer> positiveInt() {
         return positiveInt(0);
     }
 
-    public static Codec<Double> positiveDouble(){
+    public static Codec<Double> positiveDouble() {
         return positiveDouble(0);
     }
 
@@ -93,20 +93,18 @@ public class SerializationUtils {
             this.max = maxHealth;
         }
 
-        private static <NB1 extends Number, NB2 extends Number, NB3 extends Number> DataResult<NumberConstraint<NB1, NB2, NB3>> verify(
-                NumberConstraint<NB1, NB2, NB3> nbConstraint
-        ) {
-            if (nbConstraint.min.doubleValue() > nbConstraint.starting.doubleValue())
+        private DataResult<NumberConstraint<N1, N2, N3>> verify() {
+            if (this.min.doubleValue() > this.starting.doubleValue())
                 return DataResult.error("Starting value can't be smaller than minimum value!");
 
-            if (nbConstraint.max.doubleValue() != 0) { //if max is 0, consider it is infinity.
-                if (nbConstraint.min.doubleValue() > nbConstraint.max.doubleValue())
+            if (this.max.doubleValue() != 0) { //if max is 0, consider it is infinity.
+                if (this.min.doubleValue() > this.max.doubleValue())
                     return DataResult.error("Minimum value  can't be greater than maximum value!");
-                if (nbConstraint.starting.doubleValue() > nbConstraint.max.doubleValue())
+                if (this.starting.doubleValue() > this.max.doubleValue())
                     return DataResult.error("Starting value can't be greater than maximum value!");
             }
 
-            return DataResult.success(nbConstraint);
+            return DataResult.success(this);
         }
     }
 }

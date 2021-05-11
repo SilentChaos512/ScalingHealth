@@ -22,7 +22,8 @@ import java.util.function.Function;
 
 @Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID)
 public class SHMechanicListener extends JsonReloadListener {
-    private static SHMechanicListener instance = null;
+    private static SHMechanicListener currentInstance = null;
+    private static SHMechanicListener reloadingInstance = null;
 
     public static final Logger LOGGER = LogManager.getLogger("SHMechanicsListener");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
@@ -33,15 +34,18 @@ public class SHMechanicListener extends JsonReloadListener {
     private DifficultyMechanics difficultyMechanics;
     private DamageScalingMechanics damageScalingMechanics;
 
-    public SHMechanicListener() {
+    public SHMechanicListener(boolean server) {
         super(GSON, FOLDER);
-        instance = this;
+        if (!server || currentInstance == null)
+            currentInstance = this;
+        else
+            reloadingInstance = this;
     }
 
     @Override
     protected void apply(Map<ResourceLocation, JsonElement> map, IResourceManager resourceManager, IProfiler profiler) {
         Function<String, JsonElement> getter = file -> map.entrySet().stream()
-                .filter(e -> e.getKey().getPath().equals(file))
+                .filter(e -> e.getKey().getNamespace().equals(ScalingHealth.MOD_ID) && e.getKey().getPath().equals(file))
                 .map(Map.Entry::getValue)
                 .findAny().orElse(JsonNull.INSTANCE);
 
@@ -56,12 +60,17 @@ public class SHMechanicListener extends JsonReloadListener {
         this.damageScalingMechanics = DamageScalingMechanics.CODEC.parse(JsonOps.INSTANCE, getter.apply(DamageScalingMechanics.FILE))
                 .getOrThrow(false, prefix("DamageScalingMechanics: "));
         LOGGER.debug("Finished Parsing SH Config!");
+
+        if (this == reloadingInstance) {
+            currentInstance = this;
+            reloadingInstance = null;
+        }
     }
 
     public static SHMechanicListener getInstance() {
-        if (instance == null)
+        if (currentInstance == null)
             throw new RuntimeException("Tried to access SHMechanicsListener too early!");
-        return instance;
+        return currentInstance;
     }
 
     private static Consumer<String> prefix(String pre) {
@@ -89,17 +98,17 @@ public class SHMechanicListener extends JsonReloadListener {
     }
 
     public static void setClientInstance(PlayerMechanics playerMechanics, ItemMechanics itemMechanics, MobMechanics mobMechanics, DifficultyMechanics difficultyMechanics, DamageScalingMechanics damageScalingMechanics) {
-        new SHMechanicListener();
-        instance.playerMechanics = playerMechanics;
-        instance.itemMechanics = itemMechanics;
-        instance.mobMechanics = mobMechanics;
-        instance.difficultyMechanics = difficultyMechanics;
-        instance.damageScalingMechanics = damageScalingMechanics;
+        new SHMechanicListener(false);
+        currentInstance.playerMechanics = playerMechanics;
+        currentInstance.itemMechanics = itemMechanics;
+        currentInstance.mobMechanics = mobMechanics;
+        currentInstance.difficultyMechanics = difficultyMechanics;
+        currentInstance.damageScalingMechanics = damageScalingMechanics;
         ScalingHealth.LOGGER.debug("Loaded SHMechanics on the client.");
     }
 
     @SubscribeEvent
     public static void addListener(AddReloadListenerEvent event) {
-        event.addListener(new SHMechanicListener());
+        event.addListener(new SHMechanicListener(true));
     }
 }

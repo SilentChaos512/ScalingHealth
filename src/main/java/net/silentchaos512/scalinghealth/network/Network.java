@@ -7,7 +7,9 @@ import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.client.ClientHandler;
+import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.Collections;
 import java.util.Objects;
 import java.util.function.IntSupplier;
 
@@ -45,7 +47,10 @@ public final class Network {
                 .decoder(SHMechanicsPacket::decode)
                 .encoder(SHMechanicsPacket::encode)
                 .consumer(SHMechanicsPacket::handle)
-                .markAsLoginPacket()
+                //from #markAsLoginPacket but modified to not send anything on local connections
+                .buildLoginPacketList(isLocal -> isLocal ? Collections.emptyList() :
+                        Collections.singletonList(Pair.of(SHMechanicsPacket.class.getName(), new SHMechanicsPacket()))
+                )
                 .loginIndex(SHMechanicsPacket::getLoginIdx, SHMechanicsPacket::setLoginIdx)
                 .add();
 
