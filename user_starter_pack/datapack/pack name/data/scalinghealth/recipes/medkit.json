@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "scalinghealth",
+  "pattern": [
+    "aba",
+    "cdc",
+    "eee"
+  ],
+  "key": {
+    "a": {
+      "item": "scalinghealth:heart_dust"
+    },
+    "b": {
+      "tag": "forge:ingots/iron"
+    },
+    "c": {
+      "item": "scalinghealth:bandages"
+    },
+    "d": {
+      "item": "minecraft:glistering_melon_slice"
+    },
+    "e": {
+      "item": "minecraft:terracotta"
+    }
+  },
+  "result": {
+    "item": "scalinghealth:medkit",
+    "count": 2
+  }
+}

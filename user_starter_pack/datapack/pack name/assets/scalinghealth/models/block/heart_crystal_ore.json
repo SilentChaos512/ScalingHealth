@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "scalinghealth:block/heart_crystal_ore"
+  }
+}

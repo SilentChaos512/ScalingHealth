@@ -1,0 +1,10 @@
+{
+  "conditions": [
+    {
+      "condition": "forge:loot_table_id",
+      "loot_table_id": "minecraft:chests/underwater_ruin_big"
+    }
+  ],
+  "table": "scalinghealth:chests_addition/underwater_ruin_big",
+  "type": "scalinghealth:table_loot_mod"
+}

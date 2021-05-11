@@ -1,0 +1,10 @@
+{
+  "cursedHeartChange": 10,
+  "enchantedHeartChange": -10,
+  "chanceHeartChange": 10,
+  "heartCrystalBonusRegen": 4,
+  "heartCrystalLevelCost": 3,
+  "heartCrystalHealthIncrease": 1,
+  "powerCrystalLevelCost": 3,
+  "powerCrystalDamageIncrease": 0.5
+}

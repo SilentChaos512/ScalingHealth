@@ -3,7 +3,22 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [4.0.4] - 2021-03-15
+## [4.1.0] - 2021
+### Notes
+- Previous configs will NOT work anymore and will have to be transferred over to being a datapack. Information about datapacks can be find on the minecraft wiki. For other SH specific inquiries with datapacks leave a comment on CF or join the discord
+- This update is NOT network compatible, and will require both the client and the server to be up to date.
+### Added
+- Moved config options to the datapack system
+- Changed a few default values, lowering difficulty overall by default
+- Changed default value for xp level threshold before health gain (3 -> 10 levels)
+- Added ukrainian translation, courtesy of github user Yuraplonka
+### Fixed
+- Fixed power crystal ore gen config option not working
+- Fixed crash occurring when a creeper would explode with certain mods installed
+- Fixed dimension/biome difficulty multiplier not working properly when the other list was empty
+- Fixed some crashes/bugs occurring from modifying the config files
+
+## [4.0.5] - 2021-03-15
 ### Fixed
 - Chests loot tables are now exposed to be modified by datapacks. Requires Forge 36.0.14 and up.
 

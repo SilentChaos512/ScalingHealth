@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "entries": [
+    "scalinghealth:chests/stronghold_library",
+    "scalinghealth:chests/abandoned_mineshaft",
+    "scalinghealth:chests/simple_dungeon",
+    "scalinghealth:hostile",
+    "scalinghealth:chests/underwater_ruin_big",
+    "scalinghealth:chests/woodland_mansion",
+    "scalinghealth:chests/buried_treasure",
+    "scalinghealth:chests/nether_bridge",
+    "scalinghealth:peaceful"
+  ]
+}

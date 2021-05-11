@@ -119,7 +119,7 @@ dependencies {
 }
 
 jar {
-    appendix = "${project.mc_version}"
+    archiveAppendix = "${project.mc_version}"
     manifest {
         attributes(["Specification-Title": project.mod_id,
                     "Specification-Vendor": "SilentChaos512",
@@ -135,20 +135,20 @@ jar {
 }
 
 task deobfJar(type: Jar) {
-    appendix = "${project.mc_version}"
-    classifier = 'deobf'
+    archiveAppendix = "${project.mc_version}"
+    archiveClassifier = 'deobf'
     from sourceSets.main.output
 }
 
 task sourcesJar(type: Jar) {
-    appendix = "${project.mc_version}"
-    classifier = 'sources'
+    archiveAppendix = "${project.mc_version}"
+    archiveClassifier = 'sources'
     from sourceSets.main.allJava
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    appendix = "${project.mc_version}"
-    classifier = 'javadoc'
+    archiveAppendix = "${project.mc_version}"
+    archiveClassifier = 'javadoc'
     from javadoc.getDestinationDir()
 }
 
@@ -162,6 +162,14 @@ artifacts {
     if (project.hasProperty('doJavadocJar')) {
         archives javadocJar
     }
+}
+
+task zipUserStartPack(type: Zip) {
+    archiveBaseName = 'user_start_pack'
+    archiveVersion = '1'
+
+    destinationDirectory = file('build/zips')
+    from ('user_starter_pack')
 }
 
 class Secrets {
@@ -188,18 +196,24 @@ curseforge {
         apiKey = secret.curseforgeAPIKey
         project {
             id = project.cf_project_id
-            changelog = file(project.cf_changelog_filename)
-            changelogType = 'markdown'
-            releaseType = project.cf_release_type
             addGameVersion(project.mc_version)
             addGameVersion('1.16.5')
             mainArtifact(jar) {
+                changelog = file(project.cf_changelog_filename)
+                changelogType = 'markdown'
+                releaseType = project.cf_release_type
                 relations {
                     requiredDependency 'silent-lib'
+                    optionalDependency 'configured'
                 }
             }
+            addArtifact(zipUserStartPack) {
+                releaseType = 'release'
+            }
         }
-        curseGradleOptions.debug = true
+        options {
+            debug = true
+        }
     }
 }
 
@@ -298,7 +312,7 @@ String getBuildNumber() {
 }
 
 task incrementBuild {
-    doFirst {
+    doLast {
         def versionFile = file('version.properties')
         if (versionFile.canRead()) {
             Properties versionProps = new Properties()
@@ -326,7 +340,6 @@ def writeUpdateJson() {
     json[project.mc_version] = json[project.mc_version].sort([compare: {a, b -> b.compareTo(a)}] as Comparator)
     json['promos']["${project.mc_version}-latest"] = version
 
-    println(json)
     file.write(JsonOutput.prettyPrint(JsonOutput.toJson(json)))
 }
 
@@ -339,9 +352,13 @@ task createUpdateJson {
 
 tasks.configureEach { task ->
     if (task.name == 'curseforge' + project.cf_project_id) {
-        task.finalizedBy {
-            incrementBuild
-            createUpdateJson
+        if (!project.extensions.getByType(com.matthewprenger.cursegradle.CurseExtension).curseGradleOptions.debug) {
+            task.finalizedBy {
+                incrementBuild
+            }
+            task.finalizedBy {
+                createUpdateJson
+            }
         }
     }
 }

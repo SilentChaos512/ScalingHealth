@@ -1,0 +1,10 @@
+{
+  "conditions": [
+    {
+      "condition": "scalinghealth:entity_group_condition",
+      "entity_group": "hostile"
+    }
+  ],
+  "table": "scalinghealth:bonus_drops/hostile",
+  "type": "scalinghealth:table_loot_mod"
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "group": "scalinghealth",
+  "pattern": [
+    "xxx",
+    "xxx",
+    "xxx"
+  ],
+  "key": {
+    "x": {
+      "item": "scalinghealth:power_crystal_shard"
+    }
+  },
+  "result": {
+    "item": "scalinghealth:power_crystal"
+  }
+}
