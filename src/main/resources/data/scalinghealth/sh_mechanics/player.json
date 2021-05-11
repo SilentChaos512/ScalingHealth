@@ -3,7 +3,7 @@
   "minHealth" : 2,
   "maxHealth" : 200,
   "setOnDeath": "maxHealth",
-  "levelsPerHp": 3,
+  "levelsPerHp": 10,
   "hpPerLevel":  1,
   "maxAttackDamage" : 10,
   "regen" : {

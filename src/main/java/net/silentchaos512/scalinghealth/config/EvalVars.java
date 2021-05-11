@@ -46,7 +46,7 @@ public enum EvalVars {
 
     public static Expression dummyPopulate(Expression expression) {
         for (EvalVars var : values())
-            expression.setVariable(var.varName(), "0");
+            expression.setVariable(var.varName(), "1");
         return expression;
     }
 

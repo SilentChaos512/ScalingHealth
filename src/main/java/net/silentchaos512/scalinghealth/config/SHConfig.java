@@ -73,9 +73,6 @@ public class SHConfig {
 
             //region Health Hearts
 
-            builder.comment("Settings for heart rows")
-                    .push("hearts.health.icons");
-
             heartIconStyle = builder
                     .comment("Heart style",
                             "REPLACE_ALL: All rows replaced with Scaling Health style hearts",
@@ -114,9 +111,6 @@ public class SHConfig {
             heartTanks = builder
                     .comment("Enable heart tanks, the small icons above your hearts which indicate the number of filled health rows")
                     .define("hearts.health.tanks.enabled", true);
-
-            builder.comment("Settings for the text displayed next to the heart rows")
-                    .push("hearts.health.text");
 
             healthTextStyle = builder
                     .comment("Style of health text")
@@ -215,6 +209,11 @@ public class SHConfig {
                     .define("blights.render", true);
             //endregion
         }
+
+        public void reload() {
+            this.absorptionHeartColors.recalculate();
+            this.heartColors.recalculate();
+        }
     }
 
     public static class Server {
@@ -249,82 +248,81 @@ public class SHConfig {
 
             crystalsAddHealth = builder
                     .comment("Enable player bonus hp by crystals.")
-                    .define("features.crystalsAddHealth", true);
+                    .define("crystalsAddHealth", true);
 
             xpAddHealth = builder
                     .comment("Enable player bonus hp by xp.")
-                    .define("features.xpAddHealth", true);
+                    .define("xpAddHealth", true);
 
             crystalsRegenHealth = builder
                     .comment("Enable player regen hp by crystals.")
-                    .define("features.crystalsRegenHealth", true);
+                    .define("crystalsRegenHealth", true);
 
             crystalsAddPetHealth = builder
                     .comment("Enable pet add hp by crystals.")
-                    .define("features.crystalsAddPetHealth", true);
+                    .define("crystalsAddPetHealth", true);
 
             crystalsAddDamage = builder
                     .comment("Enable player add damage by crystals.")
-                    .define("features.crystalsAddDamage", true);
+                    .define("crystalsAddDamage", true);
 
             hpCrystalsOreGen = builder
                     .comment("Enable ore gen of health crystals. Still drops as loot.")
-                    .define("features.hpCrystalsOreGen", true);
+                    .define("hpCrystalsOreGen", true);
 
             powerCrystalsOreGen = builder
                     .comment("Enable ore gen of power crystals. Still drops as loot.")
-                    .define("features.powerCrystalsOreGen", true);
+                    .define("powerCrystalsOreGen", true);
 
             mobHpIncrease = builder
                     .comment("Mobs will gain bonus health with difficulty.")
-                    .define("features.mobHpIncrease", true);
+                    .define("mobHpIncrease", true);
 
             mobDamageIncrease = builder
                     .comment("Mobs will gain bonus damage with difficulty.")
-                    .define("features.mobDamageIncrease", true);
+                    .define("mobDamageIncrease", true);
 
             playerDamageScaling = builder
                     .comment("Enable player damage scaling.")
-                    .define("features.playerDamageScaling", true);
+                    .define("playerDamageScaling", true);
 
             mobDamageScaling = builder
                     .comment("Enable mob damage scaling.")
-                    .define("features.mobDamageScaling", true);
+                    .define("mobDamageScaling", true);
 
             enableDifficulty = builder
                     .comment("Enable difficulty system. If disabled, everything will have 0 difficulty.")
-                    .define("features.enableDifficulty", true);
+                    .define("enableDifficulty", true);
 
             enableBlights = builder
                     .comment("Enable blights. If disabled, no blights will spawn.")
-                    .define("features.enableBlights", true);
+                    .define("enableBlights", true);
 
-
-            builder.comment(
+            builder.pop().comment(
                     "Debug settings are intended for tuning configs or diagnosing issues.",
                     "They may decrease performance and should be disabled for normal play."
             ).push("debug");
 
             debugMaster = builder
                     .comment("Must be true for other debug settings to apply")
-                    .define("debug.masterSwitch", false);
+                    .define("masterSwitch", false);
             debugShowOverlay = withMasterCheck(builder
                     .comment("Show some text in-game about player health, difficulty, and maybe other things.")
-                    .define("debug.showOverlay", true)
+                    .define("showOverlay", true)
             );
             debugLogEntitySpawns = withMasterCheck(builder
                     .comment("Log details of entity spawns, including effects of difficulty.",
                             "This creates a lot of log spam, and will likely lag the game.")
-                    .define("debug.logEntitySpawns", false)
+                    .define("logEntitySpawns", false)
             );
             debugMobPotionEffects = withMasterCheck(builder
                     .comment("Logs details of potions effects added to mobs.")
-                    .define("debug.logApplyingMobPotions", false)
+                    .define("logApplyingMobPotions", false)
             );
             debugLogScaledDamage = withMasterCheck(builder
                     .comment("Log details of scaled damage, useful for fine-tuning damage scaling.",
                             "May create a fair amount of log spam, but shouldn't slow down the game too much.")
-                    .define("debug.logDamageScaling", true)
+                    .define("logDamageScaling", false)
             );
         }
 
@@ -355,6 +353,6 @@ public class SHConfig {
     }
 
     private static boolean validateColor(Object o) {
-        return o instanceof String && Color.validate((String) o);
+        return o instanceof Integer && Color.validate(o.toString());
     }
 }

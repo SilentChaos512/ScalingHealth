@@ -71,6 +71,7 @@ public class DifficultySourceCapability implements IDifficultySource, ICapabilit
         difficulty = nbt.getFloat(NBT_DIFFICULTY);
     }
 
+    //TODO remove try-catch? also not attaching to client world?
     public static boolean canAttachTo(ICapabilityProvider obj) {
         try {
             if (obj.getCapability(INSTANCE).isPresent()) {

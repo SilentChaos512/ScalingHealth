@@ -18,14 +18,11 @@
 
 package net.silentchaos512.scalinghealth.event;
 
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.SpawnReason;
-import net.minecraft.entity.passive.TameableEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.DamageSource;
 import net.minecraft.util.Util;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraftforge.event.TickEvent;
@@ -49,7 +46,6 @@ import net.silentchaos512.scalinghealth.utils.config.SHMobs;
 import net.silentchaos512.scalinghealth.utils.config.SHPlayers;
 import net.silentchaos512.utils.MathUtils;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -65,7 +61,7 @@ public final class CommonEvents {
 
       if (!(player instanceof ServerPlayerEntity)) return;
       ServerPlayerEntity sp = (ServerPlayerEntity) event.getPlayer();
-      ScalingHealth.LOGGER.info("Sending login packet to player {}", player);
+      ScalingHealth.LOGGER.debug("Sending login packet to player {}", player);
       ClientLoginMessage msg = new ClientLoginMessage(SHDifficulty.areaMode(), (float) SHDifficulty.maxValue());
       Network.channel.sendTo(msg, sp.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
    }
@@ -107,37 +103,6 @@ public final class CommonEvents {
    public static void onLevelChange(PlayerXpEvent.LevelChange event) {
       if(!EnabledFeatures.healthXpEnabled() || event.isCanceled()) return;
       SHPlayers.getPlayerData(event.getPlayer()).updateStats(event.getPlayer());
-   }
-
-   /**
-    * Get the player that caused a mob's death. Could be a FakePlayer or null.
-    *
-    * @return The player that caused the damage, or the owner of the tamed animal that caused the
-    * damage.
-    */
-   @Nullable
-   private static PlayerEntity getPlayerThatCausedDeath(DamageSource source) {
-      if (source == null) {
-         return null;
-      }
-
-      // Player is true source.S
-      Entity entitySource = source.getTrueSource();
-      if (entitySource instanceof PlayerEntity) {
-         return (PlayerEntity) entitySource;
-      }
-
-      // Player's pet is true source.
-      boolean isTamedAnimal = entitySource instanceof TameableEntity
-              && ((TameableEntity) entitySource).isTamed();
-      if (isTamedAnimal) {
-         TameableEntity tamed = (TameableEntity) entitySource;
-         if (tamed.getOwner() instanceof PlayerEntity) {
-            return (PlayerEntity) tamed.getOwner();
-         }
-      }
-      // No player responsible.
-      return null;
    }
 
    // TODO APRILS FOOLS?

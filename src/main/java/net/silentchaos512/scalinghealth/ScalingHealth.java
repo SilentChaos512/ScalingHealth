@@ -10,6 +10,7 @@ import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.server.FMLServerAboutToStartEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -51,6 +52,7 @@ public class ScalingHealth {
         Network.init();
 
         modbus.addListener(this::commonSetup);
+        modbus.addListener(this::reloadConfig);
         modbus.addGenericListener(GlobalLootModifierSerializer.class, this::registerLootModSerializers);
 
         MinecraftForge.EVENT_BUS.addListener(this::serverAboutToStart);
@@ -70,6 +72,11 @@ public class ScalingHealth {
 
     private void serverAboutToStart(FMLServerAboutToStartEvent event) {
         ModCommands.registerAll(event.getServer().getCommandManager().getDispatcher());
+    }
+
+    private void reloadConfig(ModConfig.Reloading event) {
+        if (event.getConfig().getType() == ModConfig.Type.CLIENT)
+            SHConfig.CLIENT.reload();
     }
 
     public static ResourceLocation getId(String path) {

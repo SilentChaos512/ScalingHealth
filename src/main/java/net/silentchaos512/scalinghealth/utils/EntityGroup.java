@@ -8,6 +8,8 @@ import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanicListener;
 import net.silentchaos512.scalinghealth.utils.config.EnabledFeatures;
 import net.silentchaos512.scalinghealth.utils.config.SHMobs;
 
+//TODO add tag based forcing, as the HOSTILE and PEACEFUL cases are purely determined by the IMob interface
+// and the BOSS case makes no more sense as there is no way to know in code
 public enum EntityGroup {
     PEACEFUL,
     HOSTILE,

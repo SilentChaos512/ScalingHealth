@@ -4,6 +4,8 @@ import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.Attributes;
 import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
+import net.minecraft.entity.boss.WitherEntity;
+import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.monster.IMob;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
@@ -54,7 +56,8 @@ public final class MobDifficultyHandler {
             Network.channel.send(PacketDistributor.TRACKING_ENTITY.with(()->entity), msg);
 
             BlightHandler.applyBlightPotionEffects(entity);
-            if(EntityGroup.from(entity) == EntityGroup.BOSS){
+            //TODO no good in code method for determining if an entity is a boss or not, switch to tag?
+            if(entity instanceof WitherEntity || entity instanceof EnderDragonEntity) {
                 ITextComponent blight = new TranslationTextComponent("misc.scalinghealth.blight", entity.getDisplayName()).deepCopy().mergeStyle(TextFormatting.DARK_PURPLE);
                 entity.setCustomName(blight);
             }

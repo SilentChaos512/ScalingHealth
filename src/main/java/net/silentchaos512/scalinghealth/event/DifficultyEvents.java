@@ -98,21 +98,20 @@ public final class DifficultyEvents {
 
     @SubscribeEvent
     public static void onMobDeath(LivingDeathEvent event) {
-        if(!(event.getEntityLiving() instanceof MobEntity)) return;
-        MobEntity entity = (MobEntity) event.getEntityLiving();
+        LivingEntity killed = event.getEntityLiving();
         if (event.getSource() == null || event.getEntity().world.isRemote)
             return;
 
         Entity entitySource = event.getSource().getTrueSource();
-        boolean isTamedAnimal = entitySource instanceof TameableEntity && ((TameableEntity) entitySource).isTamed();
-        if (entitySource instanceof PlayerEntity ) {
-            SHDifficulty.setSourceDifficulty((PlayerEntity) entitySource, SHDifficulty.applyKillMutator(entity, (PlayerEntity) entitySource));
+        if (entitySource instanceof PlayerEntity) {
+            SHDifficulty.applyKillMutator(killed, (PlayerEntity) entitySource);
             return;
         }
-        if(isTamedAnimal){
+
+        if(entitySource instanceof TameableEntity && ((TameableEntity) entitySource).isTamed()) {
             TameableEntity pet = (TameableEntity) entitySource;
             if(pet.getOwner() instanceof PlayerEntity)
-                SHDifficulty.setSourceDifficulty(((PlayerEntity) pet.getOwner()), SHDifficulty.applyKillMutator(entity, (PlayerEntity) pet.getOwner()));
+                SHDifficulty.applyKillMutator(killed, (PlayerEntity) pet.getOwner());
         }
     }
 
@@ -131,7 +130,6 @@ public final class DifficultyEvents {
         }
     }
 
-    //Testing stuff with the priority
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onPlayerClone(PlayerEvent.Clone event) {
         // Player is cloned. Copy capabilities before applying health/difficulty changes if needed.
@@ -157,13 +155,6 @@ public final class DifficultyEvents {
             notifyOfChanges(clone, "difficulty", source.getDifficulty(), newDifficulty);
             source.setDifficulty(newDifficulty);
         });
-    }
-
-    @SubscribeEvent
-    public static void onPlayerJoinServer(PlayerEvent.PlayerLoggedInEvent event) {
-        PlayerEntity player = event.getPlayer();
-        ScalingHealth.LOGGER.info("Updating stats for {}", player.getCustomName());
-        SHPlayers.getPlayerData(player).updateStats(player);
     }
 
     private static void notifyOfChanges(PlayerEntity player, String valueName, float oldValue, float newValue) {

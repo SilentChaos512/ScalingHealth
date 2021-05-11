@@ -1,9 +1,11 @@
 package net.silentchaos512.scalinghealth.utils.config;
 
 import com.mojang.datafixers.util.Pair;
+import com.udojava.evalex.Expression;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.MobEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -18,12 +20,14 @@ import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
 import net.silentchaos512.scalinghealth.capability.IDifficultySource;
 import net.silentchaos512.scalinghealth.config.EvalVars;
 import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanicListener;
+import net.silentchaos512.scalinghealth.utils.EntityGroup;
 import net.silentchaos512.scalinghealth.utils.mode.AreaDifficultyMode;
 import net.silentchaos512.utils.MathUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -95,6 +99,7 @@ public final class SHDifficulty {
         return SHMechanicListener.getDifficultyMechanics().multipliers.getScale(world, world.getBiome(pos));
     }
 
+    //TODO Can't be checked on the ClientWorld, have to send packet (for debug overlay)
     public static double lunarMultiplier(World world) {
         return (world.getDimensionKey() != World.OVERWORLD || world.isDaytime()) ? 1 :
                 SHMechanicListener.getDifficultyMechanics().multipliers
@@ -141,8 +146,31 @@ public final class SHDifficulty {
         return EvalVars.apply(player, SHMechanicListener.getDifficultyMechanics().mutators.onPlayerDeath.get());
     }
 
-    public static double applyKillMutator(MobEntity entity, PlayerEntity player){
-        return EvalVars.apply(player, SHMechanicListener.getDifficultyMechanics().mutators.onPlayerKilled.get());
+    public static void applyKillMutator(LivingEntity killed, PlayerEntity killer) {
+        //check if player, if it is, no other mutator can apply
+        if (killed instanceof PlayerEntity) {
+            setSourceDifficulty(killer, EvalVars.apply(killer, SHMechanicListener.getDifficultyMechanics().mutators.onPlayerKilled.get()));
+            return;
+        }
+
+        //check if blight, continue even if it to apply the base mutator
+        if (affected(killed).isBlight())
+            setSourceDifficulty(killer, EvalVars.apply(killer, SHMechanicListener.getDifficultyMechanics().mutators.onBlightKilled.get()));
+
+        //check for entity specific mutators first
+        for (Pair<List<ResourceLocation>, Supplier<Expression>> p : SHMechanicListener.getDifficultyMechanics().mutators.byEntity) {
+            if (p.getFirst().contains(killed.getType().getRegistryName())) {
+                setSourceDifficulty(killer, EvalVars.apply(killer, p.getSecond().get()));
+                return;
+            }
+        }
+
+        //finally fall back to categorising entity between peaceful and hostile
+        if (EntityGroup.from(killed, true) == EntityGroup.PEACEFUL) {
+            setSourceDifficulty(killer, EvalVars.apply(killer, SHMechanicListener.getDifficultyMechanics().mutators.onPeacefulKilled.get()));
+        } else {
+            setSourceDifficulty(killer, EvalVars.apply(killer, SHMechanicListener.getDifficultyMechanics().mutators.onHostileKilled.get()));
+        }
     }
 
     public static double diffOnPlayerSleep(PlayerEntity entity){

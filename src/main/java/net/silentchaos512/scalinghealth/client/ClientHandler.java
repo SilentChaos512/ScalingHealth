@@ -30,34 +30,30 @@ public final class ClientHandler {
 
     private ClientHandler() {}
 
-    public static void onMessage(ClientSyncMessage msg, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> handleSyncMessage(msg));
+    public static void handleSyncMessage(ClientSyncMessage msg, Supplier<NetworkEvent.Context> ctx) {
+        ctx.get().enqueueWork(() -> {
+            playerDifficulty = msg.playerDifficulty;
+            areaDifficulty = msg.areaDifficulty;
+            regenTimer = msg.regenTimer;
+            locationMultiPercent = msg.locationMultiPercent;
+
+            Minecraft mc = Minecraft.getInstance();
+            ClientPlayerEntity player = mc.player;
+            if (player != null) {
+                player.experienceLevel = msg.experienceLevel;
+            }
+        });
         ctx.get().setPacketHandled(true);
     }
 
-    private static void handleSyncMessage(ClientSyncMessage msg) {
-        playerDifficulty = msg.playerDifficulty;
-        areaDifficulty = msg.areaDifficulty;
-        regenTimer = msg.regenTimer;
-        locationMultiPercent = msg.locationMultiPercent;
-
-        Minecraft mc = Minecraft.getInstance();
-        ClientPlayerEntity player = mc.player;
-        if (player != null) {
-            player.experienceLevel = msg.experienceLevel;
-        }
-    }
-
-    public static void onLoginMessage(ClientLoginMessage msg, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> handleLoginMessage(msg));
+    public static void handleLoginMessage(ClientLoginMessage msg, Supplier<NetworkEvent.Context> ctx) {
+        ctx.get().enqueueWork(() -> {
+            ScalingHealth.LOGGER.info(MARKER, "Processing login packet");
+            areaMode = msg.areaMode;
+            maxDifficultyValue = msg.maxDifficultyValue;
+            ScalingHealth.LOGGER.info(MARKER, "World area mode: {}", areaMode.getName());
+            ScalingHealth.LOGGER.info(MARKER, "World max difficulty: {}", maxDifficultyValue);
+        });
         ctx.get().setPacketHandled(true);
-    }
-
-    private static void handleLoginMessage(ClientLoginMessage msg) {
-        ScalingHealth.LOGGER.info(MARKER, "Processing login packet");
-        areaMode = msg.areaMode;
-        maxDifficultyValue = msg.maxDifficultyValue;
-        ScalingHealth.LOGGER.info(MARKER, "World area mode: {}", areaMode.getName());
-        ScalingHealth.LOGGER.info(MARKER, "World max difficulty: {}", maxDifficultyValue);
     }
 }

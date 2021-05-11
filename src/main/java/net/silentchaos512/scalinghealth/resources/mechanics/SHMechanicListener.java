@@ -88,6 +88,16 @@ public class SHMechanicListener extends JsonReloadListener {
         return getInstance().damageScalingMechanics;
     }
 
+    public static void setClientInstance(PlayerMechanics playerMechanics, ItemMechanics itemMechanics, MobMechanics mobMechanics, DifficultyMechanics difficultyMechanics, DamageScalingMechanics damageScalingMechanics) {
+        new SHMechanicListener();
+        instance.playerMechanics = playerMechanics;
+        instance.itemMechanics = itemMechanics;
+        instance.mobMechanics = mobMechanics;
+        instance.difficultyMechanics = difficultyMechanics;
+        instance.damageScalingMechanics = damageScalingMechanics;
+        ScalingHealth.LOGGER.debug("Loaded SHMechanics on the client.");
+    }
+
     @SubscribeEvent
     public static void addListener(AddReloadListenerEvent event) {
         event.addListener(new SHMechanicListener());
