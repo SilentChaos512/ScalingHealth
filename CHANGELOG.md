@@ -3,7 +3,11 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [4.1.0] - 2021
+## [4.1.1] - 2021-05-16
+### Fixed
+- Commands now work after /reload
+
+## [4.1.0] - 2021-05-11
 ### Notes
 - Previous configs will NOT work anymore and will have to be transferred over to being a datapack. Information about datapacks can be find on the minecraft wiki. For other SH specific inquiries with datapacks leave a comment on CF or join the discord
 - This update is NOT network compatible, and will require both the client and the server to be up to date.

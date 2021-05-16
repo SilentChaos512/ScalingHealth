@@ -21,7 +21,6 @@ apply plugin: 'net.minecraftforge.gradle'
 repositories {
     maven { url = 'https://maven.minecraftforge.net/' }
     mavenLocal()
-    jcenter()
 }
 
 tasks.withType(JavaCompile) {
@@ -33,10 +32,14 @@ javadoc {
 }
 
 archivesBaseName = project.archivesBaseName
-def versionInfo = getModVersion()
-System.out.println(versionInfo)
-version = "${versionInfo['version']}"
-def version_short = "${versionInfo['version_short']}"
+
+ext {
+    VERSION_INFO = getModVersion()
+    VERSION_SHORT = "${VERSION_INFO['version_short']}"
+}
+
+System.out.println(VERSION_INFO)
+version = "${VERSION_INFO['version']}"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8) // Mojang ships Java 8 to end users, so your mod should target Java 8.
 
@@ -123,7 +126,7 @@ jar {
     manifest {
         attributes(["Specification-Title": project.mod_id,
                     "Specification-Vendor": "SilentChaos512",
-                    "Specification-Version": "${versionInfo['version_simple']}",
+                    "Specification-Version": "${VERSION_INFO['version_simple']}",
                     "Implementation-Title": project.name,
                     "Implementation-Version": "${version}",
                     "Implementation-Vendor" :"SilentChaos512",
@@ -179,6 +182,7 @@ class Secrets {
     }
 }
 
+import com.matthewprenger.cursegradle.CurseExtension
 import groovy.json.JsonSlurper
 
 def secretFile = file 'secret.json'
@@ -280,15 +284,14 @@ task incrementBuild {
 import groovy.json.JsonOutput
 
 def writeUpdateJson() {
-    def version = getModVersion()['version_short']
     def slurper = new JsonSlurper()
     def file = new File('update.json')
     def json = slurper.parse(file)
 
-    if (!json[project.mc_version].containsKey(version.toString()))
-        json[project.mc_version][version.toString()] = project.changelogUrl
+    if (!json[project.mc_version].containsKey(VERSION_SHORT))
+        json[project.mc_version][VERSION_SHORT] = project.changelogUrl
     json[project.mc_version] = json[project.mc_version].sort([compare: {a, b -> b.compareTo(a)}] as Comparator)
-    json['promos']["${project.mc_version}-latest"] = version
+    json['promos']["${project.mc_version}-latest"] = VERSION_SHORT
 
     file.write(JsonOutput.prettyPrint(JsonOutput.toJson(json)))
 }
@@ -302,7 +305,7 @@ task createUpdateJson {
 
 tasks.configureEach { task ->
     if (task.name == 'curseforge' + project.cf_project_id) {
-        if (!project.extensions.getByType(com.matthewprenger.cursegradle.CurseExtension).curseGradleOptions.debug) {
+        if (!project.extensions.getByType(CurseExtension).curseGradleOptions.debug) {
             task.finalizedBy {
                 incrementBuild
             }
