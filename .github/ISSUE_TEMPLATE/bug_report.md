@@ -10,8 +10,8 @@ labels: bug
 - **Scaling Health**: x.x.x
 - **Silent Lib**: x.x.x
 - **Forge**: x.x.x
-- **Modpack**: N/A <!-- if publicly available -->
-- **Optifine Installed**: No <!-- enter Yes or No -->
+- **Modpack**: N/A <!-- if publicly available state the name, if it is custom SEND the modlist, if you put N/A you are ONLY using SH + lib and are encountering the bug -->
+- **Optifine Installed**: No <!-- if yes, remove it before submitting any log files, for it will make it easier to read them -->
 
 ## Expected Behavior
 <!-- What do you expect to happen in this case? -->
@@ -25,7 +25,7 @@ labels: bug
 
 ## Links/Images
 <!-- Links to crash reports, logs, images, videos, or related issues, if appropriate. -->
-<!-- Do not paste the contents of the crash report here. Drag and drop the files or upload to Gist, Dropbox, Pastebin, or wherever you can. -->
+<!-- Do not paste the contents of the crash report here nor give a file to be downloaded, instead upload to Gist, Dropbox, Pastebin, or wherever you can. -->
 
 - (Link or file)
 - (Another link or file, if needed)
