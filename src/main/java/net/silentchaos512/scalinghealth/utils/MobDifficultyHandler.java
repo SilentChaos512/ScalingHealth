@@ -68,19 +68,19 @@ public final class MobDifficultyHandler {
         if(difficulty <= 0) return;
 
         // Random potion effect
-        SHMobs.getMobEffects().forEach(c -> c.apply(entity, difficulty));
+        SHMobs.getMobEffects().forEach(c -> c.tryApply(entity, difficulty));
 
         if(EnabledFeatures.mobHpIncreaseEnabled()) {
             double healthBoost = difficulty;
-            ModifiableAttributeInstance attributeMaxHealth = entity.getAttribute(Attributes.MAX_HEALTH);
-            double baseMaxHealth = attributeMaxHealth.getBaseValue();
+
             double healthMultiplier = isHostile
                     ? SHMobs.healthHostileMultiplier()
                     : SHMobs.healthPassiveMultiplier();
 
             healthBoost *= healthMultiplier;
 
-            healthBoost += 2 * healthMultiplier * difficulty * ScalingHealth.RANDOM.nextFloat();;
+            //TODO test... wtf was i doing here?
+            //healthBoost += 2 * healthMultiplier * difficulty * ScalingHealth.RANDOM.nextFloat();
 
             if(CommonEvents.spawnerSpawns.contains(entity.getUniqueID())){
                 healthBoost *= SHMobs.spawnerModifier();
@@ -89,7 +89,7 @@ public final class MobDifficultyHandler {
 
             // Apply extra health and damage.
             MobHealthMode mode = SHMobs.getHealthMode();
-            ModifierHandler.setMaxHealth(entity, mode.getModifierHealth(healthBoost, baseMaxHealth), mode.getOp());
+            ModifierHandler.setMaxHealth(entity, mode.getModifierHealth(healthBoost, entity.getAttribute(Attributes.MAX_HEALTH).getBaseValue()), mode.getOp());
         }
 
         // Increase attack damage.
