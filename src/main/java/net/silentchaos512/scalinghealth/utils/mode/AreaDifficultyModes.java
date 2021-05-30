@@ -38,6 +38,8 @@ public class AreaDifficultyModes {
 
         public double getAverage(World world, BlockPos pos) {
             List<Pair<IDifficultySource, BlockPos>> sources = SHDifficulty.positionedPlayerSources(world, pos, getRadius());
+            if (sources.isEmpty())
+                return 0;
             return sources.stream()
                     .map(p -> p.getFirst().getDifficulty())
                     .reduce(Float::sum)
@@ -54,7 +56,7 @@ public class AreaDifficultyModes {
                 total += weight * p.getFirst().getDifficulty();
                 totalWeight += weight;
             }
-            return total / totalWeight;
+            return totalWeight <= 0 ? 0 : total / totalWeight;
         }
 
         @Override
