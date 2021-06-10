@@ -53,6 +53,7 @@ import java.util.UUID;
 @Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID)
 public final class CommonEvents {
    public static List<UUID> spawnerSpawns = new ArrayList<>();
+   private static boolean changedLevelThisTick = false;
 
    @SubscribeEvent
    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
@@ -95,14 +96,20 @@ public final class CommonEvents {
    public static void playerTick(TickEvent.PlayerTickEvent event){
       if(event.phase == TickEvent.Phase.START) return;
       PlayerEntity player = event.player;
+
       if (player.world.isRemote) return;
       SHPlayers.getPlayerData(player).tick(player);
+
+      if (changedLevelThisTick) {
+         changedLevelThisTick = false;
+         SHPlayers.getPlayerData(player).updateStats(player);
+      }
    }
 
    @SubscribeEvent(priority = EventPriority.LOWEST)
    public static void onLevelChange(PlayerXpEvent.LevelChange event) {
       if(!EnabledFeatures.healthXpEnabled() || event.isCanceled()) return;
-      SHPlayers.getPlayerData(event.getPlayer()).updateStats(event.getPlayer());
+      changedLevelThisTick = true; //delay the player update until after the event, so that the Exp on the player was updated.
    }
 
    // TODO APRILS FOOLS?
