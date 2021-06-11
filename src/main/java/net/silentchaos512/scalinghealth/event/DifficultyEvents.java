@@ -78,7 +78,7 @@ public final class DifficultyEvents {
     public static void onLivingUpdate(LivingEvent.LivingUpdateEvent event) {
         LivingEntity entity = event.getEntityLiving();
         //Return if players are empty on an integrated server, as the player needs a small delay to connect.
-        if (entity.world.isRemote || (entity.world.getPlayers().isEmpty() && ((ServerWorld)entity.world).getServer() instanceof IntegratedServer))
+        if (entity.world.isRemote || (entity.world.getPlayers().isEmpty() && !((ServerWorld)entity.world).getServer().isDedicatedServer()))
             return;
 
         // Tick mobs, which will calculate difficulty when appropriate and apply changes
