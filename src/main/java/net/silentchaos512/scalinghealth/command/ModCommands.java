@@ -20,13 +20,13 @@ public final class ModCommands {
 
     static IFormattableTextComponent playerNameText(PlayerEntity player) {
         return new TranslationTextComponent("command.scalinghealth.playerName",
-                player.getName().deepCopy().mergeStyle(TextFormatting.ITALIC)).mergeStyle(TextFormatting.AQUA);
+                player.getName().copy().withStyle(TextFormatting.ITALIC)).withStyle(TextFormatting.AQUA);
     }
 
     static IFormattableTextComponent valueText(double value, double maxValue) {
         return new TranslationTextComponent("command.scalinghealth.valueOverMax",
                 String.format("%.1f", value),
                 String.format("%.1f", maxValue)
-        ).deepCopy().mergeStyle(TextFormatting.WHITE);
+        ).copy().withStyle(TextFormatting.WHITE);
     }
 }

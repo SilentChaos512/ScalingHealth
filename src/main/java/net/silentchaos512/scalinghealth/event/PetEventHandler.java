@@ -39,10 +39,10 @@ public class PetEventHandler {
             return;
 
         LivingEntity entity = event.getEntityLiving();
-        if (entity != null && !entity.world.isRemote) {
+        if (entity != null && !entity.level.isClientSide) {
             boolean fullHp = entity.getHealth() == entity.getMaxHealth();
-            boolean isTamed = entity instanceof TameableEntity && ((TameableEntity) entity).isTamed();
-            boolean isRegenTime = entity.hurtResistantTime <= 0 && entity.ticksExisted % regenDelay == 0;
+            boolean isTamed = entity instanceof TameableEntity && ((TameableEntity) entity).isTame();
+            boolean isRegenTime = entity.invulnerableTime <= 0 && entity.tickCount % regenDelay == 0;
             if (isTamed && isRegenTime && !fullHp)
                 entity.heal(2f);
         }
@@ -56,10 +56,10 @@ public class PetEventHandler {
             return;
 
         TameableEntity pet = (TameableEntity) event.getTarget();
-        if(!pet.isTamed())
+        if(!pet.isTame())
             return;
 
-        if(pet.world.isRemote) {
+        if(pet.level.isClientSide) {
             event.setCancellationResult(ActionResultType.SUCCESS);
             event.setCanceled(true);
             return;

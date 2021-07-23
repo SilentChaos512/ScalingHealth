@@ -48,8 +48,8 @@ public interface IPlayerData {
     }
 
     static void sendUpdatePacketTo(PlayerEntity player) {
-        World world = player.world;
-        BlockPos pos = player.getPosition();
+        World world = player.level;
+        BlockPos pos = player.blockPosition();
         ClientSyncMessage msg = new ClientSyncMessage(
                 SHDifficulty.source(player).getDifficulty(),
                 SHDifficulty.source(world).getDifficulty(),
@@ -59,6 +59,6 @@ public interface IPlayerData {
                 player.experienceLevel
         );
         ServerPlayerEntity playerMP = (ServerPlayerEntity) player;
-        Network.channel.sendTo(msg, playerMP.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
+        Network.channel.sendTo(msg, playerMP.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
     }
 }

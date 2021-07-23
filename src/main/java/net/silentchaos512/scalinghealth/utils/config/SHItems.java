@@ -19,12 +19,12 @@ public final class SHItems {
     }
 
     public static int levelCostToUseHeartCrystal(PlayerEntity player) {
-        if (player.abilities.isCreativeMode) return 0;
+        if (player.abilities.instabuild) return 0;
         return SHMechanicListener.getItemMechanics().heartCrystalLevelCost;
     }
 
     public static int levelCostToUsePowerCrystal(PlayerEntity player) {
-        if (player.abilities.isCreativeMode) return 0;
+        if (player.abilities.instabuild) return 0;
         return SHMechanicListener.getItemMechanics().powerCrystalLevelCost;
     }
 

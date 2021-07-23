@@ -39,7 +39,7 @@ public class PetHealthCapability implements IPetData, ICapabilitySerializable<Co
 
     @Override
     public void tick(TameableEntity pet) {
-        if(!refreshed && pet.ticksExisted > 2){
+        if(!refreshed && pet.tickCount > 2){
             refreshed = true;
             ModifierHandler.setMaxHealth(pet, getBonusHealth(), AttributeModifier.Operation.ADDITION);
         }

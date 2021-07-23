@@ -7,7 +7,7 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 
 public class ParticleUtils {
     public static void spawn(IParticleData data, int count, LivingEntity entity) {
-        spawn(data, count, entity.world, entity.getPosX(), entity.getPosY() + 0.65 * entity.getHeight(), entity.getPosZ());
+        spawn(data, count, entity.level, entity.getX(), entity.getY() + 0.65 * entity.getBbHeight(), entity.getZ());
     }
 
     public static void spawn(IParticleData data, int count, IWorld world, double posX, double posY, double posZ) {

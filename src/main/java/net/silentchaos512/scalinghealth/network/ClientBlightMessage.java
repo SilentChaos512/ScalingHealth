@@ -26,7 +26,7 @@ public class ClientBlightMessage {
 
     public static boolean handle(ClientBlightMessage msg, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
-            Entity e = Minecraft.getInstance().world.getEntityByID(msg.entityId);
+            Entity e = Minecraft.getInstance().level.getEntity(msg.entityId);
             if(e instanceof MobEntity)
                 SHDifficulty.affected(e).setIsBlight(true);
         });

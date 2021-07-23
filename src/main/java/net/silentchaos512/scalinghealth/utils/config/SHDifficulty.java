@@ -48,7 +48,7 @@ public final class SHDifficulty {
         IDifficultySource source = SHDifficulty.source(player);
         if (!MathUtils.doublesEqual(source.getDifficulty(), difficulty)) {
             source.setDifficulty((float) difficulty);                               //player diff
-            SHDifficulty.source(player.world).setDifficulty((float) difficulty);    //world diff
+            SHDifficulty.source(player.level).setDifficulty((float) difficulty);    //world diff
         }
     }
 
@@ -61,7 +61,7 @@ public final class SHDifficulty {
 
     public static List<Pair<IDifficultySource, BlockPos>> positionedPlayerSources(IWorld world, Vector3i center, long radius) {
         return playersInRange(world, center, radius)
-                .map(player -> Pair.of(source(player), player.getPosition()))
+                .map(player -> Pair.of(source(player), player.blockPosition()))
                 .collect(Collectors.toList());
     }
 
@@ -69,14 +69,14 @@ public final class SHDifficulty {
         Collection<Tuple<BlockPos, IDifficultySource>> list = new ArrayList<>();
 
         // Get players
-        playersInRange(world, center, radius).forEach(player -> list.add(new Tuple<>(player.getPosition(), SHDifficulty.source(player))));
+        playersInRange(world, center, radius).forEach(player -> list.add(new Tuple<>(player.blockPosition(), SHDifficulty.source(player))));
         return list;
     }
 
     public static Stream<? extends PlayerEntity> playersInRange(IWorld world, Vector3i center, long radius) {
         if (radius <= 0)
-            return world.getPlayers().stream();
-        return world.getPlayers().stream()
+            return world.players().stream();
+        return world.players().stream()
                 .filter(p -> MCMathUtils.distanceSq(p, center) < (radius * radius));
     }
 
@@ -101,9 +101,9 @@ public final class SHDifficulty {
 
     //TODO Can't be checked on the ClientWorld, have to send packet (for debug overlay)
     public static double lunarMultiplier(World world) {
-        return (world.getDimensionKey() != World.OVERWORLD || world.isDaytime()) ? 1 :
+        return (world.dimension() != World.OVERWORLD || world.isDay()) ? 1 :
                 SHMechanicListener.getDifficultyMechanics().multipliers
-                        .getLunarMultiplier(world.getDimensionType().getMoonPhase(world.func_241851_ab()));
+                        .getLunarMultiplier(world.dimensionType().moonPhase(world.dayTime()));
     }
 
     public static double groupMultiplier(World world, BlockPos pos) {

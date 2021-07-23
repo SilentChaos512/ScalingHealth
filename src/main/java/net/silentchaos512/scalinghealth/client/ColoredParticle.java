@@ -27,37 +27,37 @@ public class ColoredParticle extends TexturedParticle {
 
     public ColoredParticle(ClientWorld worldIn, Color color, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn) {
         super(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn);
-        this.maxAge = 16;
-        this.canCollide = false;
+        this.lifetime = 16;
+        this.hasPhysics = false;
         this.setColor(color.getRed(), color.getGreen(), color.getBlue());
     }
 
     @Override
-    public void renderParticle(IVertexBuilder builder, ActiveRenderInfo info, float v) {
-        int frame = FRAMES.length * this.age / this.maxAge;
+    public void render(IVertexBuilder builder, ActiveRenderInfo info, float v) {
+        int frame = FRAMES.length * this.age / this.lifetime;
         int textureIndex = FRAMES[MathUtils.clamp(frame, 0, FRAMES.length - 1)];
         ResourceLocation texture = TEXTURES.get(textureIndex);
-        Minecraft.getInstance().textureManager.bindTexture(texture);
-        super.renderParticle(builder, info, v);
+        Minecraft.getInstance().textureManager.bind(texture);
+        super.render(builder, info, v);
     }
 
     @Override
-    protected float getMinU() {
+    protected float getU0() {
         return 0;
     }
 
     @Override
-    protected float getMaxU() {
+    protected float getU1() {
         return 1;
     }
 
     @Override
-    protected float getMinV() {
+    protected float getV0() {
         return 0;
     }
 
     @Override
-    protected float getMaxV() {
+    protected float getV1() {
         return 1;
     }
 
@@ -74,7 +74,7 @@ public class ColoredParticle extends TexturedParticle {
 
         @Nullable
         @Override
-        public Particle makeParticle(BasicParticleType typeIn, ClientWorld worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(BasicParticleType typeIn, ClientWorld worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
             return new ColoredParticle(worldIn, this.color, x, y, z, xSpeed, ySpeed, zSpeed);
         }
     }

@@ -8,6 +8,8 @@ import net.silentchaos512.scalinghealth.utils.config.EnabledFeatures;
 import net.silentchaos512.scalinghealth.utils.config.SHItems;
 import net.silentchaos512.scalinghealth.utils.config.SHPlayers;
 
+import net.minecraft.item.Item.Properties;
+
 public class PowerCrystal extends StatBoosterItem {
     public PowerCrystal(Properties properties) {
         super(properties);

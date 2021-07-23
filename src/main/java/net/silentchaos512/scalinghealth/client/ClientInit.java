@@ -35,14 +35,14 @@ public class ClientInit {
 
     @SubscribeEvent
     public static void registerParticleFactories(ParticleFactoryRegisterEvent event) {
-        ParticleManager particles = Minecraft.getInstance().particles;
+        ParticleManager particles = Minecraft.getInstance().particleEngine;
 
         ImmutableMap.of(
                 Registration.HEART_CRYSTAL_PARTICLE.get(), factory(Color.FIREBRICK),
                 Registration.POWER_CRYSTAL_PARTICLE.get(), factory(Color.ROYALBLUE),
                 Registration.CURSED_HEART_PARTICLE.get(), factory(Color.REBECCAPURPLE),
                 Registration.ENCHANTED_HEART_PARTICLE.get(), factory(Color.ANTIQUEWHITE)
-        ).forEach(particles::registerFactory);
+        ).forEach(particles::register);
     }
 
     private static IParticleFactory<BasicParticleType> factory(Color color) {

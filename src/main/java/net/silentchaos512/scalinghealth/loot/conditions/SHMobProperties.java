@@ -37,14 +37,14 @@ public class SHMobProperties implements ILootCondition {
     }
 
     @Override
-    public LootConditionType getConditionType() {
+    public LootConditionType getType() {
         return Registry.LOOT_CONDITION_TYPE.getOptional(NAME)
                 .orElseThrow(() -> new RuntimeException("Loot condition type did not register for some reason"));
     }
 
     @Override
     public boolean test(LootContext lootContext) {
-        Entity entity = lootContext.get(this.target.getParameter());
+        Entity entity = lootContext.getParamOrNull(this.target.getParam());
         if (entity instanceof MobEntity) {
             IDifficultyAffected affected = SHDifficulty.affected(entity);
             //rare case where its prob better to get the non-blight difficulty
@@ -69,16 +69,16 @@ public class SHMobProperties implements ILootCondition {
 
         @Override
         public SHMobProperties deserialize(JsonObject json, JsonDeserializationContext context) {
-            LootContext.EntityTarget target = JSONUtils.deserializeClass(json, "entity", context, LootContext.EntityTarget.class);
-            boolean isBlight = JSONUtils.getBoolean(json, "is_blight", false);
+            LootContext.EntityTarget target = JSONUtils.getAsObject(json, "entity", context, LootContext.EntityTarget.class);
+            boolean isBlight = JSONUtils.getAsBoolean(json, "is_blight", false);
             float minDifficulty = 0;
             float maxDifficulty = Float.MAX_VALUE;
             if (json.has("difficulty")) {
                 JsonElement difficulty = json.get("difficulty");
                 if (difficulty.isJsonObject()) {
                     JsonObject jsonObject = difficulty.getAsJsonObject();
-                    minDifficulty = JSONUtils.getFloat(jsonObject, "min", minDifficulty);
-                    maxDifficulty = JSONUtils.getFloat(jsonObject, "max", maxDifficulty);
+                    minDifficulty = JSONUtils.getAsFloat(jsonObject, "min", minDifficulty);
+                    maxDifficulty = JSONUtils.getAsFloat(jsonObject, "max", maxDifficulty);
                 } else {
                     minDifficulty = maxDifficulty = difficulty.getAsFloat();
                 }

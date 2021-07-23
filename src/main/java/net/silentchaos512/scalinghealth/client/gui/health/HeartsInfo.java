@@ -45,8 +45,8 @@ class HeartsInfo {
 
         int updateCounter = ClientTicks.ticksInGame();
         random.setSeed(updateCounter * 312871);
-        scaledWindowWidth = mc.getMainWindow().getScaledWidth();
-        scaledWindowHeight = mc.getMainWindow().getScaledHeight();
+        scaledWindowWidth = mc.getWindow().getGuiScaledWidth();
+        scaledWindowHeight = mc.getWindow().getGuiScaledHeight();
 
         health = player.getHealth();
         previousHealthInt = healthInt;
@@ -58,10 +58,10 @@ class HeartsInfo {
 
         rowsUsedInHud = absorptionInt > 0 ? 2 : 1;
         rowHeight = rowsUsedInHud + 9; // wut?
-        recentlyHurtHighlight = player.hurtResistantTime / 3 % 2 == 1;
-        hardcoreMode = player.world.getWorldInfo().isHardcore();
+        recentlyHurtHighlight = player.invulnerableTime / 3 % 2 == 1;
+        hardcoreMode = player.level.getLevelData().isHardcore();
         for (int i = 0; i < lowHealthBob.length; ++i) lowHealthBob[i] = random.nextInt(2);
-        regenTimer = player.isPotionActive(Effects.REGENERATION) ? updateCounter % 20 : -1;
+        regenTimer = player.hasEffect(Effects.REGENERATION) ? updateCounter % 20 : -1;
 
         heartStyle = SHConfig.CLIENT.heartIconStyle.get();
         absorptionStyle = SHConfig.CLIENT.absorptionIconStyle.get();

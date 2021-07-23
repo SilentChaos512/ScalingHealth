@@ -29,6 +29,6 @@ public class SoundUtils {
     }
 
     public static void play(PlayerEntity entity, SoundEvent event, float volume, float pitch) {
-        entity.world.playSound(entity, entity.getPosition(), event, SoundCategory.PLAYERS, volume, pitch);
+        entity.level.playSound(entity, entity.blockPosition(), event, SoundCategory.PLAYERS, volume, pitch);
     }
 }

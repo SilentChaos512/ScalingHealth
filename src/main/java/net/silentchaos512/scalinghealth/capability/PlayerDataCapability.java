@@ -72,7 +72,7 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
 
     @Override
     public void tick(PlayerEntity player) {
-        if(player.world.getGameTime() % 20 == 0 && !player.world.isRemote){
+        if(player.level.getGameTime() % 20 == 0 && !player.level.isClientSide){
             checkPlayerIdle(player);
 
             if(player instanceof ServerPlayerEntity)
@@ -81,9 +81,9 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
     }
 
     private void checkPlayerIdle(PlayerEntity player) {
-        if(SHDifficulty.areaDifficulty(player.world, player.getPosition()) >= SHDifficulty.maxValue()) return;
+        if(SHDifficulty.areaDifficulty(player.level, player.blockPosition()) >= SHDifficulty.maxValue()) return;
 
-        if(player.getPosition().equals(lastPos)){
+        if(player.blockPosition().equals(lastPos)){
             timeAfk++;
         }
         else {
@@ -91,11 +91,11 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
             timeAfk = 0;
         }
 
-        lastPos = player.getPosition();
+        lastPos = player.blockPosition();
         if(timeAfk > SHDifficulty.timeBeforeAfk()){
             if(!afk) {
                 afk = true;
-                if(SHDifficulty.afkMessage()) player.sendMessage(new TranslationTextComponent("misc.scalinghealth.afkmessage"), Util.DUMMY_UUID);
+                if(SHDifficulty.afkMessage()) player.sendMessage(new TranslationTextComponent("misc.scalinghealth.afkmessage"), Util.NIL_UUID);
             }
         }
 

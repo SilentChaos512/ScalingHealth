@@ -27,7 +27,7 @@ public class TableGlobalModifier extends LootModifier{
    @Nonnull
    @Override
    protected List<ItemStack> doApply(List<ItemStack> generatedLoot, LootContext context) {
-      table.func_216154_a(generatedLoot::add, context);
+      table.createItemStack(generatedLoot::add, context);
       generatedLoot.forEach(stack -> {
          if ((EnabledFeatures.powerCrystalEnabled() && stack.getItem() instanceof PowerCrystal)
                  || (!EnabledFeatures.difficultyEnabled() && stack.getItem() instanceof DifficultyMutatorItem)) {
@@ -40,15 +40,15 @@ public class TableGlobalModifier extends LootModifier{
    public static class Serializer extends GlobalLootModifierSerializer<TableGlobalModifier> {
       @Override
       public TableGlobalModifier read(ResourceLocation location, JsonObject object, ILootCondition[] lootConditions) {
-         String resLoc = JSONUtils.getString(object, "table");
-         TableLootEntry table = (TableLootEntry) TableLootEntry.builder(new ResourceLocation(resLoc)).build();
+         String resLoc = JSONUtils.getAsString(object, "table");
+         TableLootEntry table = (TableLootEntry) TableLootEntry.lootTableReference(new ResourceLocation(resLoc)).build();
          return new TableGlobalModifier(lootConditions, table);
       }
 
       @Override
       public JsonObject write(TableGlobalModifier instance) {
          JsonObject json = makeConditions(instance.conditions);
-         json.addProperty("table", instance.table.table.toString());
+         json.addProperty("table", instance.table.name.toString());
          return json;
       }
    }

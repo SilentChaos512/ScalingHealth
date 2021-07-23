@@ -20,7 +20,7 @@ public final class DifficultyCommand {
 
     public static void register(CommandDispatcher<CommandSource> dispatcher) {
         LiteralArgumentBuilder<CommandSource> builder = Commands.literal("sh_difficulty").requires(source ->
-                source.hasPermissionLevel(2));
+                source.hasPermission(2));
 
         // get
         builder
@@ -38,7 +38,7 @@ public final class DifficultyCommand {
                         )
                         .executes(context -> {
                             // No target, use sender
-                            return getDifficultySingle(context, context.getSource().asPlayer());
+                            return getDifficultySingle(context, context.getSource().getPlayerOrException());
                         })
                 );
         // set
@@ -89,28 +89,28 @@ public final class DifficultyCommand {
 
     private static int getDifficultySingle(CommandContext<CommandSource> context, PlayerEntity player) {
         IDifficultySource source = SHDifficulty.source(player);
-        context.getSource().sendFeedback(ModCommands.playerNameText(player), true);
+        context.getSource().sendSuccess(ModCommands.playerNameText(player), true);
         double maxDifficulty = SHDifficulty.maxValue();
 
         // Player difficulty
         float difficulty = source.getDifficulty();
         IFormattableTextComponent playerValues = ModCommands.valueText(difficulty, maxDifficulty);
         IFormattableTextComponent playerText = text("player", playerValues)
-                .mergeStyle(TextFormatting.YELLOW);
-        context.getSource().sendFeedback(playerText, true);
+                .withStyle(TextFormatting.YELLOW);
+        context.getSource().sendSuccess(playerText, true);
 
         // Area difficulty
-        double areaDifficulty = SHDifficulty.areaDifficulty(player.world, player.getPosition());
+        double areaDifficulty = SHDifficulty.areaDifficulty(player.level, player.blockPosition());
         IFormattableTextComponent areaValues = ModCommands.valueText(areaDifficulty, maxDifficulty);
         IFormattableTextComponent areaText = text("area", areaValues)
-                .mergeStyle(TextFormatting.YELLOW);
+                .withStyle(TextFormatting.YELLOW);
 
         // Area mode
         ITextComponent modeText = new StringTextComponent(" (")
-                .appendSibling(new TranslationTextComponent("scalinghealth.modes.difficulty." + SHDifficulty.areaMode().getName()).mergeStyle(TextFormatting.GRAY))
-                .appendString(")");
-        areaText.appendSibling(modeText);
-        context.getSource().sendFeedback(areaText, true);
+                .append(new TranslationTextComponent("scalinghealth.modes.difficulty." + SHDifficulty.areaMode().getName()).withStyle(TextFormatting.GRAY))
+                .append(")");
+        areaText.append(modeText);
+        context.getSource().sendSuccess(areaText, true);
         return 1;
     }
 
@@ -122,8 +122,8 @@ public final class DifficultyCommand {
         double maxDifficulty = SHDifficulty.maxValue();
         IFormattableTextComponent textValues = ModCommands.valueText(difficulty, maxDifficulty);
         IFormattableTextComponent textDifficulty = text("server", textValues)
-                .mergeStyle(TextFormatting.YELLOW);
-        context.getSource().sendFeedback(textDifficulty, true);
+                .withStyle(TextFormatting.YELLOW);
+        context.getSource().sendSuccess(textDifficulty, true);
         return 1;
     }
 

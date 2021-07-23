@@ -60,7 +60,7 @@ public class DifficultyMeter extends Screen {
     public void onTick(TickEvent.ClientTickEvent event) {
         if(!EnabledFeatures.difficultyEnabled()) return;
 
-        this.keyDown = KeyManager.TOGGLE_DIFF.isKeyDown();
+        this.keyDown = KeyManager.TOGGLE_DIFF.isDown();
     }
 
     @SubscribeEvent
@@ -79,8 +79,8 @@ public class DifficultyMeter extends Screen {
         final double maxDifficulty = ClientHandler.maxDifficultyValue;
         if (maxDifficulty <= 0) return;
 
-        int width = mc.getMainWindow().getScaledWidth();
-        int height = mc.getMainWindow().getScaledHeight();
+        int width = mc.getWindow().getGuiScaledWidth();
+        int height = mc.getWindow().getGuiScaledHeight();
 
         AreaDifficultyMode areaMode = ClientHandler.areaMode;
         int preClampAreaDifficulty = (int) ClientHandler.areaDifficulty;
@@ -103,8 +103,8 @@ public class DifficultyMeter extends Screen {
         if (showMode == DifficultyMeterShow.ALWAYS || keyDown || currentTime - lastUpdateTime < 20 * SHConfig.CLIENT.difficultyMeterShowTime.get()) {
             RenderSystem.enableBlend();
 
-            mc.textureManager.bindTexture(TEXTURE);
-            event.getMatrixStack().push();
+            mc.textureManager.bind(TEXTURE);
+            event.getMatrixStack().pushPose();
 
             Anchor anchor = SHConfig.CLIENT.difficultyMeterAnchor.get();
             int posX = anchor.getX(width, 66, 5) + SHConfig.CLIENT.difficultyMeterOffsetX.get();
@@ -124,26 +124,26 @@ public class DifficultyMeter extends Screen {
             // Text
             final float textScale = SHConfig.CLIENT.difficultyMeterTextScale.get().floatValue();
             if (textScale > 0) {
-                event.getMatrixStack().push();
+                event.getMatrixStack().pushPose();
                 event.getMatrixStack().scale(textScale, textScale, 1);
-                mc.fontRenderer.drawStringWithShadow(
+                mc.font.drawShadow(
                         event.getMatrixStack(),
-                        I18n.format("misc.scalinghealth.difficultyMeterText"),
+                        I18n.get("misc.scalinghealth.difficultyMeterText"),
                         posX / textScale + 4,
                         posY / textScale - 9,
                         0xFFFFFF);
 
                 // Text Difficulty
                 String str = String.format("%d", areaDifficulty);
-                int strWidth = mc.fontRenderer.getStringWidth(str);
-                mc.fontRenderer.drawStringWithShadow(
+                int strWidth = mc.font.width(str);
+                mc.font.drawShadow(
                         event.getMatrixStack(), str,
                         posX / textScale + 104 - strWidth,
                         posY / textScale - 9,
                         0xAAAAAA);
-                event.getMatrixStack().pop();
+                event.getMatrixStack().popPose();
             }
-            event.getMatrixStack().pop();
+            event.getMatrixStack().popPose();
         }
     }
 

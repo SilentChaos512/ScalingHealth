@@ -12,7 +12,7 @@ import java.util.function.Function;
 public enum EvalVars {
     HEALTH("health", ctx -> ctx.player != null ? ctx.player.getHealth() : 20),
     MAX_HEALTH("maxHealth", ctx -> ctx.player != null ? ctx.player.getMaxHealth() : 20),
-    FOOD("food", ctx -> ctx.player != null ? ctx.player.getFoodStats().getFoodLevel() : 0),
+    FOOD("food", ctx -> ctx.player != null ? ctx.player.getFoodData().getFoodLevel() : 0),
     PLAYER_DIFFICULTY("difficulty", ctx -> ctx.player == null ? 0 : SHDifficulty.source(ctx.player).getDifficulty()),
     MAX_DIFFICULTY("maxDifficulty", ctx -> SHDifficulty.maxValue()),
     AREA_DIFFICULTY("areaDifficulty", ctx -> SHDifficulty.areaDifficulty(ctx.world, ctx.pos, false)),
@@ -33,7 +33,7 @@ public enum EvalVars {
     }
 
     public static double apply(PlayerEntity player, Expression expression) {
-        return apply(player.world, player.getPosition(), player, expression);
+        return apply(player.level, player.blockPosition(), player, expression);
     }
 
     public static double apply(World world, BlockPos pos, @Nullable PlayerEntity player, Expression expression) {

@@ -32,7 +32,7 @@ public class SHWorldFeatures {
     public static void addOres(BiomeLoadingEvent event) {
         for(OreSpawnInfo info : ORES) {
             if(info.test.getAsBoolean())
-                event.getGeneration().withFeature(GenerationStage.Decoration.UNDERGROUND_ORES, info.feature.get());
+                event.getGeneration().addFeature(GenerationStage.Decoration.UNDERGROUND_ORES, info.feature.get());
         }
     }
 
@@ -44,11 +44,11 @@ public class SHWorldFeatures {
             this.feature = Suppliers.memoize(() -> Registry.register(
                     WorldGenRegistries.CONFIGURED_FEATURE,
                     ScalingHealth.getId(name),
-                    Feature.ORE.withConfiguration(new OreFeatureConfig(
-                            OreFeatureConfig.FillerBlockType.BASE_STONE_OVERWORLD,
-                            block.get().getDefaultState(),
+                    Feature.ORE.configured(new OreFeatureConfig(
+                            OreFeatureConfig.FillerBlockType.NATURAL_STONE,
+                            block.get().defaultBlockState(),
                             size
-                    )).range(height).square().count(count)
+                    )).range(height).squared().count(count)
             ));
             this.test = test;
         }

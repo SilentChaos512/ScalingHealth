@@ -47,7 +47,7 @@ public class DifficultyMobEffect {
 
     public void apply(LivingEntity e, double difficulty) {
         if (difficulty >= minDifficulty) {
-            e.addPotionEffect(new EffectInstance(effect, (int) (durationMinutes * 60 * 20), level - 1));
+            e.addEffect(new EffectInstance(effect, (int) (durationMinutes * 60 * 20), level - 1));
             if (ScalingHealth.LOGGER.isDebugEnabled() && SHConfig.SERVER.debugMobPotionEffects.get()) {
                 ScalingHealth.LOGGER.debug(MARKER, "Applied effect {}, level {} for {}min to {} ({})",
                         effect.getRegistryName(), level, durationMinutes, e.getScoreboardName(), e.getType().getRegistryName());

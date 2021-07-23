@@ -50,63 +50,63 @@ public abstract class BaseLootTableGenerator extends LootTableProvider {
     protected abstract void addTables();
 
     protected LootTable.Builder createSilkTouchTable(String name, Block block, Item lootItem) {
-        LootPool.Builder builder = LootPool.builder()
+        LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
-                .rolls(ConstantRange.of(1))
-                .addEntry(AlternativesLootEntry.builder(
-                        ItemLootEntry.builder(block)
-                                .acceptCondition(MatchTool.builder(ItemPredicate.Builder.create()
-                                        .enchantment(new EnchantmentPredicate(Enchantments.SILK_TOUCH, MinMaxBounds.IntBound.atLeast(1))))),
-                        ItemLootEntry.builder(lootItem)
-                                .acceptFunction(ApplyBonus.oreDrops(Enchantments.FORTUNE))
-                                .acceptFunction(ExplosionDecay.builder())
-                        ).acceptCondition(SurvivesExplosion.builder())
+                .setRolls(ConstantRange.exactly(1))
+                .add(AlternativesLootEntry.alternatives(
+                        ItemLootEntry.lootTableItem(block)
+                                .when(MatchTool.toolMatches(ItemPredicate.Builder.item()
+                                        .hasEnchantment(new EnchantmentPredicate(Enchantments.SILK_TOUCH, MinMaxBounds.IntBound.atLeast(1))))),
+                        ItemLootEntry.lootTableItem(lootItem)
+                                .apply(ApplyBonus.addOreBonusCount(Enchantments.BLOCK_FORTUNE))
+                                .apply(ExplosionDecay.explosionDecay())
+                        ).when(SurvivesExplosion.survivesExplosion())
                 );
-        return LootTable.builder().addLootPool(builder);
+        return LootTable.lootTable().withPool(builder);
     }
 
     protected LootTable.Builder createSHDropsTable(LootPool.Builder... pools){
-        LootTable.Builder table = LootTable.builder();
+        LootTable.Builder table = LootTable.lootTable();
         for(LootPool.Builder pool : pools)
-            table.addLootPool(pool);
+            table.withPool(pool);
         return table;
     }
 
     protected LootPool.Builder createSHDropsPool(String name, int rolls, MobLootCondition conditions, MobLootEntry... entries) {
-        LootPool.Builder builder = LootPool.builder()
+        LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
-                .rolls(ConstantRange.of(rolls));
+                .setRolls(ConstantRange.exactly(rolls));
 
         for(MobLootEntry entry : entries){
             if(entry.isCount())
-                builder.addEntry(
-                        ItemLootEntry.builder(entry.item).
-                                weight(entry.weight).
-                                acceptFunction(SetCount.builder(ConstantRange.of(entry.max))));
+                builder.add(
+                        ItemLootEntry.lootTableItem(entry.item).
+                                setWeight(entry.weight).
+                                apply(SetCount.setCount(ConstantRange.exactly(entry.max))));
             else
-                builder.addEntry(
-                        ItemLootEntry.builder(entry.item).
-                                weight(entry.weight).
-                                acceptFunction(SetCount.builder(RandomValueRange.of(entry.min, entry.max))));
+                builder.add(
+                        ItemLootEntry.lootTableItem(entry.item).
+                                setWeight(entry.weight).
+                                apply(SetCount.setCount(RandomValueRange.between(entry.min, entry.max))));
         }
 
         if(conditions.hasDiffCond() || conditions.blight)
-            builder.acceptCondition(SHMobProperties.builder(LootContext.EntityTarget.THIS, conditions.blight, conditions.difficulty, Integer.MAX_VALUE));
+            builder.when(SHMobProperties.builder(LootContext.EntityTarget.THIS, conditions.blight, conditions.difficulty, Integer.MAX_VALUE));
         if(conditions.hasLootCond())
-            builder.acceptCondition(RandomChanceWithLooting.builder(conditions.lootingChance, conditions.lootingMulti));
+            builder.when(RandomChanceWithLooting.randomChanceAndLootingBoost(conditions.lootingChance, conditions.lootingMulti));
         if(conditions.playerKill)
-            builder.acceptCondition(KilledByPlayer.builder());
+            builder.when(KilledByPlayer.killedByPlayer());
 
         return builder;
     }
 
     @Override
-    public void act(DirectoryCache cache) {
+    public void run(DirectoryCache cache) {
         addTables();
 
         Map<ResourceLocation, LootTable> tables = new HashMap<>();
         for (Map.Entry<Block, LootTable.Builder> entry : blockLootTables.entrySet()) {
-            tables.put(entry.getKey().getLootTable(), entry.getValue().setParameterSet(LootParameterSets.BLOCK).build());
+            tables.put(entry.getKey().getLootTable(), entry.getValue().setParamSet(LootParameterSets.BLOCK).build());
         }
         for(Map.Entry<EntityGroup, LootTable.Builder> entry : mobLootTable.entrySet()) {
             tables.put(ScalingHealth.getId("bonus_drops/" + entry.getKey().name().toLowerCase(Locale.ROOT)), entry.getValue().build());
@@ -120,7 +120,7 @@ public abstract class BaseLootTableGenerator extends LootTableProvider {
         tables.forEach((key, lootTable) -> {
             Path path = outputFolder.resolve("data/" + key.getNamespace() + "/loot_tables/" + key.getPath() + ".json");
             try {
-                IDataProvider.save(GSON, cache, LootTableManager.toJson(lootTable), path);
+                IDataProvider.save(GSON, cache, LootTableManager.serialize(lootTable), path);
             } catch (IOException e) {
                 LOGGER.error("Couldn't write loot table {}", path, e);
             }

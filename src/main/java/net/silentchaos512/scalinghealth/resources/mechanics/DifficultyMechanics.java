@@ -118,7 +118,7 @@ public class DifficultyMechanics {
             if (scaleMap.containsKey(p))
                 return scaleMap.get(p);
 
-            ResourceLocation dim = world.getDimensionKey().getLocation();
+            ResourceLocation dim = world.dimension().location();
             if (!dimensions.contains(dim) && !biomes.contains(biome.getRegistryName())) {
                 scaleMap.put(p, 1D);
                 return 1D;
@@ -131,7 +131,7 @@ public class DifficultyMechanics {
         //Check the scales that have specified both a dimension and a biome.
         private double biomeAndDimMatch(World w, Biome b) {
             ResourceLocation biome = b.getRegistryName();
-            ResourceLocation dim = w.getDimensionKey().getLocation();
+            ResourceLocation dim = w.dimension().location();
             return locationMultipliers.stream()
                     .filter(p -> p.getSecond().getFirst().contains(biome))
                     .filter(p -> p.getSecond().getSecond().contains(dim))
@@ -153,7 +153,7 @@ public class DifficultyMechanics {
 
         //Check the scales that only have a dimension specified
         private double dimMatch(World w) {
-            ResourceLocation dim = w.getDimensionKey().getLocation();
+            ResourceLocation dim = w.dimension().location();
             return locationMultipliers.stream()
                     .filter(p -> p.getSecond().getSecond().contains(dim))
                     .filter(p -> p.getSecond().getFirst().isEmpty())

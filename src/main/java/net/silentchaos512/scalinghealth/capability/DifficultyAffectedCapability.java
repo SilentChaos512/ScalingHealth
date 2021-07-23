@@ -38,7 +38,7 @@ public class DifficultyAffectedCapability implements IDifficultyAffected, ICapab
 
     @Override
     public void setDifficulty(MobEntity mob) {
-        difficulty = (float) ((Math.random()*(0.1)+0.95) * SHDifficulty.areaDifficulty(mob.world, mob.getPosition()));
+        difficulty = (float) ((Math.random()*(0.1)+0.95) * SHDifficulty.areaDifficulty(mob.level, mob.blockPosition()));
     }
 
     @Override
@@ -63,7 +63,7 @@ public class DifficultyAffectedCapability implements IDifficultyAffected, ICapab
 
     @Override
     public void tick(MobEntity entity) {
-        if (!processed && entity.isAlive() && entity.ticksExisted > 2) {
+        if (!processed && entity.isAlive() && entity.tickCount > 2) {
             setDifficulty(entity);
             MobDifficultyHandler.process(entity, this);
             processed = true;

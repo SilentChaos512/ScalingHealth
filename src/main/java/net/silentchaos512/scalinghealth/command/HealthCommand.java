@@ -22,7 +22,7 @@ public final class HealthCommand {
 
     public static void register(CommandDispatcher<CommandSource> dispatcher) {
         LiteralArgumentBuilder<CommandSource> builder = Commands.literal("sh_health").requires(source ->
-                source.hasPermissionLevel(2));
+                source.hasPermission(2));
 
         // get
         builder
@@ -35,7 +35,7 @@ public final class HealthCommand {
                         )
                         .executes(context -> {
                             // No target, use sender
-                            return getHealthSingle(context, context.getSource().asPlayer());
+                            return getHealthSingle(context, context.getSource().getPlayerOrException());
                         })
                 );
         // set
@@ -74,20 +74,20 @@ public final class HealthCommand {
     private static int getHealthSingle(CommandContext<CommandSource> context, PlayerEntity player) {
         IPlayerData data = SHPlayers.getPlayerData(player);
 
-        context.getSource().sendFeedback(ModCommands.playerNameText(player), true);
+        context.getSource().sendSuccess(ModCommands.playerNameText(player), true);
         // Actual health
         IFormattableTextComponent actualValues = ModCommands.valueText(player.getHealth(), player.getMaxHealth());
         IFormattableTextComponent actualText = text("actual", actualValues)
-                .mergeStyle(TextFormatting.YELLOW);
-        context.getSource().sendFeedback(actualText, true);
+                .withStyle(TextFormatting.YELLOW);
+        context.getSource().sendSuccess(actualText, true);
         // Heart crystals and health modifier
         int extraHearts = data.getHeartCrystals();
         String extraHealth = (extraHearts >= 0 ? "+" : "") + (2 * extraHearts);
         IFormattableTextComponent heartsValues = text("heartCrystals.values",extraHearts / SHItems.heartCrystalIncreaseAmount(), extraHealth)
-                .mergeStyle(TextFormatting.WHITE);
+                .withStyle(TextFormatting.WHITE);
         IFormattableTextComponent heartsText = text("heartCrystals", heartsValues)
-                .mergeStyle(TextFormatting.YELLOW);
-        context.getSource().sendFeedback(heartsText, true);
+                .withStyle(TextFormatting.YELLOW);
+        context.getSource().sendSuccess(heartsText, true);
         return 1;
     }
 

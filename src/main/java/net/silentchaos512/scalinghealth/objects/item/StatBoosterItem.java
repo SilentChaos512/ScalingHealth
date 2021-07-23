@@ -23,6 +23,8 @@ import net.silentchaos512.scalinghealth.utils.config.SHPlayers;
 import javax.annotation.Nullable;
 import java.util.List;
 
+import net.minecraft.item.Item.Properties;
+
 public abstract class StatBoosterItem extends Item {
     public StatBoosterItem(Properties properties) {
         super(properties);
@@ -31,8 +33,8 @@ public abstract class StatBoosterItem extends Item {
     private boolean usedForPet = false;
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
-        tooltip.add(new TranslationTextComponent(this.getTranslationKey() + ".desc"));
+    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn) {
+        tooltip.add(new TranslationTextComponent(this.getDescriptionId() + ".desc"));
     }
 
     @Override
@@ -41,21 +43,21 @@ public abstract class StatBoosterItem extends Item {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand handIn) {
-        ItemStack stack = player.getHeldItem(handIn);
+    public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand handIn) {
+        ItemStack stack = player.getItemInHand(handIn);
         if(usedForPet){
-            if(world.isRemote)  usedForPet = false;
+            if(world.isClientSide)  usedForPet = false;
             return new ActionResult<>(ActionResultType.FAIL, stack);
         }
 
-        if (!world.isRemote) {
+        if (!world.isClientSide) {
             final boolean statIncreaseAllowed = isStatIncreaseAllowed(player);
             final int levelRequirement = getLevelCost(player);
 
             // Does player have enough XP?
             if (player.experienceLevel < levelRequirement) {
                 String translationKey = "item.scalinghealth.stat_booster.notEnoughXP";
-                player.sendMessage(new TranslationTextComponent(translationKey, levelRequirement), Util.DUMMY_UUID);
+                player.sendMessage(new TranslationTextComponent(translationKey, levelRequirement), Util.NIL_UUID);
                 return new ActionResult<>(ActionResultType.PASS, stack);
             }
 
@@ -85,7 +87,7 @@ public abstract class StatBoosterItem extends Item {
         int levelRequirement = getLevelCost(player);
         if (player.experienceLevel < levelRequirement) {
             String translationKey = "item.scalinghealth.stat_booster.notEnoughXP";
-            player.sendMessage(new TranslationTextComponent(translationKey, levelRequirement), Util.DUMMY_UUID);
+            player.sendMessage(new TranslationTextComponent(translationKey, levelRequirement), Util.NIL_UUID);
             return;
         }
 
@@ -93,7 +95,7 @@ public abstract class StatBoosterItem extends Item {
         pet.getCapability(PetHealthCapability.INSTANCE).ifPresent(data -> data.addHealth(SHMechanicListener.getMobMechanics().pets.petsHealthCrystalGain, pet));
         stack.shrink(1);
         consumeLevels(player, levelRequirement);
-        player.addStat(Stats.ITEM_USED.get(this));
+        player.awardStat(Stats.ITEM_USED.get(this));
     }
 
     protected abstract int getLevelCost(PlayerEntity player);
@@ -112,11 +114,11 @@ public abstract class StatBoosterItem extends Item {
 
     private ActionResult<ItemStack> useAsConsumable(World world, PlayerEntity player, ItemStack stack, int levelRequirement, boolean consumed) {
         if (consumed) {
-            world.playSound(null, player.getPosition(), SoundEvents.ENTITY_PLAYER_BURP, SoundCategory.PLAYERS,
+            world.playSound(null, player.blockPosition(), SoundEvents.PLAYER_BURP, SoundCategory.PLAYERS,
                     0.5f, 1 + 0.1f * (float) ScalingHealth.RANDOM.nextGaussian());
             stack.shrink(1);
             consumeLevels(player, levelRequirement);
-            player.addStat(Stats.ITEM_USED.get(this));
+            player.awardStat(Stats.ITEM_USED.get(this));
             return new ActionResult<>(ActionResultType.SUCCESS, stack);
         }
         return new ActionResult<>(ActionResultType.PASS, stack);
@@ -126,7 +128,7 @@ public abstract class StatBoosterItem extends Item {
         increaseStat(player);
         stack.shrink(1);
         consumeLevels(player, levelRequirement);
-        player.addStat(Stats.ITEM_USED.get(this));
+        player.awardStat(Stats.ITEM_USED.get(this));
         IPlayerData.sendUpdatePacketTo(player);
         return new ActionResult<>(ActionResultType.SUCCESS, stack);
     }
@@ -138,7 +140,7 @@ public abstract class StatBoosterItem extends Item {
     }
 
     private static void consumeLevels(PlayerEntity player, int amount) {
-        player.addExperienceLevel(-amount);
+        player.giveExperienceLevels(-amount);
         SHPlayers.getPlayerData(player).updateStats(player);
     }
 }

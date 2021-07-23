@@ -56,13 +56,13 @@ public final class DamageScaling {
     public static void onEntityHurt(LivingAttackEvent event) {
         if(!EnabledFeatures.mobDamageScalingEnabled() && !EnabledFeatures.playerDamageScalingEnabled()) return;
         LivingEntity entity = event.getEntityLiving();
-        if (entity.world.isRemote) return;
+        if (entity.level.isClientSide) return;
         // Entity invulnerable?
-        if (entity.isInvulnerableTo(event.getSource()) || entity.hurtResistantTime > entity.maxHurtResistantTime / 2)
+        if (entity.isInvulnerableTo(event.getSource()) || entity.invulnerableTime > entity.invulnerableDuration / 2)
             return;
 
         // Check entity has already been processed from original event, or is not allowed to be affected
-        if (ENTITY_ATTACKED_THIS_TICK.contains(entity.getUniqueID()) || !EntityGroup.from(entity).isAffectedByDamageScaling())
+        if (ENTITY_ATTACKED_THIS_TICK.contains(entity.getUUID()) || !EntityGroup.from(entity).isAffectedByDamageScaling())
             return;
 
         DamageSource source = event.getSource();
@@ -71,7 +71,7 @@ public final class DamageScaling {
         // Get scaling factor from map, if it exists. Otherwise, use the generic scale.
         float scale = SHMechanicListener.getDamageScalingMechanics().scales
                 .stream()
-                .filter(p -> p.getFirst().contains(source.getDamageType()))
+                .filter(p -> p.getFirst().contains(source.getMsgId()))
                 .map(Pair::getSecond)
                 .reduce((s1, s2) -> s1 * s2)
                 .orElseGet(() -> SHMechanicListener.getDamageScalingMechanics().genericScale)
@@ -88,12 +88,12 @@ public final class DamageScaling {
             final float newAmount = makeSane(event.getAmount() + change);
 
             event.setCanceled(true);
-            ENTITY_ATTACKED_THIS_TICK.add(entity.getUniqueID());
-            entity.attackEntityFrom(event.getSource(), newAmount);
+            ENTITY_ATTACKED_THIS_TICK.add(entity.getUUID());
+            entity.hurt(event.getSource(), newAmount);
 
             if (SHConfig.SERVER.debugLogScaledDamage.get()) {
                 ScalingHealth.LOGGER.debug(MARKER, "{} on {}: {} -> {} (scale={}, affected={}, change={})",
-                        source.damageType, entity.getScoreboardName(), original, newAmount, scale, affectedAmount, change);
+                        source.msgId, entity.getScoreboardName(), original, newAmount, scale, affectedAmount, change);
             }
         }
     }
@@ -103,7 +103,7 @@ public final class DamageScaling {
         Mode mode = config.mode;
         switch (mode) {
             case AREA_DIFFICULTY:
-                return SHDifficulty.areaDifficulty(entity.world, entity.getPosition()) * config.difficultyWeight;
+                return SHDifficulty.areaDifficulty(entity.level, entity.blockPosition()) * config.difficultyWeight;
             case MAX_HEALTH:
                 ModifiableAttributeInstance attr = entity.getAttribute(Attributes.MAX_HEALTH);
                 if (attr == null) {
@@ -141,11 +141,11 @@ public final class DamageScaling {
         AREA_DIFFICULTY;
 
         private static final Map<String, Mode> BY_NAME = Arrays.stream(values())
-                .collect(Collectors.toMap(Mode::getString, Function.identity()));
-        public static final Codec<Mode> CODEC = IStringSerializable.createEnumCodec(Mode::values, BY_NAME::get);
+                .collect(Collectors.toMap(Mode::getSerializedName, Function.identity()));
+        public static final Codec<Mode> CODEC = IStringSerializable.fromEnum(Mode::values, BY_NAME::get);
 
         @Override
-        public String getString() {
+        public String getSerializedName() {
             return name();
         }
     }

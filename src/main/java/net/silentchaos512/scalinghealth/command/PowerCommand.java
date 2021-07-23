@@ -24,7 +24,7 @@ public final class PowerCommand {
 
     public static void register(CommandDispatcher<CommandSource> dispatcher) {
         LiteralArgumentBuilder<CommandSource> builder = Commands.literal("sh_power").requires(source ->
-                source.hasPermissionLevel(2));
+                source.hasPermission(2));
 
         // get
         builder
@@ -37,7 +37,7 @@ public final class PowerCommand {
                         )
                         .executes(context -> {
                             // No target, use sender
-                            return runGetSingle(context, context.getSource().asPlayer());
+                            return runGetSingle(context, context.getSource().getPlayerOrException());
                         })
                 );
         // set
@@ -75,20 +75,20 @@ public final class PowerCommand {
 
     private static int runGetSingle(CommandContext<CommandSource> context, PlayerEntity player) {
         IPlayerData data = SHPlayers.getPlayerData(player);
-        context.getSource().sendFeedback(ModCommands.playerNameText(player), true);
+        context.getSource().sendSuccess(ModCommands.playerNameText(player), true);
         // Actual power
         ModifiableAttributeInstance attr = player.getAttribute(Attributes.ATTACK_DAMAGE);
         ITextComponent actualText = text("actual", String.format("%.1f", attr.getValue()))
-                .deepCopy().mergeStyle(TextFormatting.YELLOW);
-        context.getSource().sendFeedback(actualText, true);
+                .copy().withStyle(TextFormatting.YELLOW);
+        context.getSource().sendSuccess(actualText, true);
         // Crystals and modifier
         int crystals = data.getPowerCrystals();
         String extraPower = (crystals >= 0 ? "+" : "") + (data.getAttackDamageModifier());
         ITextComponent crystalsValues = text("powerCrystals.values", crystals, extraPower)
-                .deepCopy().mergeStyle(TextFormatting.WHITE);
+                .copy().withStyle(TextFormatting.WHITE);
         ITextComponent crystalsText = text("powerCrystals", crystalsValues)
-                .deepCopy().mergeStyle(TextFormatting.YELLOW);
-        context.getSource().sendFeedback(crystalsText, true);
+                .copy().withStyle(TextFormatting.YELLOW);
+        context.getSource().sendSuccess(crystalsText, true);
         return 1;
     }
 

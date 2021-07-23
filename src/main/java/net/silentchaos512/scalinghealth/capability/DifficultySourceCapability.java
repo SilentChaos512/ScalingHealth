@@ -81,7 +81,7 @@ public class DifficultySourceCapability implements IDifficultySource, ICapabilit
             ScalingHealth.LOGGER.error("Failed to get capabilities from {}", obj);
             return false;
         }
-        return obj instanceof PlayerEntity || (obj instanceof ServerWorld && ((ServerWorld) obj).getDimensionKey().equals(World.OVERWORLD));
+        return obj instanceof PlayerEntity || (obj instanceof ServerWorld && ((ServerWorld) obj).dimension().equals(World.OVERWORLD));
     }
 
     public static void register() {

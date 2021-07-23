@@ -51,7 +51,7 @@ public class AreaDifficultyModes {
             int totalWeight = 0;
             int rSq = getRadius() * getRadius();
             for (Pair<IDifficultySource, BlockPos> p : SHDifficulty.positionedPlayerSources(world, pos, getRadius())) {
-                int distanceSq = (int) pos.distanceSq(p.getSecond());
+                int distanceSq = (int) pos.distSqr(p.getSecond());
                 int weight = 1 - distanceSq / rSq;
                 total += weight * p.getFirst().getDifficulty();
                 totalWeight += weight;
@@ -105,7 +105,7 @@ public class AreaDifficultyModes {
                 ).apply(inst, Distance::new)
         );
 
-        private static final BlockPos ADJUSTED_ZERO = BlockPos.ZERO.up(65);
+        private static final BlockPos ADJUSTED_ZERO = BlockPos.ZERO.above(65);
 
         private final boolean fromOrigin;
         private final double distanceFactor;
@@ -121,8 +121,8 @@ public class AreaDifficultyModes {
         @Override
         public double getDifficulty(World world, BlockPos pos) {
             if(worldSpawn == null)
-                worldSpawn = new BlockPos(world.getWorldInfo().getSpawnX(), world.getWorldInfo().getSpawnY(), world.getWorldInfo().getSpawnZ());
-            return Math.sqrt(pos.distanceSq(center.get())) * this.distanceFactor;
+                worldSpawn = new BlockPos(world.getLevelData().getXSpawn(), world.getLevelData().getYSpawn(), world.getLevelData().getZSpawn());
+            return Math.sqrt(pos.distSqr(center.get())) * this.distanceFactor;
         }
 
         @Override

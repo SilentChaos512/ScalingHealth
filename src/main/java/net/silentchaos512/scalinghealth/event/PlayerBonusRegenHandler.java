@@ -44,7 +44,7 @@ public final class PlayerBonusRegenHandler {
     public static int getTimerForPlayer(PlayerEntity player) {
         if (player == null) return -1;
 
-        UUID uuid = player.getUniqueID();
+        UUID uuid = player.getUUID();
         return TIMERS.getOrDefault(uuid, -1);
     }
 
@@ -55,7 +55,7 @@ public final class PlayerBonusRegenHandler {
         PlayerEntity player = event.player;
         PlayerMechanics.RegenMechanics config = SHMechanicListener.getPlayerMechanics().regenMechanics;
 
-        UUID uuid = player.getUniqueID();
+        UUID uuid = player.getUUID();
 
         // Add player timer if needed.
         if (!TIMERS.containsKey(uuid)) {
@@ -67,7 +67,7 @@ public final class PlayerBonusRegenHandler {
             int timer = TIMERS.get(uuid);
             if (--timer <= 0) {
                 player.heal(getHealTickAmount(player));
-                player.addExhaustion((float) config.exhaustion);
+                player.causeFoodExhaustion((float) config.exhaustion);
                 timer = (int) (20 * config.tickDelay);
             }
             TIMERS.put(uuid, timer);
@@ -77,8 +77,8 @@ public final class PlayerBonusRegenHandler {
     @SubscribeEvent
     public static void onPlayerHurt(LivingHurtEvent event) {
         LivingEntity entity = event.getEntityLiving();
-        if (!entity.world.isRemote && entity instanceof PlayerEntity) {
-            TIMERS.put(entity.getUniqueID(), (int) (SHMechanicListener.getPlayerMechanics().regenMechanics.initialDelay * 20));
+        if (!entity.level.isClientSide && entity instanceof PlayerEntity) {
+            TIMERS.put(entity.getUUID(), (int) (SHMechanicListener.getPlayerMechanics().regenMechanics.initialDelay * 20));
         }
     }
 
@@ -104,7 +104,7 @@ public final class PlayerBonusRegenHandler {
 
         if (entity instanceof PlayerEntity) {
             PlayerEntity player = (PlayerEntity) entity;
-            int food = player.getFoodStats().getFoodLevel();
+            int food = player.getFoodData().getFoodLevel();
             if (food < config.minFood || food > config.maxFood) {
                 return false;
             }

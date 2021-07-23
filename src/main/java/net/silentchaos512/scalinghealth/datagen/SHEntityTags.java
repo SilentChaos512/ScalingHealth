@@ -13,9 +13,9 @@ public class SHEntityTags extends EntityTypeTagsProvider {
    }
 
    @Override
-   protected void registerTags() {
-      this.getOrCreateBuilder(EntityTags.BLIGHT_EXEMPT).add(BAT, CAT, CHICKEN, COD, COW, DONKEY, FOX, HORSE, MOOSHROOM, MULE,
+   protected void addTags() {
+      this.tag(EntityTags.BLIGHT_EXEMPT).add(BAT, CAT, CHICKEN, COD, COW, DONKEY, FOX, HORSE, MOOSHROOM, MULE,
               OCELOT, PARROT, PIG, RABBIT, SALMON, SHEEP, TROPICAL_FISH, TURTLE, VILLAGER, WANDERING_TRADER);
-      this.getOrCreateBuilder(EntityTags.DIFFICULTY_EXEMPT).add(VILLAGER, WANDERING_TRADER);
+      this.tag(EntityTags.DIFFICULTY_EXEMPT).add(VILLAGER, WANDERING_TRADER);
    }
 }

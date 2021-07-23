@@ -38,7 +38,7 @@ public class ScalingHealth {
 
     public static final ItemGroup SH = new ItemGroup(MOD_ID) {
         @Override
-        public ItemStack createIcon() {
+        public ItemStack makeIcon() {
             return new ItemStack(Registration.HEART_CRYSTAL.get());
         }
     };

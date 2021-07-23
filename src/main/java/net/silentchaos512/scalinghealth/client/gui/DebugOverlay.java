@@ -34,7 +34,7 @@ public class DebugOverlay extends DebugRenderOverlay {
                 "- Area=" + String.format(FLOAT_FORMAT + " (x%.1f, ☽x%.1f)",
                         ClientHandler.areaDifficulty,
                         ClientHandler.locationMultiPercent / 100f,
-                        SHDifficulty.lunarMultiplier(player.world)),
+                        SHDifficulty.lunarMultiplier(player.level)),
                 "Health",
                 "- Health=" + String.format("%.5f / %.1f", player.getHealth(), player.getMaxHealth()),
                 "- Regen=" + String.format("%ds", ClientHandler.regenTimer / 20)

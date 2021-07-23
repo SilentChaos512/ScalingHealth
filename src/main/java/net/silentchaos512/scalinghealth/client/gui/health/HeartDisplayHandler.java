@@ -70,35 +70,35 @@ public final class HeartDisplayHandler extends Screen {
         PlayerEntity player = mc.player;
 
         // Health text
-        if (event.getType() == RenderGameOverlayEvent.ElementType.TEXT && mc.playerController.gameIsSurvivalOrAdventure()) {
+        if (event.getType() == RenderGameOverlayEvent.ElementType.TEXT && mc.gameMode.hasExperience()) {
             // Draw health string?
             if (SHConfig.CLIENT.healthTextStyle.get() != HealthTextStyle.DISABLED) {
-                mc.getProfiler().startSection("scalinghealthRenderHealthText");
+                mc.getProfiler().push("scalinghealthRenderHealthText");
                 renderHealthText(mc, event.getMatrixStack(), info.health, info.maxHealth,
                         -91 + SHConfig.CLIENT.healthTextOffsetX.get(),
                         -38 + SHConfig.CLIENT.healthTextOffsetY.get(),
                         SHConfig.CLIENT.healthTextStyle.get(),
                         SHConfig.CLIENT.healthTextColorStyle.get());
-                mc.getProfiler().endSection();
+                mc.getProfiler().pop();
             }
             // Draw absorption amount string?
             if (SHConfig.CLIENT.absorptionTextStyle.get() != HealthTextStyle.DISABLED && player.getAbsorptionAmount() > 0) {
-                mc.getProfiler().startSection("scalinghealthRenderAbsorptionText");
+                mc.getProfiler().push("scalinghealthRenderAbsorptionText");
                 renderHealthText(mc, event.getMatrixStack(), player.getAbsorptionAmount(), 0,
                         -91 + SHConfig.CLIENT.absorptionTextOffsetX.get(),
                         -49 + SHConfig.CLIENT.absorptionTextOffsetY.get(),
                         SHConfig.CLIENT.absorptionTextStyle.get(),
                         HealthTextColor.SOLID);
-                mc.getProfiler().endSection();
+                mc.getProfiler().pop();
             }
         }
 
         // Hearts
         if (event.getType() == RenderGameOverlayEvent.ElementType.HEALTH && info.heartStyle != HeartIconStyle.VANILLA) {
             event.setCanceled(true);
-            mc.getProfiler().startSection("scalinghealthRenderHearts");
+            mc.getProfiler().push("scalinghealthRenderHearts");
             renderHearts(event, mc, player);
-            mc.getProfiler().endSection();
+            mc.getProfiler().pop();
         }
     }
 
@@ -122,7 +122,7 @@ public final class HeartDisplayHandler extends Screen {
         int potionOffset = info.hardcoreMode ? 27 : 0;
 
         // Draw extra hearts (only top 2 rows)
-        mc.textureManager.bindTexture(TEXTURE);
+        mc.textureManager.bind(TEXTURE);
         int rowCount = info.getCustomHeartRowCount(info.healthInt);
         int maxHealthRows = info.getCustomHeartRowCount((int) player.getMaxHealth());
 
@@ -261,7 +261,7 @@ public final class HeartDisplayHandler extends Screen {
         }
 
         RenderSystem.disableBlend();
-        mc.textureManager.bindTexture(Screen.GUI_ICONS_LOCATION);
+        mc.textureManager.bind(Screen.GUI_ICONS_LOCATION);
     }
 
     private void drawVanillaHearts(MatrixStack stack, int left, int top) {
@@ -313,10 +313,10 @@ public final class HeartDisplayHandler extends Screen {
         final int top = (int) ((info.scaledWindowHeight + offsetY + (1 / scale)) / scale);
 
         // Draw health string
-        mc.getProfiler().startSection("shTextPreDraw");
+        mc.getProfiler().push("shTextPreDraw");
         String healthString = style.textFor(current, max);
-        FontRenderer fontRenderer = Minecraft.getInstance().fontRenderer;
-        int stringWidth = fontRenderer.getStringWidth(healthString);
+        FontRenderer fontRenderer = Minecraft.getInstance().font;
+        int stringWidth = fontRenderer.width(healthString);
         int color;
         float divisor = max == 0 ? current : max;
         switch (styleColor) {
@@ -337,14 +337,14 @@ public final class HeartDisplayHandler extends Screen {
                 color = SHConfig.CLIENT.healthTextFullColor.get();
                 break;
         }
-        mc.getProfiler().endSection();
+        mc.getProfiler().pop();
 
-        mc.getProfiler().startSection("shTextDraw");
-        stack.push();
+        mc.getProfiler().push("shTextDraw");
+        stack.pushPose();
         stack.scale(scale, scale, 1);
-        fontRenderer.drawStringWithShadow(stack, healthString, left - stringWidth - 2, top, color);
-        stack.pop();
-        mc.getProfiler().endSection();
+        fontRenderer.drawShadow(stack, healthString, left - stringWidth - 2, top, color);
+        stack.popPose();
+        mc.getProfiler().pop();
     }
 
     private void blitWithColor(MatrixStack stack, int x, int y, int textureX, int textureY, int width, int height, int color) {
@@ -368,13 +368,13 @@ public final class HeartDisplayHandler extends Screen {
     }
 
     private static boolean showEffectHearts(PlayerEntity player) {
-        return player.isPotionActive(Effects.POISON) || player.isPotionActive(Effects.WITHER);
+        return player.hasEffect(Effects.POISON) || player.hasEffect(Effects.WITHER);
     }
 
     private static int effectHeartColor(PlayerEntity player) {
-        if (player.isPotionActive(Effects.WITHER))
+        if (player.hasEffect(Effects.WITHER))
             return 0x663E47;
-        if (player.isPotionActive(Effects.POISON))
+        if (player.hasEffect(Effects.POISON))
             return 0x4E9331;
         return 0xFFFFFF;
     }

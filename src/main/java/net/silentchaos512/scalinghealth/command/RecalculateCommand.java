@@ -16,12 +16,12 @@ public final class RecalculateCommand {
 
     public static void register(CommandDispatcher<CommandSource> dispatcher) {
         dispatcher.register(Commands.literal("sh_recalculate").requires(source ->
-                source.hasPermissionLevel(2))
+                source.hasPermission(2))
                 .then(Commands.literal("all")
                         .executes(context -> {
-                            context.getSource().sendFeedback(new TranslationTextComponent("command.scalinghealth.recalculate.start"), true);
+                            context.getSource().sendSuccess(new TranslationTextComponent("command.scalinghealth.recalculate.start"), true);
                             int processed = recalculateAllEntities(context);
-                            context.getSource().sendFeedback(new TranslationTextComponent("command.scalinghealth.recalculate.finish", processed), true);
+                            context.getSource().sendSuccess(new TranslationTextComponent("command.scalinghealth.recalculate.finish", processed), true);
                             return 1;
                         })
                 ));
@@ -29,7 +29,7 @@ public final class RecalculateCommand {
 
     private static int recalculateAllEntities(CommandContext<CommandSource> context) {
         AtomicInteger processed = new AtomicInteger(0);
-        context.getSource().getWorld().getEntities().filter(e -> e instanceof MobEntity).forEach(entity -> {
+        context.getSource().getLevel().getEntities().filter(e -> e instanceof MobEntity).forEach(entity -> {
             MobDifficultyHandler.process((MobEntity) entity, SHDifficulty.affected(entity));
             processed.incrementAndGet();
         });

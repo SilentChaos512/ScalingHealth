@@ -46,14 +46,14 @@ public class HealingItem extends Item {
     private final int effectDuration;
 
     public HealingItem(float healAmount, int healSpeed) {
-        super(new Item.Properties().maxStackSize(16).group(ScalingHealth.SH));
+        super(new Item.Properties().stacksTo(16).tab(ScalingHealth.SH));
         this.healAmount = healAmount;
         this.healSpeed = healSpeed;
         this.effectDuration = (int) (this.healAmount * 100 * 20 * 2 / this.healSpeed);
     }
 
     @Override
-    public UseAction getUseAction(ItemStack stack) {
+    public UseAction getUseAnimation(ItemStack stack) {
         return UseAction.BOW;
     }
 
@@ -63,25 +63,25 @@ public class HealingItem extends Item {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, PlayerEntity player, Hand hand) {
-        ItemStack stack = player.getHeldItem(hand);
-        if (player.getHealth() < player.getMaxHealth() && !player.isPotionActive(Registration.BANDAGED.get())) {
-            player.setActiveHand(hand);
-            return ActionResult.resultSuccess( stack);
+    public ActionResult<ItemStack> use(World worldIn, PlayerEntity player, Hand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (player.getHealth() < player.getMaxHealth() && !player.hasEffect(Registration.BANDAGED.get())) {
+            player.startUsingItem(hand);
+            return ActionResult.success( stack);
         }
-        return ActionResult.resultFail(stack);
+        return ActionResult.fail(stack);
     }
 
     @Override
-    public ItemStack onItemUseFinish(ItemStack stack, World world, LivingEntity entityLiving) {
-        if (!world.isRemote) {
-            entityLiving.addPotionEffect(new EffectInstance(Registration.BANDAGED.get(),
+    public ItemStack finishUsingItem(ItemStack stack, World world, LivingEntity entityLiving) {
+        if (!world.isClientSide) {
+            entityLiving.addEffect(new EffectInstance(Registration.BANDAGED.get(),
                     this.effectDuration, this.healSpeed, false, false));
             stack.shrink(1);
 
             if (entityLiving instanceof PlayerEntity) {
                 PlayerEntity player = (PlayerEntity) entityLiving;
-                player.addStat(Stats.ITEM_USED.get(this));
+                player.awardStat(Stats.ITEM_USED.get(this));
             }
         }
         return stack;
@@ -90,13 +90,13 @@ public class HealingItem extends Item {
     @Override
     public void onUsingTick(ItemStack stack, LivingEntity player, int count) {
         if (count % 10 == 0) {
-            player.playSound(SoundEvents.ITEM_ARMOR_EQUIP_LEATHER,
+            player.playSound(SoundEvents.ARMOR_EQUIP_LEATHER,
                     1.25f, (float) (1.1f + 0.05f * ScalingHealth.RANDOM.nextGaussian()));
         }
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
         tooltip.add(new TranslationTextComponent("item.scalinghealth.healing_item.value",
                 (int) (this.healAmount * 100),
                 this.effectDuration / 20));

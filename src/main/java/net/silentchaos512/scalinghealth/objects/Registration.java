@@ -34,14 +34,14 @@ public class Registration {
     private static final DeferredRegister<GlobalLootModifierSerializer<?>> GLMS = DeferredRegister.create(ForgeRegistries.LOOT_MODIFIER_SERIALIZERS, ScalingHealth.MOD_ID);
 
     public static final RegistryObject<Block> HEART_CRYSTAL_ORE = BLOCKS.register("heart_crystal_ore", () ->
-            new ShardOreBlock(Block.Properties.create(Material.ROCK).hardnessAndResistance(3, 15)));
+            new ShardOreBlock(Block.Properties.of(Material.STONE).strength(3, 15)));
     public static final RegistryObject<Block> POWER_CRYSTAL_ORE = BLOCKS.register("power_crystal_ore", () ->
-            new ShardOreBlock(Block.Properties.create(Material.ROCK).hardnessAndResistance(3, 15)));
+            new ShardOreBlock(Block.Properties.of(Material.STONE).strength(3, 15)));
 
     public static final RegistryObject<Item> HEART_CRYSTAL_ORE_ITEM = ITEMS.register("heart_crystal_ore", () ->
-            new BlockItem(HEART_CRYSTAL_ORE.get(), new Item.Properties().group(ScalingHealth.SH)));
+            new BlockItem(HEART_CRYSTAL_ORE.get(), new Item.Properties().tab(ScalingHealth.SH)));
     public static final RegistryObject<Item> POWER_CRYSTAL_ORE_ITEM = ITEMS.register("power_crystal_ore", () ->
-            new BlockItem(POWER_CRYSTAL_ORE.get(), new Item.Properties().group(ScalingHealth.SH)));
+            new BlockItem(POWER_CRYSTAL_ORE.get(), new Item.Properties().tab(ScalingHealth.SH)));
 
     //Crystals
     public static final RegistryObject<Item> HEART_CRYSTAL = ITEMS.register("heart_crystal", () ->
@@ -71,7 +71,7 @@ public class Registration {
 
     public static final RegistryObject<Effect> BANDAGED = EFFECTS.register("bandaged", () ->
             new BandagedEffect(EffectType.NEUTRAL, 0xf7dcad)
-                    .addAttributesModifier(
+                    .addAttributeModifier(
                             Attributes.MOVEMENT_SPEED,
                             BandagedEffect.MOD_UUID,
                             BandagedEffect.SPEED_MODIFIER,
@@ -109,6 +109,6 @@ public class Registration {
     }
 
     private static Item.Properties grouped() {
-        return new Item.Properties().group(ScalingHealth.SH);
+        return new Item.Properties().tab(ScalingHealth.SH);
     }
 }

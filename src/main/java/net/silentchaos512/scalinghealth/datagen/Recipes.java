@@ -17,50 +17,50 @@ public class Recipes extends RecipeProvider {
     }
 
     @Override
-    protected void registerRecipes(Consumer<IFinishedRecipe> consumer) {
+    protected void buildShapelessRecipes(Consumer<IFinishedRecipe> consumer) {
         fullBlockRecipe(consumer, Registration.HEART_CRYSTAL.get(), Registration.HEART_CRYSTAL_SHARD.get());
         fullBlockRecipe(consumer, Registration.POWER_CRYSTAL.get(), Registration.POWER_CRYSTAL_SHARD.get());
-        ShapelessRecipeBuilder.shapelessRecipe(Registration.HEART_DUST.get(), 24)
-                .addIngredient(Registration.HEART_CRYSTAL.get())
-                .addCriterion("cobblestone", getDefaultTrigger())
-                .setGroup(ScalingHealth.MOD_ID)
-                .build(consumer);
+        ShapelessRecipeBuilder.shapeless(Registration.HEART_DUST.get(), 24)
+                .requires(Registration.HEART_CRYSTAL.get())
+                .unlockedBy("cobblestone", getDefaultTrigger())
+                .group(ScalingHealth.MOD_ID)
+                .save(consumer);
 
-        ShapedRecipeBuilder.shapedRecipe(Registration.BANDAGES.get(), 2)
-                .patternLine("xxx")
-                .patternLine("yyy")
-                .key('x', Items.PAPER)
-                .key('y', Registration.HEART_DUST.get())
-                .addCriterion("cobblestone", getDefaultTrigger())
-                .setGroup(ScalingHealth.MOD_ID)
-                .build(consumer);
+        ShapedRecipeBuilder.shaped(Registration.BANDAGES.get(), 2)
+                .pattern("xxx")
+                .pattern("yyy")
+                .define('x', Items.PAPER)
+                .define('y', Registration.HEART_DUST.get())
+                .unlockedBy("cobblestone", getDefaultTrigger())
+                .group(ScalingHealth.MOD_ID)
+                .save(consumer);
 
-        ShapedRecipeBuilder.shapedRecipe(Registration.MEDKIT.get(), 2)
-                .patternLine("aba")
-                .patternLine("cdc")
-                .patternLine("eee")
-                .key('a', Registration.HEART_DUST.get())
-                .key('b', Tags.Items.INGOTS_IRON)
-                .key('c', Registration.BANDAGES.get())
-                .key('d', Items.GLISTERING_MELON_SLICE)
-                .key('e', Items.TERRACOTTA)
-                .addCriterion("cobblestone", getDefaultTrigger())
-                .setGroup(ScalingHealth.MOD_ID)
-                .build(consumer);
+        ShapedRecipeBuilder.shaped(Registration.MEDKIT.get(), 2)
+                .pattern("aba")
+                .pattern("cdc")
+                .pattern("eee")
+                .define('a', Registration.HEART_DUST.get())
+                .define('b', Tags.Items.INGOTS_IRON)
+                .define('c', Registration.BANDAGES.get())
+                .define('d', Items.GLISTERING_MELON_SLICE)
+                .define('e', Items.TERRACOTTA)
+                .unlockedBy("cobblestone", getDefaultTrigger())
+                .group(ScalingHealth.MOD_ID)
+                .save(consumer);
     }
 
     private void fullBlockRecipe(Consumer<IFinishedRecipe> consumer, IItemProvider result, IItemProvider ingredient){
-        ShapedRecipeBuilder.shapedRecipe(result)
-                .patternLine("xxx")
-                .patternLine("xxx")
-                .patternLine("xxx")
-                .key('x', ingredient)
-                .addCriterion("cobblestone", getDefaultTrigger())
-                .setGroup(ScalingHealth.MOD_ID)
-                .build(consumer);
+        ShapedRecipeBuilder.shaped(result)
+                .pattern("xxx")
+                .pattern("xxx")
+                .pattern("xxx")
+                .define('x', ingredient)
+                .unlockedBy("cobblestone", getDefaultTrigger())
+                .group(ScalingHealth.MOD_ID)
+                .save(consumer);
     }
 
     private ICriterionInstance getDefaultTrigger(){
-        return InventoryChangeTrigger.Instance.forItems(Items.COBBLESTONE);
+        return InventoryChangeTrigger.Instance.hasItems(Items.COBBLESTONE);
     }
 }

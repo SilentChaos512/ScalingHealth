@@ -52,13 +52,13 @@ public final class MobDifficultyHandler {
 
         if (makeBlight) {
             data.setIsBlight(true);
-            ClientBlightMessage msg = new ClientBlightMessage(entity.getEntityId());
+            ClientBlightMessage msg = new ClientBlightMessage(entity.getId());
             Network.channel.send(PacketDistributor.TRACKING_ENTITY.with(()->entity), msg);
 
             BlightHandler.applyBlightPotionEffects(entity);
             //TODO no good in code method for determining if an entity is a boss or not, switch to tag?
             if(entity instanceof WitherEntity || entity instanceof EnderDragonEntity) {
-                ITextComponent blight = new TranslationTextComponent("misc.scalinghealth.blight", entity.getDisplayName()).deepCopy().mergeStyle(TextFormatting.DARK_PURPLE);
+                ITextComponent blight = new TranslationTextComponent("misc.scalinghealth.blight", entity.getDisplayName()).copy().withStyle(TextFormatting.DARK_PURPLE);
                 entity.setCustomName(blight);
             }
         }
@@ -82,9 +82,9 @@ public final class MobDifficultyHandler {
             //TODO test... wtf was i doing here?
             //healthBoost += 2 * healthMultiplier * difficulty * ScalingHealth.RANDOM.nextFloat();
 
-            if(CommonEvents.spawnerSpawns.contains(entity.getUniqueID())){
+            if(CommonEvents.spawnerSpawns.contains(entity.getUUID())){
                 healthBoost *= SHMobs.spawnerModifier();
-                CommonEvents.spawnerSpawns.remove(entity.getUniqueID());
+                CommonEvents.spawnerSpawns.remove(entity.getUUID());
             }
 
             // Apply extra health and damage.

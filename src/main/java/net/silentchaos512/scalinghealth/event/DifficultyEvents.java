@@ -78,7 +78,7 @@ public final class DifficultyEvents {
     public static void onLivingUpdate(LivingEvent.LivingUpdateEvent event) {
         LivingEntity entity = event.getEntityLiving();
         //Return if players are empty on an integrated server, as the player needs a small delay to connect.
-        if (entity.world.isRemote || (entity.world.getPlayers().isEmpty() && !((ServerWorld)entity.world).getServer().isDedicatedServer()))
+        if (entity.level.isClientSide || (entity.level.players().isEmpty() && !((ServerWorld)entity.level).getServer().isDedicatedServer()))
             return;
 
         // Tick mobs, which will calculate difficulty when appropriate and apply changes
@@ -87,12 +87,12 @@ public final class DifficultyEvents {
                     data.tick((MobEntity)entity));
 
         if(entity instanceof TameableEntity) {
-            if(!((TameableEntity) entity).isTamed()) return;
+            if(!((TameableEntity) entity).isTame()) return;
                 entity.getCapability(PetHealthCapability.INSTANCE).ifPresent(data ->
                         data.tick((TameableEntity) entity));
         }
 
-        if (entity instanceof PlayerEntity && entity.world.getGameTime() % 20 == 0) {
+        if (entity instanceof PlayerEntity && entity.level.getGameTime() % 20 == 0) {
             entity.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
                 source.addDifficulty((float) SHDifficulty.changePerSecond());
             });
@@ -102,16 +102,16 @@ public final class DifficultyEvents {
     @SubscribeEvent
     public static void onMobDeath(LivingDeathEvent event) {
         LivingEntity killed = event.getEntityLiving();
-        if (event.getSource() == null || event.getEntity().world.isRemote)
+        if (event.getSource() == null || event.getEntity().level.isClientSide)
             return;
 
-        Entity entitySource = event.getSource().getTrueSource();
+        Entity entitySource = event.getSource().getEntity();
         if (entitySource instanceof PlayerEntity) {
             SHDifficulty.applyKillMutator(killed, (PlayerEntity) entitySource);
             return;
         }
 
-        if(entitySource instanceof TameableEntity && ((TameableEntity) entitySource).isTamed()) {
+        if(entitySource instanceof TameableEntity && ((TameableEntity) entitySource).isTame()) {
             TameableEntity pet = (TameableEntity) entitySource;
             if(pet.getOwner() instanceof PlayerEntity)
                 SHDifficulty.applyKillMutator(killed, (PlayerEntity) pet.getOwner());
@@ -122,7 +122,7 @@ public final class DifficultyEvents {
     public static void onWorldTick(TickEvent.WorldTickEvent event) {
         if(event.phase == TickEvent.Phase.START) return;
         World world = event.world;
-        if (world.isRemote) return;
+        if (world.isClientSide) return;
 
         // Tick world difficulty source
         if (world.getGameTime() % 20 == 0) {
@@ -164,7 +164,7 @@ public final class DifficultyEvents {
         float diff = newValue - oldValue;
         String line = String.format("%s %.2f %s", diff > 0 ? "gained" : "lost", diff, valueName);
         if(diff != 0)
-            player.sendMessage(new StringTextComponent(line), Util.DUMMY_UUID);
+            player.sendMessage(new StringTextComponent(line), Util.NIL_UUID);
         ScalingHealth.LOGGER.info("Player {}", line);
     }
 

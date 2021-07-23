@@ -40,11 +40,11 @@ public class SHMechanicsPacket implements IntSupplier {
 
     public void encode(PacketBuffer buffer) {
         try {
-            buffer.func_240629_a_(PlayerMechanics.CODEC, playerMechanics);
-            buffer.func_240629_a_(ItemMechanics.CODEC, itemMechanics);
-            buffer.func_240629_a_(MobMechanics.CODEC, mobMechanics);
-            buffer.func_240629_a_(DifficultyMechanics.CODEC, difficultyMechanics);
-            buffer.func_240629_a_(DamageScalingMechanics.CODEC, damageScalingMechanics);
+            buffer.writeWithCodec(PlayerMechanics.CODEC, playerMechanics);
+            buffer.writeWithCodec(ItemMechanics.CODEC, itemMechanics);
+            buffer.writeWithCodec(MobMechanics.CODEC, mobMechanics);
+            buffer.writeWithCodec(DifficultyMechanics.CODEC, difficultyMechanics);
+            buffer.writeWithCodec(DamageScalingMechanics.CODEC, damageScalingMechanics);
         } catch (IOException e) {
             ScalingHealth.LOGGER.error(e);
         }
@@ -57,11 +57,11 @@ public class SHMechanicsPacket implements IntSupplier {
         DifficultyMechanics difficultyMechanics = null;
         DamageScalingMechanics damageScalingMechanics = null;
         try {
-            playerMechanics = buffer.func_240628_a_(PlayerMechanics.CODEC);
-            itemMechanics = buffer.func_240628_a_(ItemMechanics.CODEC);
-            mobMechanics = buffer.func_240628_a_(MobMechanics.CODEC);
-            difficultyMechanics = buffer.func_240628_a_(DifficultyMechanics.CODEC);
-            damageScalingMechanics = buffer.func_240628_a_(DamageScalingMechanics.CODEC);
+            playerMechanics = buffer.readWithCodec(PlayerMechanics.CODEC);
+            itemMechanics = buffer.readWithCodec(ItemMechanics.CODEC);
+            mobMechanics = buffer.readWithCodec(MobMechanics.CODEC);
+            difficultyMechanics = buffer.readWithCodec(DifficultyMechanics.CODEC);
+            damageScalingMechanics = buffer.readWithCodec(DamageScalingMechanics.CODEC);
         } catch (IOException e) {
             ScalingHealth.LOGGER.error(e);
         }
@@ -91,7 +91,7 @@ public class SHMechanicsPacket implements IntSupplier {
         }
         else {
             ScalingHealth.LOGGER.error("Failed to receive SHMechanics on Client!");
-            ctx.get().getNetworkManager().closeChannel(new StringTextComponent("Did not receive Scaling Health configuration data, closing connection."));
+            ctx.get().getNetworkManager().disconnect(new StringTextComponent("Did not receive Scaling Health configuration data, closing connection."));
         }
     }
 

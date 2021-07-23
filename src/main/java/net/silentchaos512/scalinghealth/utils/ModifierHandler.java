@@ -41,7 +41,7 @@ public final class ModifierHandler {
         if (instance == null) return;
         AttributeModifier mod = instance.getModifier(uuid);
         if (mod != null) instance.removeModifier(mod);
-        instance.applyPersistentModifier(new AttributeModifier(uuid, name, amount, op));
+        instance.addPermanentModifier(new AttributeModifier(uuid, name, amount, op));
     }
 
     public static void setMaxHealth(LivingEntity entity, double amount, AttributeModifier.Operation op) {

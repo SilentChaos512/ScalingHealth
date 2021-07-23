@@ -42,6 +42,8 @@ import net.silentchaos512.scalinghealth.utils.config.SHItems;
 import javax.annotation.Nullable;
 import java.util.List;
 
+import net.minecraft.item.Item.Properties;
+
 public class DifficultyMutatorItem extends Item {
     public enum Type {
         ENCHANTED,
@@ -86,7 +88,7 @@ public class DifficultyMutatorItem extends Item {
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flag) {
+    public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> list, ITooltipFlag flag) {
         double amount = getEffectAmount(world);
         if(this.type != Type.CHANCE) {
             String amountStr = (amount > 0 ? "+" : "") + String.format("%.1f", amount);
@@ -102,18 +104,18 @@ public class DifficultyMutatorItem extends Item {
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand) {
-        ItemStack stack = player.getHeldItem(hand);
+    public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+        ItemStack stack = player.getItemInHand(hand);
         if(!EnabledFeatures.difficultyEnabled())
             return new ActionResult<>(ActionResultType.FAIL, stack);
 
         IDifficultySource source = SHDifficulty.source(player);
 
         float change = (float) getEffectAmount(world);
-        if (!world.isRemote) {
+        if (!world.isClientSide) {
             source.addDifficulty(change);
             stack.shrink(1);
-            player.addStat(Stats.ITEM_USED.get(this));
+            player.awardStat(Stats.ITEM_USED.get(this));
         }
 
         switch (this.type) {
@@ -136,14 +138,14 @@ public class DifficultyMutatorItem extends Item {
     }
 
     private void cursedHeartEffects(World world, PlayerEntity player) {
-        if(world.isRemote) {
+        if(world.isClientSide) {
             ParticleUtils.spawn(Registration.CURSED_HEART_PARTICLE.get(), 40, player);
             SoundUtils.play(player, Registration.CURSED_HEART_USE.get());
         }
     }
 
     private void enchantedHeartEffects(World world, PlayerEntity player) {
-        if(world.isRemote) {
+        if(world.isClientSide) {
             ParticleUtils.spawn(Registration.ENCHANTED_HEART_PARTICLE.get(), 40, player);
             SoundUtils.play(player, Registration.ENCHANTED_HEART_USE.get());
         }

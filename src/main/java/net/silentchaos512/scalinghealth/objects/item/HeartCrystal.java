@@ -29,6 +29,8 @@ import net.silentchaos512.scalinghealth.utils.config.SHItems;
 import net.silentchaos512.scalinghealth.utils.config.SHPlayers;
 import net.silentchaos512.utils.MathUtils;
 
+import net.minecraft.item.Item.Properties;
+
 public class HeartCrystal extends StatBoosterItem {
     public HeartCrystal(Properties properties) {
         super(properties);

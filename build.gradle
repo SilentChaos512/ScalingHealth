@@ -1,17 +1,15 @@
 buildscript {
     repositories {
         maven { url = 'https://maven.minecraftforge.net/' }
-        jcenter()
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
     }
 }
 
 plugins {
     id 'eclipse'
-    id 'maven'
     id 'maven-publish'
     id 'com.matthewprenger.cursegradle' version '1.4.0'
 }
@@ -47,7 +45,7 @@ println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getPro
 minecraft {
      accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
-    mappings channel: project.mcp_channel.toString(), version: project.mcp_mappings.toString()
+    mappings channel: 'official', version: '1.16.5'
 
     runs {
         client {

@@ -37,13 +37,13 @@ public class EntityGroupCondition implements ILootCondition {
     */
    @Override
    public boolean test(LootContext context) {
-      Entity entity = context.get(LootParameters.THIS_ENTITY);
-      return context.has(LootParameters.DAMAGE_SOURCE) && entity instanceof LivingEntity &&
+      Entity entity = context.getParamOrNull(LootParameters.THIS_ENTITY);
+      return context.hasParam(LootParameters.DAMAGE_SOURCE) && entity instanceof LivingEntity &&
               EntityGroup.from((LivingEntity) entity, true) == this.group;
    }
 
    @Override
-   public LootConditionType getConditionType() {
+   public LootConditionType getType() {
       return Registry.LOOT_CONDITION_TYPE.getOptional(NAME)
               .orElseThrow(() -> new RuntimeException("Loot condition type did not register for some reason"));
    }
@@ -56,7 +56,7 @@ public class EntityGroupCondition implements ILootCondition {
 
       @Override
       public EntityGroupCondition deserialize(JsonObject json, JsonDeserializationContext context) {
-         String group = JSONUtils.getString(json, "entity_group");
+         String group = JSONUtils.getAsString(json, "entity_group");
          return new EntityGroupCondition(EntityGroup.from(group));
       }
    }

@@ -20,13 +20,13 @@ public class LootTablesGenerator extends BaseLootTableGenerator {
     }
 
     public static final List<ResourceLocation> CHESTS = Lists.newArrayList(
-            LootTables.CHESTS_ABANDONED_MINESHAFT,
-            LootTables.CHESTS_BURIED_TREASURE,
-            LootTables.CHESTS_NETHER_BRIDGE,
-            LootTables.CHESTS_SIMPLE_DUNGEON,
-            LootTables.CHESTS_STRONGHOLD_LIBRARY,
-            LootTables.CHESTS_UNDERWATER_RUIN_BIG,
-            LootTables.CHESTS_WOODLAND_MANSION
+            LootTables.ABANDONED_MINESHAFT,
+            LootTables.BURIED_TREASURE,
+            LootTables.NETHER_BRIDGE,
+            LootTables.SIMPLE_DUNGEON,
+            LootTables.STRONGHOLD_LIBRARY,
+            LootTables.UNDERWATER_RUIN_BIG,
+            LootTables.WOODLAND_MANSION
     );
 
     public static final Map<ResourceLocation, ResourceLocation> VANILLA_TO_SH = CHESTS
@@ -42,25 +42,25 @@ public class LootTablesGenerator extends BaseLootTableGenerator {
         blockLootTables.put(Registration.POWER_CRYSTAL_ORE.get(),
                 createSilkTouchTable("power_crystal_ore", Registration.POWER_CRYSTAL_ORE.get(), Registration.POWER_CRYSTAL_SHARD.get()));
 
-        LootTable.Builder builder = LootTable.builder().addLootPool(
+        LootTable.Builder builder = LootTable.lootTable().withPool(
                 new LootPool.Builder()
-                        .rolls(new RandomValueRange(1))
-                        .addEntry(ItemLootEntry.builder(Registration.HEART_CRYSTAL.get())
-                                .weight(3).quality(2)
-                                .acceptFunction(SetCount.builder(new RandomValueRange(1,2)))
-                        ).addEntry(ItemLootEntry.builder(Registration.CURSED_HEART.get())
-                        .weight(1).quality(5)
-                        .acceptFunction(SetCount.builder(new RandomValueRange(1, 3)))
-                ).addEntry(ItemLootEntry.builder(Registration.ENCHANTED_HEART.get())
-                        .weight(1).quality(5)
-                        .acceptFunction(SetCount.builder(new RandomValueRange(1, 3)))
-                ).addEntry(ItemLootEntry.builder(Registration.CHANCE_HEART.get())
-                        .weight(1).quality(5)
-                        .acceptFunction(SetCount.builder(new RandomValueRange(1, 3)))
-                ).addEntry(ItemLootEntry.builder(Registration.POWER_CRYSTAL.get())
-                        .weight(2).quality(7)
-                        .acceptFunction(SetCount.builder(new RandomValueRange(1, 2)))
-                ).addEntry(EmptyLootEntry.func_216167_a().weight(10)));
+                        .setRolls(new RandomValueRange(1))
+                        .add(ItemLootEntry.lootTableItem(Registration.HEART_CRYSTAL.get())
+                                .setWeight(3).setQuality(2)
+                                .apply(SetCount.setCount(new RandomValueRange(1,2)))
+                        ).add(ItemLootEntry.lootTableItem(Registration.CURSED_HEART.get())
+                        .setWeight(1).setQuality(5)
+                        .apply(SetCount.setCount(new RandomValueRange(1, 3)))
+                ).add(ItemLootEntry.lootTableItem(Registration.ENCHANTED_HEART.get())
+                        .setWeight(1).setQuality(5)
+                        .apply(SetCount.setCount(new RandomValueRange(1, 3)))
+                ).add(ItemLootEntry.lootTableItem(Registration.CHANCE_HEART.get())
+                        .setWeight(1).setQuality(5)
+                        .apply(SetCount.setCount(new RandomValueRange(1, 3)))
+                ).add(ItemLootEntry.lootTableItem(Registration.POWER_CRYSTAL.get())
+                        .setWeight(2).setQuality(7)
+                        .apply(SetCount.setCount(new RandomValueRange(1, 2)))
+                ).add(EmptyLootEntry.emptyItem().setWeight(10)));
 
         VANILLA_TO_SH.values().forEach(rl -> lootTables.put(rl, builder));
 

@@ -31,19 +31,19 @@ public class LootModifierGen extends GlobalLootModifierProvider {
         this.add("hostile", tableGlobalModifier,
                 new TableGlobalModifier(
                         new ILootCondition[]{new EntityGroupCondition(EntityGroup.HOSTILE)},
-                        (TableLootEntry) TableLootEntry.builder(ScalingHealth.getId("bonus_drops/hostile")).build()
+                        (TableLootEntry) TableLootEntry.lootTableReference(ScalingHealth.getId("bonus_drops/hostile")).build()
                 ));
         this.add("peaceful", tableGlobalModifier,
                 new TableGlobalModifier(
                         new ILootCondition[]{new EntityGroupCondition(EntityGroup.PEACEFUL)},
-                        (TableLootEntry) TableLootEntry.builder(ScalingHealth.getId("bonus_drops/peaceful")).build()
+                        (TableLootEntry) TableLootEntry.lootTableReference(ScalingHealth.getId("bonus_drops/peaceful")).build()
                 ));
 
         LootTablesGenerator.CHESTS.forEach(rl ->
                 this.add(rl.getPath(), tableGlobalModifier,
                         new TableGlobalModifier(
                                 new ILootCondition[]{LootTableIdCondition.builder(rl).build()},
-                                (TableLootEntry) TableLootEntry.builder(LootTablesGenerator.VANILLA_TO_SH.get(rl)).build()
+                                (TableLootEntry) TableLootEntry.lootTableReference(LootTablesGenerator.VANILLA_TO_SH.get(rl)).build()
                         )
                 ));
 

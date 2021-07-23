@@ -32,18 +32,18 @@ public final class SummonCommand {
 
     public static void register(CommandDispatcher<CommandSource> dispatcher) {
         LiteralArgumentBuilder<CommandSource> builder = Commands.literal("sh_summon").requires(source ->
-                source.hasPermissionLevel(2));
+                source.hasPermission(2));
 
         // blight summoning? setting difficulty?
-        builder.then(Commands.argument("entity", EntitySummonArgument.entitySummon())
+        builder.then(Commands.argument("entity", EntitySummonArgument.id())
                 .suggests(SuggestionProviders.SUMMONABLE_ENTITIES)
                 .executes(source ->
                         summonEntity(
                                 source.getSource(),
-                                EntitySummonArgument.getEntityId(source, "entity"),
+                                EntitySummonArgument.getSummonableEntity(source, "entity"),
                                 -1,
                                 false,
-                                source.getSource().getPos(),
+                                source.getSource().getPosition(),
                                 new CompoundNBT(),
                                 true
                         )
@@ -52,10 +52,10 @@ public final class SummonCommand {
                         .executes(source ->
                                 summonEntity(
                                         source.getSource(),
-                                        EntitySummonArgument.getEntityId(source, "entity"),
+                                        EntitySummonArgument.getSummonableEntity(source, "entity"),
                                         IntegerArgumentType.getInteger(source, "difficulty"),
                                         false,
-                                        source.getSource().getPos(),
+                                        source.getSource().getPosition(),
                                         new CompoundNBT(),
                                         true
                                 )
@@ -64,10 +64,10 @@ public final class SummonCommand {
                                 .executes(source ->
                                         summonEntity(
                                                 source.getSource(),
-                                                EntitySummonArgument.getEntityId(source, "entity"),
+                                                EntitySummonArgument.getSummonableEntity(source, "entity"),
                                                 IntegerArgumentType.getInteger(source, "difficulty"),
                                                 BoolArgumentType.getBool(source, "forceBlight"),
-                                                source.getSource().getPos(),
+                                                source.getSource().getPosition(),
                                                 new CompoundNBT(),
                                                 true
                                         )
@@ -76,22 +76,22 @@ public final class SummonCommand {
                                         .executes(source ->
                                                 summonEntity(
                                                         source.getSource(),
-                                                        EntitySummonArgument.getEntityId(source, "entity"),
+                                                        EntitySummonArgument.getSummonableEntity(source, "entity"),
                                                         IntegerArgumentType.getInteger(source, "difficulty"),
                                                         BoolArgumentType.getBool(source, "forceBlight"),
                                                         Vec3Argument.getVec3(source, "pos"),
                                                         new CompoundNBT(),
                                                         true
                                                 )
-                                        ).then(Commands.argument("nbt", NBTCompoundTagArgument.nbt())
+                                        ).then(Commands.argument("nbt", NBTCompoundTagArgument.compoundTag())
                                                 .executes(source ->
                                                         summonEntity(
                                                                 source.getSource(),
-                                                                EntitySummonArgument.getEntityId(source, "entity"),
+                                                                EntitySummonArgument.getSummonableEntity(source, "entity"),
                                                                 IntegerArgumentType.getInteger(source, "difficulty"),
                                                                 BoolArgumentType.getBool(source, "forceBlight"),
                                                                 Vec3Argument.getVec3(source, "pos"),
-                                                                NBTCompoundTagArgument.getNbt(source, "nbt"),
+                                                                NBTCompoundTagArgument.getCompoundTag(source, "nbt"),
                                                                 false
                                                         )
                                                 )
@@ -108,18 +108,18 @@ public final class SummonCommand {
     private static int summonEntity(CommandSource source, ResourceLocation id, int difficulty, boolean forceBlight, Vector3d pos, CompoundNBT tags, boolean randomizeProperties) throws CommandSyntaxException {
         CompoundNBT nbt = tags.copy();
         nbt.putString("id", id.toString());
-        ServerWorld world = source.getWorld();
-        Entity entity = EntityType.loadEntityAndExecute(nbt, world, e -> {
-            e.setLocationAndAngles(pos.x, pos.y, pos.z, e.rotationYaw, e.rotationPitch);
+        ServerWorld world = source.getLevel();
+        Entity entity = EntityType.loadEntityRecursive(nbt, world, e -> {
+            e.moveTo(pos.x, pos.y, pos.z, e.yRot, e.xRot);
             //noinspection ReturnOfNull
-            return !world.summonEntity(e) ? null : e;
+            return !world.addWithUUID(e) ? null : e;
         });
         if (entity == null) {
             throw SUMMON_FAILED.create();
         } else {
             if (randomizeProperties && entity instanceof MobEntity) {
                 MobEntity mob = (MobEntity) entity;
-                mob.onInitialSpawn(world, world.getDifficultyForLocation(entity.getPosition()), SpawnReason.COMMAND, null, null);
+                mob.finalizeSpawn(world, world.getCurrentDifficultyAt(entity.blockPosition()), SpawnReason.COMMAND, null, null);
 
                 if (difficulty > 0) {
                     IDifficultyAffected affected = SHDifficulty.affected(entity);
@@ -129,7 +129,7 @@ public final class SummonCommand {
                     affected.setProcessed(true);
                 }
             }
-            source.sendFeedback(new TranslationTextComponent("commands.summon.success", entity.getDisplayName()), true);
+            source.sendSuccess(new TranslationTextComponent("commands.summon.success", entity.getDisplayName()), true);
             return 1;
         }
     }

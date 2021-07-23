@@ -38,10 +38,10 @@ public class BandagedEffect extends Effect {
     }
 
     @Override
-    public void performEffect(LivingEntity entityLiving, int amplifier) {
+    public void applyEffectTick(LivingEntity entityLiving, int amplifier) {
         // Remove effect if fully healed.
         if (entityLiving.getHealth() >= entityLiving.getMaxHealth()) {
-            entityLiving.removePotionEffect(this);
+            entityLiving.removeEffect(this);
         }
 
         float healAmount = BASE_HEAL_RATE * entityLiving.getMaxHealth() * (amplifier + 1);
@@ -50,7 +50,7 @@ public class BandagedEffect extends Effect {
     }
 
     @Override
-    public boolean isReady(int duration, int amplifier) {
+    public boolean isDurationEffectTick(int duration, int amplifier) {
         // Heal every second.
         return duration % 20 == 0;
     }
@@ -62,7 +62,7 @@ public class BandagedEffect extends Effect {
     }
 
     @Override
-    public double getAttributeModifierAmount(int amplifier, AttributeModifier modifier) {
+    public double getAttributeModifierValue(int amplifier, AttributeModifier modifier) {
         // I don't want to consider the amplifier.
         return modifier.getAmount();
     }

@@ -64,20 +64,20 @@ public final class CommonEvents {
       ServerPlayerEntity sp = (ServerPlayerEntity) event.getPlayer();
       ScalingHealth.LOGGER.debug("Sending login packet to player {}", player);
       ClientLoginMessage msg = new ClientLoginMessage(SHDifficulty.areaMode(), (float) SHDifficulty.maxValue());
-      Network.channel.sendTo(msg, sp.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
+      Network.channel.sendTo(msg, sp.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
    }
 
    @SubscribeEvent
    public static void onSpawn(LivingSpawnEvent.CheckSpawn event){
       if(!(event.getEntityLiving() instanceof MobEntity)) return;
-      if(event.getSpawnReason() == SpawnReason.SPAWNER) spawnerSpawns.add(event.getEntityLiving().getUniqueID());
+      if(event.getSpawnReason() == SpawnReason.SPAWNER) spawnerSpawns.add(event.getEntityLiving().getUUID());
    }
 
    @SubscribeEvent(priority = EventPriority.HIGHEST)
    public static void onMobXPDropped(LivingExperienceDropEvent event) {
       LivingEntity entity = event.getEntityLiving();
       // Additional XP from all mobs.
-      short difficulty = (short) SHDifficulty.areaDifficulty(entity.world, entity.getPosition());
+      short difficulty = (short) SHDifficulty.areaDifficulty(entity.level, entity.blockPosition());
       float multi = (float) (1.0f + SHMobs.xpBoost() * difficulty);
 
       float amount = event.getDroppedExperience();
@@ -97,7 +97,7 @@ public final class CommonEvents {
       if(event.phase == TickEvent.Phase.START) return;
       PlayerEntity player = event.player;
 
-      if (player.world.isRemote) return;
+      if (player.level.isClientSide) return;
       SHPlayers.getPlayerData(player).tick(player);
 
       if (changedLevelThisTick) {
@@ -124,12 +124,12 @@ public final class CommonEvents {
    @SubscribeEvent
    public static void onPlayerSleepInBed(PlayerSleepInBedEvent event) {
       PlayerEntity player = event.getPlayer();
-      if (!player.world.isRemote && SHConfig.CLIENT.warnWhenSleeping.get()) {
+      if (!player.level.isClientSide && SHConfig.CLIENT.warnWhenSleeping.get()) {
          double newDifficulty = SHDifficulty.diffOnPlayerSleep(player);
 
          if (!MathUtils.doublesEqual(SHDifficulty.getDifficultyOf(player), newDifficulty, 0.1)) {
             ScalingHealth.LOGGER.debug("old={}, new={}", SHDifficulty.getDifficultyOf(player), newDifficulty);
-            player.sendMessage(new TranslationTextComponent("misc.scalinghealth.sleepWarning"), Util.DUMMY_UUID);
+            player.sendMessage(new TranslationTextComponent("misc.scalinghealth.sleepWarning"), Util.NIL_UUID);
          }
       }
    }
@@ -137,7 +137,7 @@ public final class CommonEvents {
    @SubscribeEvent
    public static void onPlayerWakeUp(PlayerWakeUpEvent event) {
       PlayerEntity player = event.getPlayer();
-      if (!player.world.isRemote && !event.updateWorld()) {
+      if (!player.level.isClientSide && !event.updateWorld()) {
          SHDifficulty.setSourceDifficulty(player, SHDifficulty.diffOnPlayerSleep(player));
       }
    }
