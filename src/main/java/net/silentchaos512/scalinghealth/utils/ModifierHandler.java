@@ -18,11 +18,11 @@
 
 package net.silentchaos512.scalinghealth.utils;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attribute;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.silentchaos512.lib.util.EntityHelper;
 import net.silentchaos512.scalinghealth.utils.config.SHDifficulty;
 
@@ -37,7 +37,7 @@ public final class ModifierHandler {
     private ModifierHandler() { throw new IllegalAccessError("Utility class"); }
 
     public static void setModifier(LivingEntity entity, Attribute attribute, UUID uuid, String name, double amount, AttributeModifier.Operation op) {
-        ModifiableAttributeInstance instance = entity.getAttribute(attribute);
+        AttributeInstance instance = entity.getAttribute(attribute);
         if (instance == null) return;
         AttributeModifier mod = instance.getModifier(uuid);
         if (mod != null) instance.removeModifier(mod);

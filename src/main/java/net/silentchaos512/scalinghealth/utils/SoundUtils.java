@@ -18,17 +18,17 @@
 
 package net.silentchaos512.scalinghealth.utils;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.player.Player;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 
 public class SoundUtils {
-    public static void play(PlayerEntity entity, SoundEvent event) {
+    public static void play(Player entity, SoundEvent event) {
         play(entity, event, 0.5f, 1 + 0.1f * (float) ScalingHealth.RANDOM.nextGaussian());
     }
 
-    public static void play(PlayerEntity entity, SoundEvent event, float volume, float pitch) {
-        entity.level.playSound(entity, entity.blockPosition(), event, SoundCategory.PLAYERS, volume, pitch);
+    public static void play(Player entity, SoundEvent event, float volume, float pitch) {
+        entity.level.playSound(entity, entity.blockPosition(), event, SoundSource.PLAYERS, volume, pitch);
     }
 }

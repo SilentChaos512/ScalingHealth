@@ -1,6 +1,6 @@
 package net.silentchaos512.scalinghealth.utils.config;
 
-import net.minecraft.entity.MobEntity;
+import net.minecraft.world.entity.Mob;
 import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanicListener;
 import net.silentchaos512.scalinghealth.resources.tags.EntityTags;
 import net.silentchaos512.scalinghealth.utils.mode.MobHealthMode;
@@ -11,7 +11,7 @@ import java.util.List;
 public final class SHMobs {
     private SHMobs() { throw new IllegalAccessError("Utility class"); }
 
-    public static boolean allowsDifficultyChanges(MobEntity entity) {
+    public static boolean allowsDifficultyChanges(Mob entity) {
         return !EntityTags.DIFFICULTY_EXEMPT.contains(entity.getType());
     }
 
@@ -19,11 +19,11 @@ public final class SHMobs {
         return SHMechanicListener.getMobMechanics().blight.blightChance;
     }
 
-    public static boolean canBecomeBlight(MobEntity entity) {
+    public static boolean canBecomeBlight(Mob entity) {
         return EnabledFeatures.blightsEnabled() && !EntityTags.BLIGHT_EXEMPT.contains(entity.getType());
     }
 
-    public static boolean isBlight(MobEntity entity) {
+    public static boolean isBlight(Mob entity) {
         return SHDifficulty.affected(entity).isBlight();
     }
 

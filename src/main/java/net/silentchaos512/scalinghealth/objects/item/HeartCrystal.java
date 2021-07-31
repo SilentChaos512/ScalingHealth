@@ -18,9 +18,9 @@
 
 package net.silentchaos512.scalinghealth.objects.item;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.player.Player;
 import net.silentchaos512.lib.util.EntityHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.objects.Registration;
@@ -29,32 +29,30 @@ import net.silentchaos512.scalinghealth.utils.config.SHItems;
 import net.silentchaos512.scalinghealth.utils.config.SHPlayers;
 import net.silentchaos512.utils.MathUtils;
 
-import net.minecraft.item.Item.Properties;
-
 public class HeartCrystal extends StatBoosterItem {
     public HeartCrystal(Properties properties) {
         super(properties);
     }
 
     @Override
-    protected int getLevelCost(PlayerEntity player) {
+    protected int getLevelCost(Player player) {
         return SHItems.levelCostToUseHeartCrystal(player);
     }
 
     @Override
-    protected boolean isStatIncreaseAllowed(PlayerEntity player) {
+    protected boolean isStatIncreaseAllowed(Player player) {
         return EnabledFeatures.healthCrystalEnabled() &&
                 SHPlayers.getPlayerData(player).getBonusHearts(player) < SHPlayers.maxHealth();
     }
 
     @Override
-    protected boolean shouldConsume(PlayerEntity player) {
+    protected boolean shouldConsume(Player player) {
         return EnabledFeatures.healthCrystalRegenEnabled() &&
                 player.getHealth() < player.getMaxHealth();
     }
 
     @Override
-    protected void extraConsumeEffect(PlayerEntity player) {
+    protected void extraConsumeEffect(Player player) {
         int current = (int) player.getHealth();
         double healAmount = SHItems.heartCrystalHpBonusRegen();
         EntityHelper.heal(player, (float) healAmount, true);
@@ -65,12 +63,12 @@ public class HeartCrystal extends StatBoosterItem {
     }
 
     @Override
-    protected void increaseStat(PlayerEntity player) {
+    protected void increaseStat(Player player) {
         SHPlayers.getPlayerData(player).addHeartCrystals(player, SHItems.heartCrystalIncreaseAmount());
     }
 
     @Override
-    protected IParticleData getParticleType() {
+    protected ParticleOptions getParticleType() {
         return Registration.HEART_CRYSTAL_PARTICLE.get();
     }
 

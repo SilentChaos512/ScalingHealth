@@ -19,21 +19,21 @@
 package net.silentchaos512.scalinghealth.objects.potion;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectType;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.item.ItemStack;
 import net.silentchaos512.lib.util.EntityHelper;
 
 import java.util.List;
 
-public class BandagedEffect extends Effect {
+public class BandagedEffect extends MobEffect {
     private static final float BASE_HEAL_RATE = 0.005f;
     public static final double SPEED_MODIFIER = -0.25;
     public static final String MOD_UUID = "732486d8-f730-41a2-868f-eb988738986f";
 
-    public BandagedEffect(EffectType type, int color) {
+    public BandagedEffect(MobEffectCategory type, int color) {
         super(type, color);
     }
 

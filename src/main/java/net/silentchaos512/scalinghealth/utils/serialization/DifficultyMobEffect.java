@@ -3,10 +3,10 @@ package net.silentchaos512.scalinghealth.utils.serialization;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectInstance;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistryEntry;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -33,12 +33,12 @@ public class DifficultyMobEffect {
             ).apply(inst, DifficultyMobEffect::new)
     );
 
-    public final Effect effect;
+    public final MobEffect effect;
     public final int level;
     public final int minDifficulty;
     public final double durationMinutes;
 
-    public DifficultyMobEffect(Effect effect, int level, int minDifficulty, double durationMinutes) {
+    public DifficultyMobEffect(MobEffect effect, int level, int minDifficulty, double durationMinutes) {
         this.effect = effect;
         this.level = level;
         this.minDifficulty = minDifficulty;
@@ -47,7 +47,7 @@ public class DifficultyMobEffect {
 
     public void apply(LivingEntity e, double difficulty) {
         if (difficulty >= minDifficulty) {
-            e.addEffect(new EffectInstance(effect, (int) (durationMinutes * 60 * 20), level - 1));
+            e.addEffect(new MobEffectInstance(effect, (int) (durationMinutes * 60 * 20), level - 1));
             if (ScalingHealth.LOGGER.isDebugEnabled() && SHConfig.SERVER.debugMobPotionEffects.get()) {
                 ScalingHealth.LOGGER.debug(MARKER, "Applied effect {}, level {} for {}min to {} ({})",
                         effect.getRegistryName(), level, durationMinutes, e.getScoreboardName(), e.getType().getRegistryName());

@@ -2,16 +2,16 @@ package net.silentchaos512.scalinghealth.utils.config;
 
 import com.mojang.datafixers.util.Pair;
 import com.udojava.evalex.Expression;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.util.Tuple;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3i;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.silentchaos512.lib.util.MCMathUtils;
 import net.silentchaos512.scalinghealth.capability.DifficultyAffectedCapability;
@@ -44,7 +44,7 @@ public final class SHDifficulty {
                 .orElseGet(DifficultySourceCapability::new);
     }
 
-    public static void setSourceDifficulty(PlayerEntity player, double difficulty){
+    public static void setSourceDifficulty(Player player, double difficulty){
         IDifficultySource source = SHDifficulty.source(player);
         if (!MathUtils.doublesEqual(source.getDifficulty(), difficulty)) {
             source.setDifficulty((float) difficulty);                               //player diff
@@ -54,18 +54,18 @@ public final class SHDifficulty {
 
     @SuppressWarnings("TypeMayBeWeakened")
     public static double getDifficultyOf(Entity entity) {
-        if (entity instanceof PlayerEntity)
+        if (entity instanceof Player)
             return source(entity).getDifficulty();
         return affected(entity).affectiveDifficulty();
     }
 
-    public static List<Pair<IDifficultySource, BlockPos>> positionedPlayerSources(IWorld world, Vector3i center, long radius) {
+    public static List<Pair<IDifficultySource, BlockPos>> positionedPlayerSources(LevelAccessor world, Vec3i center, long radius) {
         return playersInRange(world, center, radius)
                 .map(player -> Pair.of(source(player), player.blockPosition()))
                 .collect(Collectors.toList());
     }
 
-    public static Collection<Tuple<BlockPos, IDifficultySource>> allPlayerSources(IWorld world, Vector3i center, long radius) {
+    public static Collection<Tuple<BlockPos, IDifficultySource>> allPlayerSources(LevelAccessor world, Vec3i center, long radius) {
         Collection<Tuple<BlockPos, IDifficultySource>> list = new ArrayList<>();
 
         // Get players
@@ -73,7 +73,7 @@ public final class SHDifficulty {
         return list;
     }
 
-    public static Stream<? extends PlayerEntity> playersInRange(IWorld world, Vector3i center, long radius) {
+    public static Stream<? extends Player> playersInRange(LevelAccessor world, Vec3i center, long radius) {
         if (radius <= 0)
             return world.players().stream();
         return world.players().stream()
@@ -84,29 +84,29 @@ public final class SHDifficulty {
         return SHMechanicListener.getDifficultyMechanics().groupBonusRadius;
     }
 
-    public static double areaDifficulty(World world, BlockPos pos) {
+    public static double areaDifficulty(Level world, BlockPos pos) {
         return areaDifficulty(world, pos, true);
     }
 
-    public static double areaDifficulty(World world, BlockPos pos, boolean groupBonus) {
+    public static double areaDifficulty(Level world, BlockPos pos, boolean groupBonus) {
         return clamp(areaMode().getDifficulty(world, pos) *
                 locationMultiplier(world, pos) *
                 lunarMultiplier(world) *
                 (groupBonus ? groupMultiplier(world, pos) : 1));
     }
 
-    public static double locationMultiplier(World world, BlockPos pos) {
+    public static double locationMultiplier(Level world, BlockPos pos) {
         return SHMechanicListener.getDifficultyMechanics().multipliers.getScale(world, world.getBiome(pos));
     }
 
     //TODO Can't be checked on the ClientWorld, have to send packet (for debug overlay)
-    public static double lunarMultiplier(World world) {
-        return (world.dimension() != World.OVERWORLD || world.isDay()) ? 1 :
+    public static double lunarMultiplier(Level world) {
+        return (world.dimension() != Level.OVERWORLD || world.isDay()) ? 1 :
                 SHMechanicListener.getDifficultyMechanics().multipliers
                         .getLunarMultiplier(world.dimensionType().moonPhase(world.dayTime()));
     }
 
-    public static double groupMultiplier(World world, BlockPos pos) {
+    public static double groupMultiplier(Level world, BlockPos pos) {
         return EvalVars.apply(world, pos, null, SHMechanicListener.getDifficultyMechanics().groupBonus.get());
     }
 
@@ -115,7 +115,7 @@ public final class SHDifficulty {
     }
 
     public static double clamp(double difficulty) {
-        return MathHelper.clamp(difficulty, minValue(), maxValue());
+        return Mth.clamp(difficulty, minValue(), maxValue());
     }
 
     public static double minValue() {
@@ -142,13 +142,13 @@ public final class SHDifficulty {
         return SHMechanicListener.getDifficultyMechanics().timeBeforeAfk;
     }
 
-    public static double getDifficultyAfterDeath(PlayerEntity player) {
+    public static double getDifficultyAfterDeath(Player player) {
         return EvalVars.apply(player, SHMechanicListener.getDifficultyMechanics().mutators.onPlayerDeath.get());
     }
 
-    public static void applyKillMutator(LivingEntity killed, PlayerEntity killer) {
+    public static void applyKillMutator(LivingEntity killed, Player killer) {
         //check if player, if it is, no other mutator can apply
-        if (killed instanceof PlayerEntity) {
+        if (killed instanceof Player) {
             setSourceDifficulty(killer, EvalVars.apply(killer, SHMechanicListener.getDifficultyMechanics().mutators.onPlayerKilled.get()));
             return;
         }
@@ -173,7 +173,7 @@ public final class SHDifficulty {
         }
     }
 
-    public static double diffOnPlayerSleep(PlayerEntity entity){
+    public static double diffOnPlayerSleep(Player entity){
         return EvalVars.apply(entity, SHMechanicListener.getDifficultyMechanics().mutators.onPlayerSleep.get());
     }
 

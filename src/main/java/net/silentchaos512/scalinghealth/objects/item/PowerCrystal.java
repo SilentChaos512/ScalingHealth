@@ -1,14 +1,12 @@
 package net.silentchaos512.scalinghealth.objects.item;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.particles.IParticleData;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.player.Player;
 import net.silentchaos512.scalinghealth.objects.Registration;
 import net.silentchaos512.scalinghealth.utils.config.EnabledFeatures;
 import net.silentchaos512.scalinghealth.utils.config.SHItems;
 import net.silentchaos512.scalinghealth.utils.config.SHPlayers;
-
-import net.minecraft.item.Item.Properties;
 
 public class PowerCrystal extends StatBoosterItem {
     public PowerCrystal(Properties properties) {
@@ -16,34 +14,34 @@ public class PowerCrystal extends StatBoosterItem {
     }
 
     @Override
-    protected int getLevelCost(PlayerEntity player) {
+    protected int getLevelCost(Player player) {
         return SHItems.levelCostToUsePowerCrystal(player);
     }
 
     @Override
-    protected boolean isStatIncreaseAllowed(PlayerEntity player) {
+    protected boolean isStatIncreaseAllowed(Player player) {
         return EnabledFeatures.powerCrystalEnabled() &&
                 SHPlayers.getPlayerData(player).getPowerCrystals() * SHItems.powerCrystalIncreaseAmount() < SHPlayers.maxAttackDamage();
     }
 
     @Override
-    protected boolean shouldConsume(PlayerEntity player) {
+    protected boolean shouldConsume(Player player) {
         // No extra effect
         return false;
     }
 
     @Override
-    protected void extraConsumeEffect(PlayerEntity player) {
+    protected void extraConsumeEffect(Player player) {
         // Nada
     }
 
     @Override
-    protected void increaseStat(PlayerEntity player) {
+    protected void increaseStat(Player player) {
         SHPlayers.getPlayerData(player).addPowerCrystal(player);
     }
 
     @Override
-    protected IParticleData getParticleType() {
+    protected ParticleOptions getParticleType() {
         return Registration.POWER_CRYSTAL_PARTICLE.get();
     }
 

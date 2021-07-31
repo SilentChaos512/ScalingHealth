@@ -1,10 +1,10 @@
 package net.silentchaos512.scalinghealth;
 
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootConditionType;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -12,6 +12,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.silentchaos512.scalinghealth.capability.DifficultyAffectedCapability;
@@ -36,7 +37,7 @@ public class ScalingHealth {
     public static final Logger LOGGER = LogManager.getLogger(MOD_NAME);
     public static final Random RANDOM = new Random();
 
-    public static final ItemGroup SH = new ItemGroup(MOD_ID) {
+    public static final CreativeModeTab SH = new CreativeModeTab(MOD_ID) {
         @Override
         public ItemStack makeIcon() {
             return new ItemStack(Registration.HEART_CRYSTAL.get());
@@ -59,8 +60,8 @@ public class ScalingHealth {
     }
 
     private void registerLootModSerializers(RegistryEvent.Register<GlobalLootModifierSerializer<?>> event) {
-        Registry.register(Registry.LOOT_CONDITION_TYPE, SHMobProperties.NAME, new LootConditionType(new SHMobProperties.Serializer()));
-        Registry.register(Registry.LOOT_CONDITION_TYPE, EntityGroupCondition.NAME, new LootConditionType(new EntityGroupCondition.Serializer()));
+        Registry.register(Registry.LOOT_CONDITION_TYPE, SHMobProperties.NAME, new LootItemConditionType(new SHMobProperties.ThisSerializer()));
+        Registry.register(Registry.LOOT_CONDITION_TYPE, EntityGroupCondition.NAME, new LootItemConditionType(new EntityGroupCondition.ThisSerializer()));
     }
 
     private void commonSetup(FMLCommonSetupEvent event) {
@@ -74,7 +75,7 @@ public class ScalingHealth {
         ModCommands.registerAll(event.getDispatcher());
     }
 
-    private void reloadConfig(ModConfig.Reloading event) {
+    private void reloadConfig(ModConfigEvent.Reloading event) {
         if (event.getConfig().getType() == ModConfig.Type.CLIENT)
             SHConfig.CLIENT.reload();
     }

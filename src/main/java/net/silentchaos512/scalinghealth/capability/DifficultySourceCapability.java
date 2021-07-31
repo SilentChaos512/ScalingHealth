@@ -1,12 +1,11 @@
 package net.silentchaos512.scalinghealth.capability;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -16,7 +15,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Optional;
 
-public class DifficultySourceCapability implements IDifficultySource, ICapabilitySerializable<CompoundNBT> {
+public class DifficultySourceCapability implements IDifficultySource, ICapabilitySerializable<CompoundTag> {
     @CapabilityInject(IDifficultySource.class)
     public static Capability<IDifficultySource> INSTANCE = null;
 
@@ -60,14 +59,14 @@ public class DifficultySourceCapability implements IDifficultySource, ICapabilit
     }
 
     @Override
-    public CompoundNBT serializeNBT() {
-        CompoundNBT nbt = new CompoundNBT();
+    public CompoundTag serializeNBT() {
+        CompoundTag nbt = new CompoundTag();
         nbt.putFloat(NBT_DIFFICULTY, difficulty);
         return nbt;
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT nbt) {
+    public void deserializeNBT(CompoundTag nbt) {
         difficulty = nbt.getFloat(NBT_DIFFICULTY);
     }
 
@@ -81,28 +80,10 @@ public class DifficultySourceCapability implements IDifficultySource, ICapabilit
             ScalingHealth.LOGGER.error("Failed to get capabilities from {}", obj);
             return false;
         }
-        return obj instanceof PlayerEntity || (obj instanceof ServerWorld && ((ServerWorld) obj).dimension().equals(World.OVERWORLD));
+        return obj instanceof Player || (obj instanceof ServerLevel && ((ServerLevel) obj).dimension().equals(Level.OVERWORLD));
     }
 
     public static void register() {
-        CapabilityManager.INSTANCE.register(IDifficultySource.class, new Storage(), DifficultySourceCapability::new);
-    }
-
-    private static class Storage implements Capability.IStorage<IDifficultySource> {
-        @Nullable
-        @Override
-        public INBT writeNBT(Capability<IDifficultySource> capability, IDifficultySource instance, Direction side) {
-            if (instance instanceof DifficultySourceCapability) {
-                return ((DifficultySourceCapability) instance).serializeNBT();
-            }
-            return new CompoundNBT();
-        }
-
-        @Override
-        public void readNBT(Capability<IDifficultySource> capability, IDifficultySource instance, Direction side, INBT nbt) {
-            if (instance instanceof DifficultySourceCapability) {
-                ((DifficultySourceCapability) instance).deserializeNBT((CompoundNBT) nbt);
-            }
-        }
+        CapabilityManager.INSTANCE.register(IDifficultySource.class);
     }
 }

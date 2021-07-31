@@ -4,20 +4,20 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.loot.ILootSerializer;
-import net.minecraft.loot.LootConditionType;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.conditions.ILootCondition;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.Serializer;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
 import net.silentchaos512.scalinghealth.utils.config.SHDifficulty;
 
-public class SHMobProperties implements ILootCondition {
+public class SHMobProperties implements LootItemCondition {
     public static final ResourceLocation NAME = new ResourceLocation(ScalingHealth.MOD_ID, "mob_properties");
 
     private final LootContext.EntityTarget target;
@@ -32,12 +32,12 @@ public class SHMobProperties implements ILootCondition {
         this.maxDifficulty = maxDifficulty;
     }
 
-    public static ILootCondition.IBuilder builder(LootContext.EntityTarget target, boolean isBlight, float minDifficulty, float maxDifficulty){
+    public static LootItemCondition.Builder builder(LootContext.EntityTarget target, boolean isBlight, float minDifficulty, float maxDifficulty){
         return () -> new SHMobProperties(target, isBlight, minDifficulty, maxDifficulty);
     }
 
     @Override
-    public LootConditionType getType() {
+    public LootItemConditionType getType() {
         return Registry.LOOT_CONDITION_TYPE.getOptional(NAME)
                 .orElseThrow(() -> new RuntimeException("Loot condition type did not register for some reason"));
     }
@@ -45,7 +45,7 @@ public class SHMobProperties implements ILootCondition {
     @Override
     public boolean test(LootContext lootContext) {
         Entity entity = lootContext.getParamOrNull(this.target.getParam());
-        if (entity instanceof MobEntity) {
+        if (entity instanceof Mob) {
             IDifficultyAffected affected = SHDifficulty.affected(entity);
             //rare case where its prob better to get the non-blight difficulty
             float difficulty = affected.getDifficulty();
@@ -56,7 +56,7 @@ public class SHMobProperties implements ILootCondition {
         return false;
     }
 
-    public static class Serializer implements ILootSerializer<SHMobProperties> {
+    public static class ThisSerializer implements Serializer<SHMobProperties> {
         @Override
         public void serialize(JsonObject json, SHMobProperties value, JsonSerializationContext context) {
             json.add("entity", context.serialize(value.target));
@@ -69,16 +69,16 @@ public class SHMobProperties implements ILootCondition {
 
         @Override
         public SHMobProperties deserialize(JsonObject json, JsonDeserializationContext context) {
-            LootContext.EntityTarget target = JSONUtils.getAsObject(json, "entity", context, LootContext.EntityTarget.class);
-            boolean isBlight = JSONUtils.getAsBoolean(json, "is_blight", false);
+            LootContext.EntityTarget target = GsonHelper.getAsObject(json, "entity", context, LootContext.EntityTarget.class);
+            boolean isBlight = GsonHelper.getAsBoolean(json, "is_blight", false);
             float minDifficulty = 0;
             float maxDifficulty = Float.MAX_VALUE;
             if (json.has("difficulty")) {
                 JsonElement difficulty = json.get("difficulty");
                 if (difficulty.isJsonObject()) {
                     JsonObject jsonObject = difficulty.getAsJsonObject();
-                    minDifficulty = JSONUtils.getAsFloat(jsonObject, "min", minDifficulty);
-                    maxDifficulty = JSONUtils.getAsFloat(jsonObject, "max", maxDifficulty);
+                    minDifficulty = GsonHelper.getAsFloat(jsonObject, "min", minDifficulty);
+                    maxDifficulty = GsonHelper.getAsFloat(jsonObject, "max", maxDifficulty);
                 } else {
                     minDifficulty = maxDifficulty = difficulty.getAsFloat();
                 }

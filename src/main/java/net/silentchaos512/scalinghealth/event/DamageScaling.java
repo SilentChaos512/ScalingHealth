@@ -20,12 +20,12 @@ package net.silentchaos512.scalinghealth.event;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -105,12 +105,12 @@ public final class DamageScaling {
             case AREA_DIFFICULTY:
                 return SHDifficulty.areaDifficulty(entity.level, entity.blockPosition()) * config.difficultyWeight;
             case MAX_HEALTH:
-                ModifiableAttributeInstance attr = entity.getAttribute(Attributes.MAX_HEALTH);
+                AttributeInstance attr = entity.getAttribute(Attributes.MAX_HEALTH);
                 if (attr == null) {
                     ScalingHealth.LOGGER.warn("Living Entity {} has no max health attribute", entity.getType().getRegistryName());
                     return 1;
                 }
-                double baseHealth = entity instanceof PlayerEntity
+                double baseHealth = entity instanceof Player
                         ? SHPlayers.startingHealth()
                         : attr.getBaseValue();
                 return (entity.getMaxHealth() - baseHealth) / baseHealth;
@@ -135,14 +135,14 @@ public final class DamageScaling {
         ENTITY_ATTACKED_THIS_TICK.clear();
     }
 
-    public enum Mode implements IStringSerializable {
+    public enum Mode implements StringRepresentable {
         MAX_HEALTH,
         DIFFICULTY,
         AREA_DIFFICULTY;
 
         private static final Map<String, Mode> BY_NAME = Arrays.stream(values())
                 .collect(Collectors.toMap(Mode::getSerializedName, Function.identity()));
-        public static final Codec<Mode> CODEC = IStringSerializable.fromEnum(Mode::values, BY_NAME::get);
+        public static final Codec<Mode> CODEC = StringRepresentable.fromEnum(Mode::values, BY_NAME::get);
 
         @Override
         public String getSerializedName() {

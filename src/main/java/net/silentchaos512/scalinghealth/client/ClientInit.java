@@ -2,9 +2,9 @@ package net.silentchaos512.scalinghealth.client;
 
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.particle.IParticleFactory;
-import net.minecraft.client.particle.ParticleManager;
-import net.minecraft.particles.BasicParticleType;
+import net.minecraft.client.particle.ParticleEngine;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -35,7 +35,7 @@ public class ClientInit {
 
     @SubscribeEvent
     public static void registerParticleFactories(ParticleFactoryRegisterEvent event) {
-        ParticleManager particles = Minecraft.getInstance().particleEngine;
+        ParticleEngine particles = Minecraft.getInstance().particleEngine;
 
         ImmutableMap.of(
                 Registration.HEART_CRYSTAL_PARTICLE.get(), factory(Color.FIREBRICK),
@@ -45,7 +45,7 @@ public class ClientInit {
         ).forEach(particles::register);
     }
 
-    private static IParticleFactory<BasicParticleType> factory(Color color) {
+    private static ParticleProvider<SimpleParticleType> factory(Color color) {
         return new ColoredParticle.Factory(color);
     }
 }

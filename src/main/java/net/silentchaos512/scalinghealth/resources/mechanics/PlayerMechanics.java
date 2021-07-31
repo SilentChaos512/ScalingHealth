@@ -1,13 +1,10 @@
 package net.silentchaos512.scalinghealth.resources.mechanics;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.DataResult;
-import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.udojava.evalex.Expression;
 import net.silentchaos512.scalinghealth.utils.serialization.SerializationUtils;
 
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class PlayerMechanics {

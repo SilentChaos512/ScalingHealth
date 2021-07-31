@@ -1,15 +1,16 @@
 package net.silentchaos512.scalinghealth.client;
 
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.particle.IParticleFactory;
-import net.minecraft.client.particle.IParticleRenderType;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.TexturedParticle;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.particles.BasicParticleType;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.resources.ResourceLocation;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.utils.Color;
 import net.silentchaos512.utils.MathUtils;
@@ -19,13 +20,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class ColoredParticle extends TexturedParticle {
+public class ColoredParticle extends SingleQuadParticle {
     private static final List<ResourceLocation> TEXTURES = IntStream.range(0, 4).boxed()
             .map(k -> new ResourceLocation(ScalingHealth.MOD_ID, "textures/particle/generic" + k + ".png"))
             .collect(Collectors.toList());
     private static final int[] FRAMES = {0, 1, 2, 3, 2, 1, 0};
 
-    public ColoredParticle(ClientWorld worldIn, Color color, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn) {
+    public ColoredParticle(ClientLevel worldIn, Color color, double xCoordIn, double yCoordIn, double zCoordIn, double xSpeedIn, double ySpeedIn, double zSpeedIn) {
         super(worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn);
         this.lifetime = 16;
         this.hasPhysics = false;
@@ -33,11 +34,10 @@ public class ColoredParticle extends TexturedParticle {
     }
 
     @Override
-    public void render(IVertexBuilder builder, ActiveRenderInfo info, float v) {
+    public void render(VertexConsumer builder, Camera info, float v) {
         int frame = FRAMES.length * this.age / this.lifetime;
         int textureIndex = FRAMES[MathUtils.clamp(frame, 0, FRAMES.length - 1)];
-        ResourceLocation texture = TEXTURES.get(textureIndex);
-        Minecraft.getInstance().textureManager.bind(texture);
+        RenderSystem.setShaderTexture(0, TEXTURES.get(textureIndex));
         super.render(builder, info, v);
     }
 
@@ -62,11 +62,11 @@ public class ColoredParticle extends TexturedParticle {
     }
 
     @Override
-    public IParticleRenderType getRenderType() {
-        return IParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+    public ParticleRenderType getRenderType() {
+        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
     }
 
-    public static class Factory implements IParticleFactory<BasicParticleType> {
+    public static class Factory implements ParticleProvider<SimpleParticleType> {
         private final Color color;
         public Factory(Color color) {
             this.color = color;
@@ -74,7 +74,7 @@ public class ColoredParticle extends TexturedParticle {
 
         @Nullable
         @Override
-        public Particle createParticle(BasicParticleType typeIn, ClientWorld worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(SimpleParticleType typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
             return new ColoredParticle(worldIn, this.color, x, y, z, xSpeed, ySpeed, zSpeed);
         }
     }

@@ -1,6 +1,6 @@
 package net.silentchaos512.scalinghealth.network;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 
 public class ClientSyncMessage {
     public float playerDifficulty;
@@ -21,7 +21,7 @@ public class ClientSyncMessage {
         this.experienceLevel = xp;
     }
 
-    public static ClientSyncMessage fromBytes(PacketBuffer buf) {
+    public static ClientSyncMessage fromBytes(FriendlyByteBuf buf) {
         ClientSyncMessage msg = new ClientSyncMessage();
         msg.playerDifficulty = buf.readFloat();
         msg.worldDifficulty = buf.readFloat();
@@ -32,7 +32,7 @@ public class ClientSyncMessage {
         return msg;
     }
 
-    public void toBytes(PacketBuffer buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         buf.writeFloat(playerDifficulty);
         buf.writeFloat(worldDifficulty);
         buf.writeFloat(areaDifficulty);

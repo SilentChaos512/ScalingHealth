@@ -2,6 +2,7 @@ package net.silentchaos512.scalinghealth.config;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec.*;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.ModConfig;
 import net.silentchaos512.scalinghealth.client.gui.difficulty.DifficultyMeterShow;
@@ -14,15 +15,6 @@ import net.silentchaos512.utils.Color;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.function.Supplier;
-
-import static net.minecraftforge.common.ForgeConfigSpec.*;
-
-import net.minecraftforge.common.ForgeConfigSpec.BooleanValue;
-import net.minecraftforge.common.ForgeConfigSpec.Builder;
-import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
-import net.minecraftforge.common.ForgeConfigSpec.DoubleValue;
-import net.minecraftforge.common.ForgeConfigSpec.EnumValue;
-import net.minecraftforge.common.ForgeConfigSpec.IntValue;
 
 public class SHConfig {
     public static class Client {

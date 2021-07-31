@@ -1,9 +1,9 @@
 package net.silentchaos512.scalinghealth.config;
 
 import com.udojava.evalex.Expression;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.silentchaos512.scalinghealth.utils.config.SHDifficulty;
 
 import javax.annotation.Nullable;
@@ -32,11 +32,11 @@ public enum EvalVars {
         return name;
     }
 
-    public static double apply(PlayerEntity player, Expression expression) {
+    public static double apply(Player player, Expression expression) {
         return apply(player.level, player.blockPosition(), player, expression);
     }
 
-    public static double apply(World world, BlockPos pos, @Nullable PlayerEntity player, Expression expression) {
+    public static double apply(Level world, BlockPos pos, @Nullable Player player, Expression expression) {
         Context context = new Context(world, pos, player);
         for (EvalVars variable : values()) {
             expression.setVariable(variable.varName(), variable.value.apply(context).toString());
@@ -51,11 +51,11 @@ public enum EvalVars {
     }
 
     private static final class Context {
-        private final World world;
+        private final Level world;
         private final BlockPos pos;
-        private final PlayerEntity player;
+        private final Player player;
 
-        private Context(World world, BlockPos pos, @Nullable PlayerEntity player) {
+        private Context(Level world, BlockPos pos, @Nullable Player player) {
             this.world = world;
             this.pos = pos;
             this.player = player;

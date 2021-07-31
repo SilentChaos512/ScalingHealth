@@ -1,16 +1,17 @@
 package net.silentchaos512.scalinghealth.event;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Matrix3f;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Quaternion;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Matrix3f;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.math.vector.Quaternion;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -27,12 +28,12 @@ public class BlightRenderEvent {
    private static final RenderType RENDER_TYPE = RenderType.entityCutout(TEXTURE);
 
    @SubscribeEvent
-   public static void renderBlight(RenderLivingEvent<MobEntity, ? extends EntityModel<? extends MobEntity>> event) {
+   public static void renderBlight(RenderLivingEvent<Mob, ? extends EntityModel<? extends Mob>> event) {
       LivingEntity entity = event.getEntity();
-      if(EnabledFeatures.shouldRenderBlights() && entity instanceof MobEntity && SHDifficulty.affected(entity).isBlight()){
-         MatrixStack stack = event.getMatrixStack();
+      if(EnabledFeatures.shouldRenderBlights() && entity instanceof Mob && SHDifficulty.affected(entity).isBlight()){
+         PoseStack stack = event.getMatrixStack();
          int light = event.getLight();
-         MobEntity mob = (MobEntity) entity;
+         Mob mob = (Mob) entity;
 
          stack.pushPose();
          float w = mob.getBbWidth() * FIRE_SCALE;
@@ -43,13 +44,13 @@ public class BlightRenderEvent {
          float yOffset = (float) (mob.getY() - mob.getBoundingBox().minY);
          float zOffset = 0.0F;
 
-         Quaternion cam = event.getRenderer().getDispatcher().cameraOrientation();
+         Quaternion cam = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
          stack.mulPose(new Quaternion(0, cam.j(), 0, cam.r()));
 
          stack.translate(0, 0, hwRatio * 0.02f);
          int i = 0;
 
-         IVertexBuilder vertexBuilder = event.getBuffers().getBuffer(RENDER_TYPE);
+         VertexConsumer vertexBuilder = event.getBuffers().getBuffer(RENDER_TYPE);
          Matrix4f matrix4f = stack.last().pose();
          Matrix3f matrix3f = stack.last().normal();
 

@@ -1,10 +1,9 @@
 package net.silentchaos512.scalinghealth.capability;
 
-import net.minecraft.entity.MobEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Mob;
 import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -17,7 +16,7 @@ import net.silentchaos512.scalinghealth.utils.config.SHMobs;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class DifficultyAffectedCapability implements IDifficultyAffected, ICapabilitySerializable<CompoundNBT> {
+public class DifficultyAffectedCapability implements IDifficultyAffected, ICapabilitySerializable<CompoundTag> {
     @CapabilityInject(IDifficultyAffected.class)
     public static Capability<IDifficultyAffected> INSTANCE = null;
     public static ResourceLocation NAME = ScalingHealth.getId("difficulty_affected");
@@ -37,7 +36,7 @@ public class DifficultyAffectedCapability implements IDifficultyAffected, ICapab
     }
 
     @Override
-    public void setDifficulty(MobEntity mob) {
+    public void setDifficulty(Mob mob) {
         difficulty = (float) ((Math.random()*(0.1)+0.95) * SHDifficulty.areaDifficulty(mob.level, mob.blockPosition()));
     }
 
@@ -62,7 +61,7 @@ public class DifficultyAffectedCapability implements IDifficultyAffected, ICapab
     }
 
     @Override
-    public void tick(MobEntity entity) {
+    public void tick(Mob entity) {
         if (!processed && entity.isAlive() && entity.tickCount > 2) {
             setDifficulty(entity);
             MobDifficultyHandler.process(entity, this);
@@ -81,44 +80,26 @@ public class DifficultyAffectedCapability implements IDifficultyAffected, ICapab
     }
 
     @Override
-    public CompoundNBT serializeNBT() {
-        CompoundNBT nbt = new CompoundNBT();
+    public CompoundTag serializeNBT() {
+        CompoundTag nbt = new CompoundTag();
         nbt.putBoolean(NBT_BLIGHT, blight);
         nbt.putFloat(NBT_DIFFICULTY, difficulty);
         return nbt;
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT nbt) {
+    public void deserializeNBT(CompoundTag nbt) {
         blight = nbt.getBoolean(NBT_BLIGHT);
         difficulty = nbt.getFloat(NBT_DIFFICULTY);
     }
 
     public static boolean canAttachTo(ICapabilityProvider entity) {
-        return entity instanceof MobEntity
+        return entity instanceof Mob
                 && !entity.getCapability(INSTANCE).isPresent()
-                && SHMobs.allowsDifficultyChanges((MobEntity) entity);
+                && SHMobs.allowsDifficultyChanges((Mob) entity);
     }
 
     public static void register() {
-        CapabilityManager.INSTANCE.register(IDifficultyAffected.class, new Storage(), DifficultyAffectedCapability::new);
-    }
-
-    private static class Storage implements Capability.IStorage<IDifficultyAffected> {
-        @Nullable
-        @Override
-        public INBT writeNBT(Capability<IDifficultyAffected> capability, IDifficultyAffected instance, Direction side) {
-            if (instance instanceof DifficultyAffectedCapability) {
-                return ((DifficultyAffectedCapability) instance).serializeNBT();
-            }
-            return new CompoundNBT();
-        }
-
-        @Override
-        public void readNBT(Capability<IDifficultyAffected> capability, IDifficultyAffected instance, Direction side, INBT nbt) {
-            if (instance instanceof DifficultyAffectedCapability) {
-                ((DifficultyAffectedCapability) instance).deserializeNBT((CompoundNBT) nbt);
-            }
-        }
+        CapabilityManager.INSTANCE.register(IDifficultyAffected.class);
     }
 }

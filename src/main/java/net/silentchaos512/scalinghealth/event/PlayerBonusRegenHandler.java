@@ -18,10 +18,10 @@
 
 package net.silentchaos512.scalinghealth.event;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -41,7 +41,7 @@ public final class PlayerBonusRegenHandler {
 
     private PlayerBonusRegenHandler() {}
 
-    public static int getTimerForPlayer(PlayerEntity player) {
+    public static int getTimerForPlayer(Player player) {
         if (player == null) return -1;
 
         UUID uuid = player.getUUID();
@@ -52,7 +52,7 @@ public final class PlayerBonusRegenHandler {
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if (event.side == LogicalSide.CLIENT) return;
 
-        PlayerEntity player = event.player;
+        Player player = event.player;
         PlayerMechanics.RegenMechanics config = SHMechanicListener.getPlayerMechanics().regenMechanics;
 
         UUID uuid = player.getUUID();
@@ -77,14 +77,14 @@ public final class PlayerBonusRegenHandler {
     @SubscribeEvent
     public static void onPlayerHurt(LivingHurtEvent event) {
         LivingEntity entity = event.getEntityLiving();
-        if (!entity.level.isClientSide && entity instanceof PlayerEntity) {
+        if (!entity.level.isClientSide && entity instanceof Player) {
             TIMERS.put(entity.getUUID(), (int) (SHMechanicListener.getPlayerMechanics().regenMechanics.initialDelay * 20));
         }
     }
 
     private static float getHealTickAmount(LivingEntity entity) {
         if (SHMechanicListener.getPlayerMechanics().regenMechanics.proportionaltoMaxHp) {
-            ModifiableAttributeInstance attr = entity.getAttribute(Attributes.MAX_HEALTH);
+            AttributeInstance attr = entity.getAttribute(Attributes.MAX_HEALTH);
             if (attr == null) {
                 ScalingHealth.LOGGER.warn("LivingEntity {} does not have a max hp attribute!", entity.getType().getRegistryName());
                 return 0;
@@ -102,8 +102,8 @@ public final class PlayerBonusRegenHandler {
             return false;
         }
 
-        if (entity instanceof PlayerEntity) {
-            PlayerEntity player = (PlayerEntity) entity;
+        if (entity instanceof Player) {
+            Player player = (Player) entity;
             int food = player.getFoodData().getFoodLevel();
             if (food < config.minFood || food > config.maxFood) {
                 return false;

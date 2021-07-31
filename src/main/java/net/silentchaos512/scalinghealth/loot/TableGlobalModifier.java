@@ -1,12 +1,12 @@
 package net.silentchaos512.scalinghealth.loot;
 
 import com.google.gson.JsonObject;
-import net.minecraft.item.ItemStack;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.TableLootEntry;
-import net.minecraft.loot.conditions.ILootCondition;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.entries.LootTableReference;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.common.loot.LootModifier;
 import net.silentchaos512.scalinghealth.objects.item.DifficultyMutatorItem;
@@ -17,9 +17,9 @@ import javax.annotation.Nonnull;
 import java.util.List;
 
 public class TableGlobalModifier extends LootModifier{
-   private final TableLootEntry table;
+   private final LootTableReference table;
 
-   public TableGlobalModifier(ILootCondition[] conditions, TableLootEntry table) {
+   public TableGlobalModifier(LootItemCondition[] conditions, LootTableReference table) {
       super(conditions);
       this.table = table;
    }
@@ -39,9 +39,9 @@ public class TableGlobalModifier extends LootModifier{
 
    public static class Serializer extends GlobalLootModifierSerializer<TableGlobalModifier> {
       @Override
-      public TableGlobalModifier read(ResourceLocation location, JsonObject object, ILootCondition[] lootConditions) {
-         String resLoc = JSONUtils.getAsString(object, "table");
-         TableLootEntry table = (TableLootEntry) TableLootEntry.lootTableReference(new ResourceLocation(resLoc)).build();
+      public TableGlobalModifier read(ResourceLocation location, JsonObject object, LootItemCondition[] lootConditions) {
+         String resLoc = GsonHelper.getAsString(object, "table");
+         LootTableReference table = (LootTableReference) LootTableReference.lootTableReference(new ResourceLocation(resLoc)).build();
          return new TableGlobalModifier(lootConditions, table);
       }
 

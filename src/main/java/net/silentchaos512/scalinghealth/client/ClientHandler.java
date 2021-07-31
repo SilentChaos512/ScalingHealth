@@ -1,8 +1,8 @@
 package net.silentchaos512.scalinghealth.client;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.network.ClientLoginMessage;
 import net.silentchaos512.scalinghealth.network.ClientSyncMessage;
@@ -38,7 +38,7 @@ public final class ClientHandler {
             locationMultiPercent = msg.locationMultiPercent;
 
             Minecraft mc = Minecraft.getInstance();
-            ClientPlayerEntity player = mc.player;
+            LocalPlayer player = mc.player;
             if (player != null) {
                 player.experienceLevel = msg.experienceLevel;
             }

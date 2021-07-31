@@ -2,9 +2,9 @@ package net.silentchaos512.scalinghealth.utils.mode;
 
 import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.Codec;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 import java.util.Map;
 
@@ -22,7 +22,7 @@ public abstract class AreaDifficultyMode {
     public static final Codec<AreaDifficultyMode> CODEC = Codec.STRING
             .dispatch(AreaDifficultyMode::getName, CODECS::get);
 
-    public abstract double getDifficulty(World world, BlockPos pos);
+    public abstract double getDifficulty(Level world, BlockPos pos);
 
     public abstract String getName();
 

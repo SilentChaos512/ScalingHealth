@@ -2,7 +2,7 @@ package net.silentchaos512.scalinghealth.utils.mode;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.silentchaos512.scalinghealth.utils.serialization.SerializationUtils;
 
 public class MobHealthMode {

@@ -18,17 +18,17 @@
 
 package net.silentchaos512.scalinghealth.client.gui.health;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -46,7 +46,7 @@ import java.util.List;
  * Much of the code can be found in {@link ForgeIngameGui}.
  */
 public final class HeartDisplayHandler extends Screen {
-    public static final HeartDisplayHandler INSTANCE = new HeartDisplayHandler(new StringTextComponent(""));
+    public static final HeartDisplayHandler INSTANCE = new HeartDisplayHandler(new TextComponent(""));
 
     private static final float COLOR_CHANGE_PERIOD = 150;
     private static final ResourceLocation TEXTURE = new ResourceLocation(ScalingHealth.MOD_ID, "textures/gui/hud.png");
@@ -58,19 +58,19 @@ public final class HeartDisplayHandler extends Screen {
 
     private final HeartsInfo info = new HeartsInfo();
 
-    private HeartDisplayHandler(ITextComponent title) {
+    private HeartDisplayHandler(Component title) {
         super(title);
     }
 
     @SubscribeEvent(receiveCanceled = true)
-    public void onHealthBar(RenderGameOverlayEvent.Pre event) {
+    public void onHealthBar(RenderGameOverlayEvent.Text event) {
         if (info.heartStyle == HeartIconStyle.VANILLA) return;
 
         Minecraft mc = Minecraft.getInstance();
-        PlayerEntity player = mc.player;
+        Player player = mc.player;
 
         // Health text
-        if (event.getType() == RenderGameOverlayEvent.ElementType.TEXT && mc.gameMode.hasExperience()) {
+        if (mc.gameMode.getPlayerMode().isSurvival()) {
             // Draw health string?
             if (SHConfig.CLIENT.healthTextStyle.get() != HealthTextStyle.DISABLED) {
                 mc.getProfiler().push("scalinghealthRenderHealthText");
@@ -92,29 +92,39 @@ public final class HeartDisplayHandler extends Screen {
                 mc.getProfiler().pop();
             }
         }
-
-        // Hearts
-        if (event.getType() == RenderGameOverlayEvent.ElementType.HEALTH && info.heartStyle != HeartIconStyle.VANILLA) {
-            event.setCanceled(true);
-            mc.getProfiler().push("scalinghealthRenderHearts");
-            renderHearts(event, mc, player);
-            mc.getProfiler().pop();
-        }
     }
 
-    private void renderHearts(RenderGameOverlayEvent event, Minecraft mc, PlayerEntity player) {
-        MatrixStack stack = event.getMatrixStack();
+    @SubscribeEvent(receiveCanceled = true)
+    public void onHealthDraw(RenderGameOverlayEvent.PreLayer event) {
+        if (event.getOverlay() != ForgeIngameGui.PLAYER_HEALTH_ELEMENT ||
+                info.heartStyle == HeartIconStyle.VANILLA ||
+                !Minecraft.getInstance().options.hideGui ||
+                !getGui().shouldDrawSurvivalElements()
+        )
+            return;
+
+        Minecraft mc = Minecraft.getInstance();
+        Player player = mc.player;
+
+        event.setCanceled(true);
+        mc.getProfiler().push("scalinghealthRenderHearts");
+        renderHearts(event, mc, player);
+        mc.getProfiler().pop();
+    }
+
+    private void renderHearts(RenderGameOverlayEvent event, Minecraft mc, Player player) {
+        PoseStack stack = event.getMatrixStack();
         info.update();
 
         RenderSystem.enableBlend();
 
-        float absorb = MathHelper.ceil(player.getAbsorptionAmount());
+        float absorb = Mth.ceil(player.getAbsorptionAmount());
 
         final int left = info.scaledWindowWidth / 2 - 91;
-        int top = info.scaledWindowHeight - ForgeIngameGui.left_height;
-        ForgeIngameGui.left_height += info.rowsUsedInHud * info.rowHeight;
+        int top = info.scaledWindowHeight - getGui().left_height;
+        getGui().left_height += info.rowsUsedInHud * info.rowHeight;
         if (info.rowHeight != 10)
-            ForgeIngameGui.left_height += 10 - info.rowHeight;
+            getGui().left_height += 10 - info.rowHeight;
 
         // Draw vanilla hearts
         drawVanillaHearts(event.getMatrixStack(), left, top);
@@ -122,7 +132,7 @@ public final class HeartDisplayHandler extends Screen {
         int potionOffset = info.hardcoreMode ? 27 : 0;
 
         // Draw extra hearts (only top 2 rows)
-        mc.textureManager.bind(TEXTURE);
+        RenderSystem.setShaderTexture(0, TEXTURE);
         int rowCount = info.getCustomHeartRowCount(info.healthInt);
         int maxHealthRows = info.getCustomHeartRowCount((int) player.getMaxHealth());
 
@@ -181,7 +191,7 @@ public final class HeartDisplayHandler extends Screen {
                 int allTanksInRow = info.getAllHeartTanksInRow(row);
                 int rowColor = getColorForRow(row, false);
                 top -= 4;
-                ForgeIngameGui.left_height += 4;
+                getGui().left_height += 4;
 
                 // Draw tanks
                 int x;
@@ -261,10 +271,10 @@ public final class HeartDisplayHandler extends Screen {
         }
 
         RenderSystem.disableBlend();
-        mc.textureManager.bind(Screen.GUI_ICONS_LOCATION);
+        RenderSystem.setShaderTexture(0, Screen.GUI_ICONS_LOCATION);
     }
 
-    private void drawVanillaHearts(MatrixStack stack, int left, int top) {
+    private void drawVanillaHearts(PoseStack stack, int left, int top) {
         int textureX = info.recentlyHurtHighlight ? 25 : 16;
         int textureY = 9 * (info.hardcoreMode ? 5 : 0);
         int margin = 16;
@@ -273,9 +283,9 @@ public final class HeartDisplayHandler extends Screen {
         float absorbRemaining = info.absorption;
         float healthTotal = info.healthInt + info.absorptionInt;
 
-        int iStart = MathHelper.ceil((healthMax + (info.absorptionStyle == AbsorptionIconStyle.VANILLA ? info.absorptionInt : 0)) / 2f) - 1;
+        int iStart = Mth.ceil((healthMax + (info.absorptionStyle == AbsorptionIconStyle.VANILLA ? info.absorptionInt : 0)) / 2f) - 1;
         for (int i = iStart; i >= 0; --i) {
-            int row = MathHelper.ceil((i + 1) / 10f) - 1;
+            int row = Mth.ceil((i + 1) / 10f) - 1;
             int x = left + i % 10 * 8;
             int y = info.offsetHeartPosY(i, top - row * info.rowHeight);
 
@@ -306,7 +316,7 @@ public final class HeartDisplayHandler extends Screen {
         }
     }
 
-    private void renderHealthText(Minecraft mc, MatrixStack stack, float current, float max, int offsetX, int offsetY, HealthTextStyle style, HealthTextColor styleColor) {
+    private void renderHealthText(Minecraft mc, PoseStack stack, float current, float max, int offsetX, int offsetY, HealthTextStyle style, HealthTextColor styleColor) {
         final float scale = (float) style.getScale();
         final int left = (int) ((info.scaledWindowWidth / 2 + offsetX) / scale);
         // GuiIngameForge.left_height == 59 in normal cases. Making it a constant should fix some issues.
@@ -315,7 +325,7 @@ public final class HeartDisplayHandler extends Screen {
         // Draw health string
         mc.getProfiler().push("shTextPreDraw");
         String healthString = style.textFor(current, max);
-        FontRenderer fontRenderer = Minecraft.getInstance().font;
+        Font fontRenderer = Minecraft.getInstance().font;
         int stringWidth = fontRenderer.width(healthString);
         int color;
         float divisor = max == 0 ? current : max;
@@ -347,16 +357,16 @@ public final class HeartDisplayHandler extends Screen {
         mc.getProfiler().pop();
     }
 
-    private void blitWithColor(MatrixStack stack, int x, int y, int textureX, int textureY, int width, int height, int color) {
+    private void blitWithColor(PoseStack stack, int x, int y, int textureX, int textureY, int width, int height, int color) {
         float a = ((color >> 24) & 255) / 255f;
         if (a <= 0f)
             a = 1f;
         float r = ((color >> 16) & 255) / 255f;
         float g = ((color >> 8) & 255) / 255f;
         float b = (color & 255) / 255f;
-        RenderSystem.color4f(r, g, b, a);
+        RenderSystem.setShaderColor(r, g, b, a);
         blit(stack, x, y, textureX, textureY, width, height);
-        RenderSystem.color4f(1, 1, 1, 1);
+        RenderSystem.setShaderColor(1, 1, 1, 1);
     }
 
     private static int getColorForRow(int row, boolean absorption) {
@@ -367,15 +377,19 @@ public final class HeartDisplayHandler extends Screen {
         return colors.get(index);
     }
 
-    private static boolean showEffectHearts(PlayerEntity player) {
-        return player.hasEffect(Effects.POISON) || player.hasEffect(Effects.WITHER);
+    private static boolean showEffectHearts(Player player) {
+        return player.hasEffect(MobEffects.POISON) || player.hasEffect(MobEffects.WITHER);
     }
 
-    private static int effectHeartColor(PlayerEntity player) {
-        if (player.hasEffect(Effects.WITHER))
+    private static int effectHeartColor(Player player) {
+        if (player.hasEffect(MobEffects.WITHER))
             return 0x663E47;
-        if (player.hasEffect(Effects.POISON))
+        if (player.hasEffect(MobEffects.POISON))
             return 0x4E9331;
         return 0xFFFFFF;
+    }
+
+    public static ForgeIngameGui getGui() {
+        return (ForgeIngameGui) Minecraft.getInstance().gui;
     }
 }

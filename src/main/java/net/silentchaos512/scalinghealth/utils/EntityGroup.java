@@ -1,9 +1,9 @@
 package net.silentchaos512.scalinghealth.utils;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.monster.IMob;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.entity.player.Player;
 import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanicListener;
 import net.silentchaos512.scalinghealth.utils.config.EnabledFeatures;
 import net.silentchaos512.scalinghealth.utils.config.SHMobs;
@@ -31,10 +31,10 @@ public enum EntityGroup {
     }
 
     public static EntityGroup from(LivingEntity entity, boolean ignoreBlightStatus) {
-        if (entity instanceof PlayerEntity)
+        if (entity instanceof Player)
             return PLAYER;
-        if (entity instanceof IMob) {
-            if (!ignoreBlightStatus && SHMobs.isBlight((MobEntity) entity))
+        if (entity instanceof Enemy) {
+            if (!ignoreBlightStatus && SHMobs.isBlight((Mob) entity))
                 return BLIGHT;
             return HOSTILE;
         }

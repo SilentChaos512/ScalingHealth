@@ -1,15 +1,14 @@
 package net.silentchaos512.scalinghealth.capability;
 
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -20,7 +19,7 @@ import net.silentchaos512.scalinghealth.utils.config.SHPlayers;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class PlayerDataCapability implements IPlayerData, ICapabilitySerializable<CompoundNBT> {
+public class PlayerDataCapability implements IPlayerData, ICapabilitySerializable<CompoundTag> {
     @CapabilityInject(IPlayerData.class)
     public static Capability<IPlayerData> INSTANCE = null;
     public static ResourceLocation NAME = ScalingHealth.getId("player_data");
@@ -38,7 +37,7 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
     private int powerCrystals;
 
     @Override
-    public int getBonusHearts(PlayerEntity player) {
+    public int getBonusHearts(Player player) {
         return SHPlayers.clampedHpFromHeartCrystals(getHeartCrystals()) + SHPlayers.fullHeartsFromXp(player.experienceLevel);
     }
 
@@ -48,7 +47,7 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
     }
 
     @Override
-    public void setHeartCrystals(PlayerEntity player, int amount) {
+    public void setHeartCrystals(Player player, int amount) {
         heartCrystals = SHPlayers.clampExtraHearts(amount);
         ModifierHandler.setMaxHealth(player, getModifiedHealth(player), AttributeModifier.Operation.ADDITION);
     }
@@ -59,28 +58,28 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
     }
 
     @Override
-    public void setPowerCrystalCount(PlayerEntity player, int amount) {
+    public void setPowerCrystalCount(Player player, int amount) {
         powerCrystals = SHPlayers.clampPowerCrystals(amount);
         ModifierHandler.addAttackDamage(player, getAttackDamageModifier(), AttributeModifier.Operation.ADDITION);
     }
 
     @Override
-    public void updateStats(PlayerEntity player) {
+    public void updateStats(Player player) {
         ModifierHandler.setMaxHealth(player, getModifiedHealth(player), AttributeModifier.Operation.ADDITION);
         ModifierHandler.addAttackDamage(player, getAttackDamageModifier(), AttributeModifier.Operation.ADDITION);
     }
 
     @Override
-    public void tick(PlayerEntity player) {
+    public void tick(Player player) {
         if(player.level.getGameTime() % 20 == 0 && !player.level.isClientSide){
             checkPlayerIdle(player);
 
-            if(player instanceof ServerPlayerEntity)
+            if(player instanceof ServerPlayer)
                 IPlayerData.sendUpdatePacketTo(player);
         }
     }
 
-    private void checkPlayerIdle(PlayerEntity player) {
+    private void checkPlayerIdle(Player player) {
         if(SHDifficulty.areaDifficulty(player.level, player.blockPosition()) >= SHDifficulty.maxValue()) return;
 
         if(player.blockPosition().equals(lastPos)){
@@ -95,7 +94,7 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
         if(timeAfk > SHDifficulty.timeBeforeAfk()){
             if(!afk) {
                 afk = true;
-                if(SHDifficulty.afkMessage()) player.sendMessage(new TranslationTextComponent("misc.scalinghealth.afkmessage"), Util.NIL_UUID);
+                if(SHDifficulty.afkMessage()) player.sendMessage(new TranslatableComponent("misc.scalinghealth.afkmessage"), Util.NIL_UUID);
             }
         }
 
@@ -114,21 +113,21 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
     }
 
     @Override
-    public CompoundNBT serializeNBT() {
-        CompoundNBT nbt = new CompoundNBT();
+    public CompoundTag serializeNBT() {
+        CompoundTag nbt = new CompoundTag();
         nbt.putInt(NBT_HEART_CRYSTALS, heartCrystals);
         nbt.putInt(NBT_POWER_CRYSTALS, powerCrystals);
         return nbt;
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT nbt) {
+    public void deserializeNBT(CompoundTag nbt) {
         heartCrystals = nbt.getInt(NBT_HEART_CRYSTALS);
         powerCrystals = nbt.getInt(NBT_POWER_CRYSTALS);
     }
 
     public static boolean canAttachTo(ICapabilityProvider entity) {
-        if (!(entity instanceof PlayerEntity)) {
+        if (!(entity instanceof Player)) {
             return false;
         }
         try {
@@ -144,24 +143,6 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
     }
 
     public static void register() {
-        CapabilityManager.INSTANCE.register(IPlayerData.class, new Storage(), PlayerDataCapability::new);
-    }
-
-    private static class Storage implements Capability.IStorage<IPlayerData> {
-        @Nullable
-        @Override
-        public INBT writeNBT(Capability<IPlayerData> capability, IPlayerData instance, Direction side) {
-            if (instance instanceof PlayerDataCapability) {
-                return ((PlayerDataCapability) instance).serializeNBT();
-            }
-            return new CompoundNBT();
-        }
-
-        @Override
-        public void readNBT(Capability<IPlayerData> capability, IPlayerData instance, Direction side, INBT nbt) {
-            if (instance instanceof PlayerDataCapability) {
-                ((PlayerDataCapability) instance).deserializeNBT((CompoundNBT) nbt);
-            }
-        }
+        CapabilityManager.INSTANCE.register(IPlayerData.class);
     }
 }

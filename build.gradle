@@ -21,14 +21,6 @@ repositories {
     mavenLocal()
 }
 
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
-}
-
-javadoc {
-    failOnError = false
-}
-
 archivesBaseName = project.archivesBaseName
 
 ext {
@@ -39,13 +31,13 @@ ext {
 System.out.println(VERSION_INFO)
 version = "${VERSION_INFO['version']}"
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(8) // Mojang ships Java 8 to end users, so your mod should target Java 8.
+java.toolchain.languageVersion = JavaLanguageVersion.of(16)
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
      accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
-    mappings channel: 'official', version: '1.16.5'
+    mappings channel: 'official', version: '1.17.1'
 
     runs {
         client {
@@ -110,11 +102,11 @@ dependencies {
 
     extraLibs "com.udojava:EvalEx:2.1"
 
-    compileOnly fg.deobf("mezz.jei:jei-${project.jei_version}:api")
-    runtimeOnly fg.deobf("mezz.jei:jei-${project.jei_version}")
+//    compileOnly fg.deobf("mezz.jei:jei-${project.jei_version}:api")
+//    runtimeOnly fg.deobf("mezz.jei:jei-${project.jei_version}")
 
-    implementation fg.deobf("curse.maven:silentlib-242998:3235738")
-    implementation fg.deobf("curse.maven:configured-457570:3291560")
+    implementation fg.deobf("curse.maven:silentlib-242998:${project.sl_file}")
+//    implementation fg.deobf("curse.maven:configured-457570:3291560")
 
     configurations.implementation.extendsFrom(configurations.extraLibs)
 }
@@ -199,7 +191,6 @@ curseforge {
         project {
             id = project.cf_project_id
             addGameVersion(project.mc_version)
-            addGameVersion('1.16.5')
             mainArtifact(jar) {
                 changelog = file(project.cf_changelog_filename)
                 changelogType = 'markdown'

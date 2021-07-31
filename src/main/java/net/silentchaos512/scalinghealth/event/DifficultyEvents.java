@@ -1,18 +1,17 @@
 package net.silentchaos512.scalinghealth.event;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.INBT;
-import net.minecraft.server.integrated.IntegratedServer;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.Util;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
@@ -64,8 +63,8 @@ public final class DifficultyEvents {
     }
 
     @SubscribeEvent
-    public static void onAttachWorldCapabilities(AttachCapabilitiesEvent<World> event) {
-        World world = event.getObject();
+    public static void onAttachWorldCapabilities(AttachCapabilitiesEvent<Level> event) {
+        Level world = event.getObject();
         if (SHConfig.SERVER.enableDifficulty.get() && DifficultySourceCapability.canAttachTo(world)) {
             debug(()->"attach source to world");
             DifficultySourceCapability cap = new DifficultySourceCapability();
@@ -78,21 +77,21 @@ public final class DifficultyEvents {
     public static void onLivingUpdate(LivingEvent.LivingUpdateEvent event) {
         LivingEntity entity = event.getEntityLiving();
         //Return if players are empty on an integrated server, as the player needs a small delay to connect.
-        if (entity.level.isClientSide || (entity.level.players().isEmpty() && !((ServerWorld)entity.level).getServer().isDedicatedServer()))
+        if (entity.level.isClientSide || (entity.level.players().isEmpty() && !((ServerLevel)entity.level).getServer().isDedicatedServer()))
             return;
 
         // Tick mobs, which will calculate difficulty when appropriate and apply changes
-        if (entity instanceof MobEntity)
+        if (entity instanceof Mob)
             entity.getCapability(DifficultyAffectedCapability.INSTANCE).ifPresent(data ->
-                    data.tick((MobEntity)entity));
+                    data.tick((Mob)entity));
 
-        if(entity instanceof TameableEntity) {
-            if(!((TameableEntity) entity).isTame()) return;
+        if(entity instanceof TamableAnimal) {
+            if(!((TamableAnimal) entity).isTame()) return;
                 entity.getCapability(PetHealthCapability.INSTANCE).ifPresent(data ->
-                        data.tick((TameableEntity) entity));
+                        data.tick((TamableAnimal) entity));
         }
 
-        if (entity instanceof PlayerEntity && entity.level.getGameTime() % 20 == 0) {
+        if (entity instanceof Player && entity.level.getGameTime() % 20 == 0) {
             entity.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
                 source.addDifficulty((float) SHDifficulty.changePerSecond());
             });
@@ -106,22 +105,22 @@ public final class DifficultyEvents {
             return;
 
         Entity entitySource = event.getSource().getEntity();
-        if (entitySource instanceof PlayerEntity) {
-            SHDifficulty.applyKillMutator(killed, (PlayerEntity) entitySource);
+        if (entitySource instanceof Player) {
+            SHDifficulty.applyKillMutator(killed, (Player) entitySource);
             return;
         }
 
-        if(entitySource instanceof TameableEntity && ((TameableEntity) entitySource).isTame()) {
-            TameableEntity pet = (TameableEntity) entitySource;
-            if(pet.getOwner() instanceof PlayerEntity)
-                SHDifficulty.applyKillMutator(killed, (PlayerEntity) pet.getOwner());
+        if(entitySource instanceof TamableAnimal && ((TamableAnimal) entitySource).isTame()) {
+            TamableAnimal pet = (TamableAnimal) entitySource;
+            if(pet.getOwner() instanceof Player)
+                SHDifficulty.applyKillMutator(killed, (Player) pet.getOwner());
         }
     }
 
     @SubscribeEvent
     public static void onWorldTick(TickEvent.WorldTickEvent event) {
         if(event.phase == TickEvent.Phase.START) return;
-        World world = event.world;
+        Level world = event.world;
         if (world.isClientSide) return;
 
         // Tick world difficulty source
@@ -136,8 +135,8 @@ public final class DifficultyEvents {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onPlayerClone(PlayerEvent.Clone event) {
         // Player is cloned. Copy capabilities before applying health/difficulty changes if needed.
-        PlayerEntity original = event.getOriginal();
-        PlayerEntity clone = event.getPlayer();
+        Player original = event.getOriginal();
+        Player clone = event.getPlayer();
 
         debug(() -> "onPlayerClone");
         copyCapability(PlayerDataCapability.INSTANCE, original, clone);
@@ -160,19 +159,20 @@ public final class DifficultyEvents {
         });
     }
 
-    private static void notifyOfChanges(PlayerEntity player, String valueName, float oldValue, float newValue) {
+    private static void notifyOfChanges(Player player, String valueName, float oldValue, float newValue) {
         float diff = newValue - oldValue;
         String line = String.format("%s %.2f %s", diff > 0 ? "gained" : "lost", diff, valueName);
         if(diff != 0)
-            player.sendMessage(new StringTextComponent(line), Util.NIL_UUID);
+            player.sendMessage(new TextComponent(line), Util.NIL_UUID);
         ScalingHealth.LOGGER.info("Player {}", line);
     }
 
     private static <T> void copyCapability(Capability<T> capability, ICapabilityProvider original, ICapabilityProvider clone) {
         original.getCapability(capability).ifPresent(dataOriginal ->
             clone.getCapability(capability).ifPresent(dataClone -> {
-                INBT nbt = capability.getStorage().writeNBT(capability, dataOriginal, null);
-                capability.getStorage().readNBT(capability, dataClone, null, nbt);
+                if(dataOriginal instanceof INBTSerializable originalS && dataClone instanceof INBTSerializable cloneS) {
+                    cloneS.deserializeNBT(originalS.serializeNBT());
+                }
             }));
     }
 

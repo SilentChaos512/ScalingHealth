@@ -1,10 +1,14 @@
 package net.silentchaos512.scalinghealth.datagen;
 
-import net.minecraft.advancements.ICriterionInstance;
-import net.minecraft.advancements.criterion.InventoryChangeTrigger;
-import net.minecraft.data.*;
-import net.minecraft.item.Items;
-import net.minecraft.util.IItemProvider;
+import net.minecraft.advancements.CriterionTriggerInstance;
+import net.minecraft.advancements.critereon.InventoryChangeTrigger;
+import net.minecraft.data.DataGenerator;
+import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.Tags;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.objects.Registration;
@@ -17,7 +21,7 @@ public class Recipes extends RecipeProvider {
     }
 
     @Override
-    protected void buildShapelessRecipes(Consumer<IFinishedRecipe> consumer) {
+    protected void buildCraftingRecipes(Consumer<FinishedRecipe> consumer) {
         fullBlockRecipe(consumer, Registration.HEART_CRYSTAL.get(), Registration.HEART_CRYSTAL_SHARD.get());
         fullBlockRecipe(consumer, Registration.POWER_CRYSTAL.get(), Registration.POWER_CRYSTAL_SHARD.get());
         ShapelessRecipeBuilder.shapeless(Registration.HEART_DUST.get(), 24)
@@ -49,7 +53,7 @@ public class Recipes extends RecipeProvider {
                 .save(consumer);
     }
 
-    private void fullBlockRecipe(Consumer<IFinishedRecipe> consumer, IItemProvider result, IItemProvider ingredient){
+    private void fullBlockRecipe(Consumer<FinishedRecipe> consumer, ItemLike result, ItemLike ingredient){
         ShapedRecipeBuilder.shaped(result)
                 .pattern("xxx")
                 .pattern("xxx")
@@ -60,7 +64,7 @@ public class Recipes extends RecipeProvider {
                 .save(consumer);
     }
 
-    private ICriterionInstance getDefaultTrigger(){
-        return InventoryChangeTrigger.Instance.hasItems(Items.COBBLESTONE);
+    private CriterionTriggerInstance getDefaultTrigger(){
+        return InventoryChangeTrigger.TriggerInstance.hasItems(Items.COBBLESTONE);
     }
 }

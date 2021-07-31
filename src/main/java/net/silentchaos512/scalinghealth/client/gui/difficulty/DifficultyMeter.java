@@ -18,16 +18,16 @@
 
 package net.silentchaos512.scalinghealth.client.gui.difficulty;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -42,7 +42,7 @@ import net.silentchaos512.scalinghealth.utils.mode.AreaDifficultyModes;
 import net.silentchaos512.utils.Anchor;
 
 public class DifficultyMeter extends Screen {
-    public static final DifficultyMeter INSTANCE = new DifficultyMeter(new StringTextComponent(""));
+    public static final DifficultyMeter INSTANCE = new DifficultyMeter(new TextComponent(""));
 
     private static final ResourceLocation TEXTURE = new ResourceLocation(ScalingHealth.MOD_ID, "textures/gui/hud.png");
 
@@ -52,7 +52,7 @@ public class DifficultyMeter extends Screen {
 
     private boolean keyDown = false;
 
-    protected DifficultyMeter(ITextComponent title) {
+    protected DifficultyMeter(Component title) {
         super(title);
     }
 
@@ -73,7 +73,7 @@ public class DifficultyMeter extends Screen {
         }
 
         Minecraft mc = Minecraft.getInstance();
-        PlayerEntity player = mc.player;
+        Player player = mc.player;
         if (player == null) return;
 
         final double maxDifficulty = ClientHandler.maxDifficultyValue;
@@ -84,7 +84,7 @@ public class DifficultyMeter extends Screen {
 
         AreaDifficultyMode areaMode = ClientHandler.areaMode;
         int preClampAreaDifficulty = (int) ClientHandler.areaDifficulty;
-        int areaDifficulty = MathHelper.clamp(preClampAreaDifficulty, 0, (int) maxDifficulty);
+        int areaDifficulty = Mth.clamp(preClampAreaDifficulty, 0, (int) maxDifficulty);
         int difficulty = areaMode == AreaDifficultyModes.ServerWide.INSTANCE
                 ? areaDifficulty
                 : (int) ClientHandler.playerDifficulty;
@@ -103,7 +103,7 @@ public class DifficultyMeter extends Screen {
         if (showMode == DifficultyMeterShow.ALWAYS || keyDown || currentTime - lastUpdateTime < 20 * SHConfig.CLIENT.difficultyMeterShowTime.get()) {
             RenderSystem.enableBlend();
 
-            mc.textureManager.bind(TEXTURE);
+            RenderSystem.setShaderTexture(0, TEXTURE);
             event.getMatrixStack().pushPose();
 
             Anchor anchor = SHConfig.CLIENT.difficultyMeterAnchor.get();
@@ -147,12 +147,12 @@ public class DifficultyMeter extends Screen {
         }
     }
 
-    private void blitWithColor(MatrixStack stack, int x, int y, int textureX, int textureY, int width, int height, int color) {
+    private void blitWithColor(PoseStack stack, int x, int y, int textureX, int textureY, int width, int height, int color) {
         float r = ((color >> 16) & 255) / 255f;
         float g = ((color >> 8) & 255) / 255f;
         float b = (color & 255) / 255f;
-        RenderSystem.color3f(r, g, b);
+        RenderSystem.setShaderColor(r, g, b, 1);
         blit(stack, x, y, textureX, textureY, width, height);
-        RenderSystem.color4f(1, 1, 1, 1);
+        RenderSystem.setShaderColor(1, 1, 1, 1);
     }
 }

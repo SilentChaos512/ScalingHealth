@@ -1,17 +1,16 @@
 package net.silentchaos512.scalinghealth.utils;
 
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
-import net.minecraft.entity.boss.WitherEntity;
-import net.minecraft.entity.boss.dragon.EnderDragonEntity;
-import net.minecraft.entity.monster.IMob;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
+import net.minecraft.world.entity.boss.wither.WitherBoss;
+import net.minecraft.world.entity.monster.Enemy;
+import net.minecraftforge.fmllegacy.network.PacketDistributor;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
 import net.silentchaos512.scalinghealth.event.BlightHandler;
@@ -27,12 +26,12 @@ import net.silentchaos512.utils.MathUtils;
 public final class MobDifficultyHandler {
     private MobDifficultyHandler() {}
 
-    public static void process(MobEntity entity, IDifficultyAffected data) {
+    public static void process(Mob entity, IDifficultyAffected data) {
         if (!entity.isAlive()) return;
         setEntityProperties(entity, data, shouldBecomeBlight(entity, data.getDifficulty()));
     }
 
-    public static boolean shouldBecomeBlight(MobEntity entity, float difficulty) {
+    public static boolean shouldBecomeBlight(Mob entity, float difficulty) {
         if (!SHMobs.canBecomeBlight(entity))    return false;
 
         double chance = getBlightChance(difficulty);
@@ -45,10 +44,10 @@ public final class MobDifficultyHandler {
         return SHMobs.blightChance() * difficulty / SHDifficulty.maxValue();
     }
 
-    public static void setEntityProperties(MobEntity entity, IDifficultyAffected data, boolean makeBlight) {
+    public static void setEntityProperties(Mob entity, IDifficultyAffected data, boolean makeBlight) {
         if (!entity.isAlive()) return;
 
-        boolean isHostile = entity instanceof IMob;
+        boolean isHostile = entity instanceof Enemy;
 
         if (makeBlight) {
             data.setIsBlight(true);
@@ -57,8 +56,8 @@ public final class MobDifficultyHandler {
 
             BlightHandler.applyBlightPotionEffects(entity);
             //TODO no good in code method for determining if an entity is a boss or not, switch to tag?
-            if(entity instanceof WitherEntity || entity instanceof EnderDragonEntity) {
-                ITextComponent blight = new TranslationTextComponent("misc.scalinghealth.blight", entity.getDisplayName()).copy().withStyle(TextFormatting.DARK_PURPLE);
+            if(entity instanceof WitherBoss || entity instanceof EnderDragon) {
+                Component blight = new TranslatableComponent("misc.scalinghealth.blight", entity.getDisplayName()).copy().withStyle(ChatFormatting.DARK_PURPLE);
                 entity.setCustomName(blight);
             }
         }
@@ -101,7 +100,7 @@ public final class MobDifficultyHandler {
             // Clamp the value so it doesn't go over the maximum config.
             double max = SHMobs.maxDamageBoost();
             if (max > 0f) {
-                damageBoost = MathHelper.clamp(damageBoost, 0, max);
+                damageBoost = Mth.clamp(damageBoost, 0, max);
             }
 
             ModifierHandler.addAttackDamage(entity, damageBoost, AttributeModifier.Operation.ADDITION);

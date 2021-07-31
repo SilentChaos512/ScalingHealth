@@ -18,9 +18,9 @@
 
 package net.silentchaos512.scalinghealth.event;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.util.ActionResultType;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.TamableAnimal;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -41,7 +41,7 @@ public class PetEventHandler {
         LivingEntity entity = event.getEntityLiving();
         if (entity != null && !entity.level.isClientSide) {
             boolean fullHp = entity.getHealth() == entity.getMaxHealth();
-            boolean isTamed = entity instanceof TameableEntity && ((TameableEntity) entity).isTame();
+            boolean isTamed = entity instanceof TamableAnimal && ((TamableAnimal) entity).isTame();
             boolean isRegenTime = entity.invulnerableTime <= 0 && entity.tickCount % regenDelay == 0;
             if (isTamed && isRegenTime && !fullHp)
                 entity.heal(2f);
@@ -52,15 +52,15 @@ public class PetEventHandler {
     public static void onPetInteraction(PlayerInteractEvent.EntityInteractSpecific event){
         if(!EnabledFeatures.petBonusHpEnabled() ||
                 !(event.getItemStack().getItem() instanceof HeartCrystal) ||
-                !(event.getTarget() instanceof TameableEntity))
+                !(event.getTarget() instanceof TamableAnimal))
             return;
 
-        TameableEntity pet = (TameableEntity) event.getTarget();
+        TamableAnimal pet = (TamableAnimal) event.getTarget();
         if(!pet.isTame())
             return;
 
         if(pet.level.isClientSide) {
-            event.setCancellationResult(ActionResultType.SUCCESS);
+            event.setCancellationResult(InteractionResult.SUCCESS);
             event.setCanceled(true);
             return;
         }

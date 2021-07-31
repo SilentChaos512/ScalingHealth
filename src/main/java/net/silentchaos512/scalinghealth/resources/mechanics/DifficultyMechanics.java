@@ -5,9 +5,9 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.udojava.evalex.Expression;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.scalinghealth.utils.mode.AreaDifficultyMode;
 import net.silentchaos512.scalinghealth.utils.serialization.SerializationUtils;
@@ -100,7 +100,7 @@ public class DifficultyMechanics {
         private final List<Pair<Double, Pair<List<ResourceLocation>, List<ResourceLocation>>>> locationMultipliers;
         private final List<ResourceLocation> biomes;
         private final List<ResourceLocation> dimensions;
-        private final Map<Pair<World, Biome>, Double> scaleMap = new HashMap<>();
+        private final Map<Pair<Level, Biome>, Double> scaleMap = new HashMap<>();
 
         public Multipliers(List<Double> lunarMultipliers, List<Pair<Double, Pair<List<ResourceLocation>, List<ResourceLocation>>>> locationMultipliers) {
             this.lunarMultipliers = lunarMultipliers;
@@ -113,8 +113,8 @@ public class DifficultyMechanics {
             return lunarMultipliers.isEmpty() ? 1 : lunarMultipliers.get(phase);
         }
 
-        public double getScale(World world, Biome biome) {
-            Pair<World, Biome> p = new Pair<>(world, biome);
+        public double getScale(Level world, Biome biome) {
+            Pair<Level, Biome> p = new Pair<>(world, biome);
             if (scaleMap.containsKey(p))
                 return scaleMap.get(p);
 
@@ -129,7 +129,7 @@ public class DifficultyMechanics {
         }
 
         //Check the scales that have specified both a dimension and a biome.
-        private double biomeAndDimMatch(World w, Biome b) {
+        private double biomeAndDimMatch(Level w, Biome b) {
             ResourceLocation biome = b.getRegistryName();
             ResourceLocation dim = w.dimension().location();
             return locationMultipliers.stream()
@@ -152,7 +152,7 @@ public class DifficultyMechanics {
         }
 
         //Check the scales that only have a dimension specified
-        private double dimMatch(World w) {
+        private double dimMatch(Level w) {
             ResourceLocation dim = w.dimension().location();
             return locationMultipliers.stream()
                     .filter(p -> p.getSecond().getSecond().contains(dim))

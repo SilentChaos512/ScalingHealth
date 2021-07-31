@@ -2,25 +2,33 @@ package net.silentchaos512.scalinghealth.datagen;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import net.minecraft.advancements.criterion.EnchantmentPredicate;
-import net.minecraft.advancements.criterion.ItemPredicate;
-import net.minecraft.advancements.criterion.MinMaxBounds;
-import net.minecraft.block.Block;
+import net.minecraft.advancements.critereon.EnchantmentPredicate;
+import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.advancements.critereon.MinMaxBounds;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.DirectoryCache;
-import net.minecraft.data.IDataProvider;
-import net.minecraft.data.LootTableProvider;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.item.Item;
-import net.minecraft.loot.*;
-import net.minecraft.loot.conditions.KilledByPlayer;
-import net.minecraft.loot.conditions.MatchTool;
-import net.minecraft.loot.conditions.RandomChanceWithLooting;
-import net.minecraft.loot.conditions.SurvivesExplosion;
-import net.minecraft.loot.functions.ApplyBonus;
-import net.minecraft.loot.functions.ExplosionDecay;
-import net.minecraft.loot.functions.SetCount;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.data.DataProvider;
+import net.minecraft.data.HashCache;
+import net.minecraft.data.loot.LootTableProvider;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.LootTables;
+import net.minecraft.world.level.storage.loot.entries.AlternativesEntry;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount;
+import net.minecraft.world.level.storage.loot.functions.ApplyExplosionDecay;
+import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
+import net.minecraft.world.level.storage.loot.predicates.LootItemKilledByPlayerCondition;
+import net.minecraft.world.level.storage.loot.predicates.LootItemRandomChanceWithLootingCondition;
+import net.minecraft.world.level.storage.loot.predicates.MatchTool;
+import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.loot.conditions.SHMobProperties;
 import net.silentchaos512.scalinghealth.utils.EntityGroup;
@@ -52,15 +60,15 @@ public abstract class BaseLootTableGenerator extends LootTableProvider {
     protected LootTable.Builder createSilkTouchTable(String name, Block block, Item lootItem) {
         LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
-                .setRolls(ConstantRange.exactly(1))
-                .add(AlternativesLootEntry.alternatives(
-                        ItemLootEntry.lootTableItem(block)
+                .setRolls(ConstantValue.exactly(1))
+                .add(AlternativesEntry.alternatives(
+                        LootItem.lootTableItem(block)
                                 .when(MatchTool.toolMatches(ItemPredicate.Builder.item()
-                                        .hasEnchantment(new EnchantmentPredicate(Enchantments.SILK_TOUCH, MinMaxBounds.IntBound.atLeast(1))))),
-                        ItemLootEntry.lootTableItem(lootItem)
-                                .apply(ApplyBonus.addOreBonusCount(Enchantments.BLOCK_FORTUNE))
-                                .apply(ExplosionDecay.explosionDecay())
-                        ).when(SurvivesExplosion.survivesExplosion())
+                                        .hasEnchantment(new EnchantmentPredicate(Enchantments.SILK_TOUCH, MinMaxBounds.Ints.atLeast(1))))),
+                        LootItem.lootTableItem(lootItem)
+                                .apply(ApplyBonusCount.addOreBonusCount(Enchantments.BLOCK_FORTUNE))
+                                .apply(ApplyExplosionDecay.explosionDecay())
+                        ).when(ExplosionCondition.survivesExplosion())
                 );
         return LootTable.lootTable().withPool(builder);
     }
@@ -75,38 +83,38 @@ public abstract class BaseLootTableGenerator extends LootTableProvider {
     protected LootPool.Builder createSHDropsPool(String name, int rolls, MobLootCondition conditions, MobLootEntry... entries) {
         LootPool.Builder builder = LootPool.lootPool()
                 .name(name)
-                .setRolls(ConstantRange.exactly(rolls));
+                .setRolls(ConstantValue.exactly(rolls));
 
         for(MobLootEntry entry : entries){
             if(entry.isCount())
                 builder.add(
-                        ItemLootEntry.lootTableItem(entry.item).
+                        LootItem.lootTableItem(entry.item).
                                 setWeight(entry.weight).
-                                apply(SetCount.setCount(ConstantRange.exactly(entry.max))));
+                                apply(SetItemCountFunction.setCount(ConstantValue.exactly(entry.max))));
             else
                 builder.add(
-                        ItemLootEntry.lootTableItem(entry.item).
+                        LootItem.lootTableItem(entry.item).
                                 setWeight(entry.weight).
-                                apply(SetCount.setCount(RandomValueRange.between(entry.min, entry.max))));
+                                apply(SetItemCountFunction.setCount(UniformGenerator.between(entry.min, entry.max))));
         }
 
         if(conditions.hasDiffCond() || conditions.blight)
             builder.when(SHMobProperties.builder(LootContext.EntityTarget.THIS, conditions.blight, conditions.difficulty, Integer.MAX_VALUE));
         if(conditions.hasLootCond())
-            builder.when(RandomChanceWithLooting.randomChanceAndLootingBoost(conditions.lootingChance, conditions.lootingMulti));
+            builder.when(LootItemRandomChanceWithLootingCondition.randomChanceAndLootingBoost(conditions.lootingChance, conditions.lootingMulti));
         if(conditions.playerKill)
-            builder.when(KilledByPlayer.killedByPlayer());
+            builder.when(LootItemKilledByPlayerCondition.killedByPlayer());
 
         return builder;
     }
 
     @Override
-    public void run(DirectoryCache cache) {
+    public void run(HashCache cache) {
         addTables();
 
         Map<ResourceLocation, LootTable> tables = new HashMap<>();
         for (Map.Entry<Block, LootTable.Builder> entry : blockLootTables.entrySet()) {
-            tables.put(entry.getKey().getLootTable(), entry.getValue().setParamSet(LootParameterSets.BLOCK).build());
+            tables.put(entry.getKey().getLootTable(), entry.getValue().setParamSet(LootContextParamSets.BLOCK).build());
         }
         for(Map.Entry<EntityGroup, LootTable.Builder> entry : mobLootTable.entrySet()) {
             tables.put(ScalingHealth.getId("bonus_drops/" + entry.getKey().name().toLowerCase(Locale.ROOT)), entry.getValue().build());
@@ -115,12 +123,12 @@ public abstract class BaseLootTableGenerator extends LootTableProvider {
         writeTables(cache, tables);
     }
 
-    private void writeTables(DirectoryCache cache, Map<ResourceLocation, LootTable> tables) {
+    private void writeTables(HashCache cache, Map<ResourceLocation, LootTable> tables) {
         Path outputFolder = this.generator.getOutputFolder();
         tables.forEach((key, lootTable) -> {
             Path path = outputFolder.resolve("data/" + key.getNamespace() + "/loot_tables/" + key.getPath() + ".json");
             try {
-                IDataProvider.save(GSON, cache, LootTableManager.serialize(lootTable), path);
+                DataProvider.save(GSON, cache, LootTables.serialize(lootTable), path);
             } catch (IOException e) {
                 LOGGER.error("Couldn't write loot table {}", path, e);
             }

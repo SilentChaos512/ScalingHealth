@@ -3,22 +3,22 @@ package net.silentchaos512.scalinghealth.loot.conditions;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.loot.ILootSerializer;
-import net.minecraft.loot.LootConditionType;
-import net.minecraft.loot.LootContext;
-import net.minecraft.loot.LootParameters;
-import net.minecraft.loot.conditions.ILootCondition;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.Registry;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.Serializer;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.utils.EntityGroup;
 
 import java.util.Locale;
 
-public class EntityGroupCondition implements ILootCondition {
+public class EntityGroupCondition implements LootItemCondition {
    public static final ResourceLocation NAME = new ResourceLocation(ScalingHealth.MOD_ID, "entity_group_condition");
 
    private final EntityGroup group;
@@ -37,18 +37,18 @@ public class EntityGroupCondition implements ILootCondition {
     */
    @Override
    public boolean test(LootContext context) {
-      Entity entity = context.getParamOrNull(LootParameters.THIS_ENTITY);
-      return context.hasParam(LootParameters.DAMAGE_SOURCE) && entity instanceof LivingEntity &&
+      Entity entity = context.getParamOrNull(LootContextParams.THIS_ENTITY);
+      return context.hasParam(LootContextParams.DAMAGE_SOURCE) && entity instanceof LivingEntity &&
               EntityGroup.from((LivingEntity) entity, true) == this.group;
    }
 
    @Override
-   public LootConditionType getType() {
+   public LootItemConditionType getType() {
       return Registry.LOOT_CONDITION_TYPE.getOptional(NAME)
               .orElseThrow(() -> new RuntimeException("Loot condition type did not register for some reason"));
    }
 
-   public static class Serializer implements ILootSerializer<EntityGroupCondition> {
+   public static class ThisSerializer implements Serializer<EntityGroupCondition> {
       @Override
       public void serialize(JsonObject json, EntityGroupCondition condition, JsonSerializationContext context) {
          json.addProperty("entity_group", condition.group.toString().toLowerCase(Locale.ROOT));
@@ -56,7 +56,7 @@ public class EntityGroupCondition implements ILootCondition {
 
       @Override
       public EntityGroupCondition deserialize(JsonObject json, JsonDeserializationContext context) {
-         String group = JSONUtils.getAsString(json, "entity_group");
+         String group = GsonHelper.getAsString(json, "entity_group");
          return new EntityGroupCondition(EntityGroup.from(group));
       }
    }

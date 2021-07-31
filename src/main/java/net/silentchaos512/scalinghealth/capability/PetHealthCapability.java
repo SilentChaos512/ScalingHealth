@@ -1,11 +1,10 @@
 package net.silentchaos512.scalinghealth.capability;
 
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.LazyOptional;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -14,7 +13,7 @@ import net.silentchaos512.scalinghealth.utils.ModifierHandler;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class PetHealthCapability implements IPetData, ICapabilitySerializable<CompoundNBT> {
+public class PetHealthCapability implements IPetData, ICapabilitySerializable<CompoundTag> {
     @CapabilityInject(IPetData.class)
     public static Capability<IPetData> INSTANCE = null;
     public static ResourceLocation NAME = ScalingHealth.getId("pet_health");
@@ -27,7 +26,7 @@ public class PetHealthCapability implements IPetData, ICapabilitySerializable<Co
     private boolean refreshed = false;
 
     @Override
-    public void addHealth(double hp, TameableEntity pet ) {
+    public void addHealth(double hp, TamableAnimal pet ) {
         bonusHealth += hp;
         ModifierHandler.setMaxHealth(pet, bonusHealth, AttributeModifier.Operation.ADDITION);
     }
@@ -38,7 +37,7 @@ public class PetHealthCapability implements IPetData, ICapabilitySerializable<Co
     }
 
     @Override
-    public void tick(TameableEntity pet) {
+    public void tick(TamableAnimal pet) {
         if(!refreshed && pet.tickCount > 2){
             refreshed = true;
             ModifierHandler.setMaxHealth(pet, getBonusHealth(), AttributeModifier.Operation.ADDITION);
@@ -52,14 +51,14 @@ public class PetHealthCapability implements IPetData, ICapabilitySerializable<Co
     }
 
     @Override
-    public CompoundNBT serializeNBT() {
-        CompoundNBT nbt = new CompoundNBT();
+    public CompoundTag serializeNBT() {
+        CompoundTag nbt = new CompoundTag();
         nbt.putFloat(NBT_HEALTH, bonusHealth);
         return nbt;
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT nbt) {
+    public void deserializeNBT(CompoundTag nbt) {
         bonusHealth = nbt.getFloat(NBT_HEALTH);
     }
 
@@ -72,28 +71,10 @@ public class PetHealthCapability implements IPetData, ICapabilitySerializable<Co
             ScalingHealth.LOGGER.error("Failed to get capabilities from {}", obj);
             return false;
         }
-        return obj instanceof TameableEntity;
+        return obj instanceof TamableAnimal;
     }
 
     public static void register() {
-        CapabilityManager.INSTANCE.register(IPetData.class, new Storage(), PetHealthCapability::new);
-    }
-
-    private static class Storage implements Capability.IStorage<IPetData> {
-        @Nullable
-        @Override
-        public INBT writeNBT(Capability<IPetData> capability, IPetData instance, Direction side) {
-            if (instance instanceof PetHealthCapability) {
-                return ((PetHealthCapability) instance).serializeNBT();
-            }
-            return new CompoundNBT();
-        }
-
-        @Override
-        public void readNBT(Capability<IPetData> capability, IPetData instance, Direction side, INBT nbt) {
-            if (instance instanceof PetHealthCapability) {
-                ((PetHealthCapability) instance).deserializeNBT((CompoundNBT) nbt);
-            }
-        }
+        CapabilityManager.INSTANCE.register(IPetData.class);
     }
 }

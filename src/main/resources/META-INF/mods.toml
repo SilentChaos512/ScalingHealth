@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[36,)"
+loaderVersion="[37,)"
 license="MIT"
 issueTrackerURL="https://github.com/SilentChaos512/ScalingHealth"
 displayURL="https://minecraft.curseforge.com/projects/scaling-health"
@@ -14,18 +14,18 @@ authors="SilentChaos512"
 [[dependencies.scalinghealth]]
     modId="forge"
     mandatory=true
-    versionRange="[36.0.14,)"
+    versionRange="[37.0,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.scalinghealth]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.16.5,1.17)"
+    versionRange="[1.17.1,1.18)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.scalinghealth]]
     modId="silentlib"
     mandatory=true
-    versionRange="[4.9,)"
+    versionRange="[5.0,)"
     ordering="NONE"
     side="BOTH"

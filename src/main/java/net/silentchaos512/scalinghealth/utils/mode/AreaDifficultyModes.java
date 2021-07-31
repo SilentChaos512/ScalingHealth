@@ -3,9 +3,9 @@ package net.silentchaos512.scalinghealth.utils.mode;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.Tuple;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
 import net.silentchaos512.scalinghealth.capability.IDifficultySource;
 import net.silentchaos512.scalinghealth.utils.config.SHDifficulty;
@@ -32,11 +32,11 @@ public class AreaDifficultyModes {
         }
 
         @Override
-        public double getDifficulty(World world, BlockPos pos) {
+        public double getDifficulty(Level world, BlockPos pos) {
             return this.weighted ? getWeightedAverage(world, pos) : getAverage(world, pos);
         }
 
-        public double getAverage(World world, BlockPos pos) {
+        public double getAverage(Level world, BlockPos pos) {
             List<Pair<IDifficultySource, BlockPos>> sources = SHDifficulty.positionedPlayerSources(world, pos, getRadius());
             if (sources.isEmpty())
                 return 0;
@@ -46,7 +46,7 @@ public class AreaDifficultyModes {
                     .orElse(0F) / sources.size();
         }
 
-        public double getWeightedAverage(World world, BlockPos pos) {
+        public double getWeightedAverage(Level world, BlockPos pos) {
             double total = 0;
             int totalWeight = 0;
             int rSq = getRadius() * getRadius();
@@ -83,7 +83,7 @@ public class AreaDifficultyModes {
         }
 
         @Override
-        public double getDifficulty(World world, BlockPos pos) {
+        public double getDifficulty(Level world, BlockPos pos) {
             double extrema = 0;
             for (Tuple<BlockPos, IDifficultySource> tuple : SHDifficulty.allPlayerSources(world, pos, getRadius())) {
                 extrema = extremaFct.apply((double)tuple.getB().getDifficulty(), extrema);
@@ -119,7 +119,7 @@ public class AreaDifficultyModes {
         }
 
         @Override
-        public double getDifficulty(World world, BlockPos pos) {
+        public double getDifficulty(Level world, BlockPos pos) {
             if(worldSpawn == null)
                 worldSpawn = new BlockPos(world.getLevelData().getXSpawn(), world.getLevelData().getYSpawn(), world.getLevelData().getZSpawn());
             return Math.sqrt(pos.distSqr(center.get())) * this.distanceFactor;
@@ -148,7 +148,7 @@ public class AreaDifficultyModes {
         }
 
         @Override
-        public double getDifficulty(World world, BlockPos pos) {
+        public double getDifficulty(Level world, BlockPos pos) {
             return time.getDifficulty(world, pos) + distance.getDifficulty(world, pos);
         }
 
@@ -164,7 +164,7 @@ public class AreaDifficultyModes {
         public static final Codec<ServerWide> CODEC = Codec.unit(INSTANCE);
 
         @Override
-        public double getDifficulty(World world, BlockPos pos) {
+        public double getDifficulty(Level world, BlockPos pos) {
             return DifficultySourceCapability.getOverworldCap()
                     .map(IDifficultySource::getDifficulty).orElse(0f);
         }

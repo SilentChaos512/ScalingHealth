@@ -1,6 +1,6 @@
 package net.silentchaos512.scalinghealth.utils.config;
 
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanicListener;
 
 public final class SHItems {
@@ -18,13 +18,13 @@ public final class SHItems {
         return SHMechanicListener.getItemMechanics().powerCrystalDamageIncrease;
     }
 
-    public static int levelCostToUseHeartCrystal(PlayerEntity player) {
-        if (player.abilities.instabuild) return 0;
+    public static int levelCostToUseHeartCrystal(Player player) {
+        if (player.isCreative()) return 0;
         return SHMechanicListener.getItemMechanics().heartCrystalLevelCost;
     }
 
-    public static int levelCostToUsePowerCrystal(PlayerEntity player) {
-        if (player.abilities.instabuild) return 0;
+    public static int levelCostToUsePowerCrystal(Player player) {
+        if (player.isCreative()) return 0;
         return SHMechanicListener.getItemMechanics().powerCrystalLevelCost;
     }
 

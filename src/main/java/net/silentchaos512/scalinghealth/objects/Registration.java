@@ -1,19 +1,19 @@
 package net.silentchaos512.scalinghealth.objects;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.particles.BasicParticleType;
-import net.minecraft.particles.ParticleType;
-import net.minecraft.potion.Effect;
-import net.minecraft.potion.EffectType;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.material.Material;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraftforge.fmllegacy.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.scalinghealth.ScalingHealth;
@@ -29,7 +29,7 @@ public class Registration {
     private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, ScalingHealth.MOD_ID);
     private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, ScalingHealth.MOD_ID);
     private static final DeferredRegister<ParticleType<?>> PARTICLES = DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, ScalingHealth.MOD_ID);
-    private static final DeferredRegister<Effect> EFFECTS = DeferredRegister.create(ForgeRegistries.POTIONS, ScalingHealth.MOD_ID);
+    private static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(ForgeRegistries.POTIONS, ScalingHealth.MOD_ID);
     private static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, ScalingHealth.MOD_ID);
     private static final DeferredRegister<GlobalLootModifierSerializer<?>> GLMS = DeferredRegister.create(ForgeRegistries.LOOT_MODIFIER_SERIALIZERS, ScalingHealth.MOD_ID);
 
@@ -69,8 +69,8 @@ public class Registration {
     public static final RegistryObject<Item> CHANCE_HEART = ITEMS.register("chance_heart", () ->
             new DifficultyMutatorItem(DifficultyMutatorItem.Type.CHANCE, grouped()));
 
-    public static final RegistryObject<Effect> BANDAGED = EFFECTS.register("bandaged", () ->
-            new BandagedEffect(EffectType.NEUTRAL, 0xf7dcad)
+    public static final RegistryObject<MobEffect> BANDAGED = EFFECTS.register("bandaged", () ->
+            new BandagedEffect(MobEffectCategory.NEUTRAL, 0xf7dcad)
                     .addAttributeModifier(
                             Attributes.MOVEMENT_SPEED,
                             BandagedEffect.MOD_UUID,
@@ -78,14 +78,14 @@ public class Registration {
                             AttributeModifier.Operation.MULTIPLY_TOTAL
                     ));
 
-    public static final RegistryObject<BasicParticleType> HEART_CRYSTAL_PARTICLE = PARTICLES.register("heart_crystal", () ->
-            new BasicParticleType(false));
-    public static final RegistryObject<BasicParticleType> POWER_CRYSTAL_PARTICLE = PARTICLES.register("power_crystal", () ->
-            new BasicParticleType(false));
-    public static final RegistryObject<BasicParticleType> CURSED_HEART_PARTICLE = PARTICLES.register("cursed_heart", () ->
-            new BasicParticleType(false));
-    public static final RegistryObject<BasicParticleType> ENCHANTED_HEART_PARTICLE = PARTICLES.register("enchanted_heart", () ->
-            new BasicParticleType(false));
+    public static final RegistryObject<SimpleParticleType> HEART_CRYSTAL_PARTICLE = PARTICLES.register("heart_crystal", () ->
+            new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> POWER_CRYSTAL_PARTICLE = PARTICLES.register("power_crystal", () ->
+            new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> CURSED_HEART_PARTICLE = PARTICLES.register("cursed_heart", () ->
+            new SimpleParticleType(false));
+    public static final RegistryObject<SimpleParticleType> ENCHANTED_HEART_PARTICLE = PARTICLES.register("enchanted_heart", () ->
+            new SimpleParticleType(false));
 
     public static final RegistryObject<SoundEvent> CURSED_HEART_USE = makeSound("cursed_heart_use");
     public static final RegistryObject<SoundEvent> ENCHANTED_HEART_USE = makeSound("enchanted_heart_use");

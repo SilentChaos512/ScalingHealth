@@ -1,9 +1,9 @@
 package net.silentchaos512.scalinghealth.client.gui.health;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.player.Player;
 import net.silentchaos512.lib.event.ClientTicks;
 import net.silentchaos512.scalinghealth.config.SHConfig;
 
@@ -40,7 +40,7 @@ class HeartsInfo {
         Minecraft mc = Minecraft.getInstance();
         //noinspection ConstantConditions -- can be null
         if (mc == null) return;
-        PlayerEntity player = mc.player;
+        Player player = mc.player;
         if (player == null) return;
 
         int updateCounter = ClientTicks.ticksInGame();
@@ -50,18 +50,18 @@ class HeartsInfo {
 
         health = player.getHealth();
         previousHealthInt = healthInt;
-        healthInt = MathHelper.ceil(this.health);
+        healthInt = Mth.ceil(this.health);
         maxHealth = player.getMaxHealth();
 
         absorption = player.getAbsorptionAmount();
-        absorptionInt = MathHelper.ceil(this.absorption);
+        absorptionInt = Mth.ceil(this.absorption);
 
         rowsUsedInHud = absorptionInt > 0 ? 2 : 1;
         rowHeight = rowsUsedInHud + 9; // wut?
         recentlyHurtHighlight = player.invulnerableTime / 3 % 2 == 1;
         hardcoreMode = player.level.getLevelData().isHardcore();
         for (int i = 0; i < lowHealthBob.length; ++i) lowHealthBob[i] = random.nextInt(2);
-        regenTimer = player.hasEffect(Effects.REGENERATION) ? updateCounter % 20 : -1;
+        regenTimer = player.hasEffect(MobEffects.REGENERATION) ? updateCounter % 20 : -1;
 
         heartStyle = SHConfig.CLIENT.heartIconStyle.get();
         absorptionStyle = SHConfig.CLIENT.absorptionIconStyle.get();
@@ -73,7 +73,7 @@ class HeartsInfo {
 
     int getCustomHeartRowCount(int healthAmount) {
         return heartStyle == HeartIconStyle.REPLACE_ALL
-                ? MathHelper.ceil(healthAmount / 20f)
+                ? Mth.ceil(healthAmount / 20f)
                 : healthAmount / 20;
     }
 
@@ -91,7 +91,7 @@ class HeartsInfo {
             y -= 2;
         }
         if (hasLowHealth()) {
-            y += lowHealthBob[MathHelper.clamp(xIndex, 0, lowHealthBob.length - 1)];
+            y += lowHealthBob[Mth.clamp(xIndex, 0, lowHealthBob.length - 1)];
         }
         return y;
     }
@@ -115,11 +115,11 @@ class HeartsInfo {
     }
 
     int getHeartTankRowCount() {
-        return MathHelper.ceil(getHeartTanks() / 20f);
+        return Mth.ceil(getHeartTanks() / 20f);
     }
 
     int getMaxHeartTankRowCount() {
-        return MathHelper.ceil(getMaxHeartTanks() / 20f);
+        return Mth.ceil(getMaxHeartTanks() / 20f);
     }
 
     int getFilledHeartTanksInRow(int row) {

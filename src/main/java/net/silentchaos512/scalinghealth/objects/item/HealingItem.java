@@ -18,20 +18,20 @@
 
 package net.silentchaos512.scalinghealth.objects.item;
 
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.UseAction;
-import net.minecraft.potion.EffectInstance;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.stats.Stats;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.SoundEvents;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.level.Level;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.objects.Registration;
 
@@ -53,8 +53,8 @@ public class HealingItem extends Item {
     }
 
     @Override
-    public UseAction getUseAnimation(ItemStack stack) {
-        return UseAction.BOW;
+    public UseAnim getUseAnimation(ItemStack stack) {
+        return UseAnim.BOW;
     }
 
     @Override
@@ -63,24 +63,24 @@ public class HealingItem extends Item {
     }
 
     @Override
-    public ActionResult<ItemStack> use(World worldIn, PlayerEntity player, Hand hand) {
+    public InteractionResultHolder<ItemStack> use(Level worldIn, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (player.getHealth() < player.getMaxHealth() && !player.hasEffect(Registration.BANDAGED.get())) {
             player.startUsingItem(hand);
-            return ActionResult.success( stack);
+            return InteractionResultHolder.success( stack);
         }
-        return ActionResult.fail(stack);
+        return InteractionResultHolder.fail(stack);
     }
 
     @Override
-    public ItemStack finishUsingItem(ItemStack stack, World world, LivingEntity entityLiving) {
+    public ItemStack finishUsingItem(ItemStack stack, Level world, LivingEntity entityLiving) {
         if (!world.isClientSide) {
-            entityLiving.addEffect(new EffectInstance(Registration.BANDAGED.get(),
+            entityLiving.addEffect(new MobEffectInstance(Registration.BANDAGED.get(),
                     this.effectDuration, this.healSpeed, false, false));
             stack.shrink(1);
 
-            if (entityLiving instanceof PlayerEntity) {
-                PlayerEntity player = (PlayerEntity) entityLiving;
+            if (entityLiving instanceof Player) {
+                Player player = (Player) entityLiving;
                 player.awardStat(Stats.ITEM_USED.get(this));
             }
         }
@@ -96,11 +96,11 @@ public class HealingItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable World world, List<ITextComponent> tooltip, ITooltipFlag flag) {
-        tooltip.add(new TranslationTextComponent("item.scalinghealth.healing_item.value",
+    public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag flag) {
+        tooltip.add(new TranslatableComponent("item.scalinghealth.healing_item.value",
                 (int) (this.healAmount * 100),
                 this.effectDuration / 20));
-        tooltip.add(new TranslationTextComponent("item.scalinghealth.healing_item.howToUse",
+        tooltip.add(new TranslatableComponent("item.scalinghealth.healing_item.howToUse",
                 USE_TIME / 20));
     }
 }

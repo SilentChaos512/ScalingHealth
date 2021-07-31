@@ -2,9 +2,14 @@ package net.silentchaos512.scalinghealth.datagen;
 
 import com.google.common.collect.Lists;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.loot.*;
-import net.minecraft.loot.functions.SetCount;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.storage.loot.BuiltInLootTables;
+import net.minecraft.world.level.storage.loot.LootPool;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.entries.EmptyLootItem;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
+import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.objects.Registration;
 import net.silentchaos512.scalinghealth.utils.EntityGroup;
@@ -20,13 +25,13 @@ public class LootTablesGenerator extends BaseLootTableGenerator {
     }
 
     public static final List<ResourceLocation> CHESTS = Lists.newArrayList(
-            LootTables.ABANDONED_MINESHAFT,
-            LootTables.BURIED_TREASURE,
-            LootTables.NETHER_BRIDGE,
-            LootTables.SIMPLE_DUNGEON,
-            LootTables.STRONGHOLD_LIBRARY,
-            LootTables.UNDERWATER_RUIN_BIG,
-            LootTables.WOODLAND_MANSION
+            BuiltInLootTables.ABANDONED_MINESHAFT,
+            BuiltInLootTables.BURIED_TREASURE,
+            BuiltInLootTables.NETHER_BRIDGE,
+            BuiltInLootTables.SIMPLE_DUNGEON,
+            BuiltInLootTables.STRONGHOLD_LIBRARY,
+            BuiltInLootTables.UNDERWATER_RUIN_BIG,
+            BuiltInLootTables.WOODLAND_MANSION
     );
 
     public static final Map<ResourceLocation, ResourceLocation> VANILLA_TO_SH = CHESTS
@@ -44,23 +49,23 @@ public class LootTablesGenerator extends BaseLootTableGenerator {
 
         LootTable.Builder builder = LootTable.lootTable().withPool(
                 new LootPool.Builder()
-                        .setRolls(new RandomValueRange(1))
-                        .add(ItemLootEntry.lootTableItem(Registration.HEART_CRYSTAL.get())
+                        .setRolls(UniformGenerator.between(0, 1))
+                        .add(LootItem.lootTableItem(Registration.HEART_CRYSTAL.get())
                                 .setWeight(3).setQuality(2)
-                                .apply(SetCount.setCount(new RandomValueRange(1,2)))
-                        ).add(ItemLootEntry.lootTableItem(Registration.CURSED_HEART.get())
+                                .apply(SetItemCountFunction.setCount(UniformGenerator.between(1,2)))
+                        ).add(LootItem.lootTableItem(Registration.CURSED_HEART.get())
                         .setWeight(1).setQuality(5)
-                        .apply(SetCount.setCount(new RandomValueRange(1, 3)))
-                ).add(ItemLootEntry.lootTableItem(Registration.ENCHANTED_HEART.get())
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1, 3)))
+                ).add(LootItem.lootTableItem(Registration.ENCHANTED_HEART.get())
                         .setWeight(1).setQuality(5)
-                        .apply(SetCount.setCount(new RandomValueRange(1, 3)))
-                ).add(ItemLootEntry.lootTableItem(Registration.CHANCE_HEART.get())
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1, 3)))
+                ).add(LootItem.lootTableItem(Registration.CHANCE_HEART.get())
                         .setWeight(1).setQuality(5)
-                        .apply(SetCount.setCount(new RandomValueRange(1, 3)))
-                ).add(ItemLootEntry.lootTableItem(Registration.POWER_CRYSTAL.get())
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1, 3)))
+                ).add(LootItem.lootTableItem(Registration.POWER_CRYSTAL.get())
                         .setWeight(2).setQuality(7)
-                        .apply(SetCount.setCount(new RandomValueRange(1, 2)))
-                ).add(EmptyLootEntry.emptyItem().setWeight(10)));
+                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1, 2)))
+                ).add(EmptyLootItem.emptyItem().setWeight(10)));
 
         VANILLA_TO_SH.values().forEach(rl -> lootTables.put(rl, builder));
 

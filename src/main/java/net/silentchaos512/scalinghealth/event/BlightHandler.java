@@ -18,21 +18,25 @@
 
 package net.silentchaos512.scalinghealth.event;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.passive.TameableEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.*;
+import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.TamableAnimal;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.fmllegacy.network.NetworkDirection;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.network.ClientBlightMessage;
 import net.silentchaos512.scalinghealth.network.Network;
@@ -44,43 +48,43 @@ import net.silentchaos512.scalinghealth.utils.config.SHMobs;
 public final class BlightHandler {
     private BlightHandler() {}
 
-    public static void applyBlightPotionEffects(MobEntity entity) {
+    public static void applyBlightPotionEffects(Mob entity) {
         SHMechanicListener.getMobMechanics().blight.blightEffects.forEach(e -> e.apply(entity, SHDifficulty.getDifficultyOf(entity)));
     }
 
-    private static void notifyPlayers(ITextComponent deathMessage, MobEntity blight, PlayerEntity slayer){
-        if (deathMessage instanceof TranslationTextComponent) {
+    private static void notifyPlayers(Component deathMessage, Mob blight, Player slayer){
+        if (deathMessage instanceof TranslatableComponent) {
             // Assuming arguments are the same as in DamageSource#getDeathMessage
             // May fail with some modded damage sources, but should be fine in most cases
-            TranslationTextComponent original = (TranslationTextComponent) deathMessage;
+            TranslatableComponent original = (TranslatableComponent) deathMessage;
 
-            StringTextComponent s = new StringTextComponent("Blight " + blight.getName().getString());
-            s.setStyle(Style.EMPTY.withColor(TextFormatting.DARK_PURPLE));
+            TextComponent s = new TextComponent("Blight " + blight.getName().getString());
+            s.setStyle(Style.EMPTY.withColor(ChatFormatting.DARK_PURPLE));
 
-            TranslationTextComponent newMessage = new TranslationTextComponent(original.getKey(), s);
-            StringTextComponent almostFinalMessage = new StringTextComponent(newMessage.getString());
+            TranslatableComponent newMessage = new TranslatableComponent(original.getKey(), s);
+            TextComponent almostFinalMessage = new TextComponent(newMessage.getString());
             String message = newMessage.getString();
 
             if(message.contains("drowned")){
                 if(message.startsWith("Blight Squid")){
-                    almostFinalMessage = new StringTextComponent(almostFinalMessage.getString() + "... again");
+                    almostFinalMessage = new TextComponent(almostFinalMessage.getString() + "... again");
                 }
                 else
-                    almostFinalMessage = new StringTextComponent(almostFinalMessage.getString() + "... gg");
+                    almostFinalMessage = new TextComponent(almostFinalMessage.getString() + "... gg");
             } else if(message.contains("suffocated in a wall")){
-                almostFinalMessage = new StringTextComponent(almostFinalMessage.getString() + " *slow clap*");
+                almostFinalMessage = new TextComponent(almostFinalMessage.getString() + " *slow clap*");
             }
 
-            StringTextComponent finalMessage = almostFinalMessage;
+            TextComponent finalMessage = almostFinalMessage;
 
             if(slayer != null)  {
                 if(almostFinalMessage.getString().contains("  "))
-                    finalMessage = new StringTextComponent(almostFinalMessage.getString().replace("  ", " " + slayer.getName().getString() + " ")) ;
+                    finalMessage = new TextComponent(almostFinalMessage.getString().replace("  ", " " + slayer.getName().getString() + " ")) ;
                 else
-                    finalMessage = new StringTextComponent(almostFinalMessage.getString() + slayer.getName().getString());
+                    finalMessage = new TextComponent(almostFinalMessage.getString() + slayer.getName().getString());
             }
 
-            for (PlayerEntity p : blight.level.players())
+            for (Player p : blight.level.players())
                 p.sendMessage(finalMessage, Util.NIL_UUID);
         }
     }
@@ -91,23 +95,23 @@ public final class BlightHandler {
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onBlightKilled(LivingDeathEvent event) {
-        if(!(event.getEntityLiving() instanceof MobEntity)) return;
+        if(!(event.getEntityLiving() instanceof Mob)) return;
 
-        MobEntity blight = (MobEntity) event.getEntityLiving();
+        Mob blight = (Mob) event.getEntityLiving();
         if (event.getSource() == null || !SHMobs.isBlight(blight) || event.getEntity().level.isClientSide)
             return;
 
         Entity entitySource = event.getSource().getEntity();
-        boolean isTamedAnimal = entitySource instanceof TameableEntity && ((TameableEntity) entitySource).isTame();
-        if (entitySource instanceof PlayerEntity || isTamedAnimal) {
+        boolean isTamedAnimal = entitySource instanceof TamableAnimal && ((TamableAnimal) entitySource).isTame();
+        if (entitySource instanceof Player || isTamedAnimal) {
             // Killed by a player or a player's pet.
-            PlayerEntity player;
+            Player player;
             LivingEntity actualKiller;
             if (isTamedAnimal) {
-                player = (PlayerEntity) ((TameableEntity) entitySource).getOwner();
-                actualKiller = (MobEntity) entitySource;
+                player = (Player) ((TamableAnimal) entitySource).getOwner();
+                actualKiller = (Mob) entitySource;
             } else {
-                actualKiller = player = (PlayerEntity) entitySource;
+                actualKiller = player = (Player) entitySource;
             }
 
             // Tell all players that the blight was killed.
@@ -126,10 +130,10 @@ public final class BlightHandler {
 
     @SubscribeEvent
     public static void startTrackingBlight(PlayerEvent.StartTracking event){
-        if(event.getTarget() instanceof MobEntity) {
-            MobEntity mob = (MobEntity) event.getTarget();
+        if(event.getTarget() instanceof Mob) {
+            Mob mob = (Mob) event.getTarget();
             if(SHDifficulty.affected(mob).isBlight()) {
-                ServerPlayerEntity sp = (ServerPlayerEntity) event.getPlayer();
+                ServerPlayer sp = (ServerPlayer) event.getPlayer();
                 ClientBlightMessage msg = new ClientBlightMessage(mob.getId());
                 Network.channel.sendTo(msg, sp.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
             }
@@ -139,8 +143,8 @@ public final class BlightHandler {
     @SubscribeEvent
     public static void onBlightUpdate(LivingUpdateEvent event) {
         LivingEntity blight = event.getEntityLiving();
-        if (!blight.level.isClientSide && blight instanceof MobEntity && SHMobs.isBlight((MobEntity) blight) && blight.level.getGameTime() % 1000 == 0) {
-            applyBlightPotionEffects((MobEntity) blight);
+        if (!blight.level.isClientSide && blight instanceof Mob && SHMobs.isBlight((Mob) blight) && blight.level.getGameTime() % 1000 == 0) {
+            applyBlightPotionEffects((Mob) blight);
         }
     }
 }

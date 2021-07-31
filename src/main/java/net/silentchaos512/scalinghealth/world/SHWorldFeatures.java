@@ -2,13 +2,14 @@ package net.silentchaos512.scalinghealth.world;
 
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.block.Block;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.WorldGenRegistries;
-import net.minecraft.world.gen.GenerationStage;
-import net.minecraft.world.gen.feature.ConfiguredFeature;
-import net.minecraft.world.gen.feature.Feature;
-import net.minecraft.world.gen.feature.OreFeatureConfig;
+import net.minecraft.core.Registry;
+import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.levelgen.GenerationStep;
+import net.minecraft.world.level.levelgen.VerticalAnchor;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 import net.minecraftforge.event.world.BiomeLoadingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -32,7 +33,7 @@ public class SHWorldFeatures {
     public static void addOres(BiomeLoadingEvent event) {
         for(OreSpawnInfo info : ORES) {
             if(info.test.getAsBoolean())
-                event.getGeneration().addFeature(GenerationStage.Decoration.UNDERGROUND_ORES, info.feature.get());
+                event.getGeneration().addFeature(GenerationStep.Decoration.UNDERGROUND_ORES, info.feature.get());
         }
     }
 
@@ -42,13 +43,13 @@ public class SHWorldFeatures {
 
         public OreSpawnInfo(String name, Supplier<Block> block, int size, int count, int height, BooleanSupplier test) {
             this.feature = Suppliers.memoize(() -> Registry.register(
-                    WorldGenRegistries.CONFIGURED_FEATURE,
+                    BuiltinRegistries.CONFIGURED_FEATURE,
                     ScalingHealth.getId(name),
-                    Feature.ORE.configured(new OreFeatureConfig(
-                            OreFeatureConfig.FillerBlockType.NATURAL_STONE,
+                    Feature.ORE.configured(new OreConfiguration(
+                            OreConfiguration.Predicates.NATURAL_STONE,
                             block.get().defaultBlockState(),
                             size
-                    )).range(height).squared().count(count)
+                    )).rangeUniform(VerticalAnchor.absolute(10), VerticalAnchor.absolute(height)).squared().count(count)
             ));
             this.test = test;
         }

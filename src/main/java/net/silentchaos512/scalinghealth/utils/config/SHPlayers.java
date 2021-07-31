@@ -1,6 +1,6 @@
 package net.silentchaos512.scalinghealth.utils.config;
 
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 import net.silentchaos512.scalinghealth.capability.IPlayerData;
 import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
 import net.silentchaos512.scalinghealth.config.EvalVars;
@@ -14,7 +14,7 @@ import net.silentchaos512.utils.MathUtils;
 public final class SHPlayers {
    private SHPlayers() {throw new IllegalAccessError("Utility class");}
 
-   public static IPlayerData getPlayerData(PlayerEntity entity){
+   public static IPlayerData getPlayerData(Player entity){
       return entity.getCapability(PlayerDataCapability.INSTANCE).orElseThrow(() -> new IllegalStateException("Could not access capability"));
    }
 
@@ -68,7 +68,7 @@ public final class SHPlayers {
       );
    }
 
-   public static int getCrystalsAfterDeath(PlayerEntity player){
+   public static int getCrystalsAfterDeath(Player player){
       float healthDifference =  player.getMaxHealth() - MathUtils.clamp((int) EvalVars.apply(player, SHMechanicListener.getPlayerMechanics().healthOnDeath.get()), minHealth(), maxHealth());
       int crystalDifference = (int) healthDifference / (2 * SHItems.heartCrystalIncreaseAmount());
       return getPlayerData(player).getHeartCrystals() - crystalDifference;

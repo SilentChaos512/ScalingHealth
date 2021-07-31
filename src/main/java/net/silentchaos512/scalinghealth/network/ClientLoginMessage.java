@@ -1,6 +1,6 @@
 package net.silentchaos512.scalinghealth.network;
 
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.FriendlyByteBuf;
 import net.silentchaos512.scalinghealth.utils.mode.AreaDifficultyMode;
 
 public class ClientLoginMessage {
@@ -14,7 +14,7 @@ public class ClientLoginMessage {
         this.maxDifficultyValue = maxDifficultyValue;
     }
 
-    public static ClientLoginMessage fromBytes(PacketBuffer buf) {
+    public static ClientLoginMessage fromBytes(FriendlyByteBuf buf) {
         ClientLoginMessage msg = new ClientLoginMessage();
         try {
             msg.areaMode = buf.readWithCodec(AreaDifficultyMode.CODEC);
@@ -25,7 +25,7 @@ public class ClientLoginMessage {
         return msg;
     }
 
-    public void toBytes(PacketBuffer buf) {
+    public void toBytes(FriendlyByteBuf buf) {
         try {
             buf.writeWithCodec(AreaDifficultyMode.CODEC, areaMode);
         } catch (Exception e) {

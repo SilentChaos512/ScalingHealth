@@ -1,12 +1,11 @@
 package net.silentchaos512.scalinghealth.network;
 
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.resources.mechanics.*;
 
-import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -38,33 +37,20 @@ public class SHMechanicsPacket implements IntSupplier {
         this.damageScalingMechanics = SHMechanicListener.getDamageScalingMechanics();
     }
 
-    public void encode(PacketBuffer buffer) {
-        try {
-            buffer.writeWithCodec(PlayerMechanics.CODEC, playerMechanics);
-            buffer.writeWithCodec(ItemMechanics.CODEC, itemMechanics);
-            buffer.writeWithCodec(MobMechanics.CODEC, mobMechanics);
-            buffer.writeWithCodec(DifficultyMechanics.CODEC, difficultyMechanics);
-            buffer.writeWithCodec(DamageScalingMechanics.CODEC, damageScalingMechanics);
-        } catch (IOException e) {
-            ScalingHealth.LOGGER.error(e);
-        }
+    public void encode(FriendlyByteBuf buffer) {
+        buffer.writeWithCodec(PlayerMechanics.CODEC, playerMechanics);
+        buffer.writeWithCodec(ItemMechanics.CODEC, itemMechanics);
+        buffer.writeWithCodec(MobMechanics.CODEC, mobMechanics);
+        buffer.writeWithCodec(DifficultyMechanics.CODEC, difficultyMechanics);
+        buffer.writeWithCodec(DamageScalingMechanics.CODEC, damageScalingMechanics);
     }
 
-    public static SHMechanicsPacket decode(PacketBuffer buffer) {
-        PlayerMechanics playerMechanics = null;
-        ItemMechanics itemMechanics = null;
-        MobMechanics mobMechanics = null;
-        DifficultyMechanics difficultyMechanics = null;
-        DamageScalingMechanics damageScalingMechanics = null;
-        try {
-            playerMechanics = buffer.readWithCodec(PlayerMechanics.CODEC);
-            itemMechanics = buffer.readWithCodec(ItemMechanics.CODEC);
-            mobMechanics = buffer.readWithCodec(MobMechanics.CODEC);
-            difficultyMechanics = buffer.readWithCodec(DifficultyMechanics.CODEC);
-            damageScalingMechanics = buffer.readWithCodec(DamageScalingMechanics.CODEC);
-        } catch (IOException e) {
-            ScalingHealth.LOGGER.error(e);
-        }
+    public static SHMechanicsPacket decode(FriendlyByteBuf buffer) {
+        PlayerMechanics playerMechanics = buffer.readWithCodec(PlayerMechanics.CODEC);;
+        ItemMechanics itemMechanics = buffer.readWithCodec(ItemMechanics.CODEC);;
+        MobMechanics mobMechanics = buffer.readWithCodec(MobMechanics.CODEC);;
+        DifficultyMechanics difficultyMechanics = buffer.readWithCodec(DifficultyMechanics.CODEC);;
+        DamageScalingMechanics damageScalingMechanics = buffer.readWithCodec(DamageScalingMechanics.CODEC);
         return new SHMechanicsPacket(playerMechanics, itemMechanics, mobMechanics, difficultyMechanics, damageScalingMechanics);
     }
 
@@ -91,7 +77,7 @@ public class SHMechanicsPacket implements IntSupplier {
         }
         else {
             ScalingHealth.LOGGER.error("Failed to receive SHMechanics on Client!");
-            ctx.get().getNetworkManager().disconnect(new StringTextComponent("Did not receive Scaling Health configuration data, closing connection."));
+            ctx.get().getNetworkManager().disconnect(new TextComponent("Did not receive Scaling Health configuration data, closing connection."));
         }
     }
 
