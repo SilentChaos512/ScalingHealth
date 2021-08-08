@@ -14,7 +14,7 @@ authors="SilentChaos512"
 [[dependencies.scalinghealth]]
     modId="forge"
     mandatory=true
-    versionRange="[37.0,)"
+    versionRange="[37.0.22,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.scalinghealth]]

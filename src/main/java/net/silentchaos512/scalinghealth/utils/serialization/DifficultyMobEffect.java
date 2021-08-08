@@ -22,8 +22,8 @@ public class DifficultyMobEffect {
     public static final Codec<DifficultyMobEffect> CODEC = RecordCodecBuilder.create(inst ->
             inst.group(
                     ResourceLocation.CODEC.comapFlatMap(
-                            rl -> ForgeRegistries.POTIONS.containsKey(rl) ?
-                                    DataResult.success(ForgeRegistries.POTIONS.getValue(rl)) :
+                            rl -> ForgeRegistries.MOB_EFFECTS.containsKey(rl) ?
+                                    DataResult.success(ForgeRegistries.MOB_EFFECTS.getValue(rl)) :
                                     DataResult.error("No potion named:" + rl.toString()),
                             ForgeRegistryEntry::getRegistryName
                     ).fieldOf("effect").forGetter(e -> e.effect),

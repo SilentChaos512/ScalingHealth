@@ -95,6 +95,14 @@ repositories {
 configurations {
     // Dependencies to pack into the jar
     extraLibs
+    implementation.extendsFrom extraLibs
+}
+
+//add it to the classpath manually. forgegradle + modules shenanigans
+minecraft.runs.all {
+    lazyToken('minecraft_classpath') {
+        configurations.extraLibs.copyRecursive().resolve().collect {it.absolutePath }.join(File.pathSeparator)
+    }
 }
 
 dependencies {
