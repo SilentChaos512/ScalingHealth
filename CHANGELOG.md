@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [5.0.1] - 20221-08-08
+### Fixed
+- Updated forge to 37.0.22 to fix a breaking change
+
 ## [5.0.0] - 2021-07-30
 Updated to 1.17.1
 
