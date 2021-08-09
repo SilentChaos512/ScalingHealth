@@ -19,8 +19,8 @@ public class PlayerMechanics {
                     ).forGetter(p -> new SerializationUtils.NumberConstraint<>(p.startingHp, p.minHealth, p.maxHealth)),
                     SerializationUtils.EXPRESSION_CODEC.fieldOf("setOnDeath").forGetter(p -> p.healthOnDeath),
                     SerializationUtils.positiveDouble().fieldOf("maxAttackDamage").forGetter(p -> p.maxAttackDamage),
-                    SerializationUtils.positiveInt(1).fieldOf("levelsPerHp").forGetter(p -> p.startingHp),
-                    SerializationUtils.positiveInt(1).fieldOf("hpPerLevel").forGetter(p -> p.startingHp),
+                    SerializationUtils.positiveInt(0).fieldOf("levelsPerHp").forGetter(p -> p.levelsPerHp),
+                    SerializationUtils.positiveInt(0).fieldOf("hpPerLevel").forGetter(p -> p.hpPerLevel),
                     RegenMechanics.CODEC.fieldOf("regen").forGetter(p -> p.regenMechanics)
             ).apply(inst, PlayerMechanics::new)
     );

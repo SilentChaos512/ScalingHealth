@@ -14,7 +14,7 @@ import net.silentchaos512.utils.MathUtils;
 public final class SHPlayers {
    private SHPlayers() {throw new IllegalAccessError("Utility class");}
 
-   public static IPlayerData getPlayerData(Player entity){
+   public static IPlayerData getPlayerData(Player entity) {
       return entity.getCapability(PlayerDataCapability.INSTANCE).orElseThrow(() -> new IllegalStateException("Could not access capability"));
    }
 
@@ -68,14 +68,14 @@ public final class SHPlayers {
       );
    }
 
-   public static int getCrystalsAfterDeath(Player player){
+   public static int getCrystalsAfterDeath(Player player) {
       float healthDifference =  player.getMaxHealth() - MathUtils.clamp((int) EvalVars.apply(player, SHMechanicListener.getPlayerMechanics().healthOnDeath.get()), minHealth(), maxHealth());
       int crystalDifference = (int) healthDifference / (2 * SHItems.heartCrystalIncreaseAmount());
       return getPlayerData(player).getHeartCrystals() - crystalDifference;
    }
 
    //Amount of levels needed for an hp increase.
-   public static int levelsPerHp(){
+   public static int levelsPerHp() {
       return SHMechanicListener.getPlayerMechanics().levelsPerHp;
    }
 
@@ -85,6 +85,8 @@ public final class SHPlayers {
    }
 
    public static int fullHeartsFromXp(int levels) {
+      if (hpPerLevel() == 0 || levelsPerHp() == 0)
+         return 0;
       return EnabledFeatures.healthXpEnabled() ? levels / levelsPerHp() * hpPerLevel() : 0;
    }
 }
