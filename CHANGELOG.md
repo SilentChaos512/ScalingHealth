@@ -3,7 +3,13 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [5.0.1] - 20221-08-08
+## [5.0.2] - 2021-08-09
+### Fixed
+- Health and difficulty resetting after death and return from end
+- Health per levels can't be deactivated in the datapack (it was and still is de-activable from server-config)
+- Fix potential crash on death with capabilities
+
+## [5.0.1] - 2021-08-08
 ### Fixed
 - Updated forge to 37.0.22 to fix a breaking change
 
