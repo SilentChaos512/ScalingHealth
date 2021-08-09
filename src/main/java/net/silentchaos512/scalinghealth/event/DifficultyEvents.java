@@ -10,6 +10,7 @@ import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityProvider;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -20,6 +21,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.DifficultyAffectedCapability;
 import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
@@ -32,6 +34,7 @@ import net.silentchaos512.scalinghealth.utils.config.SHPlayers;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
+import java.lang.reflect.Field;
 import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID)
@@ -132,15 +135,33 @@ public final class DifficultyEvents {
         }
     }
 
+    private static Field validCap;
+
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onPlayerClone(PlayerEvent.Clone event) {
+        if (validCap == null) {
+            try {
+                validCap = CapabilityProvider.class.getDeclaredField("valid");
+                validCap.setAccessible(true);
+            } catch (Exception e) {
+                throw new RuntimeException("Could not access field!", e);
+            }
+        }
+
         // Player is cloned. Copy capabilities before applying health/difficulty changes if needed.
         Player original = event.getOriginal();
         Player clone = event.getPlayer();
 
-        debug(() -> "onPlayerClone");
+        //TODO replace with reviveCaps() once forge calls super in LivingEntity
+        try {
+            validCap.set(original, true);
+        } catch (Exception e) {
+            throw new RuntimeException("Could not set capability field!");
+        }
+
         copyCapability(PlayerDataCapability.INSTANCE, original, clone);
         copyCapability(DifficultySourceCapability.INSTANCE, original, clone);
+        original.invalidateCaps();
 
         // If not dead, player is returning from the End
         if (!event.isWasDeath()) return;
@@ -152,6 +173,7 @@ public final class DifficultyEvents {
             notifyOfChanges(clone, "heart crystal(s)", data.getHeartCrystals(), newCrystals);
             data.setHeartCrystals(clone, newCrystals);
         });
+
         clone.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
             float newDifficulty = (float) SHDifficulty.getDifficultyAfterDeath(clone);
             notifyOfChanges(clone, "difficulty", source.getDifficulty(), newDifficulty);
