@@ -97,7 +97,8 @@ public final class CommonEvents {
       if(event.phase == TickEvent.Phase.START) return;
       Player player = event.player;
 
-      if (player.level.isClientSide) return;
+      if (player.level.isClientSide || !player.isAlive())
+         return;
       SHPlayers.getPlayerData(player).tick(player);
 
       if (changedLevelThisTick) {
