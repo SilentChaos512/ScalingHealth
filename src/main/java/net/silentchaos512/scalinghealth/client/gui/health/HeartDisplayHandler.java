@@ -98,7 +98,7 @@ public final class HeartDisplayHandler extends Screen {
     public void onHealthDraw(RenderGameOverlayEvent.PreLayer event) {
         if (event.getOverlay() != ForgeIngameGui.PLAYER_HEALTH_ELEMENT ||
                 info.heartStyle == HeartIconStyle.VANILLA ||
-                !Minecraft.getInstance().options.hideGui ||
+                Minecraft.getInstance().options.hideGui ||
                 !getGui().shouldDrawSurvivalElements()
         )
             return;
