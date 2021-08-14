@@ -1,7 +1,12 @@
 {
   "pools": [
     {
-      "rolls": 1.0,
+      "rolls": {
+        "type": "minecraft:uniform",
+        "min": 0.0,
+        "max": 1.0
+      },
+      "bonus_rolls": 0.0,
       "entries": [
         {
           "type": "minecraft:item",
@@ -11,10 +16,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
+                "type": "minecraft:uniform",
                 "min": 1.0,
-                "max": 2.0,
-                "type": "minecraft:uniform"
-              }
+                "max": 2.0
+              },
+              "add": false
             }
           ],
           "name": "scalinghealth:heart_crystal"
@@ -26,10 +32,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
+                "type": "minecraft:uniform",
                 "min": 1.0,
-                "max": 3.0,
-                "type": "minecraft:uniform"
-              }
+                "max": 3.0
+              },
+              "add": false
             }
           ],
           "name": "scalinghealth:cursed_heart"
@@ -41,10 +48,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
+                "type": "minecraft:uniform",
                 "min": 1.0,
-                "max": 3.0,
-                "type": "minecraft:uniform"
-              }
+                "max": 3.0
+              },
+              "add": false
             }
           ],
           "name": "scalinghealth:enchanted_heart"
@@ -56,10 +64,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
+                "type": "minecraft:uniform",
                 "min": 1.0,
-                "max": 3.0,
-                "type": "minecraft:uniform"
-              }
+                "max": 3.0
+              },
+              "add": false
             }
           ],
           "name": "scalinghealth:chance_heart"
@@ -72,10 +81,11 @@
             {
               "function": "minecraft:set_count",
               "count": {
+                "type": "minecraft:uniform",
                 "min": 1.0,
-                "max": 2.0,
-                "type": "minecraft:uniform"
-              }
+                "max": 2.0
+              },
+              "add": false
             }
           ],
           "name": "scalinghealth:power_crystal"

@@ -3,6 +3,7 @@ package net.silentchaos512.scalinghealth.objects;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -10,6 +11,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.OreBlock;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -18,7 +20,6 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.loot.TableGlobalModifier;
-import net.silentchaos512.scalinghealth.objects.block.ShardOreBlock;
 import net.silentchaos512.scalinghealth.objects.item.DifficultyMutatorItem;
 import net.silentchaos512.scalinghealth.objects.item.HealingItem;
 import net.silentchaos512.scalinghealth.objects.item.HeartCrystal;
@@ -34,9 +35,22 @@ public class Registration {
     private static final DeferredRegister<GlobalLootModifierSerializer<?>> GLMS = DeferredRegister.create(ForgeRegistries.LOOT_MODIFIER_SERIALIZERS, ScalingHealth.MOD_ID);
 
     public static final RegistryObject<Block> HEART_CRYSTAL_ORE = BLOCKS.register("heart_crystal_ore", () ->
-            new ShardOreBlock(Block.Properties.of(Material.STONE).strength(3, 15)));
+            new OreBlock(
+                    Block.Properties.of(Material.STONE)
+                            .strength(3, 15)
+                            .requiresCorrectToolForDrops(),
+                    UniformInt.of(1, 5)
+            )
+    );
+
     public static final RegistryObject<Block> POWER_CRYSTAL_ORE = BLOCKS.register("power_crystal_ore", () ->
-            new ShardOreBlock(Block.Properties.of(Material.STONE).strength(3, 15)));
+            new OreBlock(
+                    Block.Properties.of(Material.STONE)
+                            .strength(3, 15)
+                            .requiresCorrectToolForDrops(),
+                    UniformInt.of(1, 5)
+            )
+    );
 
     public static final RegistryObject<Item> HEART_CRYSTAL_ORE_ITEM = ITEMS.register("heart_crystal_ore", () ->
             new BlockItem(HEART_CRYSTAL_ORE.get(), new Item.Properties().tab(ScalingHealth.SH)));

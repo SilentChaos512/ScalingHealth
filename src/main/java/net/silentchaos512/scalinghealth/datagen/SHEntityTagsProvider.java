@@ -7,8 +7,8 @@ import net.silentchaos512.scalinghealth.resources.tags.EntityTags;
 
 import static net.minecraft.world.entity.EntityType.*;
 
-public class SHEntityTags extends EntityTypeTagsProvider {
-   public SHEntityTags(GatherDataEvent event) {
+public class SHEntityTagsProvider extends EntityTypeTagsProvider {
+   public SHEntityTagsProvider(GatherDataEvent event) {
       super(event.getGenerator(), ScalingHealth.MOD_ID, event.getExistingFileHelper());
    }
 
