@@ -1,7 +1,7 @@
 package net.silentchaos512.scalinghealth.client;
 
 import net.minecraft.client.KeyMapping;
-import net.minecraftforge.fmlclient.registry.ClientRegistry;
+import net.minecraftforge.client.ClientRegistry;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import org.lwjgl.glfw.GLFW;
 

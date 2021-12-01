@@ -20,8 +20,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class PlayerDataCapability implements IPlayerData, ICapabilitySerializable<CompoundTag> {
-    @CapabilityInject(IPlayerData.class)
-    public static Capability<IPlayerData> INSTANCE = null;
+    public static Capability<IPlayerData> INSTANCE = CapabilityManager.get(new CapabilityToken<>() {});;
     public static ResourceLocation NAME = ScalingHealth.getId("player_data");
 
     private static final String NBT_HEART_CRYSTALS = "HeartCrystals";
@@ -140,9 +139,5 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
             return false;
         }
         return true;
-    }
-
-    public static void register() {
-        CapabilityManager.INSTANCE.register(IPlayerData.class);
     }
 }

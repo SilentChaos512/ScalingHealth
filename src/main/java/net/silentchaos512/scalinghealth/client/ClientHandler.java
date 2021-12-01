@@ -2,7 +2,7 @@ package net.silentchaos512.scalinghealth.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraftforge.fmllegacy.network.NetworkEvent;
+import net.minecraftforge.network.NetworkEvent;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.network.ClientLoginMessage;
 import net.silentchaos512.scalinghealth.network.ClientSyncMessage;

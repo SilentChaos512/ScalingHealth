@@ -16,8 +16,7 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 public class DifficultySourceCapability implements IDifficultySource, ICapabilitySerializable<CompoundTag> {
-    @CapabilityInject(IDifficultySource.class)
-    public static Capability<IDifficultySource> INSTANCE = null;
+    public static Capability<IDifficultySource> INSTANCE = CapabilityManager.get(new CapabilityToken<>() {});;
 
     public static ResourceLocation NAME = ScalingHealth.getId("difficulty_source");
     private static IDifficultySource overworldCap = null;
@@ -81,9 +80,5 @@ public class DifficultySourceCapability implements IDifficultySource, ICapabilit
             return false;
         }
         return obj instanceof Player || (obj instanceof ServerLevel && ((ServerLevel) obj).dimension().equals(Level.OVERWORLD));
-    }
-
-    public static void register() {
-        CapabilityManager.INSTANCE.register(IDifficultySource.class);
     }
 }

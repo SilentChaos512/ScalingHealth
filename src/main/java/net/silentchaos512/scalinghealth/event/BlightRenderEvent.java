@@ -31,8 +31,8 @@ public class BlightRenderEvent {
    public static void renderBlight(RenderLivingEvent<Mob, ? extends EntityModel<? extends Mob>> event) {
       LivingEntity entity = event.getEntity();
       if(EnabledFeatures.shouldRenderBlights() && entity instanceof Mob && SHDifficulty.affected(entity).isBlight()){
-         PoseStack stack = event.getMatrixStack();
-         int light = event.getLight();
+         PoseStack stack = event.getPoseStack();
+         int light = event.getPackedLight();
          Mob mob = (Mob) entity;
 
          stack.pushPose();
@@ -50,7 +50,7 @@ public class BlightRenderEvent {
          stack.translate(0, 0, hwRatio * 0.02f);
          int i = 0;
 
-         VertexConsumer vertexBuilder = event.getBuffers().getBuffer(RENDER_TYPE);
+         VertexConsumer vertexBuilder = event.getMultiBufferSource().getBuffer(RENDER_TYPE);
          Matrix4f matrix4f = stack.last().pose();
          Matrix3f matrix3f = stack.last().normal();
 

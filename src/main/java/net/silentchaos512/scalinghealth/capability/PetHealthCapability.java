@@ -14,8 +14,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class PetHealthCapability implements IPetData, ICapabilitySerializable<CompoundTag> {
-    @CapabilityInject(IPetData.class)
-    public static Capability<IPetData> INSTANCE = null;
+    public static Capability<IPetData> INSTANCE = CapabilityManager.get(new CapabilityToken<>() {});
     public static ResourceLocation NAME = ScalingHealth.getId("pet_health");
 
     private static final String NBT_HEALTH = "SHPetBonusHealth";
@@ -72,9 +71,5 @@ public class PetHealthCapability implements IPetData, ICapabilitySerializable<Co
             return false;
         }
         return obj instanceof TamableAnimal;
-    }
-
-    public static void register() {
-        CapabilityManager.INSTANCE.register(IPetData.class);
     }
 }

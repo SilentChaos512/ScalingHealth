@@ -6,6 +6,7 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
@@ -15,10 +16,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.silentchaos512.scalinghealth.capability.DifficultyAffectedCapability;
-import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
-import net.silentchaos512.scalinghealth.capability.PetHealthCapability;
-import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
+import net.silentchaos512.scalinghealth.capability.*;
 import net.silentchaos512.scalinghealth.command.ModCommands;
 import net.silentchaos512.scalinghealth.config.SHConfig;
 import net.silentchaos512.scalinghealth.loot.conditions.EntityGroupCondition;
@@ -52,7 +50,7 @@ public class ScalingHealth {
         SHConfig.register();
         Network.init();
 
-        modbus.addListener(this::commonSetup);
+        modbus.addListener(this::registerCaps);
         modbus.addListener(this::reloadConfig);
         modbus.addGenericListener(GlobalLootModifierSerializer.class, this::registerLootModSerializers);
 
@@ -64,11 +62,11 @@ public class ScalingHealth {
         Registry.register(Registry.LOOT_CONDITION_TYPE, EntityGroupCondition.NAME, new LootItemConditionType(new EntityGroupCondition.ThisSerializer()));
     }
 
-    private void commonSetup(FMLCommonSetupEvent event) {
-        DifficultyAffectedCapability.register();
-        DifficultySourceCapability.register();
-        PlayerDataCapability.register();
-        PetHealthCapability.register();
+    private void registerCaps(RegisterCapabilitiesEvent event) {
+        event.register(IDifficultyAffected.class);
+        event.register(IDifficultySource.class);
+        event.register(IPlayerData.class);
+        event.register(IPetData.class);
     }
 
     private void registerCommandsEvent(RegisterCommandsEvent event) {

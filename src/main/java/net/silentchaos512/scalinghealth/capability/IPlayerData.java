@@ -4,7 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fmllegacy.network.NetworkDirection;
+import net.minecraftforge.network.NetworkDirection;
 import net.silentchaos512.scalinghealth.event.PlayerBonusRegenHandler;
 import net.silentchaos512.scalinghealth.network.ClientSyncMessage;
 import net.silentchaos512.scalinghealth.network.Network;

@@ -17,8 +17,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class DifficultyAffectedCapability implements IDifficultyAffected, ICapabilitySerializable<CompoundTag> {
-    @CapabilityInject(IDifficultyAffected.class)
-    public static Capability<IDifficultyAffected> INSTANCE = null;
+    public static Capability<IDifficultyAffected> INSTANCE = CapabilityManager.get(new CapabilityToken<>() {});;
     public static ResourceLocation NAME = ScalingHealth.getId("difficulty_affected");
 
     private static final String NBT_BLIGHT = "Blight";
@@ -97,9 +96,5 @@ public class DifficultyAffectedCapability implements IDifficultyAffected, ICapab
         return entity instanceof Mob
                 && !entity.getCapability(INSTANCE).isPresent()
                 && SHMobs.allowsDifficultyChanges((Mob) entity);
-    }
-
-    public static void register() {
-        CapabilityManager.INSTANCE.register(IDifficultyAffected.class);
     }
 }
