@@ -49,22 +49,25 @@ public abstract class StatBoosterItem extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand handIn) {
         ItemStack stack = player.getItemInHand(handIn);
-        if(usedForPet){
-            if(world.isClientSide)  usedForPet = false;
+        if(usedForPet) {
+            if(world.isClientSide) usedForPet = false;
             return new InteractionResultHolder<>(InteractionResult.FAIL, stack);
         }
 
-        if (!world.isClientSide) {
-            final boolean statIncreaseAllowed = isStatIncreaseAllowed(player);
-            final int levelRequirement = getLevelCost(player);
 
-            // Does player have enough XP?
-            if (player.experienceLevel < levelRequirement) {
+        final boolean statIncreaseAllowed = isStatIncreaseAllowed(player);
+        final int levelRequirement = getLevelCost(player);
+
+        // Does player have enough XP?
+        if (player.experienceLevel < levelRequirement) {
+            if (world.isClientSide) {
                 String translationKey = "item.scalinghealth.stat_booster.notEnoughXP";
                 player.sendMessage(new TranslatableComponent(translationKey, levelRequirement), Util.NIL_UUID);
-                return new InteractionResultHolder<>(InteractionResult.PASS, stack);
             }
+            return new InteractionResultHolder<>(InteractionResult.PASS, stack);
+        }
 
+        if (!world.isClientSide) {
             // May be used as a healing item even if there is no stat increase
             final boolean consumed = shouldConsume(player);
             if (consumed) {

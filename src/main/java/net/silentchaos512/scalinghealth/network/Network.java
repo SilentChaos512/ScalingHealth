@@ -1,10 +1,10 @@
 package net.silentchaos512.scalinghealth.network;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.fmllegacy.network.FMLHandshakeHandler;
-import net.minecraftforge.fmllegacy.network.NetworkDirection;
-import net.minecraftforge.fmllegacy.network.NetworkRegistry;
-import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
+import net.minecraftforge.network.HandshakeHandler;
+import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.simple.SimpleChannel;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.client.ClientHandler;
 import org.apache.commons.lang3.tuple.Pair;
@@ -57,7 +57,7 @@ public final class Network {
         channel.messageBuilder(SimpleReply.class, 5, NetworkDirection.LOGIN_TO_SERVER)
                 .decoder(pb -> new SimpleReply())
                 .encoder((r, pb) -> {})
-                .consumer(FMLHandshakeHandler.indexFirst((handler, pkt, ctx) -> ctx.get().setPacketHandled(true)))
+                .consumer(HandshakeHandler.indexFirst((handler, pkt, ctx) -> ctx.get().setPacketHandled(true)))
                 .loginIndex(SimpleReply::getIdx, SimpleReply::setIdx)
                 .add();
     }

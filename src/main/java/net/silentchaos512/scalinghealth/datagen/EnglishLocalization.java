@@ -17,6 +17,8 @@ public class EnglishLocalization extends LanguageProvider {
 
         add(Registration.HEART_CRYSTAL_ORE.get(), "Heart Crystal Ore");
         add(Registration.POWER_CRYSTAL_ORE.get(), "Power Crystal Ore");
+        add(Registration.DEEPLSATE_HEART_CRYSTAL_ORE.get(), "Deepslate Heart Crystal Ore");
+        add(Registration.DEEPSLATE_POWER_CRYSTAL_ORE.get(), "Deepslate Power Crystal Ore");
 
         addCommand("outOfBounds", "Value must be between %s and %s");
         addCommand("valueOverMax", "%s / %s");

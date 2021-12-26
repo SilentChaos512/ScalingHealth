@@ -43,7 +43,25 @@ public class Registration {
             )
     );
 
+    public static final RegistryObject<Block> DEEPLSATE_HEART_CRYSTAL_ORE = BLOCKS.register("deepslate_heart_crystal_ore", () ->
+            new OreBlock(
+                    Block.Properties.of(Material.STONE)
+                            .strength(3, 15)
+                            .requiresCorrectToolForDrops(),
+                    UniformInt.of(1, 5)
+            )
+    );
+
     public static final RegistryObject<Block> POWER_CRYSTAL_ORE = BLOCKS.register("power_crystal_ore", () ->
+            new OreBlock(
+                    Block.Properties.of(Material.STONE)
+                            .strength(3, 15)
+                            .requiresCorrectToolForDrops(),
+                    UniformInt.of(1, 5)
+            )
+    );
+
+    public static final RegistryObject<Block> DEEPSLATE_POWER_CRYSTAL_ORE = BLOCKS.register("deepslate_power_crystal_ore", () ->
             new OreBlock(
                     Block.Properties.of(Material.STONE)
                             .strength(3, 15)
@@ -56,6 +74,11 @@ public class Registration {
             new BlockItem(HEART_CRYSTAL_ORE.get(), new Item.Properties().tab(ScalingHealth.SH)));
     public static final RegistryObject<Item> POWER_CRYSTAL_ORE_ITEM = ITEMS.register("power_crystal_ore", () ->
             new BlockItem(POWER_CRYSTAL_ORE.get(), new Item.Properties().tab(ScalingHealth.SH)));
+    public static final RegistryObject<Item> DEEPSLATE_HEART_CRYSTAL_ORE_ITEM = ITEMS.register("deepslate_heart_crystal_ore", () ->
+            new BlockItem(DEEPLSATE_HEART_CRYSTAL_ORE.get(), new Item.Properties().tab(ScalingHealth.SH)));
+    public static final RegistryObject<Item> DEEPSLATE_POWER_CRYSTAL_ORE_ITEM = ITEMS.register("deepslate_power_crystal_ore", () ->
+            new BlockItem(DEEPSLATE_POWER_CRYSTAL_ORE.get(), new Item.Properties().tab(ScalingHealth.SH)));
+
 
     //Crystals
     public static final RegistryObject<Item> HEART_CRYSTAL = ITEMS.register("heart_crystal", () ->

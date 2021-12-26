@@ -15,10 +15,14 @@ public class SHBlockTagsProvider extends BlockTagsProvider {
     protected void addTags() {
         this.tag(BlockTags.MINEABLE_WITH_PICKAXE)
                 .add(Registration.HEART_CRYSTAL_ORE.get())
-                .add(Registration.POWER_CRYSTAL_ORE.get());
+                .add(Registration.POWER_CRYSTAL_ORE.get())
+                .add(Registration.DEEPLSATE_HEART_CRYSTAL_ORE.get())
+                .add(Registration.DEEPSLATE_POWER_CRYSTAL_ORE.get());
 
         this.tag(BlockTags.NEEDS_IRON_TOOL)
                 .add(Registration.HEART_CRYSTAL_ORE.get())
-                .add(Registration.POWER_CRYSTAL_ORE.get());
+                .add(Registration.POWER_CRYSTAL_ORE.get())
+                .add(Registration.DEEPLSATE_HEART_CRYSTAL_ORE.get())
+                .add(Registration.DEEPSLATE_POWER_CRYSTAL_ORE.get());
     }
 }

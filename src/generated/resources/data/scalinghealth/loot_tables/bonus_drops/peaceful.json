@@ -46,8 +46,7 @@
         {
           "condition": "minecraft:killed_by_player"
         }
-      ],
-      "functions": []
+      ]
     },
     {
       "name": "difficulty_mutators",
@@ -72,8 +71,7 @@
           "chance": 0.015,
           "looting_multiplier": 0.025
         }
-      ],
-      "functions": []
+      ]
     },
     {
       "name": "blights",
@@ -126,8 +124,7 @@
         {
           "condition": "minecraft:killed_by_player"
         }
-      ],
-      "functions": []
+      ]
     }
   ]
 }

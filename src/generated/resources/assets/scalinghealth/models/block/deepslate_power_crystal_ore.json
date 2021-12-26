@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "scalinghealth:block/deepslate_power_crystal_ore"
+  }
+}

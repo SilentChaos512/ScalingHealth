@@ -2,6 +2,8 @@
   "replace": false,
   "values": [
     "scalinghealth:heart_crystal_ore",
-    "scalinghealth:power_crystal_ore"
+    "scalinghealth:power_crystal_ore",
+    "scalinghealth:deepslate_heart_crystal_ore",
+    "scalinghealth:deepslate_power_crystal_ore"
   ]
 }

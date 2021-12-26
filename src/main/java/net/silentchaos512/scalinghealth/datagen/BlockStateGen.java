@@ -15,6 +15,8 @@ public class BlockStateGen extends BlockStateProvider {
     protected void registerStatesAndModels() {
         simpleBlockAndBlockItem(Registration.HEART_CRYSTAL_ORE.get());
         simpleBlockAndBlockItem(Registration.POWER_CRYSTAL_ORE.get());
+        simpleBlockAndBlockItem(Registration.DEEPLSATE_HEART_CRYSTAL_ORE.get());
+        simpleBlockAndBlockItem(Registration.DEEPSLATE_POWER_CRYSTAL_ORE.get());
 
         simpleItem("bandages");
         simpleItem("chance_heart");

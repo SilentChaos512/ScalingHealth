@@ -44,8 +44,12 @@ public class LootTablesGenerator extends BaseLootTableGenerator {
     protected void addTables() {
         blockLootTables.put(Registration.HEART_CRYSTAL_ORE.get(),
                 createSilkTouchTable("heart_crystal_ore", Registration.HEART_CRYSTAL_ORE.get(), Registration.HEART_CRYSTAL_SHARD.get()));
+        blockLootTables.put(Registration.DEEPLSATE_HEART_CRYSTAL_ORE.get(),
+                createSilkTouchTable("deepslate_heart_crystal_ore", Registration.DEEPLSATE_HEART_CRYSTAL_ORE.get(), Registration.HEART_CRYSTAL_SHARD.get()));
         blockLootTables.put(Registration.POWER_CRYSTAL_ORE.get(),
                 createSilkTouchTable("power_crystal_ore", Registration.POWER_CRYSTAL_ORE.get(), Registration.POWER_CRYSTAL_SHARD.get()));
+        blockLootTables.put(Registration.DEEPSLATE_POWER_CRYSTAL_ORE.get(),
+                createSilkTouchTable("deepslate_power_crystal_ore", Registration.DEEPSLATE_POWER_CRYSTAL_ORE.get(), Registration.POWER_CRYSTAL_SHARD.get()));
 
         LootTable.Builder builder = LootTable.lootTable().withPool(
                 new LootPool.Builder()

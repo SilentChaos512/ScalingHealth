@@ -3,6 +3,15 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.0.0] - 2021-12-26
+- Updated to 1.18
+### Added
+- Deepslate variations for heart and power crystal ore
+- Deepslate versions spawn between -64 and 0, and should be as frequent as the stone ores of previous SH versions
+- Stone versions of ore spawn between 0 and ~36 and are rarer than previous versions
+### Fixed
+- Heart/Power crystal animation and particles would play on the client even when the level requirement was not met.
+
 ## [5.0.4] - 2021-08-14
 ### Fixed
 - Ores now mine faster with a pickaxe and require at least an iron one to drop
