@@ -167,7 +167,7 @@ artifacts {
 
 task zipUserStartPack(type: Zip) {
     archiveBaseName = 'user_start_pack'
-    archiveVersion = '1'
+    archiveVersion = '2'
 
     destinationDirectory = file('build/zips')
     from ('user_starter_pack')
@@ -213,7 +213,7 @@ curseforge {
 //            }
         }
         options {
-            debug = false
+            debug = true
         }
     }
 }
