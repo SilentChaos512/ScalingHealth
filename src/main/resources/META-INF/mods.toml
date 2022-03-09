@@ -10,17 +10,18 @@ authors="SilentChaos512"
     modId="scalinghealth"
     version="${file.jarVersion}"
     displayName="Scaling Health"
+    updateJSONURL="https://raw.githubusercontent.com/SilentChaos512/ScalingHealth/1.18/update.json"
     description='''Extra health and damage for players and mobs. Highly customizable difficulty system.'''
 [[dependencies.scalinghealth]]
     modId="forge"
     mandatory=true
-    versionRange="[39,)"
+    versionRange="[40,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.scalinghealth]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.18,1.19)"
+    versionRange="[1.18.2,1.19)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.scalinghealth]]

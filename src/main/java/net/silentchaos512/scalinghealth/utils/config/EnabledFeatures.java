@@ -26,7 +26,7 @@ public class EnabledFeatures {
     }
 
     public static boolean hpCrystalsOreGenEnabled() {
-        return SERVER.hpCrystalsOreGen.get() && healthCrystalEnabled();
+        return SERVER.hpCrystalsOreGen.get() && (healthCrystalEnabled() || healthCrystalRegenEnabled());
     }
 
     public static boolean powerCrystalsOreGenEnabled() {

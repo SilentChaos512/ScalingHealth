@@ -12,7 +12,7 @@ public final class SHMobs {
     private SHMobs() { throw new IllegalAccessError("Utility class"); }
 
     public static boolean allowsDifficultyChanges(Mob entity) {
-        return !EntityTags.DIFFICULTY_EXEMPT.contains(entity.getType());
+        return entity.getType().is(EntityTags.DIFFICULTY_EXEMPT);
     }
 
     public static double blightChance() {
@@ -20,7 +20,7 @@ public final class SHMobs {
     }
 
     public static boolean canBecomeBlight(Mob entity) {
-        return EnabledFeatures.blightsEnabled() && !EntityTags.BLIGHT_EXEMPT.contains(entity.getType());
+        return EnabledFeatures.blightsEnabled() && !entity.getType().is(EntityTags.BLIGHT_EXEMPT);
     }
 
     public static boolean isBlight(Mob entity) {

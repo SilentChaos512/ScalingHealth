@@ -3,6 +3,7 @@ package net.silentchaos512.scalinghealth.utils.config;
 import com.mojang.datafixers.util.Pair;
 import com.udojava.evalex.Expression;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -12,6 +13,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.silentchaos512.lib.util.MCMathUtils;
 import net.silentchaos512.scalinghealth.capability.DifficultyAffectedCapability;
@@ -96,7 +98,10 @@ public final class SHDifficulty {
     }
 
     public static double locationMultiplier(Level world, BlockPos pos) {
-        return SHMechanicListener.getDifficultyMechanics().multipliers.getScale(world, world.getBiome(pos));
+        Holder<Biome> biome = world.getBiome(pos);
+        if (!biome.isBound())
+            return 1;
+        return SHMechanicListener.getDifficultyMechanics().multipliers.getScale(world, world.getBiome(pos).value());
     }
 
     //TODO Can't be checked on the ClientWorld, have to send packet (for debug overlay)
