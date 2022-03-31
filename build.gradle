@@ -208,9 +208,9 @@ curseforge {
                     optionalDependency 'configured'
                 }
             }
-            addArtifact(zipUserStartPack) {
-                releaseType = 'release'
-            }
+//            addArtifact(zipUserStartPack) {
+//                releaseType = 'release'
+//            }
         }
         options {
             debug = true
