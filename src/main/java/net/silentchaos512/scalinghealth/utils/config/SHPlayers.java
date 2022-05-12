@@ -41,8 +41,7 @@ public final class SHPlayers {
    }
 
    public static double maxAttackDamage() {
-      double value = SHMechanicListener.getPlayerMechanics().maxAttackDamage;
-      return Math.max(0, value);
+      return SHMechanicListener.getPlayerMechanics().maxAttackDamage;
    }
 
    public static int maxPowerCrystals() {

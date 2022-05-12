@@ -5,7 +5,7 @@
   "setOnDeath": "maxHealth",
   "levelsPerHp": 10,
   "hpPerLevel":  1,
-  "maxAttackDamage" : 10,
+  "maxAttackDamage" : 50,
   "regen" : {
     "initialDelay": 20,
     "tickDelay": 5,

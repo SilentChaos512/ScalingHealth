@@ -18,10 +18,13 @@
 
 package net.silentchaos512.scalinghealth.event;
 
+import net.minecraft.client.Game;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -53,6 +56,9 @@ public final class PlayerBonusRegenHandler {
         if (event.side == LogicalSide.CLIENT) return;
 
         Player player = event.player;
+        if (isDisabled(player.level))
+            return;
+
         PlayerMechanics.RegenMechanics config = SHMechanicListener.getPlayerMechanics().regenMechanics;
 
         UUID uuid = player.getUUID();
@@ -77,6 +83,9 @@ public final class PlayerBonusRegenHandler {
     @SubscribeEvent
     public static void onPlayerHurt(LivingHurtEvent event) {
         LivingEntity entity = event.getEntityLiving();
+        if (isDisabled(entity.level))
+            return;
+
         if (!entity.level.isClientSide && entity instanceof Player) {
             TIMERS.put(entity.getUUID(), (int) (SHMechanicListener.getPlayerMechanics().regenMechanics.initialDelay * 20));
         }
@@ -102,8 +111,7 @@ public final class PlayerBonusRegenHandler {
             return false;
         }
 
-        if (entity instanceof Player) {
-            Player player = (Player) entity;
+        if (entity instanceof Player player) {
             int food = player.getFoodData().getFoodLevel();
             if (food < config.minFood || food > config.maxFood) {
                 return false;
@@ -112,5 +120,9 @@ public final class PlayerBonusRegenHandler {
 
         float health = entity.getHealth();
         return health >= config.regenMinHealth && health <= config.regenMaxHealth;
+    }
+
+    private static boolean isDisabled(Level level) {
+        return !level.getGameRules().getBoolean(GameRules.RULE_NATURAL_REGENERATION);
     }
 }

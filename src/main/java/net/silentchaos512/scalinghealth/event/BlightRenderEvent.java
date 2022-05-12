@@ -25,15 +25,17 @@ import net.silentchaos512.scalinghealth.utils.config.SHDifficulty;
 public class BlightRenderEvent {
    private static final float FIRE_SCALE = 1.8F;
    private static final ResourceLocation TEXTURE = ScalingHealth.getId("textures/entity/blightfire.png");
-   private static final RenderType RENDER_TYPE = RenderType.entityCutout(TEXTURE);
+   private static RenderType RENDER_TYPE;
 
    @SubscribeEvent
    public static void renderBlight(RenderLivingEvent<Mob, ? extends EntityModel<? extends Mob>> event) {
+      if (RENDER_TYPE == null)
+         RENDER_TYPE = RenderType.entityCutout(TEXTURE);
+
       LivingEntity entity = event.getEntity();
-      if(EnabledFeatures.shouldRenderBlights() && entity instanceof Mob && SHDifficulty.affected(entity).isBlight()){
+      if(EnabledFeatures.shouldRenderBlights() && entity instanceof Mob mob && SHDifficulty.affected(entity).isBlight()){
          PoseStack stack = event.getPoseStack();
          int light = event.getPackedLight();
-         Mob mob = (Mob) entity;
 
          stack.pushPose();
          float w = mob.getBbWidth() * FIRE_SCALE;

@@ -58,10 +58,7 @@ public final class ModifierHandler {
         }
     }
 
-    @SuppressWarnings("ConstantConditions")
     public static void addAttackDamage(LivingEntity entity, double amount, AttributeModifier.Operation op) {
-        String modNamespace = entity.getType().getRegistryName().getNamespace();
-        if (!SHDifficulty.getDamageBlacklistedMods().contains(modNamespace))
-            setModifier(entity, Attributes.ATTACK_DAMAGE, MODIFIER_ID_DAMAGE, MODIFIER_NAME_DAMAGE, amount, op);
+        setModifier(entity, Attributes.ATTACK_DAMAGE, MODIFIER_ID_DAMAGE, MODIFIER_NAME_DAMAGE, amount, op);
     }
 }

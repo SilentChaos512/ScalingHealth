@@ -21,7 +21,7 @@ public class PowerCrystal extends StatBoosterItem {
     @Override
     protected boolean isStatIncreaseAllowed(Player player) {
         return EnabledFeatures.powerCrystalEnabled() &&
-                SHPlayers.getPlayerData(player).getPowerCrystals() * SHItems.powerCrystalIncreaseAmount() < SHPlayers.maxAttackDamage();
+                SHPlayers.getPlayerData(player).getPowerCrystals() * SHItems.powerCrystalIncreaseAmount() <= SHPlayers.maxAttackDamage();
     }
 
     @Override

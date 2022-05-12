@@ -16,7 +16,7 @@ public class ItemMechanics {
                     SerializationUtils.positiveInt().fieldOf("heartCrystalLevelCost").forGetter(i -> i.heartCrystalLevelCost),
                     SerializationUtils.positiveInt().fieldOf("heartCrystalHealthIncrease").forGetter(i -> i.heartCrystalHealthIncrease),
                     SerializationUtils.positiveInt().fieldOf("powerCrystalLevelCost").forGetter(i -> i.powerCrystalLevelCost),
-                    SerializationUtils.positiveDouble().fieldOf("heartCrystalBonusRegen").forGetter(i -> i.heartCrystalBonusRegen)
+                    SerializationUtils.positiveDouble().fieldOf("powerCrystalDamageIncrease").forGetter(i -> i.powerCrystalDamageIncrease)
             ).apply(inst, ItemMechanics::new)
     );
 

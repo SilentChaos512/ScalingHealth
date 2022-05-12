@@ -12,7 +12,7 @@ public final class SHMobs {
     private SHMobs() { throw new IllegalAccessError("Utility class"); }
 
     public static boolean allowsDifficultyChanges(Mob entity) {
-        return entity.getType().is(EntityTags.DIFFICULTY_EXEMPT);
+        return !entity.getType().is(EntityTags.DIFFICULTY_EXEMPT);
     }
 
     public static double blightChance() {

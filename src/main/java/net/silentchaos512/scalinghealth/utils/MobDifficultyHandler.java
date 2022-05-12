@@ -3,6 +3,7 @@ package net.silentchaos512.scalinghealth.utils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -103,7 +104,9 @@ public final class MobDifficultyHandler {
                 damageBoost = Mth.clamp(damageBoost, 0, max);
             }
 
-            ModifierHandler.addAttackDamage(entity, damageBoost, AttributeModifier.Operation.ADDITION);
+            ResourceLocation loc = entity.getType().getRegistryName();
+            if (loc != null && !SHDifficulty.getDamageBlacklistedMods().contains(loc.getNamespace()))
+                ModifierHandler.addAttackDamage(entity, damageBoost, AttributeModifier.Operation.ADDITION);
         }
     }
 }

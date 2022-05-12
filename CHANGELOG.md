@@ -3,6 +3,15 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [6.2.1] - 2022-05-12
+### Fixed
+- Difficulty exempt now works properly instead of being inverted (fixes mob hp not scaling)
+- Fix power crystal increasing difficulty based on wrong config (default 4)
+- "Fixed" default max on power crystal damage increase from 10 to 50. By default it requires 100 crystals to get the max
+- Fixed seemingly random crash on load.
+### Added
+- SH's additional natural regen will now no longer work if the vanilla natural regen gamerule is disabled.
+
 ## [6.2.0] - 2022-03-30
 - Updated to Forge version 40.0.18+
 
