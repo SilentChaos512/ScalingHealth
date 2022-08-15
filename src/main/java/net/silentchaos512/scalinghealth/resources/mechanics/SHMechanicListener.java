@@ -9,10 +9,14 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.SimpleJsonResourceReloadListener;
 import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.client.MechanicsHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,15 +32,11 @@ public class SHMechanicListener extends SimpleJsonResourceReloadListener {
     public static final Logger LOGGER = LogManager.getLogger("SHMechanicsListener");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     public static final String FOLDER = "sh_mechanics";
-    private PlayerMechanics playerMechanics;
-    private ItemMechanics itemMechanics;
-    private MobMechanics mobMechanics;
-    private DifficultyMechanics difficultyMechanics;
-    private DamageScalingMechanics damageScalingMechanics;
+    private SHMechanics shMechanics;
 
-    public SHMechanicListener(boolean server) {
+    public SHMechanicListener() {
         super(GSON, FOLDER);
-        if (!server || currentInstance == null)
+        if (currentInstance == null)
             currentInstance = this;
         else
             reloadingInstance = this;
@@ -49,16 +49,17 @@ public class SHMechanicListener extends SimpleJsonResourceReloadListener {
                 .map(Map.Entry::getValue)
                 .findAny().orElse(JsonNull.INSTANCE);
 
-        this.playerMechanics = PlayerMechanics.CODEC.parse(JsonOps.INSTANCE, getter.apply(PlayerMechanics.FILE))
+        var player = PlayerMechanics.CODEC.parse(JsonOps.INSTANCE, getter.apply(PlayerMechanics.FILE))
                 .getOrThrow(false, prefix("PlayerMechanics: "));
-        this.itemMechanics = ItemMechanics.CODEC.parse(JsonOps.INSTANCE, getter.apply(ItemMechanics.FILE))
+        var item = ItemMechanics.CODEC.parse(JsonOps.INSTANCE, getter.apply(ItemMechanics.FILE))
                 .getOrThrow(false, prefix("ItemMechanics: "));
-        this.mobMechanics = MobMechanics.CODEC.parse(JsonOps.INSTANCE, getter.apply(MobMechanics.FILE))
+        var mob = MobMechanics.CODEC.parse(JsonOps.INSTANCE, getter.apply(MobMechanics.FILE))
                 .getOrThrow(false, prefix("MobMechanics: "));
-        this.difficultyMechanics = DifficultyMechanics.CODEC.parse(JsonOps.INSTANCE, getter.apply(DifficultyMechanics.FILE))
+        var difficulty = DifficultyMechanics.CODEC.parse(JsonOps.INSTANCE, getter.apply(DifficultyMechanics.FILE))
                 .getOrThrow(false, prefix("DifficultyMechanics: "));
-        this.damageScalingMechanics = DamageScalingMechanics.CODEC.parse(JsonOps.INSTANCE, getter.apply(DamageScalingMechanics.FILE))
+        var ds = DamageScalingMechanics.CODEC.parse(JsonOps.INSTANCE, getter.apply(DamageScalingMechanics.FILE))
                 .getOrThrow(false, prefix("DamageScalingMechanics: "));
+        this.shMechanics = new SHMechanics(player, item, mob, difficulty, ds);
         LOGGER.debug("Finished Parsing SH Config!");
 
         if (this == reloadingInstance) {
@@ -67,48 +68,18 @@ public class SHMechanicListener extends SimpleJsonResourceReloadListener {
         }
     }
 
-    public static SHMechanicListener getInstance() {
+    static SHMechanics getInstance() {
         if (currentInstance == null)
             throw new RuntimeException("Tried to access SHMechanicsListener too early!");
-        return currentInstance;
+        return currentInstance.shMechanics;
     }
 
     private static Consumer<String> prefix(String pre) {
         return s -> LOGGER.error(pre + s);
     }
 
-    public static PlayerMechanics getPlayerMechanics() {
-        return getInstance().playerMechanics;
-    }
-
-    public static ItemMechanics getItemMechanics() {
-        return getInstance().itemMechanics;
-    }
-
-    public static MobMechanics getMobMechanics() {
-        return getInstance().mobMechanics;
-    }
-
-    public static DifficultyMechanics getDifficultyMechanics() {
-        return getInstance().difficultyMechanics;
-    }
-
-    public static DamageScalingMechanics getDamageScalingMechanics() {
-        return getInstance().damageScalingMechanics;
-    }
-
-    public static void setClientInstance(PlayerMechanics playerMechanics, ItemMechanics itemMechanics, MobMechanics mobMechanics, DifficultyMechanics difficultyMechanics, DamageScalingMechanics damageScalingMechanics) {
-        new SHMechanicListener(false);
-        currentInstance.playerMechanics = playerMechanics;
-        currentInstance.itemMechanics = itemMechanics;
-        currentInstance.mobMechanics = mobMechanics;
-        currentInstance.difficultyMechanics = difficultyMechanics;
-        currentInstance.damageScalingMechanics = damageScalingMechanics;
-        ScalingHealth.LOGGER.debug("Loaded SHMechanics on the client.");
-    }
-
     @SubscribeEvent
     public static void addListener(AddReloadListenerEvent event) {
-        event.addListener(new SHMechanicListener(true));
+        event.addListener(new SHMechanicListener());
     }
 }

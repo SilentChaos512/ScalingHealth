@@ -1,5 +1,6 @@
 package net.silentchaos512.scalinghealth.resources.mechanics;
 
+import com.google.common.base.Suppliers;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
@@ -10,6 +11,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.scalinghealth.utils.mode.AreaDifficultyMode;
+import net.silentchaos512.scalinghealth.utils.mode.AreaDifficultyModes;
 import net.silentchaos512.scalinghealth.utils.serialization.SerializationUtils;
 
 import java.util.Collections;
@@ -56,6 +58,36 @@ public class DifficultyMechanics {
     public final boolean sleepWarningMessage;
     public final Multipliers multipliers;
     public final Mutators mutators;
+
+    private static final Supplier<Expression> DEFAULT_EXPRESSION = Suppliers.memoize(() -> new Expression("difficulty"));
+    private static final Mutators DEFAULT_MUTATORS = new Mutators(
+            DEFAULT_EXPRESSION,
+            DEFAULT_EXPRESSION,
+            DEFAULT_EXPRESSION,
+            DEFAULT_EXPRESSION,
+            DEFAULT_EXPRESSION,
+            DEFAULT_EXPRESSION,
+            Collections.emptyList()
+    );
+
+    private static final Multipliers DEFAULT_MULTIPLIERS = new Multipliers(
+            Collections.emptyList(),
+            Collections.emptyList()
+    );
+
+    public static final DifficultyMechanics DEFAULT = new DifficultyMechanics(
+            new SerializationUtils.NumberConstraint<>(0D, 0D, 250D),
+            0.0011575,
+            new AreaDifficultyModes.DistanceAndTime(new AreaDifficultyModes.Average(256, true), new AreaDifficultyModes.Distance(0.0025, false)),
+            () -> new Expression("1 + 0.05 * (areaPlayerCount - 1)"),
+            128,
+            0.5,
+            true,
+            120,
+            true,
+            DEFAULT_MULTIPLIERS,
+            DEFAULT_MUTATORS
+    );
 
     public DifficultyMechanics(SerializationUtils.NumberConstraint<Double, Double, Double> nc, double changePerSecond, AreaDifficultyMode mode, Supplier<Expression> groupBonus, int groupBonusRadius, double idleMultiplier, boolean afkMessage, int timeBeforeAfk, boolean sleepWarningMessage, Multipliers multipliers, Mutators mutators) {
         this.starting = nc.starting;
@@ -163,7 +195,13 @@ public class DifficultyMechanics {
         }
     }
 
-    public static class Mutators {
+    public record Mutators(Supplier<Expression> onBlightKilled,
+                           Supplier<Expression> onHostileKilled,
+                           Supplier<Expression> onPeacefulKilled,
+                           Supplier<Expression> onPlayerKilled,
+                           Supplier<Expression> onPlayerDeath,
+                           Supplier<Expression> onPlayerSleep,
+                           List<Pair<List<ResourceLocation>, Supplier<Expression>>> byEntity) {
         private static final Function<ResourceLocation, DataResult<ResourceLocation>> ONLY_ENTITES = rl ->
                 ForgeRegistries.ENTITIES.containsKey(rl) ? DataResult.success(rl) : DataResult.error(rl + " is not an entity!");
 
@@ -182,22 +220,5 @@ public class DifficultyMechanics {
                 ).apply(inst, Mutators::new)
         );
 
-        public final Supplier<Expression> onBlightKilled;
-        public final Supplier<Expression> onHostileKilled;
-        public final Supplier<Expression> onPeacefulKilled;
-        public final Supplier<Expression> onPlayerKilled;
-        public final Supplier<Expression> onPlayerDeath;
-        public final Supplier<Expression> onPlayerSleep;
-        public final List<Pair<List<ResourceLocation>, Supplier<Expression>>> byEntity;
-
-        public Mutators(Supplier<Expression> onBlightKilled, Supplier<Expression> onHostileKilled, Supplier<Expression> onPeacefulKilled, Supplier<Expression> onPlayerKilled, Supplier<Expression> onPlayerDeath, Supplier<Expression> onPlayerSleep, List<Pair<List<ResourceLocation>, Supplier<Expression>>> byEntity) {
-            this.onBlightKilled = onBlightKilled;
-            this.onHostileKilled = onHostileKilled;
-            this.onPeacefulKilled = onPeacefulKilled;
-            this.onPlayerKilled = onPlayerKilled;
-            this.onPlayerDeath = onPlayerDeath;
-            this.onPlayerSleep = onPlayerSleep;
-            this.byEntity = byEntity;
-        }
     }
 }

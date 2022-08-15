@@ -4,7 +4,9 @@ import net.minecraft.world.entity.player.Player;
 import net.silentchaos512.scalinghealth.capability.IPlayerData;
 import net.silentchaos512.scalinghealth.capability.PlayerDataCapability;
 import net.silentchaos512.scalinghealth.config.EvalVars;
+import net.silentchaos512.scalinghealth.resources.mechanics.PlayerMechanics;
 import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanicListener;
+import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanics;
 import net.silentchaos512.utils.MathUtils;
 
 /**
@@ -14,20 +16,24 @@ import net.silentchaos512.utils.MathUtils;
 public final class SHPlayers {
    private SHPlayers() {throw new IllegalAccessError("Utility class");}
 
+   private static PlayerMechanics getMechanics() {
+      return SHMechanics.getMechanics().playerMechanics();
+   }
+
    public static IPlayerData getPlayerData(Player entity) {
       return entity.getCapability(PlayerDataCapability.INSTANCE).orElseThrow(() -> new IllegalStateException("Could not access capability"));
    }
 
    public static int startingHealth() {
-      return SHMechanicListener.getPlayerMechanics().startingHp;
+      return getMechanics().startingHp;
    }
 
    public static int minHealth() {
-      return SHMechanicListener.getPlayerMechanics().minHealth;
+      return getMechanics().minHealth;
    }
 
    public static int maxHealth() {
-      return SHMechanicListener.getPlayerMechanics().maxHealth;
+      return getMechanics().maxHealth;
    }
 
    public static int minHeartCrystals() {
@@ -41,7 +47,7 @@ public final class SHPlayers {
    }
 
    public static double maxAttackDamage() {
-      return SHMechanicListener.getPlayerMechanics().maxAttackDamage;
+      return getMechanics().maxAttackDamage;
    }
 
    public static int maxPowerCrystals() {
@@ -68,19 +74,19 @@ public final class SHPlayers {
    }
 
    public static int getCrystalsAfterDeath(Player player) {
-      float healthDifference =  player.getMaxHealth() - MathUtils.clamp((int) EvalVars.apply(player, SHMechanicListener.getPlayerMechanics().healthOnDeath.get()), minHealth(), maxHealth());
+      float healthDifference =  player.getMaxHealth() - MathUtils.clamp((int) EvalVars.apply(player, getMechanics().healthOnDeath.get()), minHealth(), maxHealth());
       int crystalDifference = (int) healthDifference / (2 * SHItems.heartCrystalIncreaseAmount());
       return getPlayerData(player).getHeartCrystals() - crystalDifference;
    }
 
    //Amount of levels needed for an hp increase.
    public static int levelsPerHp() {
-      return SHMechanicListener.getPlayerMechanics().levelsPerHp;
+      return getMechanics().levelsPerHp;
    }
 
    //amount of hp obtained for an hp increase from levels.
    public static int hpPerLevel() {
-      return SHMechanicListener.getPlayerMechanics().hpPerLevel;
+      return getMechanics().hpPerLevel;
    }
 
    public static int fullHeartsFromXp(int levels) {

@@ -22,6 +22,7 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IPlayerData;
 import net.silentchaos512.scalinghealth.capability.PetHealthCapability;
 import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanicListener;
+import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanics;
 import net.silentchaos512.scalinghealth.utils.ParticleUtils;
 import net.silentchaos512.scalinghealth.utils.SoundUtils;
 import net.silentchaos512.scalinghealth.utils.config.SHPlayers;
@@ -99,7 +100,7 @@ public abstract class StatBoosterItem extends Item {
         }
 
         usedForPet = true;
-        pet.getCapability(PetHealthCapability.INSTANCE).ifPresent(data -> data.addHealth(SHMechanicListener.getMobMechanics().pets.petsHealthCrystalGain, pet));
+        pet.getCapability(PetHealthCapability.INSTANCE).ifPresent(data -> data.addHealth(SHMechanics.getMechanics().mobMechanics().pets().petsHealthCrystalGain(), pet));
         stack.shrink(1);
         consumeLevels(player, levelRequirement);
         player.awardStat(Stats.ITEM_USED.get(this));

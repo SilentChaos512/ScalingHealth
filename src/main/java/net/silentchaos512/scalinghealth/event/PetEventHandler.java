@@ -28,13 +28,14 @@ import net.minecraftforge.fml.common.Mod;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.objects.item.HeartCrystal;
 import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanicListener;
+import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanics;
 import net.silentchaos512.scalinghealth.utils.config.EnabledFeatures;
 
 @Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class PetEventHandler {
     @SubscribeEvent
     public static void onLivingUpdate(LivingUpdateEvent event) {
-        double regenDelay = SHMechanicListener.getMobMechanics().pets.petsRegenDelay;
+        double regenDelay = SHMechanics.getMechanics().mobMechanics().pets().petsRegenDelay();
         if (regenDelay <= 0)
             return;
 

@@ -41,6 +41,7 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.network.ClientBlightMessage;
 import net.silentchaos512.scalinghealth.network.Network;
 import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanicListener;
+import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanics;
 import net.silentchaos512.scalinghealth.utils.config.SHDifficulty;
 import net.silentchaos512.scalinghealth.utils.config.SHMobs;
 
@@ -49,14 +50,13 @@ public final class BlightHandler {
     private BlightHandler() {}
 
     public static void applyBlightPotionEffects(Mob entity) {
-        SHMechanicListener.getMobMechanics().blight.blightEffects.forEach(e -> e.apply(entity, SHDifficulty.getDifficultyOf(entity)));
+        SHMechanics.getMechanics().mobMechanics().blight().blightEffects().forEach(e -> e.apply(entity, SHDifficulty.getDifficultyOf(entity)));
     }
 
     private static void notifyPlayers(Component deathMessage, Mob blight, Player slayer){
-        if (deathMessage instanceof TranslatableComponent) {
+        if (deathMessage instanceof TranslatableComponent original) {
             // Assuming arguments are the same as in DamageSource#getDeathMessage
             // May fail with some modded damage sources, but should be fine in most cases
-            TranslatableComponent original = (TranslatableComponent) deathMessage;
 
             TextComponent s = new TextComponent("Blight " + blight.getName().getString());
             s.setStyle(Style.EMPTY.withColor(ChatFormatting.DARK_PURPLE));

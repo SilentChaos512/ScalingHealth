@@ -35,6 +35,7 @@ import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.SHConfig;
 import net.silentchaos512.scalinghealth.resources.mechanics.DamageScalingMechanics;
 import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanicListener;
+import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanics;
 import net.silentchaos512.scalinghealth.utils.EntityGroup;
 import net.silentchaos512.scalinghealth.utils.config.EnabledFeatures;
 import net.silentchaos512.scalinghealth.utils.config.SHDifficulty;
@@ -69,12 +70,12 @@ public final class DamageScaling {
         if (source == null) return;
 
         // Get scaling factor from map, if it exists. Otherwise, use the generic scale.
-        float scale = SHMechanicListener.getDamageScalingMechanics().scales
+        float scale = SHMechanics.getMechanics().damageScalingMechanics().scales
                 .stream()
                 .filter(p -> p.getFirst().contains(source.getMsgId()))
                 .map(Pair::getSecond)
                 .reduce((s1, s2) -> s1 * s2)
-                .orElseGet(() -> SHMechanicListener.getDamageScalingMechanics().genericScale)
+                .orElseGet(() -> SHMechanics.getMechanics().damageScalingMechanics().genericScale)
                 .floatValue();
 
         // Get the amount of the damage to affect. Can be many times the base value.
@@ -99,7 +100,7 @@ public final class DamageScaling {
     }
 
     private static double getEffectScale(LivingEntity entity) {
-        DamageScalingMechanics config = SHMechanicListener.getDamageScalingMechanics();
+        DamageScalingMechanics config = SHMechanics.getMechanics().damageScalingMechanics();
         Mode mode = config.mode;
         switch (mode) {
             case AREA_DIFFICULTY:

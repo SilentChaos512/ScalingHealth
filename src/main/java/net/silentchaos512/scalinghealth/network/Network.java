@@ -20,9 +20,9 @@ public final class Network {
 
     public static void init() {
         channel = NetworkRegistry.ChannelBuilder.named(NAME)
-                .clientAcceptedVersions(s -> Objects.equals(s, "2"))
-                .serverAcceptedVersions(s -> Objects.equals(s, "2"))
-                .networkProtocolVersion(() -> "2")
+                .clientAcceptedVersions(s -> Objects.equals(s, "3"))
+                .serverAcceptedVersions(s -> Objects.equals(s, "3"))
+                .networkProtocolVersion(() -> "3")
                 .simpleChannel();
 
         channel.messageBuilder(ClientSyncMessage.class, 1)
@@ -43,39 +43,10 @@ public final class Network {
                 .consumer(ClientBlightMessage::handle)
                 .add();
 
-        channel.messageBuilder(SHMechanicsPacket.class, 4, NetworkDirection.LOGIN_TO_CLIENT)
+        channel.messageBuilder(SHMechanicsPacket.class, 4)
                 .decoder(SHMechanicsPacket::decode)
                 .encoder(SHMechanicsPacket::encode)
                 .consumer(SHMechanicsPacket::handle)
-                //from #markAsLoginPacket but modified to not send anything on local connections
-                .buildLoginPacketList(isLocal -> isLocal ? Collections.emptyList() :
-                        Collections.singletonList(Pair.of(SHMechanicsPacket.class.getName(), new SHMechanicsPacket()))
-                )
-                .loginIndex(SHMechanicsPacket::getLoginIdx, SHMechanicsPacket::setLoginIdx)
                 .add();
-
-        channel.messageBuilder(SimpleReply.class, 5, NetworkDirection.LOGIN_TO_SERVER)
-                .decoder(pb -> new SimpleReply())
-                .encoder((r, pb) -> {})
-                .consumer(HandshakeHandler.indexFirst((handler, pkt, ctx) -> ctx.get().setPacketHandled(true)))
-                .loginIndex(SimpleReply::getIdx, SimpleReply::setIdx)
-                .add();
-    }
-
-    public static class SimpleReply implements IntSupplier {
-        private int idx;
-
-        @Override
-        public int getAsInt() {
-            return getIdx();
-        }
-
-        public int getIdx() {
-            return idx;
-        }
-
-        public void setIdx(int idx) {
-            this.idx = idx;
-        }
     }
 }

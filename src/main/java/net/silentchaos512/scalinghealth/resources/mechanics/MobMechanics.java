@@ -2,14 +2,28 @@ package net.silentchaos512.scalinghealth.resources.mechanics;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.silentchaos512.scalinghealth.utils.mode.MobHealthMode;
 import net.silentchaos512.scalinghealth.utils.serialization.DifficultyMobEffect;
 import net.silentchaos512.scalinghealth.utils.serialization.SerializationUtils;
 
+import java.util.Collections;
 import java.util.List;
 
-public class MobMechanics {
+public record MobMechanics(MobHealthMode mode,
+                           Generic generic,
+                           List<DifficultyMobEffect> mobEffects,
+                           Blight blight,
+                           Pets pets) {
     public static final String FILE = "mobs";
+
+    public static final MobMechanics DEFAULT = new MobMechanics(
+            new MobHealthMode(AttributeModifier.Operation.MULTIPLY_BASE, 0.5),
+            Generic.DEFAULT,
+            Collections.EMPTY_LIST,
+            Blight.DEFAULT,
+            Pets.DEFAULT
+    );
 
     public static final Codec<MobMechanics> CODEC = RecordCodecBuilder.create(inst ->
             inst.group(
@@ -21,21 +35,21 @@ public class MobMechanics {
             ).apply(inst, MobMechanics::new)
     );
 
-    public final MobHealthMode mode;
-    public final Generic generic;
-    public final List<DifficultyMobEffect> mobEffects;
-    public final Blight blight;
-    public final Pets pets;
+    public record Generic(double passiveMultiplier, double hostileMultiplier, double hostilePotionChance,
+                          double peacefulPotionChance, double damageBoostScale, double maxDamageBoost,
+                          double spawnerModifier, double xpBoost) {
 
-    public MobMechanics(MobHealthMode mode, Generic generic, List<DifficultyMobEffect> mobEffects, Blight blight, Pets pets) {
-        this.mode = mode;
-        this.generic = generic;
-        this.mobEffects = mobEffects;
-        this.blight = blight;
-        this.pets = pets;
-    }
+        public static final Generic DEFAULT = new Generic(
+                0.375,
+                0.375,
+                0.06,
+                0.005,
+                0.1,
+                10,
+                0.3,
+                0.03
+        );
 
-    public static class Generic {
         public static final Codec<Generic> CODEC = RecordCodecBuilder.create(inst ->
                 inst.group(
                         SerializationUtils.positiveDouble().fieldOf("passiveMultiplier").forGetter(g -> g.passiveMultiplier),
@@ -48,29 +62,20 @@ public class MobMechanics {
                         SerializationUtils.positiveDouble().fieldOf("xpBoost").forGetter(g -> g.xpBoost)
                 ).apply(inst, Generic::new)
         );
-
-        public final double passiveMultiplier;
-        public final double hostileMultiplier;
-        public final double hostilePotionChance;
-        public final double peacefulPotionChance;
-        public final double damageBoostScale;
-        public final double maxDamageBoost;
-        public final double spawnerModifier;
-        public final double xpBoost;
-
-        public Generic(double passiveMultiplier, double hostileMultiplier, double hostilePotionChance, double peacefulPotionChance, double damageBoostScale, double maxDamageBoost, double spawnerModifier, double xpBoost) {
-            this.passiveMultiplier = passiveMultiplier;
-            this.hostileMultiplier = hostileMultiplier;
-            this.hostilePotionChance = hostilePotionChance;
-            this.peacefulPotionChance = peacefulPotionChance;
-            this.damageBoostScale = damageBoostScale;
-            this.maxDamageBoost = maxDamageBoost;
-            this.spawnerModifier = spawnerModifier;
-            this.xpBoost = xpBoost;
-        }
     }
 
-    public static class Blight {
+    public record Blight(double blightChance, boolean notifyBlightDeath, double blightXpBoost,
+                         double blightDifficultyModifier,
+                         List<DifficultyMobEffect> blightEffects) {
+
+        public static final Blight DEFAULT = new Blight(
+                0.03,
+                true,
+                2,
+                1.7,
+                Collections.EMPTY_LIST
+        );
+
         public static final Codec<Blight> CODEC = RecordCodecBuilder.create(inst ->
                 inst.group(
                         SerializationUtils.positiveDouble().fieldOf("blightChance").forGetter(b -> b.blightChance),
@@ -81,35 +86,18 @@ public class MobMechanics {
                 ).apply(inst, Blight::new)
         );
 
-        public final double blightChance;
-        public final boolean notifyBlightDeath;
-        public final double blightXpBoost;
-        public final double blightDifficultyModifier;
-        public final List<DifficultyMobEffect> blightEffects;
-
-        public Blight(double blightChance, boolean notifyBlightDeath, double blightXpBoost, double blightDifficultyModifier, List<DifficultyMobEffect> blightEffects) {
-            this.blightChance = blightChance;
-            this.notifyBlightDeath = notifyBlightDeath;
-            this.blightXpBoost = blightXpBoost;
-            this.blightDifficultyModifier = blightDifficultyModifier;
-            this.blightEffects = blightEffects;
-        }
     }
 
-    public static class Pets {
+    public record Pets(int petsRegenDelay, int petsHealthCrystalGain) {
+        public static final Pets DEFAULT = new Pets(
+                30, 5
+        );
+
         public static final Codec<Pets> CODEC = RecordCodecBuilder.create(inst ->
                 inst.group(
                         SerializationUtils.positiveInt().fieldOf("petsRegenDelay").forGetter(p -> p.petsRegenDelay),
                         SerializationUtils.positiveInt().fieldOf("petsHealthCrystalGain").forGetter(p -> p.petsHealthCrystalGain)
                 ).apply(inst, Pets::new)
         );
-
-        public final int petsRegenDelay;
-        public final int petsHealthCrystalGain;
-
-        public Pets(int petsRegenDelay, int petsHealthCrystalGain) {
-            this.petsRegenDelay = petsRegenDelay;
-            this.petsHealthCrystalGain = petsHealthCrystalGain;
-        }
     }
 }

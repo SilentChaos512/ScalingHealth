@@ -79,4 +79,24 @@ public class PlayerMechanics {
             this.regenMaxHealth = regenMaxHealth;
         }
     }
+
+    private static final PlayerMechanics.RegenMechanics DEFAULT_REGEN = new PlayerMechanics.RegenMechanics(
+            20,
+            5,
+            0.1,
+            false,
+            10,
+            Integer.MAX_VALUE,
+            0,
+            Integer.MAX_VALUE
+    );
+
+    public static final PlayerMechanics DEFAULT = new PlayerMechanics(
+            new SerializationUtils.NumberConstraint<>(20, 2, 200),
+            () -> new Expression("maxHealth"),
+            50,
+            10,
+            1,
+            DEFAULT_REGEN
+    );
 }

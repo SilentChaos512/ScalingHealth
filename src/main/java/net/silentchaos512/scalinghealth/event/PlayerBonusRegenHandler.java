@@ -33,6 +33,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.resources.mechanics.PlayerMechanics;
 import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanicListener;
+import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanics;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,7 +60,7 @@ public final class PlayerBonusRegenHandler {
         if (isDisabled(player.level))
             return;
 
-        PlayerMechanics.RegenMechanics config = SHMechanicListener.getPlayerMechanics().regenMechanics;
+        PlayerMechanics.RegenMechanics config = SHMechanics.getMechanics().playerMechanics().regenMechanics;
 
         UUID uuid = player.getUUID();
 
@@ -87,12 +88,12 @@ public final class PlayerBonusRegenHandler {
             return;
 
         if (!entity.level.isClientSide && entity instanceof Player) {
-            TIMERS.put(entity.getUUID(), (int) (SHMechanicListener.getPlayerMechanics().regenMechanics.initialDelay * 20));
+            TIMERS.put(entity.getUUID(), (int) (SHMechanics.getMechanics().playerMechanics().regenMechanics.initialDelay * 20));
         }
     }
 
     private static float getHealTickAmount(LivingEntity entity) {
-        if (SHMechanicListener.getPlayerMechanics().regenMechanics.proportionaltoMaxHp) {
+        if (SHMechanics.getMechanics().playerMechanics().regenMechanics.proportionaltoMaxHp) {
             AttributeInstance attr = entity.getAttribute(Attributes.MAX_HEALTH);
             if (attr == null) {
                 ScalingHealth.LOGGER.warn("LivingEntity {} does not have a max hp attribute!", entity.getType().getRegistryName());
@@ -106,7 +107,7 @@ public final class PlayerBonusRegenHandler {
     }
 
     private static boolean isActive(LivingEntity entity) {
-        PlayerMechanics.RegenMechanics config = SHMechanicListener.getPlayerMechanics().regenMechanics;
+        PlayerMechanics.RegenMechanics config = SHMechanics.getMechanics().playerMechanics().regenMechanics;
         if (!entity.isAlive() || entity.getHealth() >= entity.getMaxHealth()) {
             return false;
         }

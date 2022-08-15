@@ -30,7 +30,7 @@ public final class ClientHandler {
 
     private ClientHandler() {}
 
-    public static void handleSyncMessage(ClientSyncMessage msg, Supplier<NetworkEvent.Context> ctx) {
+    public static boolean handleSyncMessage(ClientSyncMessage msg, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             playerDifficulty = msg.playerDifficulty;
             areaDifficulty = msg.areaDifficulty;
@@ -43,10 +43,10 @@ public final class ClientHandler {
                 player.experienceLevel = msg.experienceLevel;
             }
         });
-        ctx.get().setPacketHandled(true);
+        return true;
     }
 
-    public static void handleLoginMessage(ClientLoginMessage msg, Supplier<NetworkEvent.Context> ctx) {
+    public static boolean handleLoginMessage(ClientLoginMessage msg, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             ScalingHealth.LOGGER.info(MARKER, "Processing login packet");
             areaMode = msg.areaMode;
@@ -54,6 +54,6 @@ public final class ClientHandler {
             ScalingHealth.LOGGER.info(MARKER, "World area mode: {}", areaMode.getName());
             ScalingHealth.LOGGER.info(MARKER, "World max difficulty: {}", maxDifficultyValue);
         });
-        ctx.get().setPacketHandled(true);
+        return true;
     }
 }

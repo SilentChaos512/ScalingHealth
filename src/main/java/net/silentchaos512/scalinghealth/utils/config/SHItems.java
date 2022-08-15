@@ -1,42 +1,48 @@
 package net.silentchaos512.scalinghealth.utils.config;
 
 import net.minecraft.world.entity.player.Player;
+import net.silentchaos512.scalinghealth.resources.mechanics.ItemMechanics;
 import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanicListener;
+import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanics;
 
 public final class SHItems {
     private SHItems() { throw new IllegalAccessError("Utility Class"); }
 
+    private static ItemMechanics getMechanics() {
+        return SHMechanics.getMechanics().itemMechanics();
+    }
+
     public static int heartCrystalIncreaseAmount() {
-        return SHMechanicListener.getItemMechanics().heartCrystalHealthIncrease;
+        return getMechanics().heartCrystalHealthIncrease();
     }
 
     public static double heartCrystalHpBonusRegen() {
-        return SHMechanicListener.getItemMechanics().heartCrystalBonusRegen;
+        return getMechanics().heartCrystalBonusRegen();
     }
 
     public static double powerCrystalIncreaseAmount() {
-        return SHMechanicListener.getItemMechanics().powerCrystalDamageIncrease;
+        return getMechanics().powerCrystalDamageIncrease();
     }
 
     public static int levelCostToUseHeartCrystal(Player player) {
         if (player.isCreative()) return 0;
-        return SHMechanicListener.getItemMechanics().heartCrystalLevelCost;
+        return getMechanics().heartCrystalLevelCost();
     }
 
     public static int levelCostToUsePowerCrystal(Player player) {
         if (player.isCreative()) return 0;
-        return SHMechanicListener.getItemMechanics().powerCrystalLevelCost;
+        return getMechanics().powerCrystalLevelCost();
     }
 
     public static double cursedHeartAffectAmount() {
-        return SHMechanicListener.getItemMechanics().cursedHeartChange;
+        return getMechanics().cursedHeartChange();
     }
 
     public static double enchantedHeartAffectAmount() {
-        return SHMechanicListener.getItemMechanics().enchantedHeartChange;
+        return getMechanics().enchantedHeartChange();
     }
 
     public static int chanceHeartAffectAmount(){
-        return SHMechanicListener.getItemMechanics().chanceHeartChange;
+        return getMechanics().chanceHeartChange();
     }
 }

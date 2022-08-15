@@ -21,7 +21,9 @@ import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
 import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
 import net.silentchaos512.scalinghealth.capability.IDifficultySource;
 import net.silentchaos512.scalinghealth.config.EvalVars;
+import net.silentchaos512.scalinghealth.resources.mechanics.DifficultyMechanics;
 import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanicListener;
+import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanics;
 import net.silentchaos512.scalinghealth.utils.EntityGroup;
 import net.silentchaos512.scalinghealth.utils.mode.AreaDifficultyMode;
 import net.silentchaos512.utils.MathUtils;
@@ -35,6 +37,10 @@ import java.util.stream.Stream;
 
 public final class SHDifficulty {
     private SHDifficulty() {throw new IllegalAccessError("Utility class");}
+    
+    private static DifficultyMechanics getMechanics() {
+        return SHMechanics.getMechanics().difficultyMechanics(); // cache?
+    }
 
     public static IDifficultyAffected affected(ICapabilityProvider entity) {
         return entity.getCapability(DifficultyAffectedCapability.INSTANCE)
@@ -83,7 +89,7 @@ public final class SHDifficulty {
     }
 
     public static int groupSearchRadius() {
-        return SHMechanicListener.getDifficultyMechanics().groupBonusRadius;
+        return SHMechanics.getMechanics().difficultyMechanics().groupBonusRadius;
     }
 
     public static double areaDifficulty(Level world, BlockPos pos) {
@@ -101,22 +107,22 @@ public final class SHDifficulty {
         Holder<Biome> biome = world.getBiome(pos);
         if (!biome.isBound())
             return 1;
-        return SHMechanicListener.getDifficultyMechanics().multipliers.getScale(world, world.getBiome(pos).value());
+        return getMechanics().multipliers.getScale(world, world.getBiome(pos).value());
     }
 
     //TODO Can't be checked on the ClientWorld, have to send packet (for debug overlay)
     public static double lunarMultiplier(Level world) {
         return (world.dimension() != Level.OVERWORLD || world.isDay()) ? 1 :
-                SHMechanicListener.getDifficultyMechanics().multipliers
+                getMechanics().multipliers
                         .getLunarMultiplier(world.dimensionType().moonPhase(world.dayTime()));
     }
 
     public static double groupMultiplier(Level world, BlockPos pos) {
-        return EvalVars.apply(world, pos, null, SHMechanicListener.getDifficultyMechanics().groupBonus.get());
+        return EvalVars.apply(world, pos, null, getMechanics().groupBonus.get());
     }
 
     public static AreaDifficultyMode areaMode() {
-        return SHMechanicListener.getDifficultyMechanics().mode;
+        return getMechanics().mode;
     }
 
     public static double clamp(double difficulty) {
@@ -124,46 +130,46 @@ public final class SHDifficulty {
     }
 
     public static double minValue() {
-        return SHMechanicListener.getDifficultyMechanics().minValue;
+        return getMechanics().minValue;
     }
 
     public static double maxValue() {
-        return SHMechanicListener.getDifficultyMechanics().maxValue;
+        return getMechanics().maxValue;
     }
 
     public static double changePerSecond() {
-        return SHMechanicListener.getDifficultyMechanics().changePerSecond;
+        return getMechanics().changePerSecond;
     }
 
     public static double idleModifier() {
-        return SHMechanicListener.getDifficultyMechanics().idleMultiplier;
+        return getMechanics().idleMultiplier;
     }
 
     public static boolean afkMessage(){
-        return SHMechanicListener.getDifficultyMechanics().afkMessage;
+        return getMechanics().afkMessage;
     }
 
     public static double timeBeforeAfk() {
-        return SHMechanicListener.getDifficultyMechanics().timeBeforeAfk;
+        return getMechanics().timeBeforeAfk;
     }
 
     public static double getDifficultyAfterDeath(Player player) {
-        return EvalVars.apply(player, SHMechanicListener.getDifficultyMechanics().mutators.onPlayerDeath.get());
+        return EvalVars.apply(player, getMechanics().mutators.onPlayerDeath().get());
     }
 
     public static void applyKillMutator(LivingEntity killed, Player killer) {
         //check if player, if it is, no other mutator can apply
         if (killed instanceof Player) {
-            setSourceDifficulty(killer, EvalVars.apply(killer, SHMechanicListener.getDifficultyMechanics().mutators.onPlayerKilled.get()));
+            setSourceDifficulty(killer, EvalVars.apply(killer, getMechanics().mutators.onPlayerKilled().get()));
             return;
         }
 
         //check if blight, continue even if it to apply the base mutator
         if (affected(killed).isBlight())
-            setSourceDifficulty(killer, EvalVars.apply(killer, SHMechanicListener.getDifficultyMechanics().mutators.onBlightKilled.get()));
+            setSourceDifficulty(killer, EvalVars.apply(killer, getMechanics().mutators.onBlightKilled().get()));
 
         //check for entity specific mutators first
-        for (Pair<List<ResourceLocation>, Supplier<Expression>> p : SHMechanicListener.getDifficultyMechanics().mutators.byEntity) {
+        for (Pair<List<ResourceLocation>, Supplier<Expression>> p : getMechanics().mutators.byEntity()) {
             if (p.getFirst().contains(killed.getType().getRegistryName())) {
                 setSourceDifficulty(killer, EvalVars.apply(killer, p.getSecond().get()));
                 return;
@@ -172,21 +178,21 @@ public final class SHDifficulty {
 
         //finally fall back to categorising entity between peaceful and hostile
         if (EntityGroup.from(killed, true) == EntityGroup.PEACEFUL) {
-            setSourceDifficulty(killer, EvalVars.apply(killer, SHMechanicListener.getDifficultyMechanics().mutators.onPeacefulKilled.get()));
+            setSourceDifficulty(killer, EvalVars.apply(killer, getMechanics().mutators.onPeacefulKilled().get()));
         } else {
-            setSourceDifficulty(killer, EvalVars.apply(killer, SHMechanicListener.getDifficultyMechanics().mutators.onHostileKilled.get()));
+            setSourceDifficulty(killer, EvalVars.apply(killer, getMechanics().mutators.onHostileKilled().get()));
         }
     }
 
     public static double diffOnPlayerSleep(Player entity){
-        return EvalVars.apply(entity, SHMechanicListener.getDifficultyMechanics().mutators.onPlayerSleep.get());
+        return EvalVars.apply(entity, getMechanics().mutators.onPlayerSleep().get());
     }
 
     public static boolean sleepWarningMessage(){
-        return SHMechanicListener.getDifficultyMechanics().sleepWarningMessage;
+        return getMechanics().sleepWarningMessage;
     }
 
     public static List<? extends String> getDamageBlacklistedMods(){
-        return SHMechanicListener.getDamageScalingMechanics().modBlackList;
+        return SHMechanics.getMechanics().damageScalingMechanics().modBlackList;
     }
 }

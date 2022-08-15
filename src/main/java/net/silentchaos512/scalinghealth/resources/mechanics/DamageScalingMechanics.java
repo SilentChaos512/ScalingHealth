@@ -6,6 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.silentchaos512.scalinghealth.event.DamageScaling;
 import net.silentchaos512.scalinghealth.utils.serialization.SerializationUtils;
 
+import java.util.Collections;
 import java.util.List;
 
 public class DamageScalingMechanics {
@@ -43,4 +44,14 @@ public class DamageScalingMechanics {
         this.mode = mode;
         this.scales = scales;
     }
+
+    public static final DamageScalingMechanics DEFAULT = new DamageScalingMechanics(
+            0.04,
+            0,
+            true,
+            false,
+            Collections.emptyList(),
+            DamageScaling.Mode.MAX_HEALTH,
+            Collections.emptyList()
+    );
 }
