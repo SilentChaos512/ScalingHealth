@@ -8,6 +8,7 @@ import net.silentchaos512.lib.event.ClientTicks;
 import net.silentchaos512.scalinghealth.config.SHConfig;
 
 import java.util.Random;
+import java.util.function.Supplier;
 
 /**
  * Stores various fields used by HeartDisplayHandler. All necessary fields are updated once per
@@ -29,8 +30,8 @@ class HeartsInfo {
     private final int[] lowHealthBob = new int[10];
     private int regenTimer;
     // Configs
-    HeartIconStyle heartStyle = SHConfig.CLIENT.heartIconStyle.get();
-    AbsorptionIconStyle absorptionStyle = SHConfig.CLIENT.absorptionIconStyle.get();
+    Supplier<HeartIconStyle> heartStyle = SHConfig.CLIENT.heartIconStyle;
+    Supplier<AbsorptionIconStyle> absorptionStyle = SHConfig.CLIENT.absorptionIconStyle;
     // Other
     private final Random random = new Random();
     int scaledWindowWidth;
@@ -62,9 +63,6 @@ class HeartsInfo {
         hardcoreMode = player.level.getLevelData().isHardcore();
         for (int i = 0; i < lowHealthBob.length; ++i) lowHealthBob[i] = random.nextInt(2);
         regenTimer = player.hasEffect(MobEffects.REGENERATION) ? updateCounter % 20 : -1;
-
-        heartStyle = SHConfig.CLIENT.heartIconStyle.get();
-        absorptionStyle = SHConfig.CLIENT.absorptionIconStyle.get();
     }
 
     private boolean hasLowHealth() {
@@ -72,13 +70,13 @@ class HeartsInfo {
     }
 
     int getCustomHeartRowCount(int healthAmount) {
-        return heartStyle == HeartIconStyle.REPLACE_ALL
+        return heartStyle.get() == HeartIconStyle.REPLACE_ALL
                 ? Mth.ceil(healthAmount / 20f)
                 : healthAmount / 20;
     }
 
     int getActualRow(int renderRowIndex) {
-        return renderRowIndex + (heartStyle == HeartIconStyle.REPLACE_ALL ? 0 : 1);
+        return renderRowIndex + (heartStyle.get() == HeartIconStyle.REPLACE_ALL ? 0 : 1);
     }
 
     int getHeartsInRows(int actualRow) {

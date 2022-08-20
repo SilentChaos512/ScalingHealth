@@ -4,7 +4,7 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Mob;
 import net.silentchaos512.scalinghealth.utils.MobDifficultyHandler;
 import net.silentchaos512.scalinghealth.utils.config.SHDifficulty;
@@ -19,9 +19,9 @@ public final class RecalculateCommand {
                 source.hasPermission(2))
                 .then(Commands.literal("all")
                         .executes(context -> {
-                            context.getSource().sendSuccess(new TranslatableComponent("command.scalinghealth.recalculate.start"), true);
+                            context.getSource().sendSuccess(Component.translatable("command.scalinghealth.recalculate.start"), true);
                             int processed = recalculateAllEntities(context);
-                            context.getSource().sendSuccess(new TranslatableComponent("command.scalinghealth.recalculate.finish", processed), true);
+                            context.getSource().sendSuccess(Component.translatable("command.scalinghealth.recalculate.finish", processed), true);
                             return 1;
                         })
                 ));

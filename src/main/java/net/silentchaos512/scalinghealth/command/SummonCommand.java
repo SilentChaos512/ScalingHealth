@@ -13,7 +13,7 @@ import net.minecraft.commands.arguments.EntitySummonArgument;
 import net.minecraft.commands.arguments.coordinates.Vec3Argument;
 import net.minecraft.commands.synchronization.SuggestionProviders;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -26,7 +26,7 @@ import net.silentchaos512.scalinghealth.utils.MobDifficultyHandler;
 import net.silentchaos512.scalinghealth.utils.config.SHDifficulty;
 
 public final class SummonCommand {
-    private static final SimpleCommandExceptionType SUMMON_FAILED = new SimpleCommandExceptionType(new TranslatableComponent("commands.summon.failed"));
+    private static final SimpleCommandExceptionType SUMMON_FAILED = new SimpleCommandExceptionType(Component.translatable("commands.summon.failed"));
 
     private SummonCommand() {}
 
@@ -129,7 +129,7 @@ public final class SummonCommand {
                     affected.setProcessed(true);
                 }
             }
-            source.sendSuccess(new TranslatableComponent("commands.summon.success", entity.getDisplayName()), true);
+            source.sendSuccess(Component.translatable("commands.summon.success", entity.getDisplayName()), true);
             return 1;
         }
     }

@@ -1,130 +1,130 @@
 {
   "pools": [
     {
-      "name": "crystals",
-      "rolls": 1.0,
       "bonus_rolls": 0.0,
-      "entries": [
-        {
-          "type": "minecraft:item",
-          "weight": 2,
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": {
-                "type": "minecraft:uniform",
-                "min": 1.0,
-                "max": 8.0
-              },
-              "add": false
-            }
-          ],
-          "name": "scalinghealth:heart_crystal_shard"
-        },
-        {
-          "type": "minecraft:item",
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": {
-                "type": "minecraft:uniform",
-                "min": 0.0,
-                "max": 5.0
-              },
-              "add": false
-            }
-          ],
-          "name": "scalinghealth:power_crystal_shard"
-        }
-      ],
       "conditions": [
         {
-          "condition": "minecraft:random_chance_with_looting",
           "chance": 0.055,
+          "condition": "minecraft:random_chance_with_looting",
           "looting_multiplier": 0.005
         },
         {
           "condition": "minecraft:killed_by_player"
         }
-      ]
-    },
-    {
-      "name": "difficulty_mutators",
-      "rolls": 1.0,
-      "bonus_rolls": 0.0,
+      ],
       "entries": [
         {
           "type": "minecraft:item",
           "functions": [
             {
-              "function": "minecraft:set_count",
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 8.0,
+                "min": 1.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "scalinghealth:heart_crystal_shard",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 5.0,
+                "min": 0.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "scalinghealth:power_crystal_shard"
+        }
+      ],
+      "name": "crystals",
+      "rolls": 1.0
+    },
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "chance": 0.015,
+          "condition": "minecraft:random_chance_with_looting",
+          "looting_multiplier": 0.025
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
               "count": 1.0,
-              "add": false
+              "function": "minecraft:set_count"
             }
           ],
           "name": "scalinghealth:cursed_heart"
         }
       ],
-      "conditions": [
-        {
-          "condition": "minecraft:random_chance_with_looting",
-          "chance": 0.015,
-          "looting_multiplier": 0.025
-        }
-      ]
+      "name": "difficulty_mutators",
+      "rolls": 1.0
     },
     {
-      "name": "blights",
-      "rolls": 1.0,
       "bonus_rolls": 0.0,
-      "entries": [
-        {
-          "type": "minecraft:item",
-          "weight": 5,
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": {
-                "type": "minecraft:uniform",
-                "min": -1.0,
-                "max": 1.0
-              },
-              "add": false
-            }
-          ],
-          "name": "scalinghealth:heart_crystal"
-        },
-        {
-          "type": "minecraft:item",
-          "weight": 2,
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": {
-                "type": "minecraft:uniform",
-                "min": -1.0,
-                "max": 1.0
-              },
-              "add": false
-            }
-          ],
-          "name": "scalinghealth:power_crystal"
-        }
-      ],
       "conditions": [
         {
           "condition": "scalinghealth:mob_properties",
-          "entity": "this",
-          "is_blight": true,
           "difficulty": {
-            "min": 0.0,
-            "max": 2.14748365E9
-          }
+            "max": 2.14748365E9,
+            "min": 0.0
+          },
+          "entity": "this",
+          "is_blight": true
         },
         {
           "condition": "minecraft:killed_by_player"
         }
-      ]
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 1.0,
+                "min": -1.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "scalinghealth:heart_crystal",
+          "weight": 5
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 1.0,
+                "min": -1.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "scalinghealth:power_crystal",
+          "weight": 2
+        }
+      ],
+      "name": "blights",
+      "rolls": 1.0
     }
   ]
 }

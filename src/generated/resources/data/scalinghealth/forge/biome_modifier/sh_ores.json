@@ -1,0 +1,11 @@
+{
+  "type": "forge:add_features",
+  "biomes": "#minecraft:is_overworld",
+  "features": [
+    "scalinghealth:heart_crystal_stone_ore",
+    "scalinghealth:heart_crystal_stone_deepslate",
+    "scalinghealth:power_crystal_stone_ore",
+    "scalinghealth:power_crystal_stone_deepslate"
+  ],
+  "step": "underground_ores"
+}

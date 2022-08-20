@@ -2,7 +2,6 @@ package net.silentchaos512.scalinghealth.utils;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Mob;
@@ -12,6 +11,7 @@ import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraftforge.network.PacketDistributor;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
 import net.silentchaos512.scalinghealth.event.BlightHandler;
@@ -58,7 +58,7 @@ public final class MobDifficultyHandler {
             BlightHandler.applyBlightPotionEffects(entity);
             //TODO no good in code method for determining if an entity is a boss or not, switch to tag?
             if(entity instanceof WitherBoss || entity instanceof EnderDragon) {
-                Component blight = new TranslatableComponent("misc.scalinghealth.blight", entity.getDisplayName()).copy().withStyle(ChatFormatting.DARK_PURPLE);
+                Component blight = Component.translatable("misc.scalinghealth.blight", entity.getDisplayName()).copy().withStyle(ChatFormatting.DARK_PURPLE);
                 entity.setCustomName(blight);
             }
         }
@@ -104,7 +104,7 @@ public final class MobDifficultyHandler {
                 damageBoost = Mth.clamp(damageBoost, 0, max);
             }
 
-            ResourceLocation loc = entity.getType().getRegistryName();
+            ResourceLocation loc = ForgeRegistries.ENTITY_TYPES.getKey(entity.getType());
             if (loc != null && !SHDifficulty.getDamageBlacklistedMods().contains(loc.getNamespace()))
                 ModifierHandler.addAttackDamage(entity, damageBoost, AttributeModifier.Operation.ADDITION);
         }

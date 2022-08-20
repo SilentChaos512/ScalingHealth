@@ -18,7 +18,6 @@
 
 package net.silentchaos512.scalinghealth.event;
 
-import net.minecraft.client.Game;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -30,9 +29,9 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.resources.mechanics.PlayerMechanics;
-import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanicListener;
 import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanics;
 
 import java.util.HashMap;
@@ -83,7 +82,7 @@ public final class PlayerBonusRegenHandler {
 
     @SubscribeEvent
     public static void onPlayerHurt(LivingHurtEvent event) {
-        LivingEntity entity = event.getEntityLiving();
+        LivingEntity entity = event.getEntity();
         if (isDisabled(entity.level))
             return;
 
@@ -96,7 +95,7 @@ public final class PlayerBonusRegenHandler {
         if (SHMechanics.getMechanics().playerMechanics().regenMechanics.proportionaltoMaxHp) {
             AttributeInstance attr = entity.getAttribute(Attributes.MAX_HEALTH);
             if (attr == null) {
-                ScalingHealth.LOGGER.warn("LivingEntity {} does not have a max hp attribute!", entity.getType().getRegistryName());
+                ScalingHealth.LOGGER.warn("LivingEntity {} does not have a max hp attribute!", ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()));
                 return 0;
             }
             double base = attr.getBaseValue();

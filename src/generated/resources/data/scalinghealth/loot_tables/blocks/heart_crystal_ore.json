@@ -2,17 +2,10 @@
   "type": "minecraft:block",
   "pools": [
     {
-      "name": "heart_crystal_ore",
-      "rolls": 1.0,
       "bonus_rolls": 0.0,
       "entries": [
         {
           "type": "minecraft:alternatives",
-          "conditions": [
-            {
-              "condition": "minecraft:survives_explosion"
-            }
-          ],
           "children": [
             {
               "type": "minecraft:item",
@@ -37,9 +30,9 @@
               "type": "minecraft:item",
               "functions": [
                 {
-                  "function": "minecraft:apply_bonus",
                   "enchantment": "minecraft:fortune",
-                  "formula": "minecraft:ore_drops"
+                  "formula": "minecraft:ore_drops",
+                  "function": "minecraft:apply_bonus"
                 },
                 {
                   "function": "minecraft:explosion_decay"
@@ -47,9 +40,16 @@
               ],
               "name": "scalinghealth:heart_crystal_shard"
             }
+          ],
+          "conditions": [
+            {
+              "condition": "minecraft:survives_explosion"
+            }
           ]
         }
-      ]
+      ],
+      "name": "heart_crystal_ore",
+      "rolls": 1.0
     }
   ]
 }

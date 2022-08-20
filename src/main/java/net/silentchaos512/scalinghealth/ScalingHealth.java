@@ -7,16 +7,18 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
-import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.silentchaos512.scalinghealth.capability.*;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.RegisterEvent;
+import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
+import net.silentchaos512.scalinghealth.capability.IDifficultySource;
+import net.silentchaos512.scalinghealth.capability.IPetData;
+import net.silentchaos512.scalinghealth.capability.IPlayerData;
 import net.silentchaos512.scalinghealth.command.ModCommands;
 import net.silentchaos512.scalinghealth.config.SHConfig;
 import net.silentchaos512.scalinghealth.loot.conditions.EntityGroupCondition;
@@ -52,14 +54,16 @@ public class ScalingHealth {
 
         modbus.addListener(this::registerCaps);
         modbus.addListener(this::reloadConfig);
-        modbus.addGenericListener(GlobalLootModifierSerializer.class, this::registerLootModSerializers);
+        modbus.addListener(this::registerLootType);
 
         MinecraftForge.EVENT_BUS.addListener(this::registerCommandsEvent);
     }
 
-    private void registerLootModSerializers(RegistryEvent.Register<GlobalLootModifierSerializer<?>> event) {
-        Registry.register(Registry.LOOT_CONDITION_TYPE, SHMobProperties.NAME, new LootItemConditionType(new SHMobProperties.ThisSerializer()));
-        Registry.register(Registry.LOOT_CONDITION_TYPE, EntityGroupCondition.NAME, new LootItemConditionType(new EntityGroupCondition.ThisSerializer()));
+    private void registerLootType(RegisterEvent event) {
+        if (event.getRegistryKey() == ForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS) {
+            Registry.register(Registry.LOOT_CONDITION_TYPE, SHMobProperties.NAME, new LootItemConditionType(new SHMobProperties.ThisSerializer()));
+            Registry.register(Registry.LOOT_CONDITION_TYPE, EntityGroupCondition.NAME, new LootItemConditionType(new EntityGroupCondition.ThisSerializer()));
+        }
     }
 
     private void registerCaps(RegisterCapabilitiesEvent event) {

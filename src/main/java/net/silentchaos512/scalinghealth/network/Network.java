@@ -1,17 +1,12 @@
 package net.silentchaos512.scalinghealth.network;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.network.HandshakeHandler;
-import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.client.ClientHandler;
-import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.Collections;
 import java.util.Objects;
-import java.util.function.IntSupplier;
 
 public final class Network {
     private static final ResourceLocation NAME = ScalingHealth.getId("network");

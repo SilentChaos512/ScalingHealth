@@ -19,7 +19,6 @@
 package net.silentchaos512.scalinghealth.objects.item;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
@@ -97,10 +96,10 @@ public class HealingItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level world, List<Component> tooltip, TooltipFlag flag) {
-        tooltip.add(new TranslatableComponent("item.scalinghealth.healing_item.value",
+        tooltip.add(Component.translatable("item.scalinghealth.healing_item.value",
                 (int) (this.healAmount * 100),
                 this.effectDuration / 20));
-        tooltip.add(new TranslatableComponent("item.scalinghealth.healing_item.howToUse",
+        tooltip.add(Component.translatable("item.scalinghealth.healing_item.howToUse",
                 USE_TIME / 20));
     }
 }

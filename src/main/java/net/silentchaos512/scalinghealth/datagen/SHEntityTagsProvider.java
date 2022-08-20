@@ -1,7 +1,7 @@
 package net.silentchaos512.scalinghealth.datagen;
 
 import net.minecraft.data.tags.EntityTypeTagsProvider;
-import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
+import net.minecraftforge.data.event.GatherDataEvent;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.resources.tags.EntityTags;
 

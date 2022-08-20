@@ -24,7 +24,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.silentchaos512.lib.util.EntityHelper;
-import net.silentchaos512.scalinghealth.utils.config.SHDifficulty;
 
 import java.util.UUID;
 

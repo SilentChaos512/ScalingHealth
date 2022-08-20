@@ -151,7 +151,7 @@ public class DifficultyMechanics {
                 return scaleMap.get(p);
 
             ResourceLocation dim = world.dimension().location();
-            if (!dimensions.contains(dim) && !biomes.contains(biome.getRegistryName())) {
+            if (!dimensions.contains(dim) && !biomes.contains(ForgeRegistries.BIOMES.getKey(biome))) {
                 scaleMap.put(p, 1D);
                 return 1D;
             }
@@ -162,7 +162,7 @@ public class DifficultyMechanics {
 
         //Check the scales that have specified both a dimension and a biome.
         private double biomeAndDimMatch(Level w, Biome b) {
-            ResourceLocation biome = b.getRegistryName();
+            ResourceLocation biome = ForgeRegistries.BIOMES.getKey(b);
             ResourceLocation dim = w.dimension().location();
             return locationMultipliers.stream()
                     .filter(p -> p.getSecond().getFirst().contains(biome))
@@ -174,7 +174,7 @@ public class DifficultyMechanics {
 
         //Check the scales that only have a biome specified
         private double biomeMatch(Biome b) {
-            ResourceLocation biome = b.getRegistryName();
+            ResourceLocation biome = ForgeRegistries.BIOMES.getKey(b);
             return locationMultipliers.stream()
                     .filter(p -> p.getSecond().getFirst().contains(biome))
                     .filter(p -> p.getSecond().getSecond().isEmpty())
@@ -203,7 +203,7 @@ public class DifficultyMechanics {
                            Supplier<Expression> onPlayerSleep,
                            List<Pair<List<ResourceLocation>, Supplier<Expression>>> byEntity) {
         private static final Function<ResourceLocation, DataResult<ResourceLocation>> ONLY_ENTITES = rl ->
-                ForgeRegistries.ENTITIES.containsKey(rl) ? DataResult.success(rl) : DataResult.error(rl + " is not an entity!");
+                ForgeRegistries.ENTITY_TYPES.containsKey(rl) ? DataResult.success(rl) : DataResult.error(rl + " is not an entity!");
 
         public static final Codec<Mutators> CODEC = RecordCodecBuilder.create(inst ->
                 inst.group(

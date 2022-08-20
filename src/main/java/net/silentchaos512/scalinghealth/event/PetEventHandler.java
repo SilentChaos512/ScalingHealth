@@ -21,25 +21,24 @@ package net.silentchaos512.scalinghealth.event;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.TamableAnimal;
-import net.minecraftforge.event.entity.living.LivingEvent.LivingUpdateEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.objects.item.HeartCrystal;
-import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanicListener;
 import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanics;
 import net.silentchaos512.scalinghealth.utils.config.EnabledFeatures;
 
 @Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class PetEventHandler {
     @SubscribeEvent
-    public static void onLivingUpdate(LivingUpdateEvent event) {
+    public static void onLivingUpdate(LivingEvent.LivingTickEvent event) {
         double regenDelay = SHMechanics.getMechanics().mobMechanics().pets().petsRegenDelay();
         if (regenDelay <= 0)
             return;
 
-        LivingEntity entity = event.getEntityLiving();
+        LivingEntity entity = event.getEntity();
         if (entity != null && !entity.level.isClientSide) {
             boolean fullHp = entity.getHealth() == entity.getMaxHealth();
             boolean isTamed = entity instanceof TamableAnimal && ((TamableAnimal) entity).isTame();
@@ -67,6 +66,6 @@ public class PetEventHandler {
         }
 
         HeartCrystal heart = (HeartCrystal) event.getItemStack().getItem();
-        heart.increasePetHp(event.getPlayer(), pet, event.getItemStack());
+        heart.increasePetHp(event.getEntity(), pet, event.getItemStack());
     }
 }

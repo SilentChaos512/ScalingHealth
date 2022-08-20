@@ -15,18 +15,18 @@ authors="SilentChaos512"
 [[dependencies.scalinghealth]]
     modId="forge"
     mandatory=true
-    versionRange="[40.0.18,)"
+    versionRange="[43,)"
     ordering="BEFORE"
     side="BOTH"
 [[dependencies.scalinghealth]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.18.2,1.19)"
+versionRange="[1.19.2,1.20)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.scalinghealth]]
     modId="silentlib"
     mandatory=true
-    versionRange="[6.2,)"
+    versionRange="[7.0.1,)"
     ordering="NONE"
     side="BOTH"

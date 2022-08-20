@@ -2,7 +2,6 @@ package net.silentchaos512.scalinghealth.utils.config;
 
 import net.minecraft.world.entity.Mob;
 import net.silentchaos512.scalinghealth.resources.mechanics.MobMechanics;
-import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanicListener;
 import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanics;
 import net.silentchaos512.scalinghealth.resources.tags.EntityTags;
 import net.silentchaos512.scalinghealth.utils.mode.MobHealthMode;

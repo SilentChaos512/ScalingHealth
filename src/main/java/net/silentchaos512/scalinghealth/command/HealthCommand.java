@@ -9,8 +9,8 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.silentchaos512.scalinghealth.capability.IPlayerData;
@@ -110,6 +110,6 @@ public final class HealthCommand {
     }
 
     private static MutableComponent text(String key, Object... args) {
-        return new TranslatableComponent("command.scalinghealth.health." + key, args);
+        return Component.translatable("command.scalinghealth.health." + key, args);
     }
 }

@@ -18,8 +18,7 @@
 
 package net.silentchaos512.scalinghealth.event;
 
-import net.minecraft.Util;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -57,11 +56,11 @@ public final class CommonEvents {
 
    @SubscribeEvent
    public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
-      Player player = event.getPlayer();
+      Player player = event.getEntity();
       SHPlayers.getPlayerData(player).updateStats(player);
 
       if (!(player instanceof ServerPlayer)) return;
-      ServerPlayer sp = (ServerPlayer) event.getPlayer();
+      ServerPlayer sp = (ServerPlayer) event.getEntity();
       ScalingHealth.LOGGER.debug("Sending login packet to player {}", player);
       ClientLoginMessage msg = new ClientLoginMessage(SHDifficulty.areaMode(), (float) SHDifficulty.maxValue());
       Network.channel.sendTo(msg, sp.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
@@ -69,13 +68,13 @@ public final class CommonEvents {
 
    @SubscribeEvent
    public static void onSpawn(LivingSpawnEvent.CheckSpawn event){
-      if(!(event.getEntityLiving() instanceof Mob)) return;
-      if(event.getSpawnReason() == MobSpawnType.SPAWNER) spawnerSpawns.add(event.getEntityLiving().getUUID());
+      if(!(event.getEntity() instanceof Mob)) return;
+      if(event.getSpawnReason() == MobSpawnType.SPAWNER) spawnerSpawns.add(event.getEntity().getUUID());
    }
 
    @SubscribeEvent(priority = EventPriority.HIGHEST)
    public static void onMobXPDropped(LivingExperienceDropEvent event) {
-      LivingEntity entity = event.getEntityLiving();
+      LivingEntity entity = event.getEntity();
       // Additional XP from all mobs.
       short difficulty = (short) SHDifficulty.areaDifficulty(entity.level, entity.blockPosition());
       float multi = (float) (1.0f + SHMobs.xpBoost() * difficulty);
@@ -124,21 +123,21 @@ public final class CommonEvents {
 
    @SubscribeEvent
    public static void onPlayerSleepInBed(PlayerSleepInBedEvent event) {
-      Player player = event.getPlayer();
+      Player player = event.getEntity();
       if (!player.level.isClientSide && SHConfig.CLIENT.warnWhenSleeping.get()) {
          double newDifficulty = SHDifficulty.diffOnPlayerSleep(player);
 
          if (!MathUtils.doublesEqual(SHDifficulty.getDifficultyOf(player), newDifficulty, 0.1)) {
             ScalingHealth.LOGGER.debug("old={}, new={}", SHDifficulty.getDifficultyOf(player), newDifficulty);
-            player.sendMessage(new TranslatableComponent("misc.scalinghealth.sleepWarning"), Util.NIL_UUID);
+            player.sendSystemMessage(Component.translatable("misc.scalinghealth.sleepWarning"));
          }
       }
    }
 
    @SubscribeEvent
    public static void onPlayerWakeUp(PlayerWakeUpEvent event) {
-      Player player = event.getPlayer();
-      if (!player.level.isClientSide && !event.updateWorld()) {
+      Player player = event.getEntity();
+      if (!player.level.isClientSide && !event.updateLevel()) {
          SHDifficulty.setSourceDifficulty(player, SHDifficulty.diffOnPlayerSleep(player));
       }
    }

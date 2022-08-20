@@ -1,5 +1,6 @@
 package net.silentchaos512.scalinghealth.objects;
 
+import com.mojang.serialization.Codec;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.sounds.SoundEvent;
@@ -11,9 +12,9 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.OreBlock;
+import net.minecraft.world.level.block.DropExperienceBlock;
 import net.minecraft.world.level.material.Material;
-import net.minecraftforge.common.loot.GlobalLootModifierSerializer;
+import net.minecraftforge.common.loot.IGlobalLootModifier;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -32,10 +33,10 @@ public class Registration {
     private static final DeferredRegister<ParticleType<?>> PARTICLES = DeferredRegister.create(ForgeRegistries.PARTICLE_TYPES, ScalingHealth.MOD_ID);
     private static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, ScalingHealth.MOD_ID);
     private static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, ScalingHealth.MOD_ID);
-    private static final DeferredRegister<GlobalLootModifierSerializer<?>> GLMS = DeferredRegister.create(ForgeRegistries.Keys.LOOT_MODIFIER_SERIALIZERS, ScalingHealth.MOD_ID);
+    private static final DeferredRegister<Codec<? extends IGlobalLootModifier>> GLMS = DeferredRegister.create(ForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, ScalingHealth.MOD_ID);
 
     public static final RegistryObject<Block> HEART_CRYSTAL_ORE = BLOCKS.register("heart_crystal_ore", () ->
-            new OreBlock(
+            new DropExperienceBlock(
                     Block.Properties.of(Material.STONE)
                             .strength(3, 15)
                             .requiresCorrectToolForDrops(),
@@ -44,7 +45,7 @@ public class Registration {
     );
 
     public static final RegistryObject<Block> DEEPLSATE_HEART_CRYSTAL_ORE = BLOCKS.register("deepslate_heart_crystal_ore", () ->
-            new OreBlock(
+            new DropExperienceBlock(
                     Block.Properties.of(Material.STONE)
                             .strength(3, 15)
                             .requiresCorrectToolForDrops(),
@@ -53,7 +54,7 @@ public class Registration {
     );
 
     public static final RegistryObject<Block> POWER_CRYSTAL_ORE = BLOCKS.register("power_crystal_ore", () ->
-            new OreBlock(
+            new DropExperienceBlock(
                     Block.Properties.of(Material.STONE)
                             .strength(3, 15)
                             .requiresCorrectToolForDrops(),
@@ -62,7 +63,7 @@ public class Registration {
     );
 
     public static final RegistryObject<Block> DEEPSLATE_POWER_CRYSTAL_ORE = BLOCKS.register("deepslate_power_crystal_ore", () ->
-            new OreBlock(
+            new DropExperienceBlock(
                     Block.Properties.of(Material.STONE)
                             .strength(3, 15)
                             .requiresCorrectToolForDrops(),
@@ -129,8 +130,8 @@ public class Registration {
     public static final RegistryObject<SoundEvent> HEART_CRYSTAL_USE = makeSound("heart_crystal_use");
     public static final RegistryObject<SoundEvent> PLAYER_DIED = makeSound("player_died");
 
-    public static final RegistryObject<GlobalLootModifierSerializer<TableGlobalModifier>> TABLE_INJECTOR =
-            GLMS.register("table_loot_mod", TableGlobalModifier.Serializer::new);
+    public static final RegistryObject<Codec<TableGlobalModifier>> TABLE_INJECTOR =
+            GLMS.register("table_loot_mod", TableGlobalModifier.CODEC);
 
     public static void register(IEventBus bus) {
         BLOCKS.register(bus);

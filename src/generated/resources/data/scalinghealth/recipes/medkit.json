@@ -1,11 +1,6 @@
 {
   "type": "minecraft:crafting_shaped",
   "group": "scalinghealth",
-  "pattern": [
-    "aba",
-    "cdc",
-    "eee"
-  ],
   "key": {
     "a": {
       "item": "scalinghealth:heart_dust"
@@ -23,8 +18,13 @@
       "item": "minecraft:terracotta"
     }
   },
+  "pattern": [
+    "aba",
+    "cdc",
+    "eee"
+  ],
   "result": {
-    "item": "scalinghealth:medkit",
-    "count": 2
+    "count": 2,
+    "item": "scalinghealth:medkit"
   }
 }

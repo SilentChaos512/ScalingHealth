@@ -3,7 +3,6 @@ package net.silentchaos512.scalinghealth.objects.item;
 import net.minecraft.Util;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -21,7 +20,6 @@ import net.minecraft.world.level.Level;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IPlayerData;
 import net.silentchaos512.scalinghealth.capability.PetHealthCapability;
-import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanicListener;
 import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanics;
 import net.silentchaos512.scalinghealth.utils.ParticleUtils;
 import net.silentchaos512.scalinghealth.utils.SoundUtils;
@@ -39,7 +37,7 @@ public abstract class StatBoosterItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-        tooltip.add(new TranslatableComponent(this.getDescriptionId() + ".desc"));
+        tooltip.add(Component.translatable(this.getDescriptionId() + ".desc"));
     }
 
     @Override
@@ -63,7 +61,7 @@ public abstract class StatBoosterItem extends Item {
         if (player.experienceLevel < levelRequirement) {
             if (world.isClientSide) {
                 String translationKey = "item.scalinghealth.stat_booster.notEnoughXP";
-                player.sendMessage(new TranslatableComponent(translationKey, levelRequirement), Util.NIL_UUID);
+                player.sendSystemMessage(Component.translatable(translationKey, levelRequirement));
             }
             return new InteractionResultHolder<>(InteractionResult.PASS, stack);
         }
@@ -95,7 +93,7 @@ public abstract class StatBoosterItem extends Item {
         int levelRequirement = getLevelCost(player);
         if (player.experienceLevel < levelRequirement) {
             String translationKey = "item.scalinghealth.stat_booster.notEnoughXP";
-            player.sendMessage(new TranslatableComponent(translationKey, levelRequirement), Util.NIL_UUID);
+            player.sendSystemMessage(Component.translatable(translationKey, levelRequirement));
             return;
         }
 

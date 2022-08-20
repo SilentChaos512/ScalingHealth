@@ -19,7 +19,6 @@
 package net.silentchaos512.scalinghealth.objects.item;
 
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -90,10 +89,10 @@ public class DifficultyMutatorItem extends Item {
         double amount = getEffectAmount(world);
         if(this.type != Type.CHANCE) {
             String amountStr = (amount > 0 ? "+" : "") + String.format("%.1f", amount);
-            list.add(new TranslatableComponent("item.scalinghealth.difficulty_changer.effectDesc", amountStr));
+            list.add(Component.translatable("item.scalinghealth.difficulty_changer.effectDesc", amountStr));
         }
         else
-            list.add(new TranslatableComponent("item.scalinghealth.difficulty_changer.effectDesc", "?"));
+            list.add(Component.translatable("item.scalinghealth.difficulty_changer.effectDesc", "?"));
     }
 
     @Override

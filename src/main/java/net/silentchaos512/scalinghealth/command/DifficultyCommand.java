@@ -11,8 +11,6 @@ import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
@@ -110,8 +108,8 @@ public final class DifficultyCommand {
                 .withStyle(ChatFormatting.YELLOW);
 
         // Area mode
-        Component modeText = new TextComponent(" (")
-                .append(new TranslatableComponent("scalinghealth.modes.difficulty." + SHDifficulty.areaMode().getName()).withStyle(ChatFormatting.GRAY))
+        Component modeText = Component.literal(" (")
+                .append(Component.translatable("scalinghealth.modes.difficulty." + SHDifficulty.areaMode().getName()).withStyle(ChatFormatting.GRAY))
                 .append(")");
         areaText.append(modeText);
         context.getSource().sendSuccess(areaText, true);
@@ -160,6 +158,6 @@ public final class DifficultyCommand {
     }
 
     private static MutableComponent text(String key, Object... args) {
-        return new TranslatableComponent("command.scalinghealth.difficulty." + key, args);
+        return Component.translatable("command.scalinghealth.difficulty." + key, args);
     }
 }

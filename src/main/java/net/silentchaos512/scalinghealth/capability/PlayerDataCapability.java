@@ -1,10 +1,9 @@
 package net.silentchaos512.scalinghealth.capability;
 
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -93,7 +92,7 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
         if (timeAfk > SHDifficulty.timeBeforeAfk()) {
             if(!afk) {
                 afk = true;
-                if(SHDifficulty.afkMessage()) player.sendMessage(new TranslatableComponent("misc.scalinghealth.afkmessage"), Util.NIL_UUID);
+                if(SHDifficulty.afkMessage()) player.sendSystemMessage(Component.translatable("misc.scalinghealth.afkmessage"));
             }
         }
 

@@ -1,139 +1,153 @@
 {
   "pools": [
     {
-      "name": "crystals",
-      "rolls": 1.0,
       "bonus_rolls": 0.0,
-      "entries": [
-        {
-          "type": "minecraft:item",
-          "weight": 12,
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": 1.0,
-              "add": false
-            }
-          ],
-          "name": "scalinghealth:heart_crystal"
-        },
-        {
-          "type": "minecraft:item",
-          "weight": 4,
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": 1.0,
-              "add": false
-            }
-          ],
-          "name": "scalinghealth:power_crystal"
-        },
-        {
-          "type": "minecraft:item",
-          "weight": 2,
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": {
-                "type": "minecraft:uniform",
-                "min": 3.0,
-                "max": 11.0
-              },
-              "add": false
-            }
-          ],
-          "name": "scalinghealth:heart_crystal_shard"
-        },
-        {
-          "type": "minecraft:item",
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": {
-                "type": "minecraft:uniform",
-                "min": 2.0,
-                "max": 12.0
-              },
-              "add": false
-            }
-          ],
-          "name": "scalinghealth:power_crystal_shard"
-        }
-      ],
       "conditions": [
         {
-          "condition": "minecraft:random_chance_with_looting",
           "chance": 0.055,
+          "condition": "minecraft:random_chance_with_looting",
           "looting_multiplier": 0.005
         },
         {
           "condition": "minecraft:killed_by_player"
         }
-      ]
-    },
-    {
-      "name": "extras",
-      "rolls": 1.0,
-      "bonus_rolls": 0.0,
+      ],
       "entries": [
         {
           "type": "minecraft:item",
-          "weight": 10,
           "functions": [
             {
-              "function": "minecraft:set_count",
-              "count": {
-                "type": "minecraft:uniform",
-                "min": 0.0,
-                "max": 2.0
-              },
-              "add": false
+              "add": false,
+              "count": 1.0,
+              "function": "minecraft:set_count"
             }
           ],
-          "name": "scalinghealth:bandages"
+          "name": "scalinghealth:heart_crystal",
+          "weight": 12
         },
         {
           "type": "minecraft:item",
           "functions": [
             {
-              "function": "minecraft:set_count",
+              "add": false,
               "count": 1.0,
-              "add": false
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "scalinghealth:power_crystal",
+          "weight": 4
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 11.0,
+                "min": 3.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "scalinghealth:heart_crystal_shard",
+          "weight": 2
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 12.0,
+                "min": 2.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "scalinghealth:power_crystal_shard"
+        }
+      ],
+      "name": "crystals",
+      "rolls": 1.0
+    },
+    {
+      "bonus_rolls": 0.0,
+      "conditions": [
+        {
+          "condition": "scalinghealth:mob_properties",
+          "difficulty": {
+            "max": 2.14748365E9,
+            "min": 10.0
+          },
+          "entity": "this",
+          "is_blight": false
+        },
+        {
+          "chance": 0.025,
+          "condition": "minecraft:random_chance_with_looting",
+          "looting_multiplier": 0.005
+        }
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 2.0,
+                "min": 0.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "scalinghealth:bandages",
+          "weight": 10
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": 1.0,
+              "function": "minecraft:set_count"
             }
           ],
           "name": "scalinghealth:medkit"
         }
       ],
+      "name": "extras",
+      "rolls": 1.0
+    },
+    {
+      "bonus_rolls": 0.0,
       "conditions": [
         {
           "condition": "scalinghealth:mob_properties",
-          "entity": "this",
-          "is_blight": false,
           "difficulty": {
-            "min": 10.0,
-            "max": 2.14748365E9
-          }
+            "max": 2.14748365E9,
+            "min": 70.0
+          },
+          "entity": "this",
+          "is_blight": false
         },
         {
+          "chance": 0.015,
           "condition": "minecraft:random_chance_with_looting",
-          "chance": 0.025,
-          "looting_multiplier": 0.005
+          "looting_multiplier": 0.025
         }
-      ]
-    },
-    {
-      "name": "difficulty_mutators",
-      "rolls": 1.0,
-      "bonus_rolls": 0.0,
+      ],
       "entries": [
         {
           "type": "minecraft:item",
           "functions": [
             {
-              "function": "minecraft:set_count",
+              "add": false,
               "count": 1.0,
-              "add": false
+              "function": "minecraft:set_count"
             }
           ],
           "name": "scalinghealth:chance_heart"
@@ -142,83 +156,69 @@
           "type": "minecraft:item",
           "functions": [
             {
-              "function": "minecraft:set_count",
+              "add": false,
               "count": 1.0,
-              "add": false
+              "function": "minecraft:set_count"
             }
           ],
           "name": "scalinghealth:enchanted_heart"
         }
       ],
-      "conditions": [
-        {
-          "condition": "scalinghealth:mob_properties",
-          "entity": "this",
-          "is_blight": false,
-          "difficulty": {
-            "min": 70.0,
-            "max": 2.14748365E9
-          }
-        },
-        {
-          "condition": "minecraft:random_chance_with_looting",
-          "chance": 0.015,
-          "looting_multiplier": 0.025
-        }
-      ]
+      "name": "difficulty_mutators",
+      "rolls": 1.0
     },
     {
-      "name": "blights",
-      "rolls": 1.0,
       "bonus_rolls": 0.0,
-      "entries": [
-        {
-          "type": "minecraft:item",
-          "weight": 10,
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": {
-                "type": "minecraft:uniform",
-                "min": 1.0,
-                "max": 3.0
-              },
-              "add": false
-            }
-          ],
-          "name": "scalinghealth:heart_crystal"
-        },
-        {
-          "type": "minecraft:item",
-          "weight": 5,
-          "functions": [
-            {
-              "function": "minecraft:set_count",
-              "count": {
-                "type": "minecraft:uniform",
-                "min": 1.0,
-                "max": 2.0
-              },
-              "add": false
-            }
-          ],
-          "name": "scalinghealth:power_crystal"
-        }
-      ],
       "conditions": [
         {
           "condition": "scalinghealth:mob_properties",
-          "entity": "this",
-          "is_blight": true,
           "difficulty": {
-            "min": 0.0,
-            "max": 2.14748365E9
-          }
+            "max": 2.14748365E9,
+            "min": 0.0
+          },
+          "entity": "this",
+          "is_blight": true
         },
         {
           "condition": "minecraft:killed_by_player"
         }
-      ]
+      ],
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 3.0,
+                "min": 1.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "scalinghealth:heart_crystal",
+          "weight": 10
+        },
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "add": false,
+              "count": {
+                "type": "minecraft:uniform",
+                "max": 2.0,
+                "min": 1.0
+              },
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "scalinghealth:power_crystal",
+          "weight": 5
+        }
+      ],
+      "name": "blights",
+      "rolls": 1.0
     }
   ]
 }

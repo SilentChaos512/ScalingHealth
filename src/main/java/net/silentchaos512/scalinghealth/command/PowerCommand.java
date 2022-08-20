@@ -10,7 +10,6 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -112,6 +111,6 @@ public final class PowerCommand {
     }
 
     private static Component text(String key, Object... args) {
-        return new TranslatableComponent("command.scalinghealth.power." + key, args);
+        return Component.translatable("command.scalinghealth.power." + key, args);
     }
 }

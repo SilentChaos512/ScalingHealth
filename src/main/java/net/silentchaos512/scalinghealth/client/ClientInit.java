@@ -1,12 +1,10 @@
 package net.silentchaos512.scalinghealth.client;
 
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
+import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -29,20 +27,13 @@ public class ClientInit {
     }
 
     @SubscribeEvent
-    public static void clientSetup(FMLClientSetupEvent event) {
-        KeyManager.registerBindings();
-    }
-
-    @SubscribeEvent
-    public static void registerParticleFactories(ParticleFactoryRegisterEvent event) {
-        ParticleEngine particles = Minecraft.getInstance().particleEngine;
-
+    public static void registerParticleFactories(RegisterParticleProvidersEvent event) {
         ImmutableMap.of(
                 Registration.HEART_CRYSTAL_PARTICLE.get(), factory(Color.FIREBRICK),
                 Registration.POWER_CRYSTAL_PARTICLE.get(), factory(Color.ROYALBLUE),
                 Registration.CURSED_HEART_PARTICLE.get(), factory(Color.REBECCAPURPLE),
                 Registration.ENCHANTED_HEART_PARTICLE.get(), factory(Color.ANTIQUEWHITE)
-        ).forEach(particles::register);
+        ).forEach(event::register);
     }
 
     private static ParticleProvider<SimpleParticleType> factory(Color color) {

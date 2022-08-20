@@ -31,10 +31,10 @@ import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.config.SHConfig;
 import net.silentchaos512.scalinghealth.resources.mechanics.DamageScalingMechanics;
-import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanicListener;
 import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanics;
 import net.silentchaos512.scalinghealth.utils.EntityGroup;
 import net.silentchaos512.scalinghealth.utils.config.EnabledFeatures;
@@ -43,9 +43,9 @@ import net.silentchaos512.scalinghealth.utils.config.SHPlayers;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 @Mod.EventBusSubscriber(modid = ScalingHealth.MOD_ID)
 public final class DamageScaling {
@@ -56,7 +56,7 @@ public final class DamageScaling {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onEntityHurt(LivingAttackEvent event) {
         if(!EnabledFeatures.mobDamageScalingEnabled() && !EnabledFeatures.playerDamageScalingEnabled()) return;
-        LivingEntity entity = event.getEntityLiving();
+        LivingEntity entity = event.getEntity();
         if (entity.level.isClientSide) return;
         // Entity invulnerable?
         if (entity.isInvulnerableTo(event.getSource()) || entity.invulnerableTime > entity.invulnerableDuration / 2)
@@ -108,7 +108,7 @@ public final class DamageScaling {
             case MAX_HEALTH:
                 AttributeInstance attr = entity.getAttribute(Attributes.MAX_HEALTH);
                 if (attr == null) {
-                    ScalingHealth.LOGGER.warn("Living Entity {} has no max health attribute", entity.getType().getRegistryName());
+                    ScalingHealth.LOGGER.warn("Living Entity {} has no max health attribute", ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()));
                     return 1;
                 }
                 double baseHealth = entity instanceof Player
@@ -141,9 +141,7 @@ public final class DamageScaling {
         DIFFICULTY,
         AREA_DIFFICULTY;
 
-        private static final Map<String, Mode> BY_NAME = Arrays.stream(values())
-                .collect(Collectors.toMap(Mode::getSerializedName, Function.identity()));
-        public static final Codec<Mode> CODEC = StringRepresentable.fromEnum(Mode::values, BY_NAME::get);
+        public static final Codec<Mode> CODEC = StringRepresentable.fromEnum(Mode::values);
 
         @Override
         public String getSerializedName() {

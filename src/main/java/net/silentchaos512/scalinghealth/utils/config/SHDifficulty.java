@@ -15,6 +15,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.silentchaos512.lib.util.MCMathUtils;
 import net.silentchaos512.scalinghealth.capability.DifficultyAffectedCapability;
 import net.silentchaos512.scalinghealth.capability.DifficultySourceCapability;
@@ -22,7 +23,6 @@ import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
 import net.silentchaos512.scalinghealth.capability.IDifficultySource;
 import net.silentchaos512.scalinghealth.config.EvalVars;
 import net.silentchaos512.scalinghealth.resources.mechanics.DifficultyMechanics;
-import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanicListener;
 import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanics;
 import net.silentchaos512.scalinghealth.utils.EntityGroup;
 import net.silentchaos512.scalinghealth.utils.mode.AreaDifficultyMode;
@@ -170,7 +170,7 @@ public final class SHDifficulty {
 
         //check for entity specific mutators first
         for (Pair<List<ResourceLocation>, Supplier<Expression>> p : getMechanics().mutators.byEntity()) {
-            if (p.getFirst().contains(killed.getType().getRegistryName())) {
+            if (p.getFirst().contains(ForgeRegistries.ENTITY_TYPES.getKey(killed.getType()))) {
                 setSourceDifficulty(killer, EvalVars.apply(killer, p.getSecond().get()));
                 return;
             }

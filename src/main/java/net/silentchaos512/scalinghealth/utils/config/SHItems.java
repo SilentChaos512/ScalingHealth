@@ -2,7 +2,6 @@ package net.silentchaos512.scalinghealth.utils.config;
 
 import net.minecraft.world.entity.player.Player;
 import net.silentchaos512.scalinghealth.resources.mechanics.ItemMechanics;
-import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanicListener;
 import net.silentchaos512.scalinghealth.resources.mechanics.SHMechanics;
 
 public final class SHItems {

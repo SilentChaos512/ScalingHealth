@@ -1,10 +1,10 @@
 {
+  "type": "scalinghealth:table_loot_mod",
   "conditions": [
     {
       "condition": "forge:loot_table_id",
       "loot_table_id": "minecraft:chests/woodland_mansion"
     }
   ],
-  "table": "scalinghealth:chests_addition/woodland_mansion",
-  "type": "scalinghealth:table_loot_mod"
+  "table": "scalinghealth:chests_addition/woodland_mansion"
 }

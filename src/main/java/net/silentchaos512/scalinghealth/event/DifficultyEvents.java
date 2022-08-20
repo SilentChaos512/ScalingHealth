@@ -1,7 +1,7 @@
 package net.silentchaos512.scalinghealth.event;
 
 import net.minecraft.Util;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -76,8 +76,8 @@ public final class DifficultyEvents {
     }
 
     @SubscribeEvent
-    public static void onLivingUpdate(LivingEvent.LivingUpdateEvent event) {
-        LivingEntity entity = event.getEntityLiving();
+    public static void onLivingUpdate(LivingEvent.LivingTickEvent event) {
+        LivingEntity entity = event.getEntity();
         //Return if players are empty on an integrated server, as the player needs a small delay to connect.
         if (entity.level.isClientSide || (entity.level.players().isEmpty() && !((ServerLevel)entity.level).getServer().isDedicatedServer()))
             return;
@@ -102,7 +102,7 @@ public final class DifficultyEvents {
 
     @SubscribeEvent
     public static void onMobDeath(LivingDeathEvent event) {
-        LivingEntity killed = event.getEntityLiving();
+        LivingEntity killed = event.getEntity();
         if (event.getSource() == null || event.getEntity().level.isClientSide)
             return;
 
@@ -120,9 +120,9 @@ public final class DifficultyEvents {
     }
 
     @SubscribeEvent
-    public static void onWorldTick(TickEvent.WorldTickEvent event) {
+    public static void onWorldTick(TickEvent.LevelTickEvent event) {
         if(event.phase == TickEvent.Phase.START) return;
-        Level world = event.world;
+        Level world = event.level;
         if (world.isClientSide) return;
 
         // Tick world difficulty source
@@ -149,7 +149,7 @@ public final class DifficultyEvents {
 
         // Player is cloned. Copy capabilities before applying health/difficulty changes if needed.
         Player original = event.getOriginal();
-        Player clone = event.getPlayer();
+        Player clone = event.getEntity();
 
         //TODO replace with reviveCaps() once forge calls super in LivingEntity
         try {
@@ -184,7 +184,7 @@ public final class DifficultyEvents {
         float diff = newValue - oldValue;
         String line = String.format("%s %.2f %s", diff > 0 ? "gained" : "lost", diff, valueName);
         if(diff != 0)
-            player.sendMessage(new TextComponent(line), Util.NIL_UUID);
+            player.sendSystemMessage(Component.translatable(line));
         ScalingHealth.LOGGER.info("Player {}", line);
     }
 
