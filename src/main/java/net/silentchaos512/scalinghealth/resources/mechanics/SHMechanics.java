@@ -6,6 +6,7 @@ import net.minecraftforge.event.OnDatapackSyncEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.util.thread.SidedThreadGroups;
 import net.minecraftforge.network.NetworkDirection;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.client.MechanicsHandler;
@@ -32,7 +33,9 @@ public record SHMechanics(PlayerMechanics playerMechanics, ItemMechanics itemMec
 
     public static SHMechanics getMechanics() {
         return DistExecutor.unsafeRunForDist( //unsafe faster
-                () -> MechanicsHandler::getClientMechanics,
+                () -> Thread.currentThread().getThreadGroup() == SidedThreadGroups.SERVER
+                        ? SHMechanicListener::getInstance //use server-side config in singleplayer
+                        : MechanicsHandler::getClientMechanics,
                 () -> SHMechanicListener::getInstance
         );
     }
