@@ -22,11 +22,11 @@ public record SHMechanics(PlayerMechanics playerMechanics, ItemMechanics itemMec
 
     public static SHMechanics fromNetwork(FriendlyByteBuf buffer) {
         return new SHMechanics(
-                buffer.readWithCodec(PlayerMechanics.CODEC),
-                buffer.readWithCodec(ItemMechanics.CODEC),
-                buffer.readWithCodec(MobMechanics.CODEC),
-                buffer.readWithCodec(DifficultyMechanics.CODEC),
-                buffer.readWithCodec(DamageScalingMechanics.CODEC)
+                buffer.readJsonWithCodec(PlayerMechanics.CODEC),
+                buffer.readJsonWithCodec(ItemMechanics.CODEC),
+                buffer.readJsonWithCodec(MobMechanics.CODEC),
+                buffer.readJsonWithCodec(DifficultyMechanics.CODEC),
+                buffer.readJsonWithCodec(DamageScalingMechanics.CODEC)
         );
     }
 

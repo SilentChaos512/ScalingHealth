@@ -21,6 +21,7 @@ package net.silentchaos512.scalinghealth.client.gui.difficulty;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
@@ -101,58 +102,58 @@ public class DifficultyMeter extends Screen {
 
         int currentTime = ClientTicks.ticksInGame();
         if (showMode == DifficultyMeterShow.ALWAYS || keyDown || currentTime - lastUpdateTime < 20 * SHConfig.CLIENT.difficultyMeterShowTime.get()) {
-            RenderSystem.enableBlend();
 
-            RenderSystem.setShaderTexture(0, TEXTURE);
-            event.getPoseStack().pushPose();
+            GuiGraphics graphics = event.getGuiGraphics();
 
             Anchor anchor = SHConfig.CLIENT.difficultyMeterAnchor.get();
             int posX = anchor.getX(width, 66, 5) + SHConfig.CLIENT.difficultyMeterOffsetX.get();
             int posY = anchor.getY(height, 14, 5) + SHConfig.CLIENT.difficultyMeterOffsetY.get();
 
             // Frame
-            blitWithColor(event.getPoseStack(), posX, posY, 190, 0, 66, 14, 0xFFFFFF);
+            blitWithColor(graphics, posX, posY, 190, 0, 66, 14, 0xFFFFFF);
 
             // Area Difficulty
             int barLength = (int) (60 * areaDifficulty / maxDifficulty);
-            blitWithColor(event.getPoseStack(), posX + 3, posY + 5, 193, 19, barLength, 6, 0xFFFFFF);
+            blitWithColor(graphics, posX + 3, posY + 5, 193, 19, barLength, 6, 0xFFFFFF);
 
             // Player Difficulty
             barLength = (int) (60 * difficulty / maxDifficulty);
-            blitWithColor(event.getPoseStack(), posX + 3, posY + 3, 193, 17, barLength, 2, 0xFFFFFF);
+            blitWithColor(graphics, posX + 3, posY + 3, 193, 17, barLength, 2, 0xFFFFFF);
 
             // Text
             final float textScale = SHConfig.CLIENT.difficultyMeterTextScale.get().floatValue();
             if (textScale > 0) {
-                event.getPoseStack().pushPose();
-                event.getPoseStack().scale(textScale, textScale, 1);
-                mc.font.drawShadow(
-                        event.getPoseStack(),
+                PoseStack stack = graphics.pose();
+                stack.pushPose();
+                stack.scale(textScale, textScale, 1);
+                graphics.drawString(
+                        mc.font,
                         I18n.get("misc.scalinghealth.difficultyMeterText"),
                         posX / textScale + 4,
                         posY / textScale - 9,
-                        0xFFFFFF);
+                        0xFFFFFF,
+                        true);
 
                 // Text Difficulty
                 String str = String.format("%d", areaDifficulty);
                 int strWidth = mc.font.width(str);
-                mc.font.drawShadow(
-                        event.getPoseStack(), str,
+                graphics.drawString(
+                        mc.font, str,
                         posX / textScale + 104 - strWidth,
                         posY / textScale - 9,
-                        0xAAAAAA);
-                event.getPoseStack().popPose();
+                        0xAAAAAA,
+                        true);
+                stack.popPose();
             }
-            event.getPoseStack().popPose();
         }
     }
 
-    private void blitWithColor(PoseStack stack, int x, int y, int textureX, int textureY, int width, int height, int color) {
+    private void blitWithColor(GuiGraphics graphics, int x, int y, int textureX, int textureY, int width, int height, int color) {
         float r = ((color >> 16) & 255) / 255f;
         float g = ((color >> 8) & 255) / 255f;
         float b = (color & 255) / 255f;
-        RenderSystem.setShaderColor(r, g, b, 1);
-        blit(stack, x, y, textureX, textureY, width, height);
-        RenderSystem.setShaderColor(1, 1, 1, 1);
+        graphics.setColor(r, g, b, 1);
+        graphics.blit(TEXTURE, x, y, textureX, textureY, width, height);
+        graphics.setColor(1, 1, 1, 1);
     }
 }

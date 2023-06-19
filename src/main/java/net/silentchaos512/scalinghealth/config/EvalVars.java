@@ -33,7 +33,7 @@ public enum EvalVars {
     }
 
     public static double apply(Player player, Expression expression) {
-        return apply(player.level, player.blockPosition(), player, expression);
+        return apply(player.level(), player.blockPosition(), player, expression);
     }
 
     public static double apply(Level world, BlockPos pos, @Nullable Player player, Expression expression) {

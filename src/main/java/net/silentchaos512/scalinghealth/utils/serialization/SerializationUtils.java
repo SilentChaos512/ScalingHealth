@@ -18,13 +18,13 @@ public class SerializationUtils {
     public static final Codec<Supplier<Expression>> EXPRESSION_CODEC = Codec.STRING.comapFlatMap(s ->
             {
                 if(s.isEmpty())
-                    return DataResult.error("Empty Expression");
+                    return DataResult.error(() -> "Empty Expression");
 
                 Expression dummy = EvalVars.dummyPopulate(new Expression(s));
                 try {
                     dummy.eval();
                 } catch (Exception e) {
-                    return DataResult.error("Could not parse Expression: " + e);
+                    return DataResult.error(() -> "Could not parse Expression: " + e);
                 }
                 return DataResult.success(() -> new Expression(s));
             }, e -> e.get().getExpression());
@@ -35,7 +35,7 @@ public class SerializationUtils {
                     AttributeModifier.Operation op = AttributeModifier.Operation.valueOf(s.toUpperCase(Locale.ROOT));
                     return DataResult.success(op);
                 } catch (Exception e) {
-                    return DataResult.error("No Operation named: " + s + ". Valid values are :" +
+                    return DataResult.error(() -> "No Operation named: " + s + ". Valid values are :" +
                             Arrays.stream(AttributeModifier.Operation.values())
                                     .map(Enum::name)
                                     .collect(Collectors.joining(", ")));
@@ -55,7 +55,7 @@ public class SerializationUtils {
             throw new RuntimeException("Use Codec#intRange instead");
         Function<Integer, DataResult<Integer>> bound = i ->
                 i >= min ? DataResult.success(i) :
-                        DataResult.error(i < 0 ? "Int " + i + " must be positive!" : "Value " + i + " is out of bounds");
+                        DataResult.error(() -> i < 0 ? "Int " + i + " must be positive!" : "Value " + i + " is out of bounds");
         return Codec.INT.flatXmap(bound, bound);
     }
 
@@ -64,7 +64,7 @@ public class SerializationUtils {
             throw new RuntimeException("Use Codec#doubleRange instead");
         Function<Double, DataResult<Double>> bound = d ->
                 d >= min ? DataResult.success(d) :
-                        DataResult.error("Double " + d + " must be greater than " + min);
+                        DataResult.error(() -> "Double " + d + " must be greater than " + min);
         return Codec.DOUBLE.flatXmap(bound, bound);
     }
 
@@ -95,13 +95,13 @@ public class SerializationUtils {
 
         private DataResult<NumberConstraint<N1, N2, N3>> verify() {
             if (this.min.doubleValue() > this.starting.doubleValue())
-                return DataResult.error("Starting value can't be smaller than minimum value!");
+                return DataResult.error(() -> "Starting value can't be smaller than minimum value!");
 
             if (this.max.doubleValue() != 0) { //if max is 0, consider it is infinity.
                 if (this.min.doubleValue() > this.max.doubleValue())
-                    return DataResult.error("Minimum value  can't be greater than maximum value!");
+                    return DataResult.error(() -> "Minimum value  can't be greater than maximum value!");
                 if (this.starting.doubleValue() > this.max.doubleValue())
-                    return DataResult.error("Starting value can't be greater than maximum value!");
+                    return DataResult.error(() -> "Starting value can't be greater than maximum value!");
             }
 
             return DataResult.success(this);

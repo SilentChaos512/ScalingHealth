@@ -22,11 +22,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
-import net.minecraftforge.event.entity.living.LivingSpawnEvent;
+import net.minecraftforge.event.entity.living.MobSpawnEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerSleepInBedEvent;
 import net.minecraftforge.event.entity.player.PlayerWakeUpEvent;
@@ -67,16 +66,16 @@ public final class CommonEvents {
    }
 
    @SubscribeEvent
-   public static void onSpawn(LivingSpawnEvent.CheckSpawn event){
-      if(!(event.getEntity() instanceof Mob)) return;
-      if(event.getSpawnReason() == MobSpawnType.SPAWNER) spawnerSpawns.add(event.getEntity().getUUID());
+   public static void onSpawn(MobSpawnEvent.FinalizeSpawn event){
+      if(event.getSpawner() != null)
+         spawnerSpawns.add(event.getEntity().getUUID());
    }
 
    @SubscribeEvent(priority = EventPriority.HIGHEST)
    public static void onMobXPDropped(LivingExperienceDropEvent event) {
       LivingEntity entity = event.getEntity();
       // Additional XP from all mobs.
-      short difficulty = (short) SHDifficulty.areaDifficulty(entity.level, entity.blockPosition());
+      short difficulty = (short) SHDifficulty.areaDifficulty(entity.level(), entity.blockPosition());
       float multi = (float) (1.0f + SHMobs.xpBoost() * difficulty);
 
       float amount = event.getDroppedExperience();
@@ -96,7 +95,7 @@ public final class CommonEvents {
       if(event.phase == TickEvent.Phase.START) return;
       Player player = event.player;
 
-      if (player.level.isClientSide || !player.isAlive())
+      if (player.level().isClientSide || !player.isAlive())
          return;
       SHPlayers.getPlayerData(player).tick(player);
 
@@ -124,7 +123,7 @@ public final class CommonEvents {
    @SubscribeEvent
    public static void onPlayerSleepInBed(PlayerSleepInBedEvent event) {
       Player player = event.getEntity();
-      if (!player.level.isClientSide && SHConfig.CLIENT.warnWhenSleeping.get()) {
+      if (!player.level().isClientSide && SHConfig.CLIENT.warnWhenSleeping.get()) {
          double newDifficulty = SHDifficulty.diffOnPlayerSleep(player);
 
          if (!MathUtils.doublesEqual(SHDifficulty.getDifficultyOf(player), newDifficulty, 0.1)) {
@@ -137,7 +136,7 @@ public final class CommonEvents {
    @SubscribeEvent
    public static void onPlayerWakeUp(PlayerWakeUpEvent event) {
       Player player = event.getEntity();
-      if (!player.level.isClientSide && !event.updateLevel()) {
+      if (!player.level().isClientSide && !event.updateLevel()) {
          SHDifficulty.setSourceDifficulty(player, SHDifficulty.diffOnPlayerSleep(player));
       }
    }

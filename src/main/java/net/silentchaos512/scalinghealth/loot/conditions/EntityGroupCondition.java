@@ -14,6 +14,7 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 import net.silentchaos512.scalinghealth.ScalingHealth;
+import net.silentchaos512.scalinghealth.objects.Registration;
 import net.silentchaos512.scalinghealth.utils.EntityGroup;
 
 import java.util.Locale;
@@ -44,8 +45,7 @@ public class EntityGroupCondition implements LootItemCondition {
 
    @Override
    public LootItemConditionType getType() {
-      return Registry.LOOT_CONDITION_TYPE.getOptional(NAME)
-              .orElseThrow(() -> new RuntimeException("Loot condition type did not register for some reason"));
+      return Registration.ENTITY_GROUP.get();
    }
 
    public static class ThisSerializer implements Serializer<EntityGroupCondition> {

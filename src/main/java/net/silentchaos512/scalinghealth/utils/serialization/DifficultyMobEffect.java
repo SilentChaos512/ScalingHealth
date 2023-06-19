@@ -24,7 +24,7 @@ public record DifficultyMobEffect(MobEffect effect, int level, int minDifficulty
                     ResourceLocation.CODEC.comapFlatMap(
                             rl -> ForgeRegistries.MOB_EFFECTS.containsKey(rl) ?
                                     DataResult.success(ForgeRegistries.MOB_EFFECTS.getValue(rl)) :
-                                    DataResult.error("No potion named:" + rl.toString()),
+                                    DataResult.error(() -> "No potion named:" + rl.toString()),
                             ForgeRegistries.MOB_EFFECTS::getKey
                     ).fieldOf("effect").forGetter(e -> e.effect),
                     SerializationUtils.positiveInt().fieldOf("level").forGetter(e -> e.level),

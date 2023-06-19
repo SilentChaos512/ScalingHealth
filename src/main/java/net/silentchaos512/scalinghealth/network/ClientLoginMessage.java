@@ -17,7 +17,7 @@ public class ClientLoginMessage {
     public static ClientLoginMessage fromBytes(FriendlyByteBuf buf) {
         ClientLoginMessage msg = new ClientLoginMessage();
         try {
-            msg.areaMode = buf.readWithCodec(AreaDifficultyMode.CODEC);
+            msg.areaMode = buf.readJsonWithCodec(AreaDifficultyMode.CODEC);
         } catch (Exception e) {
             throw new RuntimeException("Failed to receive difficulty mode packet!", e);
         }
@@ -27,7 +27,7 @@ public class ClientLoginMessage {
 
     public void toBytes(FriendlyByteBuf buf) {
         try {
-            buf.writeWithCodec(AreaDifficultyMode.CODEC, areaMode);
+            buf.writeJsonWithCodec(AreaDifficultyMode.CODEC, areaMode);
         } catch (Exception e) {
             throw new RuntimeException("Failed to send difficulty mode packet!", e);
         }

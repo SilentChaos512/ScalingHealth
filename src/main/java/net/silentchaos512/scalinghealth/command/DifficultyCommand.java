@@ -6,6 +6,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -20,7 +21,7 @@ import net.silentchaos512.scalinghealth.utils.config.SHDifficulty;
 public final class DifficultyCommand {
     private DifficultyCommand() {}
 
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext) {
         LiteralArgumentBuilder<CommandSourceStack> builder = Commands.literal("sh_difficulty").requires(source ->
                 source.hasPermission(2));
 
@@ -91,7 +92,7 @@ public final class DifficultyCommand {
 
     private static int getDifficultySingle(CommandContext<CommandSourceStack> context, Player player) {
         IDifficultySource source = SHDifficulty.source(player);
-        context.getSource().sendSuccess(ModCommands.playerNameText(player), true);
+        context.getSource().sendSuccess(() -> ModCommands.playerNameText(player), true);
         double maxDifficulty = SHDifficulty.maxValue();
 
         // Player difficulty
@@ -99,10 +100,10 @@ public final class DifficultyCommand {
         MutableComponent playerValues = ModCommands.valueText(difficulty, maxDifficulty);
         MutableComponent playerText = text("player", playerValues)
                 .withStyle(ChatFormatting.YELLOW);
-        context.getSource().sendSuccess(playerText, true);
+        context.getSource().sendSuccess(() -> playerText, true);
 
         // Area difficulty
-        double areaDifficulty = SHDifficulty.areaDifficulty(player.level, player.blockPosition());
+        double areaDifficulty = SHDifficulty.areaDifficulty(player.level(), player.blockPosition());
         MutableComponent areaValues = ModCommands.valueText(areaDifficulty, maxDifficulty);
         MutableComponent areaText = text("area", areaValues)
                 .withStyle(ChatFormatting.YELLOW);
@@ -112,7 +113,7 @@ public final class DifficultyCommand {
                 .append(Component.translatable("scalinghealth.modes.difficulty." + SHDifficulty.areaMode().getName()).withStyle(ChatFormatting.GRAY))
                 .append(")");
         areaText.append(modeText);
-        context.getSource().sendSuccess(areaText, true);
+        context.getSource().sendSuccess(() -> areaText, true);
         return 1;
     }
 
@@ -125,7 +126,7 @@ public final class DifficultyCommand {
         MutableComponent textValues = ModCommands.valueText(difficulty, maxDifficulty);
         MutableComponent textDifficulty = text("server", textValues)
                 .withStyle(ChatFormatting.YELLOW);
-        context.getSource().sendSuccess(textDifficulty, true);
+        context.getSource().sendSuccess(() -> textDifficulty, true);
         return 1;
     }
 

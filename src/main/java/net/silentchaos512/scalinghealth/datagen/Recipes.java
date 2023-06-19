@@ -3,10 +3,7 @@ package net.silentchaos512.scalinghealth.datagen;
 import net.minecraft.advancements.CriterionTriggerInstance;
 import net.minecraft.advancements.critereon.InventoryChangeTrigger;
 import net.minecraft.data.DataGenerator;
-import net.minecraft.data.recipes.FinishedRecipe;
-import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.data.recipes.ShapelessRecipeBuilder;
+import net.minecraft.data.recipes.*;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.Tags;
@@ -17,20 +14,20 @@ import java.util.function.Consumer;
 
 public class Recipes extends RecipeProvider {
     public Recipes (DataGenerator gen) {
-        super(gen);
+        super(gen.getPackOutput());
     }
 
     @Override
-    protected void buildCraftingRecipes(Consumer<FinishedRecipe> consumer) {
+    protected void buildRecipes(Consumer<FinishedRecipe> consumer) {
         fullBlockRecipe(consumer, Registration.HEART_CRYSTAL.get(), Registration.HEART_CRYSTAL_SHARD.get());
         fullBlockRecipe(consumer, Registration.POWER_CRYSTAL.get(), Registration.POWER_CRYSTAL_SHARD.get());
-        ShapelessRecipeBuilder.shapeless(Registration.HEART_DUST.get(), 24)
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, Registration.HEART_DUST.get())
                 .requires(Registration.HEART_CRYSTAL.get())
                 .unlockedBy("cobblestone", getDefaultTrigger())
                 .group(ScalingHealth.MOD_ID)
                 .save(consumer);
 
-        ShapedRecipeBuilder.shaped(Registration.BANDAGES.get(), 2)
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, Registration.BANDAGES.get())
                 .pattern("xxx")
                 .pattern("yyy")
                 .define('x', Items.PAPER)
@@ -39,7 +36,7 @@ public class Recipes extends RecipeProvider {
                 .group(ScalingHealth.MOD_ID)
                 .save(consumer);
 
-        ShapedRecipeBuilder.shaped(Registration.MEDKIT.get(), 2)
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, Registration.MEDKIT.get())
                 .pattern("aba")
                 .pattern("cdc")
                 .pattern("eee")
@@ -54,7 +51,7 @@ public class Recipes extends RecipeProvider {
     }
 
     private void fullBlockRecipe(Consumer<FinishedRecipe> consumer, ItemLike result, ItemLike ingredient){
-        ShapedRecipeBuilder.shaped(result)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, result)
                 .pattern("xxx")
                 .pattern("xxx")
                 .pattern("xxx")

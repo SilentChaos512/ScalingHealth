@@ -7,7 +7,7 @@ import net.silentchaos512.scalinghealth.objects.Registration;
 
 public class EnglishLocalization extends LanguageProvider {
     public EnglishLocalization(DataGenerator gen) {
-        super(gen, ScalingHealth.MOD_ID, "en_us");
+        super(gen.getPackOutput(), ScalingHealth.MOD_ID, "en_us");
     }
 
     @Override

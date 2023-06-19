@@ -79,7 +79,7 @@ public final class DifficultyEvents {
     public static void onLivingUpdate(LivingEvent.LivingTickEvent event) {
         LivingEntity entity = event.getEntity();
         //Return if players are empty on an integrated server, as the player needs a small delay to connect.
-        if (entity.level.isClientSide || (entity.level.players().isEmpty() && !((ServerLevel)entity.level).getServer().isDedicatedServer()))
+        if (entity.level().isClientSide || (entity.level().players().isEmpty() && !((ServerLevel)entity.level()).getServer().isDedicatedServer()))
             return;
 
         // Tick mobs, which will calculate difficulty when appropriate and apply changes
@@ -93,7 +93,7 @@ public final class DifficultyEvents {
                         data.tick((TamableAnimal) entity));
         }
 
-        if (entity instanceof Player && entity.level.getGameTime() % 20 == 0) {
+        if (entity instanceof Player && entity.level().getGameTime() % 20 == 0) {
             entity.getCapability(DifficultySourceCapability.INSTANCE).ifPresent(source -> {
                 source.addDifficulty((float) SHDifficulty.changePerSecond());
             });
@@ -103,7 +103,7 @@ public final class DifficultyEvents {
     @SubscribeEvent
     public static void onMobDeath(LivingDeathEvent event) {
         LivingEntity killed = event.getEntity();
-        if (event.getSource() == null || event.getEntity().level.isClientSide)
+        if (event.getSource() == null || event.getEntity().level().isClientSide)
             return;
 
         Entity entitySource = event.getSource().getEntity();

@@ -15,6 +15,7 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.capability.IDifficultyAffected;
+import net.silentchaos512.scalinghealth.objects.Registration;
 import net.silentchaos512.scalinghealth.utils.config.SHDifficulty;
 
 public class SHMobProperties implements LootItemCondition {
@@ -38,8 +39,7 @@ public class SHMobProperties implements LootItemCondition {
 
     @Override
     public LootItemConditionType getType() {
-        return Registry.LOOT_CONDITION_TYPE.getOptional(NAME)
-                .orElseThrow(() -> new RuntimeException("Loot condition type did not register for some reason"));
+        return Registration.MOB_PROPERTIES.get();
     }
 
     @Override

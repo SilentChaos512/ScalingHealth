@@ -56,7 +56,7 @@ public final class SHDifficulty {
         IDifficultySource source = SHDifficulty.source(player);
         if (!MathUtils.doublesEqual(source.getDifficulty(), difficulty)) {
             source.setDifficulty((float) difficulty);                               //player diff
-            SHDifficulty.source(player.level).setDifficulty((float) difficulty);    //world diff
+            SHDifficulty.source(player.level()).setDifficulty((float) difficulty);    //world diff
         }
     }
 

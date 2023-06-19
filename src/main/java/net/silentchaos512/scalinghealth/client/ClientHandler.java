@@ -30,30 +30,24 @@ public final class ClientHandler {
 
     private ClientHandler() {}
 
-    public static boolean handleSyncMessage(ClientSyncMessage msg, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            playerDifficulty = msg.playerDifficulty;
-            areaDifficulty = msg.areaDifficulty;
-            regenTimer = msg.regenTimer;
-            locationMultiPercent = msg.locationMultiPercent;
+    public static void handleSyncMessage(ClientSyncMessage msg, Supplier<NetworkEvent.Context> ctx) {
+        playerDifficulty = msg.playerDifficulty;
+        areaDifficulty = msg.areaDifficulty;
+        regenTimer = msg.regenTimer;
+        locationMultiPercent = msg.locationMultiPercent;
 
-            Minecraft mc = Minecraft.getInstance();
-            LocalPlayer player = mc.player;
-            if (player != null) {
-                player.experienceLevel = msg.experienceLevel;
-            }
-        });
-        return true;
+        Minecraft mc = Minecraft.getInstance();
+        LocalPlayer player = mc.player;
+        if (player != null) {
+            player.experienceLevel = msg.experienceLevel;
+        }
     }
 
-    public static boolean handleLoginMessage(ClientLoginMessage msg, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            ScalingHealth.LOGGER.info(MARKER, "Processing login packet");
-            areaMode = msg.areaMode;
-            maxDifficultyValue = msg.maxDifficultyValue;
-            ScalingHealth.LOGGER.info(MARKER, "World area mode: {}", areaMode.getName());
-            ScalingHealth.LOGGER.info(MARKER, "World max difficulty: {}", maxDifficultyValue);
-        });
-        return true;
+    public static void handleLoginMessage(ClientLoginMessage msg, Supplier<NetworkEvent.Context> ctx) {
+        ScalingHealth.LOGGER.info(MARKER, "Processing login packet");
+        areaMode = msg.areaMode;
+        maxDifficultyValue = msg.maxDifficultyValue;
+        ScalingHealth.LOGGER.info(MARKER, "World area mode: {}", areaMode.getName());
+        ScalingHealth.LOGGER.info(MARKER, "World max difficulty: {}", maxDifficultyValue);
     }
 }

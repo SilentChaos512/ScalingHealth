@@ -60,7 +60,7 @@ class HeartsInfo {
         rowsUsedInHud = absorptionInt > 0 ? 2 : 1;
         rowHeight = rowsUsedInHud + 9; // wut?
         recentlyHurtHighlight = player.invulnerableTime / 3 % 2 == 1;
-        hardcoreMode = player.level.getLevelData().isHardcore();
+        hardcoreMode = player.level().getLevelData().isHardcore();
         for (int i = 0; i < lowHealthBob.length; ++i) lowHealthBob[i] = random.nextInt(2);
         regenTimer = player.hasEffect(MobEffects.REGENERATION) ? updateCounter % 20 : -1;
     }

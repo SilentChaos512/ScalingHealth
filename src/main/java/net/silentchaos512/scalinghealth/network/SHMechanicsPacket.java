@@ -9,19 +9,18 @@ import java.util.function.Supplier;
 
 public record SHMechanicsPacket(SHMechanics shMechanics) {
     public void encode(FriendlyByteBuf buffer) {
-        buffer.writeWithCodec(PlayerMechanics.CODEC, shMechanics.playerMechanics());
-        buffer.writeWithCodec(ItemMechanics.CODEC, shMechanics.itemMechanics());
-        buffer.writeWithCodec(MobMechanics.CODEC, shMechanics.mobMechanics());
-        buffer.writeWithCodec(DifficultyMechanics.CODEC, shMechanics.difficultyMechanics());
-        buffer.writeWithCodec(DamageScalingMechanics.CODEC, shMechanics.damageScalingMechanics());
+        buffer.writeJsonWithCodec(PlayerMechanics.CODEC, shMechanics.playerMechanics());
+        buffer.writeJsonWithCodec(ItemMechanics.CODEC, shMechanics.itemMechanics());
+        buffer.writeJsonWithCodec(MobMechanics.CODEC, shMechanics.mobMechanics());
+        buffer.writeJsonWithCodec(DifficultyMechanics.CODEC, shMechanics.difficultyMechanics());
+        buffer.writeJsonWithCodec(DamageScalingMechanics.CODEC, shMechanics.damageScalingMechanics());
     }
 
     public static SHMechanicsPacket decode(FriendlyByteBuf buffer) {
         return new SHMechanicsPacket(SHMechanics.fromNetwork(buffer));
     }
 
-    public static boolean handle(SHMechanicsPacket packet, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> MechanicsHandler.setClientMechanics(packet.shMechanics));
-        return true;
+    public static void handle(SHMechanicsPacket packet, Supplier<NetworkEvent.Context> ctx) {
+        MechanicsHandler.setClientMechanics(packet.shMechanics);
     }
 }

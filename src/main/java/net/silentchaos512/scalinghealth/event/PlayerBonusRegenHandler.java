@@ -56,7 +56,7 @@ public final class PlayerBonusRegenHandler {
         if (event.side == LogicalSide.CLIENT) return;
 
         Player player = event.player;
-        if (isDisabled(player.level))
+        if (isDisabled(player.level()))
             return;
 
         PlayerMechanics.RegenMechanics config = SHMechanics.getMechanics().playerMechanics().regenMechanics;
@@ -83,10 +83,10 @@ public final class PlayerBonusRegenHandler {
     @SubscribeEvent
     public static void onPlayerHurt(LivingHurtEvent event) {
         LivingEntity entity = event.getEntity();
-        if (isDisabled(entity.level))
+        if (isDisabled(entity.level()))
             return;
 
-        if (!entity.level.isClientSide && entity instanceof Player) {
+        if (!entity.level().isClientSide && entity instanceof Player) {
             TIMERS.put(entity.getUUID(), (int) (SHMechanics.getMechanics().playerMechanics().regenMechanics.initialDelay * 20));
         }
     }

@@ -48,7 +48,7 @@ public interface IPlayerData {
     }
 
     static void sendUpdatePacketTo(Player player) {
-        Level world = player.level;
+        Level world = player.level();
         BlockPos pos = player.blockPosition();
         ClientSyncMessage msg = new ClientSyncMessage(
                 SHDifficulty.source(player).getDifficulty(),

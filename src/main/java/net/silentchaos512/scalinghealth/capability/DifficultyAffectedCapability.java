@@ -36,7 +36,7 @@ public class DifficultyAffectedCapability implements IDifficultyAffected, ICapab
 
     @Override
     public void setDifficulty(Mob mob) {
-        difficulty = (float) ((Math.random()*(0.1)+0.95) * SHDifficulty.areaDifficulty(mob.level, mob.blockPosition()));
+        difficulty = (float) ((Math.random()*(0.1)+0.95) * SHDifficulty.areaDifficulty(mob.level(), mob.blockPosition()));
     }
 
     @Override

@@ -6,6 +6,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -20,7 +21,7 @@ import net.silentchaos512.scalinghealth.utils.config.SHPlayers;
 public final class HealthCommand {
     private HealthCommand() {}
 
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext) {
         LiteralArgumentBuilder<CommandSourceStack> builder = Commands.literal("sh_health").requires(source ->
                 source.hasPermission(2));
 
@@ -74,12 +75,12 @@ public final class HealthCommand {
     private static int getHealthSingle(CommandContext<CommandSourceStack> context, Player player) {
         IPlayerData data = SHPlayers.getPlayerData(player);
 
-        context.getSource().sendSuccess(ModCommands.playerNameText(player), true);
+        context.getSource().sendSuccess(() -> ModCommands.playerNameText(player), true);
         // Actual health
         MutableComponent actualValues = ModCommands.valueText(player.getHealth(), player.getMaxHealth());
         MutableComponent actualText = text("actual", actualValues)
                 .withStyle(ChatFormatting.YELLOW);
-        context.getSource().sendSuccess(actualText, true);
+        context.getSource().sendSuccess(() -> actualText, true);
         // Heart crystals and health modifier
         int extraHearts = data.getHeartCrystals();
         String extraHealth = (extraHearts >= 0 ? "+" : "") + (2 * extraHearts);
@@ -87,7 +88,7 @@ public final class HealthCommand {
                 .withStyle(ChatFormatting.WHITE);
         MutableComponent heartsText = text("heartCrystals", heartsValues)
                 .withStyle(ChatFormatting.YELLOW);
-        context.getSource().sendSuccess(heartsText, true);
+        context.getSource().sendSuccess(() -> heartsText, true);
         return 1;
     }
 

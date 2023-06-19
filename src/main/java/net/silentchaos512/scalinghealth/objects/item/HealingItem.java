@@ -45,7 +45,7 @@ public class HealingItem extends Item {
     private final int effectDuration;
 
     public HealingItem(float healAmount, int healSpeed) {
-        super(new Item.Properties().stacksTo(16).tab(ScalingHealth.SH));
+        super(new Item.Properties().stacksTo(16));
         this.healAmount = healAmount;
         this.healSpeed = healSpeed;
         this.effectDuration = (int) (this.healAmount * 100 * 20 * 2 / this.healSpeed);
@@ -87,7 +87,7 @@ public class HealingItem extends Item {
     }
 
     @Override
-    public void onUsingTick(ItemStack stack, LivingEntity player, int count) {
+    public void onUseTick(Level level, LivingEntity player, ItemStack stack, int count) {
         if (count % 10 == 0) {
             player.playSound(SoundEvents.ARMOR_EQUIP_LEATHER,
                     1.25f, (float) (1.1f + 0.05f * ScalingHealth.RANDOM.nextGaussian()));

@@ -57,7 +57,7 @@ public final class DamageScaling {
     public static void onEntityHurt(LivingAttackEvent event) {
         if(!EnabledFeatures.mobDamageScalingEnabled() && !EnabledFeatures.playerDamageScalingEnabled()) return;
         LivingEntity entity = event.getEntity();
-        if (entity.level.isClientSide) return;
+        if (entity.level().isClientSide) return;
         // Entity invulnerable?
         if (entity.isInvulnerableTo(event.getSource()) || entity.invulnerableTime > entity.invulnerableDuration / 2)
             return;
@@ -94,7 +94,7 @@ public final class DamageScaling {
 
             if (SHConfig.SERVER.debugLogScaledDamage.get()) {
                 ScalingHealth.LOGGER.debug(MARKER, "{} on {}: {} -> {} (scale={}, affected={}, change={})",
-                        source.msgId, entity.getScoreboardName(), original, newAmount, scale, affectedAmount, change);
+                        source.getMsgId(), entity.getScoreboardName(), original, newAmount, scale, affectedAmount, change);
             }
         }
     }
@@ -104,7 +104,7 @@ public final class DamageScaling {
         Mode mode = config.mode;
         switch (mode) {
             case AREA_DIFFICULTY:
-                return SHDifficulty.areaDifficulty(entity.level, entity.blockPosition()) * config.difficultyWeight;
+                return SHDifficulty.areaDifficulty(entity.level(), entity.blockPosition()) * config.difficultyWeight;
             case MAX_HEALTH:
                 AttributeInstance attr = entity.getAttribute(Attributes.MAX_HEALTH);
                 if (attr == null) {

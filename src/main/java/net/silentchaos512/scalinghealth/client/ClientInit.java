@@ -33,7 +33,7 @@ public class ClientInit {
                 Registration.POWER_CRYSTAL_PARTICLE.get(), factory(Color.ROYALBLUE),
                 Registration.CURSED_HEART_PARTICLE.get(), factory(Color.REBECCAPURPLE),
                 Registration.ENCHANTED_HEART_PARTICLE.get(), factory(Color.ANTIQUEWHITE)
-        ).forEach(event::register);
+        ).forEach(event::registerSpecial);
     }
 
     private static ParticleProvider<SimpleParticleType> factory(Color color) {

@@ -80,7 +80,7 @@ public final class BlightHandler {
                     finalMessage = Component.literal(almostFinalMessage.getString() + slayer.getName().getString());
             }
 
-            for (Player p : blight.level.players())
+            for (Player p : blight.level().players())
                 p.sendSystemMessage(finalMessage);
         }
     }
@@ -94,7 +94,7 @@ public final class BlightHandler {
         if(!(event.getEntity() instanceof Mob)) return;
 
         Mob blight = (Mob) event.getEntity();
-        if (event.getSource() == null || !SHMobs.isBlight(blight) || event.getEntity().level.isClientSide)
+        if (event.getSource() == null || !SHMobs.isBlight(blight) || event.getEntity().level().isClientSide)
             return;
 
         Entity entitySource = event.getSource().getEntity();
@@ -139,7 +139,7 @@ public final class BlightHandler {
     @SubscribeEvent
     public static void onBlightUpdate(LivingEvent.LivingTickEvent event) {
         LivingEntity blight = event.getEntity();
-        if (!blight.level.isClientSide && blight instanceof Mob && SHMobs.isBlight((Mob) blight) && blight.level.getGameTime() % 1000 == 0) {
+        if (!blight.level().isClientSide && blight instanceof Mob && SHMobs.isBlight((Mob) blight) && blight.level().getGameTime() % 1000 == 0) {
             applyBlightPotionEffects((Mob) blight);
         }
     }

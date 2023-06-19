@@ -23,25 +23,25 @@ public final class Network {
         channel.messageBuilder(ClientSyncMessage.class, 1)
                 .decoder(ClientSyncMessage::fromBytes)
                 .encoder(ClientSyncMessage::toBytes)
-                .consumer(ClientHandler::handleSyncMessage)
+                .consumerMainThread(ClientHandler::handleSyncMessage)
                 .add();
 
         channel.messageBuilder(ClientLoginMessage.class, 2)
                 .decoder(ClientLoginMessage::fromBytes)
                 .encoder(ClientLoginMessage::toBytes)
-                .consumer(ClientHandler::handleLoginMessage)
+                .consumerMainThread(ClientHandler::handleLoginMessage)
                 .add();
 
         channel.messageBuilder(ClientBlightMessage.class, 3)
                 .decoder(ClientBlightMessage::decode)
                 .encoder(ClientBlightMessage::encode)
-                .consumer(ClientBlightMessage::handle)
+                .consumerMainThread(ClientBlightMessage::handle)
                 .add();
 
         channel.messageBuilder(SHMechanicsPacket.class, 4)
                 .decoder(SHMechanicsPacket::decode)
                 .encoder(SHMechanicsPacket::encode)
-                .consumer(SHMechanicsPacket::handle)
+                .consumerMainThread(SHMechanicsPacket::handle) //TODO NETWORK THREAD?
                 .add();
     }
 }

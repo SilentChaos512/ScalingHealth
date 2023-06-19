@@ -69,7 +69,7 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
 
     @Override
     public void tick(Player player) {
-        if (player.level.getGameTime() % 20 == 0 && !player.level.isClientSide) {
+        if (player.level().getGameTime() % 20 == 0 && !player.level().isClientSide) {
             checkPlayerIdle(player);
 
             if(player instanceof ServerPlayer)
@@ -78,7 +78,7 @@ public class PlayerDataCapability implements IPlayerData, ICapabilitySerializabl
     }
 
     private void checkPlayerIdle(Player player) {
-        if (SHDifficulty.areaDifficulty(player.level, player.blockPosition()) >= SHDifficulty.maxValue()) return;
+        if (SHDifficulty.areaDifficulty(player.level(), player.blockPosition()) >= SHDifficulty.maxValue()) return;
 
         if (player.blockPosition().equals(lastPos)) {
             timeAfk++;

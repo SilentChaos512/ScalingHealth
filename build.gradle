@@ -4,11 +4,12 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '6.0.+', changing: true
     }
 }
 
 plugins {
+    id 'idea'
     id 'eclipse'
     id 'maven-publish'
     id 'com.matthewprenger.cursegradle' version '1.4.0'
@@ -35,9 +36,10 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
-     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
-    mappings channel: 'official', version: '1.19.2'
+    mappings channel: 'official', version: '1.20.1'
+    copyIdeResources = true
 
     runs {
         client {
@@ -213,7 +215,7 @@ curseforge {
 //            }
         }
         options {
-            debug = true
+            debug = false
         }
     }
 }

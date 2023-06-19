@@ -12,7 +12,7 @@ import net.silentchaos512.scalinghealth.utils.EntityGroup;
 
 public class LootModifierGen extends GlobalLootModifierProvider {
     public LootModifierGen(DataGenerator gen) {
-        super(gen, ScalingHealth.MOD_ID);
+        super(gen.getPackOutput(), ScalingHealth.MOD_ID);
     }
 
     @Override
@@ -33,11 +33,11 @@ public class LootModifierGen extends GlobalLootModifierProvider {
                         (LootTableReference) LootTableReference.lootTableReference(ScalingHealth.getId("bonus_drops/peaceful")).build()
                 ));
 
-        LootTablesGenerator.CHESTS.forEach(rl ->
+        ChestLootTables.CHESTS.forEach(rl ->
                 this.add(rl.getPath(),
                         new TableGlobalModifier(
                                 new LootItemCondition[]{LootTableIdCondition.builder(rl).build()},
-                                (LootTableReference) LootTableReference.lootTableReference(LootTablesGenerator.VANILLA_TO_SH.get(rl)).build()
+                                (LootTableReference) LootTableReference.lootTableReference(ChestLootTables.VANILLA_TO_SH.get(rl)).build()
                         )
                 ));
 

@@ -6,6 +6,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
@@ -21,7 +22,7 @@ import net.silentchaos512.scalinghealth.utils.config.SHPlayers;
 public final class PowerCommand {
     private PowerCommand() {}
 
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext buildContext) {
         LiteralArgumentBuilder<CommandSourceStack> builder = Commands.literal("sh_power").requires(source ->
                 source.hasPermission(2));
 
@@ -74,12 +75,12 @@ public final class PowerCommand {
 
     private static int runGetSingle(CommandContext<CommandSourceStack> context, Player player) {
         IPlayerData data = SHPlayers.getPlayerData(player);
-        context.getSource().sendSuccess(ModCommands.playerNameText(player), true);
+        context.getSource().sendSuccess(() -> ModCommands.playerNameText(player), true);
         // Actual power
         AttributeInstance attr = player.getAttribute(Attributes.ATTACK_DAMAGE);
         Component actualText = text("actual", String.format("%.1f", attr.getValue()))
                 .copy().withStyle(ChatFormatting.YELLOW);
-        context.getSource().sendSuccess(actualText, true);
+        context.getSource().sendSuccess(() -> actualText, true);
         // Crystals and modifier
         int crystals = data.getPowerCrystals();
         String extraPower = (crystals >= 0 ? "+" : "") + (data.getAttackDamageModifier());
@@ -87,7 +88,7 @@ public final class PowerCommand {
                 .copy().withStyle(ChatFormatting.WHITE);
         Component crystalsText = text("powerCrystals", crystalsValues)
                 .copy().withStyle(ChatFormatting.YELLOW);
-        context.getSource().sendSuccess(crystalsText, true);
+        context.getSource().sendSuccess(() -> crystalsText, true);
         return 1;
     }
 

@@ -65,13 +65,7 @@ public class ColoredParticle extends SingleQuadParticle {
         return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
     }
 
-    public static class Factory implements ParticleProvider<SimpleParticleType> {
-        private final Color color;
-        public Factory(Color color) {
-            this.color = color;
-        }
-
-        @Nullable
+    public record Factory(Color color) implements ParticleProvider<SimpleParticleType> {
         @Override
         public Particle createParticle(SimpleParticleType typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
             return new ColoredParticle(worldIn, this.color, x, y, z, xSpeed, ySpeed, zSpeed);

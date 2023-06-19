@@ -2,9 +2,6 @@ package net.silentchaos512.scalinghealth.event;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Matrix3f;
-import com.mojang.math.Matrix4f;
-import com.mojang.math.Quaternion;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.RenderType;
@@ -20,6 +17,9 @@ import net.silentchaos512.lib.event.ClientTicks;
 import net.silentchaos512.scalinghealth.ScalingHealth;
 import net.silentchaos512.scalinghealth.utils.config.EnabledFeatures;
 import net.silentchaos512.scalinghealth.utils.config.SHDifficulty;
+import org.joml.Matrix3f;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = ScalingHealth.MOD_ID)
 public class BlightRenderEvent {
@@ -46,8 +46,8 @@ public class BlightRenderEvent {
          float yOffset = (float) (mob.getY() - mob.getBoundingBox().minY);
          float zOffset = 0.0F;
 
-         Quaternion cam = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
-         stack.mulPose(new Quaternion(0, cam.j(), 0, cam.r()));
+         Quaternionf cam = Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation();
+         stack.mulPose(new Quaternionf(0, cam.y, 0, cam.w));
 
          stack.translate(0, 0, hwRatio * 0.02f);
          int i = 0;

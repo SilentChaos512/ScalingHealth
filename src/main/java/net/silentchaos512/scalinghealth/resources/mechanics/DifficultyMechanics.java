@@ -110,7 +110,7 @@ public class DifficultyMechanics {
             if (l.isEmpty())
                 return DataResult.success(Collections.emptyList());
             if (l.size() != 8)
-                return DataResult.error("Lunar cycles multiplier list must have exactly 8 entries!");
+                return DataResult.error(() -> "Lunar cycles multiplier list must have exactly 8 entries!");
             return DataResult.success(l);
         };
 
@@ -203,7 +203,7 @@ public class DifficultyMechanics {
                            Supplier<Expression> onPlayerSleep,
                            List<Pair<List<ResourceLocation>, Supplier<Expression>>> byEntity) {
         private static final Function<ResourceLocation, DataResult<ResourceLocation>> ONLY_ENTITES = rl ->
-                ForgeRegistries.ENTITY_TYPES.containsKey(rl) ? DataResult.success(rl) : DataResult.error(rl + " is not an entity!");
+                ForgeRegistries.ENTITY_TYPES.containsKey(rl) ? DataResult.success(rl) : DataResult.error(() -> rl + " is not an entity!");
 
         public static final Codec<Mutators> CODEC = RecordCodecBuilder.create(inst ->
                 inst.group(

@@ -24,12 +24,9 @@ public class ClientBlightMessage {
         return new ClientBlightMessage(buffer.readInt());
     }
 
-    public static boolean handle(ClientBlightMessage msg, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            Entity e = Minecraft.getInstance().level.getEntity(msg.entityId);
-            if(e instanceof Mob)
-                SHDifficulty.affected(e).setIsBlight(true);
-        });
-        return true;
+    public static void handle(ClientBlightMessage msg, Supplier<NetworkEvent.Context> ctx) {
+        Entity e = Minecraft.getInstance().level.getEntity(msg.entityId);
+        if(e instanceof Mob)
+            SHDifficulty.affected(e).setIsBlight(true);
     }
 }

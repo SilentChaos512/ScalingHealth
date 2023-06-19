@@ -5,6 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
+import net.minecraftforge.common.CreativeModeTabRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
@@ -37,13 +38,6 @@ public class ScalingHealth {
     public static final Logger LOGGER = LogManager.getLogger(MOD_NAME);
     public static final Random RANDOM = new Random();
 
-    public static final CreativeModeTab SH = new CreativeModeTab(MOD_ID) {
-        @Override
-        public ItemStack makeIcon() {
-            return new ItemStack(Registration.HEART_CRYSTAL.get());
-        }
-    };
-
     public ScalingHealth() {
         IEventBus modbus = FMLJavaModLoadingContext.get().getModEventBus();
 
@@ -54,16 +48,8 @@ public class ScalingHealth {
 
         modbus.addListener(this::registerCaps);
         modbus.addListener(this::reloadConfig);
-        modbus.addListener(this::registerLootType);
 
         MinecraftForge.EVENT_BUS.addListener(this::registerCommandsEvent);
-    }
-
-    private void registerLootType(RegisterEvent event) {
-        if (event.getRegistryKey() == ForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS) {
-            Registry.register(Registry.LOOT_CONDITION_TYPE, SHMobProperties.NAME, new LootItemConditionType(new SHMobProperties.ThisSerializer()));
-            Registry.register(Registry.LOOT_CONDITION_TYPE, EntityGroupCondition.NAME, new LootItemConditionType(new EntityGroupCondition.ThisSerializer()));
-        }
     }
 
     private void registerCaps(RegisterCapabilitiesEvent event) {
@@ -74,7 +60,7 @@ public class ScalingHealth {
     }
 
     private void registerCommandsEvent(RegisterCommandsEvent event) {
-        ModCommands.registerAll(event.getDispatcher());
+        ModCommands.registerAll(event);
     }
 
     private void reloadConfig(ModConfigEvent.Reloading event) {

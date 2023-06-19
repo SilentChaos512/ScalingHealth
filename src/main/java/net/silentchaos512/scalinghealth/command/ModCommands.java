@@ -1,21 +1,20 @@
 package net.silentchaos512.scalinghealth.command;
 
-import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.ChatFormatting;
-import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.event.RegisterCommandsEvent;
 
 public final class ModCommands {
     private ModCommands() {throw new IllegalAccessError("Utility class");}
 
-    public static void registerAll(CommandDispatcher<CommandSourceStack> dispatcher) {
-        DifficultyCommand.register(dispatcher);
-        HealthCommand.register(dispatcher);
-        PowerCommand.register(dispatcher);
-        RecalculateCommand.register(dispatcher);
-        SummonCommand.register(dispatcher);
+    public static void registerAll(RegisterCommandsEvent event) {
+        DifficultyCommand.register(event.getDispatcher(), event.getBuildContext());
+        HealthCommand.register(event.getDispatcher(), event.getBuildContext());
+        PowerCommand.register(event.getDispatcher(), event.getBuildContext());
+        RecalculateCommand.register(event.getDispatcher(), event.getBuildContext());
+        SummonCommand.register(event.getDispatcher(), event.getBuildContext());
     }
 
     static MutableComponent playerNameText(Player player) {

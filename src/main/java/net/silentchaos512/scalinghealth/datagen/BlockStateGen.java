@@ -8,7 +8,7 @@ import net.silentchaos512.scalinghealth.objects.Registration;
 
 public class BlockStateGen extends BlockStateProvider {
     public BlockStateGen(GatherDataEvent event) {
-        super(event.getGenerator(), ScalingHealth.MOD_ID, event.getExistingFileHelper());
+        super(event.getGenerator().getPackOutput(), ScalingHealth.MOD_ID, event.getExistingFileHelper());
     }
 
     @Override
