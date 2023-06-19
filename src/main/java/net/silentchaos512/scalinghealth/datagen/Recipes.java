@@ -21,22 +21,23 @@ public class Recipes extends RecipeProvider {
     protected void buildRecipes(Consumer<FinishedRecipe> consumer) {
         fullBlockRecipe(consumer, Registration.HEART_CRYSTAL.get(), Registration.HEART_CRYSTAL_SHARD.get());
         fullBlockRecipe(consumer, Registration.POWER_CRYSTAL.get(), Registration.POWER_CRYSTAL_SHARD.get());
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, Registration.HEART_DUST.get())
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, Registration.HEART_DUST.get(), 24)
                 .requires(Registration.HEART_CRYSTAL.get())
                 .unlockedBy("cobblestone", getDefaultTrigger())
                 .group(ScalingHealth.MOD_ID)
                 .save(consumer);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, Registration.BANDAGES.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, Registration.BANDAGES.get(), 2)
                 .pattern("xxx")
                 .pattern("yyy")
                 .define('x', Items.PAPER)
                 .define('y', Registration.HEART_DUST.get())
                 .unlockedBy("cobblestone", getDefaultTrigger())
+                .showNotification(false)
                 .group(ScalingHealth.MOD_ID)
                 .save(consumer);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, Registration.MEDKIT.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, Registration.MEDKIT.get(), 2)
                 .pattern("aba")
                 .pattern("cdc")
                 .pattern("eee")
@@ -46,6 +47,7 @@ public class Recipes extends RecipeProvider {
                 .define('d', Items.GLISTERING_MELON_SLICE)
                 .define('e', Items.TERRACOTTA)
                 .unlockedBy("cobblestone", getDefaultTrigger())
+                .showNotification(false)
                 .group(ScalingHealth.MOD_ID)
                 .save(consumer);
     }
@@ -58,6 +60,7 @@ public class Recipes extends RecipeProvider {
                 .define('x', ingredient)
                 .unlockedBy("cobblestone", getDefaultTrigger())
                 .group(ScalingHealth.MOD_ID)
+                .showNotification(false)
                 .save(consumer);
     }
 

@@ -1,5 +1,6 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "equipment",
   "group": "scalinghealth",
   "key": {
     "a": {
@@ -26,5 +27,6 @@
   "result": {
     "count": 2,
     "item": "scalinghealth:medkit"
-  }
+  },
+  "show_notification": false
 }

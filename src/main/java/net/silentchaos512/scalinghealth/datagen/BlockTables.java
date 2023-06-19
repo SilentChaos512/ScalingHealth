@@ -1,5 +1,6 @@
 package net.silentchaos512.scalinghealth.datagen;
 
+import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.advancements.critereon.EnchantmentPredicate;
 import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.advancements.critereon.MinMaxBounds;
@@ -20,10 +21,25 @@ import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.silentchaos512.scalinghealth.objects.Registration;
 
 import java.util.Collections;
+import java.util.Set;
 
 public class BlockTables extends BlockLootSubProvider {
+    //keep a list of SH blocks otherwise default generation is the whole block registry
+    private final Set<Block> knownBlocks = new ReferenceOpenHashSet<>();
+
     protected BlockTables() {
         super(Collections.emptySet(), FeatureFlags.VANILLA_SET);
+    }
+
+    @Override
+    protected void add(Block block, LootTable.Builder builder) {
+        super.add(block, builder);
+        knownBlocks.add(block);
+    }
+
+    @Override
+    protected Iterable<Block> getKnownBlocks() {
+        return knownBlocks;
     }
 
     @Override

@@ -1,4 +1,5 @@
 {
+  "type": "minecraft:entity",
   "pools": [
     {
       "bonus_rolls": 0.0,
@@ -69,7 +70,6 @@
           "name": "scalinghealth:power_crystal_shard"
         }
       ],
-      "name": "crystals",
       "rolls": 1.0
     },
     {
@@ -119,7 +119,6 @@
           "name": "scalinghealth:medkit"
         }
       ],
-      "name": "extras",
       "rolls": 1.0
     },
     {
@@ -164,7 +163,6 @@
           "name": "scalinghealth:enchanted_heart"
         }
       ],
-      "name": "difficulty_mutators",
       "rolls": 1.0
     },
     {
@@ -217,8 +215,8 @@
           "weight": 5
         }
       ],
-      "name": "blights",
       "rolls": 1.0
     }
-  ]
+  ],
+  "random_sequence": "scalinghealth:bonus_drops/hostile"
 }

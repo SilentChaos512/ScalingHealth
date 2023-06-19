@@ -15,7 +15,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "scalinghealth:bandages"
+        "recipe": "scalinghealth:heart_crystal"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -28,7 +28,8 @@
   ],
   "rewards": {
     "recipes": [
-      "scalinghealth:bandages"
+      "scalinghealth:heart_crystal"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

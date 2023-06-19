@@ -1,5 +1,6 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "misc",
   "group": "scalinghealth",
   "key": {
     "x": {
@@ -13,5 +14,6 @@
   ],
   "result": {
     "item": "scalinghealth:heart_crystal"
-  }
+  },
+  "show_notification": false
 }

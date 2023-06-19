@@ -21,6 +21,9 @@
       "count": 1
     },
     {
+      "type": "minecraft:biome"
+    },
+    {
       "type": "scalinghealth:heart_crystal_placement"
     }
   ]

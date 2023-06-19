@@ -48,8 +48,8 @@
           ]
         }
       ],
-      "name": "deepslate_heart_crystal_ore",
       "rolls": 1.0
     }
-  ]
+  ],
+  "random_sequence": "scalinghealth:blocks/deepslate_heart_crystal_ore"
 }

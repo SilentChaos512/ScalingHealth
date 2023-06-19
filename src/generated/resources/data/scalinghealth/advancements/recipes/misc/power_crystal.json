@@ -15,7 +15,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "scalinghealth:heart_crystal"
+        "recipe": "scalinghealth:power_crystal"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -28,7 +28,8 @@
   ],
   "rewards": {
     "recipes": [
-      "scalinghealth:heart_crystal"
+      "scalinghealth:power_crystal"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

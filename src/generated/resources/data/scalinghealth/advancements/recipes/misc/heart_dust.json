@@ -30,5 +30,6 @@
     "recipes": [
       "scalinghealth:heart_dust"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

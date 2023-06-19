@@ -1,5 +1,6 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "equipment",
   "group": "scalinghealth",
   "key": {
     "x": {
@@ -16,5 +17,6 @@
   "result": {
     "count": 2,
     "item": "scalinghealth:bandages"
-  }
+  },
+  "show_notification": false
 }

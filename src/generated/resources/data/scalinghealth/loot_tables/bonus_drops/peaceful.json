@@ -1,4 +1,5 @@
 {
+  "type": "minecraft:entity",
   "pools": [
     {
       "bonus_rolls": 0.0,
@@ -45,7 +46,6 @@
           "name": "scalinghealth:power_crystal_shard"
         }
       ],
-      "name": "crystals",
       "rolls": 1.0
     },
     {
@@ -70,7 +70,6 @@
           "name": "scalinghealth:cursed_heart"
         }
       ],
-      "name": "difficulty_mutators",
       "rolls": 1.0
     },
     {
@@ -123,8 +122,8 @@
           "weight": 2
         }
       ],
-      "name": "blights",
       "rolls": 1.0
     }
-  ]
+  ],
+  "random_sequence": "scalinghealth:bonus_drops/peaceful"
 }

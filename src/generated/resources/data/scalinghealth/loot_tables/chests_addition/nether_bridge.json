@@ -1,4 +1,5 @@
 {
+  "type": "minecraft:chest",
   "pools": [
     {
       "bonus_rolls": 0.0,
@@ -96,5 +97,6 @@
         "min": 0.0
       }
     }
-  ]
+  ],
+  "random_sequence": "scalinghealth:chests_addition/nether_bridge"
 }
