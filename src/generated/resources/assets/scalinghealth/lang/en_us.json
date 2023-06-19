@@ -12,7 +12,7 @@
   "command.scalinghealth.health.heartCrystals": "Heart Crystals: %s",
   "command.scalinghealth.health.heartCrystals.values": "%d (%s health)",
   "command.scalinghealth.outOfBounds": "Value must be between %s and %s",
-  "command.scalinghealth.playerName": "Player: %s %s",
+  "command.scalinghealth.playerName": "Player: %s",
   "command.scalinghealth.playerName.inDimension": "(in dimension %s)",
   "command.scalinghealth.power.actual": "Actual Attack Damage: %s",
   "command.scalinghealth.power.powerCrystals": "Power Crystals: %s",
@@ -51,5 +51,5 @@
   "scalinghealth.subtitle.enchanted_heart_use": "Enchanted Heart used",
   "scalinghealth.subtitle.heart_crystal_use": "Heart Crystal used",
   "scalinghealth.subtitle.player_died": "Somebody died (LOL)",
-  "scalinghealth.tab" : "Scaling Health"
+  "scalinghealth.tab": "Scaling Health"
 }

@@ -22,7 +22,7 @@ public class EnglishLocalization extends LanguageProvider {
 
         addCommand("outOfBounds", "Value must be between %s and %s");
         addCommand("valueOverMax", "%s / %s");
-        addCommand("playerName", "Player: %s %s");
+        addCommand("playerName", "Player: %s");
         addCommand("playerName.inDimension", "(in dimension %s)");
         addCommand("difficulty.area", "Area Difficulty: %s");
         addCommand("difficulty.player", "Player Difficulty: %s");
@@ -71,6 +71,8 @@ public class EnglishLocalization extends LanguageProvider {
         addDiffMode("distance", "Distance");
         addDiffMode("distance_and_time", "Distance and Time");
         addDiffMode("server_wide", "Server Wide");
+
+        noPre("tab", "Scaling Health");
     }
 
     private void addDiffMode(String post, String translation) {
