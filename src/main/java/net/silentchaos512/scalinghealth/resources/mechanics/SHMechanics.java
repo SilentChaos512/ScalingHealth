@@ -46,7 +46,7 @@ public record SHMechanics(PlayerMechanics playerMechanics, ItemMechanics itemMec
         else {
             for (ServerPlayer player : event.getPlayerList().getPlayers()) {
                 Network.channel.sendTo(new SHMechanicsPacket(SHMechanicListener.getInstance()), player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
-                Network.channel.sendTo(new ClientLoginMessage(SHDifficulty.areaMode(), (float) SHDifficulty.maxValue()), event.getPlayer().connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+                Network.channel.sendTo(new ClientLoginMessage(SHDifficulty.areaMode(), (float) SHDifficulty.maxValue()), player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
             }
         }
     }

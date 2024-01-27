@@ -213,7 +213,7 @@ curseforge {
 //            }
         }
         options {
-            debug = false
+            debug = true
         }
     }
 }
